@@ -1,0 +1,51 @@
+{
+  "vessels": [
+    {
+      "name": "GANTRY",
+      "hull": "FFG-01",
+      "role": "Development yard / workstation",
+      "status": "STANDBY",
+      "mission": "Builds repo changes and Codex tasks",
+      "signal": "Codex bounded"
+    },
+    {
+      "name": "GRANITE",
+      "hull": "DDG-02",
+      "role": "Engine-room server",
+      "status": "ONLINE",
+      "mission": "Serves Monad over LAN",
+      "signal": "Caddy verified / HTTP 200"
+    },
+    {
+      "name": "ROCK64",
+      "hull": "PG-03",
+      "role": "Public edge / harbor gate",
+      "status": "ONLINE",
+      "mission": "Publishes Monad to outside world",
+      "signal": "Public /monad confirmed"
+    },
+    {
+      "name": "SIGNAL",
+      "hull": "AUX-04",
+      "role": "Music workstation / audio deck",
+      "status": "DOCKED",
+      "mission": "Logic, music systems, future Flight Recorder Box",
+      "signal": "Awaiting tasking"
+    },
+    {
+      "name": "MONAD",
+      "hull": "FLAGSHIP",
+      "role": "Cognitive operations vessel",
+      "status": "FORMING",
+      "mission": "Coordinate human intent, machines, memory, agents, and artifacts",
+      "signal": "Public live"
+    }
+  ],
+  "missions": [
+    "Public web check confirmed",
+    "Gemini CLI read-only boarding trial",
+    "Codex deploy-doctrine patch under review",
+    "OpenClaw held as reference architecture only",
+    "Admiral Bot / blog / Flight Recorder ideas in design space"
+  ]
+}

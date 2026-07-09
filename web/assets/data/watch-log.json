@@ -1,0 +1,67 @@
+[
+  {
+    "date": "2026-07-08",
+    "watch": "0600 Granite Deployment Watch",
+    "station": "Captains",
+    "tags": ["Captains", "Deployment", "Granite"],
+    "path": "logs/captains/2026/2026-07-08_granite-deployment-watch.md",
+    "summary": "Granite serves: the Monad repo was cloned, web/ deployed to /var/www/monad, Caddy validated and reloaded, and the homepage was confirmed live on the LAN.",
+    "signals": [
+      "Repo cloned at ~/dev/monad",
+      "web/ deployed to /var/www/monad",
+      "curl returned HTTP 200"
+    ]
+  },
+  {
+    "date": "2026-07-06",
+    "watch": "Morning Watch",
+    "station": "Captains",
+    "tags": ["Captains", "Doctrine", "Campaign 0"],
+    "path": "logs/captains/2026/2026-07-06_watch-morning.md",
+    "summary": "Captain watch preserving the ancestral fleet telemetry, codifying logging doctrine, and establishing the public-facing visual identity for Monad.",
+    "signals": [
+      "Logging doctrine codified",
+      "Telemetry secured",
+      "Campaign 0 structure clarified"
+    ]
+  },
+  {
+    "date": "2026-07-06",
+    "watch": "Campaign 0 Checkpoint",
+    "station": "Admirals",
+    "tags": ["Admirals", "Doctrine", "Campaign 0"],
+    "path": "logs/admirals/2026/2026-07-06_campaign-0-checkpoint.md",
+    "summary": "Admiralty checkpoint for Campaign 0, recording the strategic state of the fleet and the next operational constraints.",
+    "signals": [
+      "Campaign checkpoint recorded",
+      "Strategic continuity preserved",
+      "Fleet direction maintained"
+    ]
+  },
+  {
+    "date": "2026-07-06",
+    "watch": "V1 Maiden Voyage",
+    "station": "Helmsman",
+    "tags": ["Helmsman", "Memory", "Doctrine"],
+    "path": "logs/agents/helmsman/2026/2026-07-06_v1-maiden-voyage.md",
+    "summary": "First-person Helmsman V1 retrospective preserved as historical source material for the fleet memory.",
+    "signals": [
+      "Agent retrospective preserved",
+      "Procedural dignity established",
+      "Memory handoff protected"
+    ]
+  },
+  {
+    "date": "2026-07-06",
+    "watch": "Gemini Crossbrief",
+    "station": "Captains",
+    "tags": ["Captains", "Memory", "Doctrine"],
+    "path": "logs/logs/captains/2026/2026-07-06_gemini-crossbrief.md",
+    "summary": "Crossbrief preserving Gemini-side context and operational alignment for the Captain watch record.",
+    "signals": [
+      "Cross-model context retained",
+      "Captain record extended",
+      "Doctrine continuity reinforced"
+    ]
+  }
+]

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MONAD FLEET COMMAND</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/fleet.css">
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <main class="fleet-command-shell">
+      <section class="fleet-command-header panel">
+        <div>
+          <p class="eyebrow">Public Operations Plot / Fleet v0.1</p>
+          <h1>MONAD FLEET COMMAND</h1>
+          <p class="fleet-subtitle">Ships at sea. Signals received. The watch continues.</p>
+        </div>
+        <div class="command-status-grid">
+          <div class="command-status primary">
+            <span>Status</span>
+            <strong>PUBLIC LIVE</strong>
+          </div>
+          <div class="command-status">
+            <span>Current Watch</span>
+            <strong>0800+ / Watch successful</strong>
+          </div>
+          <div class="command-status">
+            <span>Conn</span>
+            <strong>Lt. cgl relieved</strong>
+          </div>
+          <div class="command-status">
+            <span>Captain T</span>
+            <strong>Holding continuity</strong>
+          </div>
+          <div class="command-status">
+            <span>Captain G</span>
+            <strong>Records</strong>
+          </div>
+        </div>
+        <p class="doctrine-line">Git is truth. Granite serves. Rock64 guards the harbor.</p>
+        <nav class="fleet-nav" aria-label="Fleet navigation">
+          <a class="console-button" href="index.html">Bridge</a>
+          <a class="console-button secondary" href="logs.html">Ship's Log</a>
+        </nav>
+      </section>
+
+      <section class="tactical-plot panel">
+        <div class="section-head">
+          <span class="anchor-mark">P</span>
+          <h2>Ocean / Tactical Plot</h2>
+        </div>
+        <div class="plot-grid" id="plotGrid" aria-label="Fleet tactical plot"></div>
+      </section>
+
+      <section class="roster-panel panel">
+        <div class="section-head">
+          <span class="anchor-mark">R</span>
+          <h2>Vessel Roster</h2>
+        </div>
+        <div class="roster-table-wrap">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Vessel</th>
+                <th>Hull</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Current Mission</th>
+                <th>Last Signal</th>
+              </tr>
+            </thead>
+            <tbody id="rosterBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="missions-panel panel">
+        <div class="section-head">
+          <span class="anchor-mark">M</span>
+          <h2>Active Missions</h2>
+        </div>
+        <ul class="mission-list" id="missionList"></ul>
+      </section>
+
+      <section class="watch-tail-panel panel">
+        <div class="section-head">
+          <span class="anchor-mark">W</span>
+          <h2>Watch Log Tail</h2>
+        </div>
+        <div class="watch-tail">
+          <p><span>0800</span> Monad officially live.</p>
+          <p><span>0800 Supplemental</span> Crushed it.</p>
+          <p><span>Public route</span> Confirmed at cameronlampley.com/monad.</p>
+          <p><span>Doctrine</span> Granite serves. Rock64 guards the harbor. Git remembers.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="doctrine-ticker" aria-label="Doctrine ticker">
+      <div>
+        <span>Git is truth.</span>
+        <span>Drive carries cargo.</span>
+        <span>Qdrant indexes memory.</span>
+        <span>Chat produces ore.</span>
+        <span>Logs become record.</span>
+        <span>Docs become doctrine.</span>
+        <span>No agent gets the conn by implication.</span>
+      </div>
+    </footer>
+
+    <script src="assets/js/fleet.js"></script>
+  </body>
+</html>

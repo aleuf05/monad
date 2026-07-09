@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Ship's Log</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <main class="bridge-shell log-shell">
+      <section class="hero panel log-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Archive Deck / Memory Online</p>
+          <h1>SHIP'S LOG</h1>
+          <p class="tagline">The record persists</p>
+          <p class="subline">Doctrine remembers what the watch survived.</p>
+          <div class="command-row">
+            <a class="console-button" href="index.html">Return Bridge</a>
+            <button class="console-button secondary" type="button" data-log-filter="all">All Logs</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel archive-control">
+        <div class="section-head">
+          <span class="anchor-mark">L</span>
+          <h2>Watch Archive</h2>
+        </div>
+        <div class="archive-toolbar" role="group" aria-label="Filter ship logs">
+          <button class="priority-chip is-active" type="button" data-log-filter="all">All</button>
+          <button class="priority-chip" type="button" data-log-filter="Admirals">Admirals</button>
+          <button class="priority-chip" type="button" data-log-filter="Captains">Captains</button>
+          <button class="priority-chip" type="button" data-log-filter="Helmsman">Helmsman</button>
+          <button class="priority-chip" type="button" data-log-filter="Deployment">Deployment</button>
+          <button class="priority-chip" type="button" data-log-filter="Doctrine">Doctrine</button>
+        </div>
+        <div class="archive-summary" aria-live="polite">
+          <p class="label">Archive Signal</p>
+          <p id="archiveSignal">Loading watch archive.</p>
+        </div>
+      </section>
+
+      <section class="panel archive-list-panel">
+        <div id="archiveList" class="archive-list" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="status-bar">
+      <span><b>Archive:</b> Static JSON</span>
+      <span><b>Source:</b> Repo Logs</span>
+      <span><b>Protocol:</b> Append + Preserve</span>
+    </footer>
+
+    <script src="assets/js/watch-log-data.js"></script>
+    <script src="assets/js/logs.js"></script>
+  </body>
+</html>

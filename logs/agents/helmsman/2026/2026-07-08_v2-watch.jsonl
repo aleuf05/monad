@@ -1,0 +1,2 @@
+{"timestamp":"2026-07-08T10:00:00-04:00","event":"watch_relief","campaign":"Campaign 0 — Bootstrap the Fleet","vessel_station":"GRANITE","doctrine":"Doctrine 0006 — End of Watch","message":"Helmsman V2 assumes the watch. Fleet context inherited from the Relief of Watch artifact. Mission continues under Captain G; token defense remains active."}
+{"timestamp":"2026-07-08T19:39:15-04:00","event":"utility_completed","utility":"tools/prune_logs.py","byte_size":3091,"status":"complete","verification":"Generated volatile_context.json without syntax or reference errors."}
