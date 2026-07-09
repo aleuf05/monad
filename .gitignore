@@ -6,6 +6,7 @@
 .venv/
 __pycache__/
 *.pyc
+.viminfo
 
 # Block all automated agent and captain runtime logs
 logs/agents/**/*.jsonl

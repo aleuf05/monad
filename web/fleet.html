@@ -4,8 +4,150 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MONAD FLEET COMMAND</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    >
     <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/fleet.css">
+    <link rel="stylesheet" href="assets/css/fleet.css?v=2">
+    <style>
+      .fleet-command-shell {
+        margin-bottom: 128px;
+      }
+
+      .map-command-bar {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+      }
+
+      .map-mode-control {
+        min-width: 214px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+        padding: 6px;
+        margin: 0;
+        border: 1px solid rgba(53, 200, 255, 0.38);
+        border-radius: 8px;
+        background: rgba(1, 8, 17, 0.84);
+      }
+
+      .map-mode-control legend {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+      }
+
+      .map-mode-control input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .map-mode-control label {
+        min-height: 38px;
+        display: grid;
+        place-items: center;
+        padding: 7px 10px;
+        border: 1px solid transparent;
+        border-radius: 5px;
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .map-mode-control input:checked + label {
+        border-color: rgba(53, 255, 210, 0.62);
+        color: #e9fbff;
+        background: rgba(53, 255, 210, 0.12);
+        box-shadow: inset 0 0 15px rgba(53, 255, 210, 0.08);
+      }
+
+      .map-mode-control input:focus-visible + label {
+        outline: 2px solid #ffffff;
+        outline-offset: 2px;
+      }
+
+      .fleet-map.map-mode-tactical .leaflet-tile-pane {
+        filter: brightness(1.2) contrast(1.1) saturate(0.9);
+      }
+
+      .fleet-map.map-mode-chart .leaflet-tile-pane {
+        filter: none;
+      }
+
+      .roster-panel {
+        padding-bottom: clamp(30px, 4vw, 48px);
+      }
+
+      .roster-table-wrap {
+        border-color: rgba(241, 183, 79, 0.72);
+        background: rgba(1, 8, 17, 0.86);
+        box-shadow: inset 0 0 24px rgba(53, 200, 255, 0.05);
+      }
+
+      .roster-table {
+        background: rgba(1, 8, 17, 0.72);
+      }
+
+      .roster-table th {
+        border-color: rgba(241, 183, 79, 0.56);
+        color: #ffe1a3;
+        background: rgba(241, 183, 79, 0.1);
+        font-weight: 700;
+      }
+
+      .roster-table td {
+        border-color: rgba(53, 200, 255, 0.28);
+        color: #e9f8ff;
+        font-weight: 500;
+      }
+
+      .roster-table tbody tr:nth-child(even) td {
+        background: rgba(53, 200, 255, 0.045);
+      }
+
+      .roster-table tbody tr:hover td {
+        background: rgba(53, 200, 255, 0.1);
+      }
+
+      @media (max-width: 1180px) {
+        .map-command-bar {
+          grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .map-status-panel {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 680px) {
+        .fleet-command-shell {
+          margin-bottom: 24px;
+        }
+
+        .map-command-bar {
+          grid-template-columns: 1fr;
+        }
+
+        .map-status-panel {
+          grid-column: auto;
+        }
+
+        .map-mode-control,
+        .ais-toggle {
+          width: 100%;
+          min-width: 0;
+        }
+      }
+    </style>
   </head>
   <body>
     <div class="stars" aria-hidden="true"></div>
@@ -42,7 +184,7 @@
         </div>
         <p class="doctrine-line">Git is truth. Granite serves. Rock64 guards the harbor.</p>
         <nav class="fleet-nav" aria-label="Fleet navigation">
-          <a class="console-button" href="index.html">Bridge</a>
+          <a class="console-button" href="bridge.html">Bridge</a>
           <a class="console-button secondary" href="logs.html">Ship's Log</a>
         </nav>
       </section>
@@ -50,9 +192,92 @@
       <section class="tactical-plot panel">
         <div class="section-head">
           <span class="anchor-mark">P</span>
-          <h2>Ocean / Tactical Plot</h2>
+          <h2>Fleet Map / Tactical Plot</h2>
         </div>
-        <div class="plot-grid" id="plotGrid" aria-label="Fleet tactical plot"></div>
+        <div class="map-command-bar" aria-label="Fleet map status">
+          <dl class="map-status-panel">
+            <div>
+              <dt>AO</dt>
+              <dd id="aoStatus">Strait of Hormuz</dd>
+            </div>
+            <div>
+              <dt>Conn</dt>
+              <dd id="connStatus">Captain T</dd>
+            </div>
+            <div>
+              <dt>Watch</dt>
+              <dd id="watchStatus">Persistent</dd>
+            </div>
+            <div>
+              <dt>AIS</dt>
+              <dd id="aisStatus">ON</dd>
+            </div>
+          </dl>
+          <fieldset class="map-mode-control" aria-label="Map display mode">
+            <legend>Map display mode</legend>
+            <input id="modeTactical" name="mapMode" type="radio" value="tactical" checked>
+            <label for="modeTactical">Tactical</label>
+            <input id="modeChart" name="mapMode" type="radio" value="chart">
+            <label for="modeChart">Chart</label>
+          </fieldset>
+          <label class="ais-toggle" for="aisToggle">
+            <span>AIS TRANSPONDER</span>
+            <input id="aisToggle" type="checkbox" checked>
+            <span class="toggle-track" aria-hidden="true">
+              <span class="toggle-knob"></span>
+            </span>
+          </label>
+        </div>
+        <div class="map-frame">
+          <div
+            id="fleetMap"
+            class="fleet-map"
+            role="application"
+            aria-label="Simulated Monad fleet map centered on the Strait of Hormuz"
+          ></div>
+          <aside
+            id="contactPanel"
+            class="contact-panel"
+            aria-labelledby="contactName"
+            hidden
+          >
+            <div class="contact-panel-head">
+              <div>
+                <p id="contactType" class="label">Fleet contact</p>
+                <h3 id="contactName">Contact</h3>
+              </div>
+              <button
+                id="closeContact"
+                class="contact-close"
+                type="button"
+                title="Close contact details"
+                aria-label="Close contact details"
+              >×</button>
+            </div>
+            <dl class="contact-detail-grid">
+              <div>
+                <dt>Role</dt>
+                <dd id="contactRole">—</dd>
+              </div>
+              <div>
+                <dt>Status</dt>
+                <dd id="contactStatus">—</dd>
+              </div>
+              <div>
+                <dt>Position</dt>
+                <dd id="contactPosition">—</dd>
+              </div>
+              <div>
+                <dt>Last Signal</dt>
+                <dd id="contactSignal">—</dd>
+              </div>
+            </dl>
+            <button id="centerContact" class="contact-center" type="button">
+              Center Map
+            </button>
+          </aside>
+          <p class="map-data-note">SIMULATED POSITIONS / NO LIVE AIS DATA</p>
+        </div>
       </section>
 
       <section class="roster-panel panel">
@@ -111,6 +336,77 @@
       </div>
     </footer>
 
-    <script src="assets/js/fleet.js"></script>
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="assets/js/fleet.js?v=3"></script>
+    <script>
+      (() => {
+        const modes = {
+          tactical: {
+            url: "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            options: {
+              subdomains: "abcd",
+              maxZoom: 20,
+              attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+            }
+          },
+          chart: {
+            url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            options: {
+              maxZoom: 19,
+              attribution: "&copy; OpenStreetMap contributors"
+            }
+          }
+        };
+
+        let activeBaseLayer = null;
+
+        function selectedMode() {
+          return document.querySelector('input[name="mapMode"]:checked').value;
+        }
+
+        function setMapMode(modeName) {
+          if (!fleetMap || !modes[modeName]) {
+            return;
+          }
+
+          if (activeBaseLayer) {
+            fleetMap.removeLayer(activeBaseLayer);
+          }
+
+          activeBaseLayer = L.tileLayer(
+            modes[modeName].url,
+            modes[modeName].options
+          ).addTo(fleetMap);
+
+          const mapElement = document.querySelector("#fleetMap");
+          mapElement.classList.toggle("map-mode-tactical", modeName === "tactical");
+          mapElement.classList.toggle("map-mode-chart", modeName === "chart");
+        }
+
+        function initializeMapModes() {
+          if (typeof fleetMap === "undefined" || !fleetMap) {
+            window.setTimeout(initializeMapModes, 50);
+            return;
+          }
+
+          fleetMap.eachLayer((layer) => {
+            if (layer instanceof L.TileLayer) {
+              fleetMap.removeLayer(layer);
+            }
+          });
+
+          setMapMode(selectedMode());
+          document.querySelectorAll('input[name="mapMode"]').forEach((control) => {
+            control.addEventListener("change", () => setMapMode(control.value));
+          });
+        }
+
+        initializeMapModes();
+      })();
+    </script>
   </body>
 </html>

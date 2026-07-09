@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Fleet Motion Toy</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    >
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="command-bar">
+      <div>
+        <p class="eyebrow">Standalone Navigation Experiment</p>
+        <h1>Monad Fleet Motion</h1>
+      </div>
+      <p class="instruction">Select any point on the map to set course.</p>
+    </header>
+
+    <main class="map-shell">
+      <div
+        id="map"
+        role="application"
+        aria-label="Interactive fleet motion map"
+      ></div>
+
+      <aside class="status-panel" aria-labelledby="statusHeading">
+        <div class="status-heading">
+          <div>
+            <p class="eyebrow">Flagship Telemetry</p>
+            <h2 id="statusHeading">MONAD</h2>
+          </div>
+          <span id="motionStatus" class="motion-status">Holding</span>
+        </div>
+
+        <p class="navigation-warning">Navigation v0.2 uses direct routes and may cross land.</p>
+
+        <dl class="telemetry-grid">
+          <div>
+            <dt>Current Position</dt>
+            <dd id="currentPosition">--</dd>
+          </div>
+          <div>
+            <dt>Destination</dt>
+            <dd id="destinationPosition">No course set</dd>
+          </div>
+          <div>
+            <dt>Speed</dt>
+            <dd id="speedValue">180 km/h sim</dd>
+          </div>
+          <div>
+            <dt>Time Warp</dt>
+            <dd id="warpValue">1x</dd>
+          </div>
+          <div>
+            <dt>Distance / ETA</dt>
+            <dd id="distanceValue">--</dd>
+          </div>
+        </dl>
+
+        <div class="time-warp" aria-label="Simulation speed controls">
+          <button class="warp-button" type="button" data-warp="0">Pause</button>
+          <button class="warp-button active" type="button" data-warp="1">1x</button>
+          <button class="warp-button" type="button" data-warp="10">10x</button>
+          <button class="warp-button" type="button" data-warp="100">100x</button>
+        </div>
+
+        <div class="controls">
+          <button id="pauseButton" type="button" disabled>Pause</button>
+          <button id="homeButton" type="button">Return to Hormuz</button>
+          <button id="resetButton" class="secondary" type="button">Reset Fleet</button>
+        </div>
+
+        <section class="ship-panel" aria-labelledby="shipInfoHeading">
+          <div class="panel-title-row">
+            <p class="eyebrow">Selected Ship</p>
+            <h3 id="shipInfoHeading">MONAD</h3>
+          </div>
+          <dl class="ship-details">
+            <div>
+              <dt>Position</dt>
+              <dd id="shipPosition">--</dd>
+            </div>
+            <div>
+              <dt>Speed</dt>
+              <dd id="shipSpeed">--</dd>
+            </div>
+            <div>
+              <dt>Heading</dt>
+              <dd id="shipHeading">--</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd id="shipStatus">Holding</dd>
+            </div>
+            <div>
+              <dt>Destination</dt>
+              <dd id="shipDestination">No course set</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section class="captains-log" aria-labelledby="captainsLogHeading">
+          <div class="panel-title-row">
+            <p class="eyebrow">Captain's Log</p>
+            <h3 id="captainsLogHeading">Recent Events</h3>
+          </div>
+          <ol id="captainsLog"></ol>
+        </section>
+      </aside>
+
+      <p class="simulation-note">SIMULATED POSITIONS / NOT FOR NAVIGATION</p>
+    </main>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="app.js?v=1"></script>
+  </body>
+</html>

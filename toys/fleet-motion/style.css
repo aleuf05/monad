@@ -1,0 +1,444 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", Arial, sans-serif;
+  --navy: #071a28;
+  --navy-soft: #0d2b3c;
+  --cyan: #25d9e8;
+  --gold: #e8b95d;
+  --paper: #eef7f8;
+  --muted: #9ab5bd;
+  --panel-line: rgba(37, 217, 232, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  color: var(--paper);
+  background: var(--navy);
+}
+
+.command-bar {
+  position: relative;
+  z-index: 1000;
+  min-height: 86px;
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px clamp(18px, 3vw, 38px);
+  border-bottom: 1px solid rgba(232, 185, 93, 0.58);
+  background: var(--navy);
+  box-shadow: 0 6px 24px rgba(7, 26, 40, 0.24);
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--gold);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  color: #ffffff;
+  font-size: clamp(1.45rem, 3vw, 2.35rem);
+}
+
+.instruction {
+  margin: 0;
+  color: #cce4e8;
+  font-size: 0.9rem;
+}
+
+.map-shell {
+  position: relative;
+  min-height: 0;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  min-height: 540px;
+  background: #b8d7df;
+}
+
+.status-panel {
+  position: absolute;
+  z-index: 800;
+  top: 18px;
+  right: 18px;
+  width: min(360px, calc(100% - 36px));
+  padding: 18px;
+  border: 1px solid rgba(37, 217, 232, 0.72);
+  border-radius: 8px;
+  background: rgba(7, 26, 40, 0.94);
+  box-shadow: 0 12px 34px rgba(7, 26, 40, 0.3);
+  backdrop-filter: blur(8px);
+}
+
+.status-heading {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(37, 217, 232, 0.25);
+}
+
+.status-heading h2 {
+  color: #ffffff;
+  font-size: 1.45rem;
+}
+
+.motion-status {
+  padding: 6px 9px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  background: rgba(232, 185, 93, 0.1);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.motion-status.underway {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(37, 217, 232, 0.1);
+}
+
+.motion-status.arrived {
+  border-color: #7bf2a2;
+  color: #7bf2a2;
+  background: rgba(123, 242, 162, 0.1);
+}
+
+.navigation-warning {
+  margin: 12px 0 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(232, 185, 93, 0.42);
+  border-radius: 5px;
+  color: #ffe2a4;
+  background: rgba(232, 185, 93, 0.08);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.telemetry-grid div {
+  min-width: 0;
+}
+
+.telemetry-grid dt {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.telemetry-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.time-warp {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  margin: 0 0 10px;
+}
+
+.warp-button {
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 1px solid rgba(154, 181, 189, 0.35);
+  border-radius: 5px;
+  color: #d8edef;
+  background: rgba(154, 181, 189, 0.08);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.warp-button:hover,
+.warp-button:focus-visible,
+.warp-button.active {
+  border-color: var(--cyan);
+  color: #ffffff;
+  background: rgba(37, 217, 232, 0.18);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.controls button {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid rgba(37, 217, 232, 0.55);
+  border-radius: 5px;
+  color: #ffffff;
+  background: rgba(37, 217, 232, 0.12);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.controls button:hover,
+.controls button:focus-visible {
+  border-color: var(--cyan);
+  background: rgba(37, 217, 232, 0.2);
+}
+
+.controls button:disabled {
+  border-color: rgba(154, 181, 189, 0.28);
+  color: #718b93;
+  background: rgba(154, 181, 189, 0.05);
+  cursor: not-allowed;
+}
+
+.controls .secondary {
+  grid-column: 1 / -1;
+  border-color: rgba(232, 185, 93, 0.58);
+  background: rgba(232, 185, 93, 0.1);
+}
+
+.ship-panel,
+.captains-log {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--panel-line);
+}
+
+.panel-title-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.panel-title-row h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  text-align: right;
+}
+
+.ship-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px 12px;
+  margin: 10px 0 0;
+}
+
+.ship-details dt {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ship-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #ffffff;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.ship-details div:last-child {
+  grid-column: 1 / -1;
+}
+
+.captains-log ol {
+  max-height: 132px;
+  margin: 10px 0 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.captains-log li {
+  padding: 7px 0;
+  border-top: 1px solid rgba(154, 181, 189, 0.14);
+  color: #d9ebee;
+  font-size: 0.76rem;
+  line-height: 1.35;
+}
+
+.captains-log time {
+  display: inline-block;
+  min-width: 66px;
+  color: var(--gold);
+  font-family: Consolas, "Courier New", monospace;
+}
+
+.simulation-note {
+  position: absolute;
+  z-index: 700;
+  right: 18px;
+  bottom: 18px;
+  padding: 7px 9px;
+  margin: 0;
+  border: 1px solid rgba(7, 26, 40, 0.36);
+  border-radius: 4px;
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.88);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.fleet-dot {
+  background: none;
+  border: 0;
+}
+
+.ship-dot {
+  position: relative;
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--navy);
+  box-shadow: 0 0 0 3px rgba(7, 26, 40, 0.42), 0 0 16px rgba(7, 26, 40, 0.45);
+}
+
+.ship-dot::after {
+  width: 7px;
+  height: 7px;
+  content: "";
+  border-radius: 50%;
+  background: var(--cyan);
+}
+
+.ship-dot.flagship {
+  width: 32px;
+  height: 32px;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.5), 0 0 20px rgba(232, 185, 93, 0.62);
+}
+
+.ship-dot.flagship::after {
+  width: 10px;
+  height: 10px;
+  background: var(--gold);
+}
+
+.ship-dot.selected {
+  transform: scale(1.16);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.5), 0 0 24px rgba(37, 217, 232, 0.8);
+}
+
+.leaflet-interactive.fleet-trail {
+  filter: drop-shadow(0 0 4px rgba(37, 217, 232, 0.45));
+}
+
+.leaflet-tooltip {
+  border: 1px solid rgba(7, 26, 40, 0.3);
+  color: var(--navy);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 12px rgba(7, 26, 40, 0.16);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  body {
+    overflow: auto;
+  }
+
+  .command-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .map-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #map {
+    height: 56vh;
+    min-height: 400px;
+  }
+
+  .status-panel {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: auto;
+    border-width: 1px 0 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .simulation-note {
+    top: 12px;
+    right: 10px;
+    bottom: auto;
+    max-width: calc(100% - 66px);
+  }
+}
+
+@media (max-width: 420px) {
+  .telemetry-grid,
+  .ship-details,
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .time-warp {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .controls .secondary {
+    grid-column: auto;
+  }
+
+  .ship-details div:last-child {
+    grid-column: auto;
+  }
+}

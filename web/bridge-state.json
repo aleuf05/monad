@@ -1,0 +1,39 @@
+{
+  "watch": {
+    "name": "Morning Watch",
+    "local_time": "0744",
+    "conn": "Lt. cgl",
+    "captain": "Captain T / Gemini",
+    "mode": "Cameron Brain"
+  },
+  "mission": {
+    "title": "Website Sprint / Bridge v0.1",
+    "status": "In Progress",
+    "intent": "Create a shared operational picture so Monad is less dependent on Cameron's memory as glue.",
+    "definition_of_done": "Bridge page loads, displays current state, and can be updated by editing bridge-state.json."
+  },
+  "current_task": "Test doctrine-add.py and prepare Bridge v0.1 implementation.",
+  "waiting_on": [
+    "Lt. cgl approval",
+    "Codex implementation report",
+    "Breakfast with Mama at 0800"
+  ],
+  "artifacts": [
+    "Fleet Map page",
+    "Gantry dev server",
+    "Doctrine Add tool",
+    "Doctrine 014 Adaptive Cognition draft"
+  ],
+  "next_orders": [
+    "Test scripts/doctrine-add.py",
+    "Run local dev server",
+    "Review bridge.html",
+    "Commit if acceptable"
+  ],
+  "ship_status": {
+    "ao": "Strait of Hormuz / Persian Gulf",
+    "website": "Dev server online on Gantry",
+    "deployment": "Pending Granite/Caddy deploy",
+    "cognition_mode": "Cameron Brain"
+  }
+}

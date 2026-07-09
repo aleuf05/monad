@@ -1,0 +1,92 @@
+{
+  "map": {
+    "center": [26.56, 56.25],
+    "zoom": 6,
+    "status": {
+      "ao": "Strait of Hormuz",
+      "conn": "Captain T",
+      "watch": "Persistent"
+    }
+  },
+  "markers": [
+    {
+      "id": "monad",
+      "name": "MONAD FLAGSHIP",
+      "type": "flagship",
+      "position": [26.32, 56.05],
+      "status": "FORMING",
+      "detail": "Cognitive operations vessel",
+      "signal": "AIS simulated"
+    },
+    {
+      "id": "gantry",
+      "name": "GANTRY",
+      "type": "vessel",
+      "position": [25.68, 55.18],
+      "status": "STANDBY",
+      "detail": "Development yard / workstation",
+      "signal": "Codex bounded"
+    },
+    {
+      "id": "granite",
+      "name": "GRANITE",
+      "type": "vessel",
+      "position": [26.08, 56.84],
+      "status": "ONLINE",
+      "detail": "Engine-room server",
+      "signal": "Caddy verified"
+    },
+    {
+      "id": "hormuz",
+      "name": "STRAIT OF HORMUZ",
+      "type": "station",
+      "position": [26.56, 56.25],
+      "status": "WATCHLIST",
+      "detail": "Area of operations",
+      "signal": "Passage monitored"
+    },
+    {
+      "id": "persian-gulf",
+      "name": "PERSIAN GULF",
+      "type": "area",
+      "position": [26.72, 52.62],
+      "status": "WATCHLIST",
+      "detail": "Regional operating area",
+      "signal": "Simulated theater marker"
+    }
+  ],
+  "vessels": [
+    {
+      "id": "gantry",
+      "name": "GANTRY",
+      "hull": "FFG-01",
+      "role": "Development yard / workstation",
+      "status": "STANDBY",
+      "mission": "Builds repo changes and Codex tasks",
+      "signal": "Codex bounded"
+    },
+    {
+      "id": "granite",
+      "name": "GRANITE",
+      "hull": "DDG-02",
+      "role": "Engine-room server",
+      "status": "ONLINE",
+      "mission": "Serves Monad over LAN",
+      "signal": "Caddy verified / HTTP 200"
+    },
+    {
+      "id": "monad",
+      "name": "MONAD",
+      "hull": "FLAGSHIP",
+      "role": "Cognitive operations vessel",
+      "status": "FORMING",
+      "mission": "Coordinates intent, machines, memory, agents, and artifacts",
+      "signal": "Public live"
+    }
+  ],
+  "missions": [
+    "Fleet Map MVP commissioned",
+    "Simulated Strait of Hormuz watch active",
+    "Live AIS integration held for future review"
+  ]
+}

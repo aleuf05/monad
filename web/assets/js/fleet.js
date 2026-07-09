@@ -1,6 +1,63 @@
 const fallbackFleet = {
+  map: {
+    center: [26.56, 56.25],
+    zoom: 6,
+    status: {
+      ao: "Strait of Hormuz",
+      conn: "Captain T",
+      watch: "Persistent"
+    }
+  },
+  markers: [
+    {
+      id: "monad",
+      name: "MONAD FLAGSHIP",
+      type: "flagship",
+      position: [26.32, 56.05],
+      status: "FORMING",
+      detail: "Cognitive operations vessel",
+      signal: "AIS simulated"
+    },
+    {
+      id: "gantry",
+      name: "GANTRY",
+      type: "vessel",
+      position: [25.68, 55.18],
+      status: "STANDBY",
+      detail: "Development yard / workstation",
+      signal: "Codex bounded"
+    },
+    {
+      id: "granite",
+      name: "GRANITE",
+      type: "vessel",
+      position: [26.08, 56.84],
+      status: "ONLINE",
+      detail: "Engine-room server",
+      signal: "Caddy verified"
+    },
+    {
+      id: "hormuz",
+      name: "STRAIT OF HORMUZ",
+      type: "station",
+      position: [26.56, 56.25],
+      status: "WATCHLIST",
+      detail: "Area of operations",
+      signal: "Passage monitored"
+    },
+    {
+      id: "persian-gulf",
+      name: "PERSIAN GULF",
+      type: "area",
+      position: [26.72, 52.62],
+      status: "WATCHLIST",
+      detail: "Regional operating area",
+      signal: "Simulated theater marker"
+    }
+  ],
   vessels: [
     {
+      id: "gantry",
       name: "GANTRY",
       hull: "FFG-01",
       role: "Development yard / workstation",
@@ -9,6 +66,7 @@ const fallbackFleet = {
       signal: "Codex bounded"
     },
     {
+      id: "granite",
       name: "GRANITE",
       hull: "DDG-02",
       role: "Engine-room server",
@@ -17,36 +75,19 @@ const fallbackFleet = {
       signal: "Caddy verified / HTTP 200"
     },
     {
-      name: "ROCK64",
-      hull: "PG-03",
-      role: "Public edge / harbor gate",
-      status: "ONLINE",
-      mission: "Publishes Monad to outside world",
-      signal: "Public /monad confirmed"
-    },
-    {
-      name: "SIGNAL",
-      hull: "AUX-04",
-      role: "Music workstation / audio deck",
-      status: "DOCKED",
-      mission: "Logic, music systems, future Flight Recorder Box",
-      signal: "Awaiting tasking"
-    },
-    {
+      id: "monad",
       name: "MONAD",
       hull: "FLAGSHIP",
       role: "Cognitive operations vessel",
       status: "FORMING",
-      mission: "Coordinate human intent, machines, memory, agents, and artifacts",
+      mission: "Coordinates intent, machines, memory, agents, and artifacts",
       signal: "Public live"
     }
   ],
   missions: [
-    "Public web check confirmed",
-    "Gemini CLI read-only boarding trial",
-    "Codex deploy-doctrine patch under review",
-    "OpenClaw held as reference architecture only",
-    "Admiral Bot / blog / Flight Recorder ideas in design space"
+    "Fleet Map MVP commissioned",
+    "Simulated Strait of Hormuz watch active",
+    "Live AIS integration held for future review"
   ]
 };
 
@@ -58,41 +99,211 @@ const statusClass = {
   WATCHLIST: "status-watchlist"
 };
 
-function badge(status) {
-  return `<span class="status-badge ${statusClass[status] || ""}">${status}</span>`;
+const markerLayers = new Map();
+const contactRecords = new Map();
+let fleetMap;
+let monadMarker;
+let selectedContactId;
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-function renderFleet(data) {
-  const plotGrid = document.querySelector("#plotGrid");
+function badge(status) {
+  const safeStatus = escapeHtml(status);
+  return `<span class="status-badge ${statusClass[status] || ""}">${safeStatus}</span>`;
+}
+
+function contactIcon(type) {
+  const safeType = ["flagship", "station", "area"].includes(type) ? type : "vessel";
+  return L.divIcon({
+    className: "fleet-contact-icon",
+    html: `<span class="contact-marker ${safeType}"></span>`,
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+    popupAnchor: [0, -20]
+  });
+}
+
+function popupContent(contact) {
+  return `
+    <div class="contact-popup">
+      <p class="label">${escapeHtml(contact.type)} / ${escapeHtml(contact.status)}</p>
+      <h3>${escapeHtml(contact.name)}</h3>
+      <p>${escapeHtml(contact.detail)}</p>
+      <p><strong>Signal:</strong> ${escapeHtml(contact.signal)}</p>
+      <p><strong>Position:</strong> ${contact.position.map(Number).join(", ")}</p>
+    </div>
+  `;
+}
+
+function renderStatusPanel(status) {
+  document.querySelector("#aoStatus").textContent = status.ao;
+  document.querySelector("#connStatus").textContent = status.conn;
+  document.querySelector("#watchStatus").textContent = status.watch;
+}
+
+function renderMap(data) {
+  if (typeof L === "undefined") {
+    document.querySelector("#fleetMap").textContent = "MAP SYSTEM UNAVAILABLE";
+    return;
+  }
+
+  fleetMap = L.map("fleetMap", {
+    center: data.map.center,
+    zoom: data.map.zoom,
+    minZoom: 4,
+    maxZoom: 12,
+    zoomControl: true,
+    attributionControl: true
+  });
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(fleetMap);
+
+  data.markers.forEach((contact) => {
+    contactRecords.set(contact.id, contact);
+    const marker = L.marker(contact.position, {
+      icon: contactIcon(contact.type),
+      title: contact.name,
+      alt: `${contact.name}, simulated position`
+    })
+      .bindPopup(popupContent(contact))
+      .bindTooltip(contact.name, {
+        direction: "top",
+        offset: [0, -18]
+      })
+      .addTo(fleetMap);
+
+    marker.on("click", () => selectContact(contact.id));
+    markerLayers.set(contact.id, marker);
+    if (contact.id === "monad") {
+      monadMarker = marker;
+    }
+  });
+}
+
+function renderRoster(data) {
   const rosterBody = document.querySelector("#rosterBody");
   const missionList = document.querySelector("#missionList");
 
-  plotGrid.innerHTML = data.vessels.map((vessel) => `
-    <article class="vessel-marker" data-status="${vessel.status}">
-      <p class="label">${vessel.hull}</p>
-      <h3>${vessel.name}</h3>
-      <p>${vessel.role}</p>
-      ${badge(vessel.status)}
-      <p><strong>Mission:</strong> ${vessel.mission}</p>
-      <p><strong>Signal:</strong> ${vessel.signal}</p>
-    </article>
-  `).join("");
-
   rosterBody.innerHTML = data.vessels.map((vessel) => `
-    <tr>
-      <td>${vessel.name}</td>
-      <td>${vessel.hull}</td>
-      <td>${vessel.role}</td>
+    <tr data-contact-id="${escapeHtml(vessel.id)}">
+      <td>
+        <button
+          class="roster-contact-button"
+          type="button"
+          data-select-contact="${escapeHtml(vessel.id)}"
+        >${escapeHtml(vessel.name)}</button>
+      </td>
+      <td>${escapeHtml(vessel.hull)}</td>
+      <td>${escapeHtml(vessel.role)}</td>
       <td>${badge(vessel.status)}</td>
-      <td>${vessel.mission}</td>
-      <td>${vessel.signal}</td>
+      <td>${escapeHtml(vessel.mission)}</td>
+      <td>${escapeHtml(vessel.signal)}</td>
     </tr>
   `).join("");
 
-  missionList.innerHTML = data.missions.map((mission) => `<li>${mission}</li>`).join("");
+  missionList.innerHTML = data.missions
+    .map((mission) => `<li>${escapeHtml(mission)}</li>`)
+    .join("");
+
+  rosterBody.querySelectorAll("[data-select-contact]").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectContact(button.dataset.selectContact, true);
+    });
+  });
 }
 
-fetch("status/fleet.json")
+function clearContactSelection() {
+  if (selectedContactId) {
+    markerLayers.get(selectedContactId)?.getElement()?.classList.remove("is-selected");
+    document
+      .querySelector(`tr[data-contact-id="${selectedContactId}"]`)
+      ?.classList.remove("is-selected");
+  }
+
+  selectedContactId = undefined;
+  document.querySelector("#contactPanel").hidden = true;
+}
+
+function selectContact(contactId, centerMap = false) {
+  const contact = contactRecords.get(contactId);
+  const marker = markerLayers.get(contactId);
+  if (!contact || !marker || !fleetMap.hasLayer(marker)) {
+    return;
+  }
+
+  clearContactSelection();
+  selectedContactId = contactId;
+  marker.getElement()?.classList.add("is-selected");
+  document
+    .querySelector(`tr[data-contact-id="${contactId}"]`)
+    ?.classList.add("is-selected");
+
+  document.querySelector("#contactType").textContent =
+    `${contact.type} / ${contact.status}`;
+  document.querySelector("#contactName").textContent = contact.name;
+  document.querySelector("#contactRole").textContent = contact.detail;
+  document.querySelector("#contactStatus").textContent = contact.status;
+  document.querySelector("#contactPosition").textContent =
+    contact.position.map((coordinate) => Number(coordinate).toFixed(3)).join(", ");
+  document.querySelector("#contactSignal").textContent = contact.signal;
+  document.querySelector("#contactPanel").hidden = false;
+
+  if (centerMap) {
+    centerSelectedContact();
+  }
+}
+
+function centerSelectedContact() {
+  const contact = contactRecords.get(selectedContactId);
+  if (!contact || !fleetMap) {
+    return;
+  }
+  fleetMap.flyTo(contact.position, Math.max(fleetMap.getZoom(), 8), {
+    duration: 0.6
+  });
+}
+
+function setAisState(enabled) {
+  const status = document.querySelector("#aisStatus");
+  status.textContent = enabled ? "ON" : "OFF";
+
+  if (!fleetMap || !monadMarker) {
+    return;
+  }
+  if (enabled && !fleetMap.hasLayer(monadMarker)) {
+    monadMarker.addTo(fleetMap);
+  }
+  if (!enabled && fleetMap.hasLayer(monadMarker)) {
+    fleetMap.removeLayer(monadMarker);
+    if (selectedContactId === "monad") {
+      clearContactSelection();
+    }
+  }
+}
+
+function renderFleet(data) {
+  renderStatusPanel(data.map.status);
+  renderMap(data);
+  renderRoster(data);
+
+  const aisToggle = document.querySelector("#aisToggle");
+  setAisState(aisToggle.checked);
+  aisToggle.addEventListener("change", () => setAisState(aisToggle.checked));
+  document.querySelector("#closeContact").addEventListener("click", clearContactSelection);
+  document.querySelector("#centerContact").addEventListener("click", centerSelectedContact);
+}
+
+fetch("fleet.json?v=2")
   .then((response) => {
     if (!response.ok) {
       throw new Error(`Fleet status unavailable: ${response.status}`);

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Bridge</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/bridge.css">
+  </head>
+  <body class="bridge-page">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <header class="bridge-topbar">
+      <div>
+        <p class="eyebrow">Current Operational Picture</p>
+        <h1>Monad Bridge</h1>
+      </div>
+      <nav class="bridge-nav" aria-label="Monad navigation">
+        <a class="console-button secondary" href="index.html">Home</a>
+        <a class="console-button secondary" href="fleet.html">Fleet Command</a>
+        <a class="console-button secondary" href="logs.html">Ship's Log</a>
+      </nav>
+    </header>
+
+    <main class="bridge-shell">
+      <p id="bridgeError" class="bridge-error" role="status" hidden></p>
+
+      <section class="bridge-command" aria-labelledby="commandHeading">
+        <div class="section-head">
+          <span class="anchor-mark">B</span>
+          <div>
+            <p class="label">Officer of the Deck</p>
+            <h2 id="commandHeading">Command Status</h2>
+          </div>
+          <span id="missionStatus" class="bridge-status-badge">Loading</span>
+        </div>
+        <dl class="bridge-command-grid">
+          <div>
+            <dt>Conn</dt>
+            <dd id="connValue">Loading</dd>
+          </div>
+          <div>
+            <dt>Watch</dt>
+            <dd id="watchValue">Loading</dd>
+          </div>
+          <div>
+            <dt>Mission</dt>
+            <dd id="missionValue">Loading</dd>
+          </div>
+          <div>
+            <dt>Mode</dt>
+            <dd id="modeValue">Loading</dd>
+          </div>
+        </dl>
+        <p class="bridge-watchline">
+          <span>Local watch time</span>
+          <strong id="watchTime">----</strong>
+          <span>Captain</span>
+          <strong id="captainValue">Loading</strong>
+        </p>
+      </section>
+
+      <section class="brain-panel" aria-labelledby="brainHeading">
+        <div class="brain-signal" aria-hidden="true">CB</div>
+        <div>
+          <p class="label">Active Integration Layer</p>
+          <h2 id="brainHeading">Cameron Brain Mode</h2>
+          <p>
+            The human operator is currently acting as context router, scheduler,
+            and integration layer.
+          </p>
+          <p>
+            The goal is to move active items from Cameron Brain into tasks,
+            doctrine, logs, or durable artifacts.
+          </p>
+        </div>
+      </section>
+
+      <section class="bridge-panel mission-intent" aria-labelledby="intentHeading">
+        <div class="section-head">
+          <span class="anchor-mark">I</span>
+          <h2 id="intentHeading">Mission Intent</h2>
+        </div>
+        <p id="missionIntent" class="intent-copy">Loading operational state.</p>
+        <div class="definition-line">
+          <span>Definition of Done</span>
+          <p id="definitionValue">Loading</p>
+        </div>
+      </section>
+
+      <section class="bridge-panel current-task" aria-labelledby="taskHeading">
+        <div class="section-head">
+          <span class="anchor-mark">T</span>
+          <h2 id="taskHeading">Current Task</h2>
+        </div>
+        <p id="currentTask" class="task-copy">Loading</p>
+      </section>
+
+      <section class="bridge-panel" aria-labelledby="waitingHeading">
+        <div class="section-head">
+          <span class="anchor-mark">W</span>
+          <h2 id="waitingHeading">Waiting On</h2>
+        </div>
+        <ul id="waitingList" class="bridge-list"></ul>
+      </section>
+
+      <section class="bridge-panel" aria-labelledby="artifactsHeading">
+        <div class="section-head">
+          <span class="anchor-mark">A</span>
+          <h2 id="artifactsHeading">Artifacts</h2>
+        </div>
+        <ul id="artifactList" class="bridge-list artifact-list"></ul>
+      </section>
+
+      <section class="bridge-panel next-orders" aria-labelledby="ordersHeading">
+        <div class="section-head">
+          <span class="anchor-mark">N</span>
+          <h2 id="ordersHeading">Next Orders</h2>
+        </div>
+        <ol id="ordersList" class="orders-list"></ol>
+      </section>
+
+      <section class="bridge-panel ship-status" aria-labelledby="shipHeading">
+        <div class="section-head">
+          <span class="anchor-mark">S</span>
+          <h2 id="shipHeading">Ship Status</h2>
+        </div>
+        <dl id="shipStatusGrid" class="ship-status-grid"></dl>
+      </section>
+    </main>
+
+    <footer class="bridge-footer">
+      The Bridge is current state. Logs preserve the watch. Git remembers.
+    </footer>
+
+    <script src="assets/js/bridge.js"></script>
+  </body>
+</html>

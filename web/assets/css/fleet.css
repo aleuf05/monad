@@ -89,115 +89,374 @@
 }
 
 .tactical-plot {
-  min-height: 650px;
+  grid-column: 1 / -1;
   padding: clamp(20px, 3vw, 34px);
 }
 
-.plot-grid {
+.map-command-bar {
   position: relative;
   z-index: 1;
-  min-height: 520px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.map-status-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid rgba(53, 200, 255, 0.28);
+  background: rgba(1, 8, 17, 0.76);
+}
+
+.map-status-panel div {
+  min-width: 0;
+  padding: 11px 14px;
+  border-right: 1px solid rgba(53, 200, 255, 0.18);
+}
+
+.map-status-panel div:last-child {
+  border-right: 0;
+}
+
+.map-status-panel dt {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.map-status-panel dd {
+  overflow-wrap: anywhere;
+  margin: 0;
+  color: #e9fbff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ais-toggle {
+  min-width: 210px;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid rgba(241, 183, 79, 0.52);
+  border-radius: 8px;
+  color: var(--gold);
+  background: rgba(1, 8, 17, 0.84);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.ais-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track {
+  position: relative;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 26px;
+  border: 1px solid rgba(53, 255, 210, 0.72);
+  border-radius: 999px;
+  background: rgba(53, 255, 210, 0.16);
+  box-shadow: inset 0 0 12px rgba(53, 255, 210, 0.14);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 4px;
+  left: 25px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #35ffd2;
+  box-shadow: 0 0 12px rgba(53, 255, 210, 0.8);
+  transition: left 160ms ease, background 160ms ease;
+}
+
+.ais-toggle input:focus-visible + .toggle-track {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.ais-toggle input:not(:checked) + .toggle-track {
+  border-color: rgba(241, 183, 79, 0.52);
+  background: rgba(241, 183, 79, 0.08);
+}
+
+.ais-toggle input:not(:checked) + .toggle-track .toggle-knob {
+  left: 5px;
+  background: var(--gold);
+  box-shadow: 0 0 10px rgba(241, 183, 79, 0.55);
+}
+
+.map-frame {
+  position: relative;
+  z-index: 1;
   border: 1px solid rgba(53, 200, 255, 0.28);
   border-radius: 8px;
   overflow: hidden;
+  background: #020914;
+  box-shadow: inset 0 0 34px rgba(53, 200, 255, 0.08);
+}
+
+.fleet-map {
+  width: 100%;
+  height: clamp(460px, 62vh, 680px);
+  background: #020914;
+}
+
+.fleet-map::after {
+  position: absolute;
+  z-index: 500;
+  inset: 0;
+  content: "";
+  pointer-events: none;
   background:
-    radial-gradient(circle at 50% 50%, rgba(53, 200, 255, 0.12), transparent 28%),
-    linear-gradient(rgba(53, 200, 255, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(53, 200, 255, 0.08) 1px, transparent 1px),
-    rgba(1, 8, 17, 0.76);
-  background-size: auto, 48px 48px, 48px 48px, auto;
+    linear-gradient(rgba(53, 200, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(53, 200, 255, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  box-shadow: inset 0 0 58px rgba(0, 0, 0, 0.78);
 }
 
-.plot-grid::before,
-.plot-grid::after {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: min(72vw, 720px);
-  aspect-ratio: 1;
-  content: "";
-  border: 1px solid rgba(53, 200, 255, 0.16);
-  border-radius: 50%;
-  translate: -50% -50%;
+.fleet-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(168deg) brightness(0.54) contrast(1.28) saturate(0.72);
 }
 
-.plot-grid::after {
-  width: min(48vw, 470px);
-  border-color: rgba(241, 183, 79, 0.15);
+.fleet-map .leaflet-control-zoom a {
+  border-color: rgba(53, 200, 255, 0.32);
+  color: #dffaff;
+  background: rgba(1, 8, 17, 0.94);
 }
 
-.vessel-marker {
-  position: absolute;
-  width: min(250px, 42vw);
-  padding: 14px;
-  border: 1px solid rgba(53, 200, 255, 0.42);
-  border-radius: 8px;
-  background: rgba(1, 8, 17, 0.88);
-  box-shadow: 0 0 22px rgba(53, 200, 255, 0.1);
+.fleet-map .leaflet-control-zoom a:hover,
+.fleet-map .leaflet-control-zoom a:focus {
+  color: #ffffff;
+  background: rgba(6, 37, 54, 0.98);
 }
 
-.vessel-marker::before {
-  position: absolute;
-  top: -14px;
-  left: 16px;
-  width: 28px;
-  height: 28px;
-  content: "";
-  clip-path: polygon(50% 0, 100% 100%, 50% 72%, 0 100%);
-  background: currentColor;
-  filter: drop-shadow(0 0 10px currentColor);
+.fleet-map .leaflet-control-attribution {
+  color: #8ba3ad;
+  background: rgba(1, 8, 17, 0.82);
 }
 
-.vessel-marker h3 {
-  margin-bottom: 6px;
-  color: #f4fbff;
-}
-
-.vessel-marker p {
-  margin-bottom: 7px;
-  color: var(--muted);
-  line-height: 1.35;
-}
-
-.vessel-marker[data-status="ONLINE"] {
-  color: #35ffd2;
-}
-
-.vessel-marker[data-status="STANDBY"] {
+.fleet-map .leaflet-control-attribution a {
   color: var(--cyan);
 }
 
-.vessel-marker[data-status="DOCKED"] {
+.fleet-map .leaflet-popup-content-wrapper,
+.fleet-map .leaflet-popup-tip {
+  color: var(--text);
+  background: rgba(1, 8, 17, 0.97);
+}
+
+.fleet-map .leaflet-popup-content-wrapper {
+  border: 1px solid rgba(241, 183, 79, 0.58);
+  border-radius: 8px;
+}
+
+.contact-popup {
+  min-width: 190px;
+}
+
+.contact-popup p {
+  margin: 5px 0;
+  line-height: 1.35;
+}
+
+.contact-popup .label {
+  color: var(--cyan);
+}
+
+.fleet-contact-icon {
+  background: none;
+  border: 0;
+}
+
+.contact-marker {
+  position: relative;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--cyan);
+  background: rgba(1, 8, 17, 0.9);
+  box-shadow: 0 0 18px currentColor;
+}
+
+.contact-marker::before {
+  width: 9px;
+  height: 9px;
+  content: "";
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.contact-marker::after {
+  position: absolute;
+  inset: -8px;
+  content: "";
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.contact-marker.flagship {
+  color: #35ffd2;
+}
+
+.contact-marker.station {
   color: var(--gold);
 }
 
-.vessel-marker[data-status="FORMING"] {
-  color: var(--violet);
+.contact-marker.area {
+  color: #9c7cff;
+  border-radius: 3px;
+  rotate: 45deg;
 }
 
-.vessel-marker:nth-child(1) {
-  left: 8%;
-  top: 14%;
+.contact-marker.area::before {
+  border-radius: 1px;
 }
 
-.vessel-marker:nth-child(2) {
-  right: 9%;
-  top: 18%;
+.leaflet-marker-icon.is-selected .contact-marker {
+  color: #ffffff;
+  scale: 1.18;
+  box-shadow: 0 0 8px #ffffff, 0 0 26px currentColor;
 }
 
-.vessel-marker:nth-child(3) {
-  right: 16%;
-  bottom: 12%;
+.contact-panel {
+  position: absolute;
+  z-index: 700;
+  top: 16px;
+  right: 16px;
+  width: min(330px, calc(100% - 32px));
+  padding: 17px;
+  border: 1px solid rgba(53, 255, 210, 0.68);
+  border-radius: 8px;
+  color: var(--text);
+  background: rgba(1, 8, 17, 0.96);
+  box-shadow: 0 0 26px rgba(53, 255, 210, 0.12);
 }
 
-.vessel-marker:nth-child(4) {
-  left: 12%;
-  bottom: 13%;
+.contact-panel[hidden] {
+  display: none;
 }
 
-.vessel-marker:nth-child(5) {
-  left: 50%;
-  top: 48%;
-  translate: -50% -50%;
+.contact-panel-head {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(53, 200, 255, 0.24);
+}
+
+.contact-panel-head h3 {
+  margin: 3px 0 0;
+  color: #f4fbff;
+  font-size: 1.08rem;
+}
+
+.contact-panel-head .label {
+  margin: 0;
+}
+
+.contact-close {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border: 1px solid rgba(53, 200, 255, 0.32);
+  border-radius: 4px;
+  color: var(--cyan);
+  background: rgba(53, 200, 255, 0.06);
+  cursor: pointer;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.contact-close:hover,
+.contact-close:focus-visible {
+  border-color: var(--cyan);
+  color: #ffffff;
+}
+
+.contact-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.contact-detail-grid div {
+  min-width: 0;
+}
+
+.contact-detail-grid dt {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-detail-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #e9fbff;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.contact-center {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid rgba(241, 183, 79, 0.6);
+  border-radius: 5px;
+  color: var(--gold);
+  background: rgba(241, 183, 79, 0.08);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.contact-center:hover,
+.contact-center:focus-visible {
+  border-color: var(--gold);
+  color: #ffffff;
+  background: rgba(241, 183, 79, 0.14);
+}
+
+.map-data-note {
+  position: absolute;
+  z-index: 600;
+  right: 12px;
+  bottom: 12px;
+  margin: 0;
+  padding: 7px 9px;
+  border: 1px solid rgba(241, 183, 79, 0.45);
+  border-radius: 4px;
+  color: var(--gold);
+  background: rgba(1, 8, 17, 0.88);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  pointer-events: none;
 }
 
 .status-badge {
@@ -233,6 +492,29 @@
 
 .roster-table td:nth-child(4) {
   color: #e9fbff;
+}
+
+.roster-table tr.is-selected td {
+  background: rgba(53, 255, 210, 0.1);
+  box-shadow: inset 0 1px rgba(53, 255, 210, 0.3), inset 0 -1px rgba(53, 255, 210, 0.3);
+}
+
+.roster-contact-button {
+  padding: 0;
+  border: 0;
+  color: #f4fbff;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.roster-contact-button:hover,
+.roster-contact-button:focus-visible {
+  color: #35ffd2;
+  text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
 .mission-list {
@@ -328,24 +610,16 @@
     min-height: auto;
   }
 
-  .plot-grid {
-    min-height: auto;
-    display: grid;
-    gap: 12px;
-    padding: 16px;
+  .map-command-bar {
+    grid-template-columns: 1fr;
   }
 
-  .plot-grid::before,
-  .plot-grid::after {
-    display: none;
+  .ais-toggle {
+    min-width: 0;
   }
 
-  .vessel-marker,
-  .vessel-marker:nth-child(n) {
-    position: relative;
-    inset: auto;
-    width: 100%;
-    translate: none;
+  .fleet-map {
+    height: 520px;
   }
 }
 
@@ -361,6 +635,35 @@
 
   .doctrine-line {
     letter-spacing: 0.06em;
+  }
+
+  .map-status-panel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .map-status-panel div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .map-status-panel div:nth-child(-n + 2) {
+    border-bottom: 1px solid rgba(53, 200, 255, 0.18);
+  }
+
+  .fleet-map {
+    height: 430px;
+  }
+
+  .contact-panel {
+    position: relative;
+    inset: auto;
+    width: auto;
+    margin: 10px;
+  }
+
+  .map-data-note {
+    right: 8px;
+    bottom: 24px;
+    max-width: calc(100% - 16px);
   }
 
   .doctrine-ticker {
