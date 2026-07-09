@@ -1,5 +1,16 @@
+# ==============================================================================
+# MONAD RUNTIME EXCLUSIONS
+# ==============================================================================
+
+# Ignore the virtual environment completely
 .venv/
-*.env
 __pycache__/
-*.py[cod]
-.viminfo
+*.pyc
+
+# Block all automated agent and captain runtime logs
+logs/agents/**/*.jsonl
+logs/agents/**/*.log
+logs/public-ready.log
+
+# Exceptions: Allow tracking of foundational documentation/blueprints
+!logs/captains/**/*.md
