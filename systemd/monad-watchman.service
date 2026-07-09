@@ -1,0 +1,21 @@
+[Unit]
+Description=Monad Watchman heartbeat service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/watchman.py
+Restart=always
+RestartSec=10
+UMask=0027
+Environment=PYTHONUNBUFFERED=1
+Environment=MONAD_QDRANT_HEALTH_URL=http://127.0.0.1:6333/healthz
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
