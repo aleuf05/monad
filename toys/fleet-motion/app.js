@@ -1,4 +1,4 @@
-﻿const HOME = { lat: 26.56, lng: 56.25 };
+const HOME = { lat: 26.56, lng: 56.25 };
 const BASE_SPEED_KMH = 180;
 const ARRIVAL_RADIUS_KM = 0.08;
 const SLOWDOWN_DISTANCE_KM = 12;
@@ -14,12 +14,16 @@ const THREAT_SPEED_KMH = 240;
 const THREAT_INTERCEPT_RADIUS_KM = 9;
 const THREAT_BREACH_RADIUS_KM = 6;
 const INTERNAL_FEATURES = {
-  threatDrill: false
+  threatDrill: false,
+  scenarioTools: false
 };
 const TRAIL_LIMIT = 180;
 const TRAIL_REDRAW_MIN_POINTS = 2;
 const LOG_LIMIT = 9;
 const INTRO_DURATION_MS = 4800;
+const FLEET_STATE_SCHEMA_VERSION = 1;
+const FLEET_STATE_STORAGE_KEY = "monad.fleetMotion.state";
+const FLEET_STATE_SAVE_INTERVAL_MS = 1200;
 const DESIGN_DEFAULTS = {
   flagshipSpeedKmh: BASE_SPEED_KMH,
   escortSpeedScale: 1,
@@ -328,6 +332,18 @@ const shipDestination = document.querySelector("#shipDestination");
 const captainsLog = document.querySelector("#captainsLog");
 const openingOverlay = document.querySelector("#openingOverlay");
 const skipIntroButton = document.querySelector("#skipIntroButton");
+const lastStateSaved = document.querySelector("#lastStateSaved");
+const stateSchemaValue = document.querySelector("#stateSchemaValue");
+const stateSavedValue = document.querySelector("#stateSavedValue");
+const statePresetValue = document.querySelector("#statePresetValue");
+const stateFlagshipValue = document.querySelector("#stateFlagshipValue");
+const stateMotionValue = document.querySelector("#stateMotionValue");
+const stateRouteValue = document.querySelector("#stateRouteValue");
+const stateEscortValue = document.querySelector("#stateEscortValue");
+const stateSelectionValue = document.querySelector("#stateSelectionValue");
+const copyStateButton = document.querySelector("#copyStateButton");
+const downloadStateButton = document.querySelector("#downloadStateButton");
+const clearStateButton = document.querySelector("#clearStateButton");
 
 let flagship = { ...HOME };
 let destination = null;
@@ -364,6 +380,10 @@ let logEntries = [];
 let shipTrails = [];
 let simulationClockSeconds = 0;
 let escortStates = createEscortStates();
+let lastPersistedAt = null;
+let lastPersistenceAttemptMs = 0;
+let restoredFromPersistentState = false;
+let persistenceSuspended = false;
 
 function createEscortStates() {
   return FORMATION.map((escort) => ({
@@ -373,6 +393,333 @@ function createEscortStates() {
     headingDegrees: null,
     blocked: false
   }));
+}
+
+
+function clonePoint(point) {
+  return point ? { lat: Number(point.lat), lng: Number(point.lng) } : null;
+}
+
+function clonePoints(points) {
+  return (points || []).map((point) => clonePoint(point)).filter(Boolean);
+}
+
+function createBaselineFleetState() {
+  return {
+    schemaVersion: FLEET_STATE_SCHEMA_VERSION,
+    savedAt: null,
+    activePresetId: "hormuz_transit",
+    designSettings: { ...DESIGN_DEFAULTS },
+    flagship: {
+      position: { ...HOME },
+      headingDegrees: null,
+      speedKmh: 0,
+      engineOrderKmh: BASE_SPEED_KMH
+    },
+    navigation: {
+      destination: null,
+      finalDestination: null,
+      waypoints: [],
+      routeQueue: [],
+      waypointMode: false,
+      selectedWaypointIndex: null,
+      lastStatus: "Holding",
+      lastNavigationMessage: "Clear"
+    },
+    time: {
+      timeWarp: 1,
+      lastMovingWarp: 1,
+      simulationClockSeconds: 0
+    },
+    escorts: {
+      modeIndex: 1,
+      modeId: "loose",
+      formation: FORMATION.map((escort) => ({ ...escort })),
+      ships: createEscortStates().map((escort) => ({
+        id: escort.id,
+        name: escort.name,
+        position: clonePoint(escort.position),
+        speedKmh: escort.speedKmh,
+        headingDegrees: escort.headingDegrees,
+        blocked: escort.blocked
+      }))
+    },
+    selection: {
+      selectedShipId: "monad"
+    }
+  };
+}
+
+function createCanonicalFleetState() {
+  const now = new Date().toISOString();
+  return {
+    schemaVersion: FLEET_STATE_SCHEMA_VERSION,
+    savedAt: now,
+    activePresetId,
+    designSettings: { ...designSettings },
+    flagship: {
+      position: clonePoint(flagship),
+      headingDegrees,
+      speedKmh: currentSpeedKmh,
+      engineOrderKmh: currentFlagshipSpeedKmh()
+    },
+    navigation: {
+      destination: clonePoint(destination),
+      finalDestination: clonePoint(finalDestination),
+      waypoints: clonePoints(waypoints),
+      routeQueue: clonePoints(routeQueue),
+      waypointMode,
+      selectedWaypointIndex,
+      lastStatus,
+      lastNavigationMessage
+    },
+    time: {
+      timeWarp,
+      lastMovingWarp,
+      simulationClockSeconds
+    },
+    escorts: {
+      modeIndex: escortModeIndex,
+      modeId: currentEscortMode().id,
+      formation: FORMATION.map((escort) => ({ ...escort })),
+      ships: escortStates.map((escort) => ({
+        id: escort.id,
+        name: escort.name,
+        position: clonePoint(escort.position),
+        speedKmh: escort.speedKmh,
+        headingDegrees: escort.headingDegrees,
+        blocked: escort.blocked
+      }))
+    },
+    selection: {
+      selectedShipId
+    }
+  };
+}
+
+function normalizeFleetState(candidate) {
+  if (!candidate || candidate.schemaVersion !== FLEET_STATE_SCHEMA_VERSION) {
+    return null;
+  }
+  const baseline = createBaselineFleetState();
+  return {
+    ...baseline,
+    ...candidate,
+    designSettings: { ...baseline.designSettings, ...(candidate.designSettings || {}) },
+    flagship: { ...baseline.flagship, ...(candidate.flagship || {}) },
+    navigation: { ...baseline.navigation, ...(candidate.navigation || {}) },
+    time: { ...baseline.time, ...(candidate.time || {}) },
+    escorts: { ...baseline.escorts, ...(candidate.escorts || {}) },
+    selection: { ...baseline.selection, ...(candidate.selection || {}) }
+  };
+}
+
+function applyCanonicalFleetState(state) {
+  const normalized = normalizeFleetState(state);
+  if (!normalized) {
+    return false;
+  }
+
+  activePresetId = normalized.activePresetId || "freeplay";
+  if (INTERNAL_FEATURES.scenarioTools && SCENARIO_PRESETS[activePresetId]) {
+    scenarioPresetSelect.value = activePresetId;
+    variantNameInput.value = SCENARIO_PRESETS[activePresetId].variantName;
+    suggestedChangeInput.placeholder = SCENARIO_PRESETS[activePresetId].notePrompt;
+  }
+
+  designSettings = { ...DESIGN_DEFAULTS, ...normalized.designSettings };
+  flagship = clonePoint(normalized.flagship.position) || { ...HOME };
+  headingDegrees = normalized.flagship.headingDegrees;
+  currentSpeedKmh = Number(normalized.flagship.speedKmh) || 0;
+
+  destination = clonePoint(normalized.navigation.destination);
+  finalDestination = clonePoint(normalized.navigation.finalDestination);
+  waypoints = clonePoints(normalized.navigation.waypoints);
+  routeQueue = clonePoints(normalized.navigation.routeQueue);
+  waypointMode = Boolean(normalized.navigation.waypointMode);
+  selectedWaypointIndex = normalized.navigation.selectedWaypointIndex;
+  lastStatus = normalized.navigation.lastStatus || "Holding";
+  lastNavigationMessage = normalized.navigation.lastNavigationMessage || "Clear";
+
+  timeWarp = Number(normalized.time.timeWarp) || 0;
+  lastMovingWarp = Number(normalized.time.lastMovingWarp) || 1;
+  simulationClockSeconds = Number(normalized.time.simulationClockSeconds) || 0;
+
+  escortModeIndex = Number.isInteger(normalized.escorts.modeIndex)
+    ? normalized.escorts.modeIndex
+    : escortModeIndexFor(normalized.escorts.modeId);
+  escortStates = FORMATION.map((escort, index) => {
+    const saved = (normalized.escorts.ships || []).find((ship) => ship.id === escort.id) || normalized.escorts.ships?.[index];
+    return {
+      ...escort,
+      position: clonePoint(saved?.position) || { lat: HOME.lat + escort.lat, lng: HOME.lng + escort.lng },
+      speedKmh: Number(saved?.speedKmh) || 0,
+      headingDegrees: saved?.headingDegrees ?? null,
+      blocked: Boolean(saved?.blocked)
+    };
+  });
+
+  selectedShipId = normalized.selection.selectedShipId || "monad";
+  renderedHeading = null;
+  renderedSelection = null;
+  renderedEscortHeadings = null;
+  syncDesignControls();
+  redrawWaypoints();
+  createInitialTrails();
+  lastPersistedAt = normalized.savedAt || null;
+  updateLastSavedIndicator();
+  updateFleetMarkers();
+  updateStatus();
+  return true;
+}
+
+function updateLastSavedIndicator() {
+  if (!lastStateSaved) {
+    return;
+  }
+  if (!lastPersistedAt) {
+    lastStateSaved.textContent = "Not saved yet";
+    return;
+  }
+  const date = new Date(lastPersistedAt);
+  lastStateSaved.textContent = Number.isNaN(date.getTime())
+    ? "Saved"
+    : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+
+function persistFleetState(force = false) {
+  if (persistenceSuspended && !force) {
+    return;
+  }
+  if (force) {
+    persistenceSuspended = false;
+  }
+  const nowMs = Date.now();
+  if (!force && nowMs - lastPersistenceAttemptMs < FLEET_STATE_SAVE_INTERVAL_MS) {
+    return;
+  }
+  lastPersistenceAttemptMs = nowMs;
+  try {
+    const state = createCanonicalFleetState();
+    localStorage.setItem(FLEET_STATE_STORAGE_KEY, JSON.stringify(state));
+    lastPersistedAt = state.savedAt;
+    updateLastSavedIndicator();
+    updateStateInspector();
+  } catch (error) {
+    console.warn("Fleet state persistence failed", error);
+    if (lastStateSaved) {
+      lastStateSaved.textContent = "Save failed";
+    }
+  }
+}
+
+function restoreFleetState() {
+  try {
+    const raw = localStorage.getItem(FLEET_STATE_STORAGE_KEY);
+    if (!raw) {
+      return false;
+    }
+    return applyCanonicalFleetState(JSON.parse(raw));
+  } catch (error) {
+    console.warn("Fleet state restore failed", error);
+    return false;
+  }
+}
+
+function clearPersistedFleetState() {
+  localStorage.removeItem(FLEET_STATE_STORAGE_KEY);
+  lastPersistedAt = null;
+  updateLastSavedIndicator();
+}
+
+
+function formatSavedTimestamp(value) {
+  if (!value) {
+    return "Not saved";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Saved";
+  }
+  return date.toLocaleString([], {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+
+function stateJsonFromStorage() {
+  return localStorage.getItem(FLEET_STATE_STORAGE_KEY) || JSON.stringify(createCanonicalFleetState(), null, 2);
+}
+
+function updateStateInspector() {
+  if (!stateSchemaValue) {
+    return;
+  }
+  const routeLegs = routeQueue.length;
+  const waypointCount = waypoints.length;
+  const mode = currentEscortMode();
+  stateSchemaValue.textContent = `v${FLEET_STATE_SCHEMA_VERSION}`;
+  stateSavedValue.textContent = persistenceSuspended ? "Cleared this session" : formatSavedTimestamp(lastPersistedAt);
+  statePresetValue.textContent = SCENARIO_PRESETS[activePresetId]?.label || activePresetId || "Manual";
+  stateFlagshipValue.textContent = `${formatPosition(flagship)} / ${headingDegrees === null ? "--" : `${Math.round(headingDegrees)} deg`}`;
+  stateMotionValue.textContent = `${formatSpeed(currentSpeedKmh)} / ${timeWarp === 0 ? "paused" : `${timeWarp}x`}`;
+  stateRouteValue.textContent = `${routeLegs} leg${routeLegs === 1 ? "" : "s"} / ${waypointCount} waypoint${waypointCount === 1 ? "" : "s"}`;
+  stateEscortValue.textContent = `${mode.label} / ${escortStates.length} ships`;
+  stateSelectionValue.textContent = getSelectedShip().name;
+}
+
+function copyStateJson() {
+  persistFleetState(true);
+  const json = stateJsonFromStorage();
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(json).catch(() => {});
+  }
+  addLog("Persistent state JSON copied.");
+  updateStateInspector();
+}
+
+function downloadStateJson() {
+  persistFleetState(true);
+  const json = stateJsonFromStorage();
+  const blob = new Blob([json.endsWith("\n") ? json : `${json}\n`], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `fleet-motion-state-${safeFilename(activePresetId || "manual")}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  addLog("Persistent state JSON download prepared.");
+  updateStateInspector();
+}
+
+function clearSavedStateFromControl() {
+  if (!window.confirm("Clear the saved Fleet Motion state from this browser? Autosave will pause until a forced export or page reload.")) {
+    return;
+  }
+  clearPersistedFleetState();
+  persistenceSuspended = true;
+  addLog("Persisted fleet state cleared for this browser session.");
+  updateStateInspector();
+}
+
+
+function reloadPersistedFleetStateFromControl() {
+  const restored = restoreFleetState();
+  if (!restored) {
+    window.alert("No saved fleet state is available yet.");
+    addLog("No persisted fleet state available to reload.");
+    updateStatus();
+    return;
+  }
+  addLog("Fleet state reloaded from persistence store.");
+  flashAt(flagship, "feedback-pulse reset");
+  updateFleetMarkers();
+  updateStatus();
 }
 
 function createInitialTrails() {
@@ -1046,6 +1393,9 @@ function updateWarpControls() {
 }
 
 function syncDesignControls() {
+  if (!INTERNAL_FEATURES.scenarioTools) {
+    return;
+  }
   flagshipSpeedControl.value = String(designSettings.flagshipSpeedKmh);
   escortSpeedControl.value = designSettings.escortSpeedScale.toFixed(2);
   formationSpreadControl.value = designSettings.formationSpread.toFixed(2);
@@ -1093,7 +1443,13 @@ function scenarioPoints(points) {
   return points.map((point) => roundedPosition(point));
 }
 
+// Quarantine: scenario editor/evaluator support is intentionally out of the
+// normal Fleet Motion loop. Keep it disabled until the navigation engine is
+// mature enough to justify scenario-management UI again.
 function buildScenarioArtifact() {
+  if (!INTERNAL_FEATURES.scenarioTools) {
+    return null;
+  }
   const activeRoute = [
     ...(destination ? [{ ...destination }] : []),
     ...routeQueue.slice(destination ? 1 : 0)
@@ -1106,7 +1462,7 @@ function buildScenarioArtifact() {
       area: "Strait of Hormuz",
       presetId: activePresetId,
       presetLabel: SCENARIO_PRESETS[activePresetId]?.label || "Freeplay / Manual",
-      variantName: variantNameInput.value.trim() || "untitled_variant",
+      variantName: variantNameInput?.value.trim() || activePresetId || "manual",
       status: currentStatus()
     },
     parameters: {
@@ -1139,14 +1495,14 @@ function buildScenarioArtifact() {
       navigationStatus: lastNavigationMessage
     },
     designerNotes: {
-      feltGood: feltGoodInput.value.trim(),
-      feltWrong: feltWrongInput.value.trim(),
-      suggestedChange: suggestedChangeInput.value.trim()
+      feltGood: feltGoodInput?.value.trim() || "",
+      feltWrong: feltWrongInput?.value.trim() || "",
+      suggestedChange: suggestedChangeInput?.value.trim() || ""
     },
     constraints: [
       "Standalone browser toy",
-      "No backend or persistence",
-      "Not connected to Bridge, doctrine, Qdrant, agents, or deployment automation",
+      "Navigation loop first",
+      "Scenario tools quarantined",
       "Not for real navigation"
     ]
   };
@@ -1168,11 +1524,18 @@ function buildScenarioArtifact() {
 }
 
 function exportScenario() {
+  if (!INTERNAL_FEATURES.scenarioTools) {
+    return;
+  }
   lastScenarioExport = `${JSON.stringify(buildScenarioArtifact(), null, 2)}\n`;
-  scenarioExportOutput.value = lastScenarioExport;
-  downloadScenarioButton.disabled = false;
-  scenarioExportOutput.focus();
-  scenarioExportOutput.select();
+  if (scenarioExportOutput) {
+    scenarioExportOutput.value = lastScenarioExport;
+    scenarioExportOutput.focus();
+    scenarioExportOutput.select();
+  }
+  if (downloadScenarioButton) {
+    downloadScenarioButton.disabled = false;
+  }
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(lastScenarioExport).catch(() => {});
   }
@@ -1180,23 +1543,23 @@ function exportScenario() {
 }
 
 function safeFilename(value) {
-  return (value || "fleet-motion-scenario")
+  return (value || "fleet-motion")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 80) || "fleet-motion-scenario";
+    .slice(0, 80) || "fleet-motion";
 }
 
 function downloadScenarioExport() {
-  if (!lastScenarioExport) {
+  if (!INTERNAL_FEATURES.scenarioTools || !lastScenarioExport) {
     return;
   }
   const blob = new Blob([lastScenarioExport], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${safeFilename(variantNameInput.value)}.json`;
+  link.download = `${safeFilename(variantNameInput?.value || activePresetId)}.json`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -1207,11 +1570,11 @@ function downloadScenarioExport() {
 function loadPassiveOpeningRoute() {
   const preset = SCENARIO_PRESETS.hormuz_transit;
   activePresetId = preset.id;
-  scenarioPresetSelect.value = preset.id;
+  if (scenarioPresetSelect) scenarioPresetSelect.value = preset.id;
   designSettings = { ...preset.settings };
   escortModeIndex = escortModeIndexFor(preset.escortModeId);
-  variantNameInput.value = preset.variantName;
-  suggestedChangeInput.placeholder = preset.notePrompt;
+  if (variantNameInput) variantNameInput.value = preset.variantName;
+  if (suggestedChangeInput) suggestedChangeInput.placeholder = preset.notePrompt;
   syncDesignControls();
   waypoints = [];
   selectedWaypointIndex = null;
@@ -1231,12 +1594,15 @@ function completeIntro() {
   }
 }
 
-function startOpeningSequence() {
-  loadPassiveOpeningRoute();
+function startOpeningSequence({ loadOpeningRoute = true } = {}) {
+  if (loadOpeningRoute) {
+    loadPassiveOpeningRoute();
+  }
   updateFleetMarkers();
   updateStatus();
+  const focusPoint = loadOpeningRoute ? HOME : flagship;
   window.setTimeout(() => {
-    map.flyTo([HOME.lat, HOME.lng], 7, {
+    map.flyTo([focusPoint.lat, focusPoint.lng], 7, {
       animate: true,
       duration: 3.2,
       easeLinearity: 0.28
@@ -1248,18 +1614,20 @@ function startOpeningSequence() {
 function applyScenarioPreset(presetId) {
   const preset = SCENARIO_PRESETS[presetId] || SCENARIO_PRESETS.freeplay;
   activePresetId = preset.id;
-  scenarioPresetSelect.value = preset.id;
+  if (scenarioPresetSelect) scenarioPresetSelect.value = preset.id;
 
-  resetFleet();
+  if (!resetFleet({ requireConfirmation: true })) {
+    return;
+  }
   designSettings = { ...preset.settings };
   escortModeIndex = escortModeIndexFor(preset.escortModeId);
   syncDesignControls();
 
-  variantNameInput.value = preset.variantName;
+  if (variantNameInput) variantNameInput.value = preset.variantName;
   feltGoodInput.value = "";
   feltWrongInput.value = "";
   suggestedChangeInput.value = "";
-  suggestedChangeInput.placeholder = preset.notePrompt;
+  if (suggestedChangeInput) suggestedChangeInput.placeholder = preset.notePrompt;
   lastScenarioExport = "";
   scenarioExportOutput.value = "";
   downloadScenarioButton.disabled = true;
@@ -1278,6 +1646,7 @@ function applyScenarioPreset(presetId) {
   }
 
   addLog(`Scenario preset loaded: ${preset.label}.`);
+  persistFleetState(true);
 }
 
 function spawnThreat() {
@@ -1395,6 +1764,8 @@ function updateStatus() {
   updateWarpControls();
   updateMarkerIcons();
   updateShipInfo();
+  persistFleetState();
+  updateStateInspector();
 }
 
 function setDestination(position) {
@@ -1680,7 +2051,10 @@ function setTimeWarp(nextWarp) {
   updateStatus();
 }
 
-function resetFleet() {
+function resetFleet({ requireConfirmation = true } = {}) {
+  if (requireConfirmation && !window.confirm("Reset Fleet Motion to the documented Strait of Hormuz baseline? This clears the persisted voyage.")) {
+    return false;
+  }
   flagship = { ...HOME };
   clearRoutePlan();
   timeWarp = 1;
@@ -1707,6 +2081,8 @@ function resetFleet() {
   updateFleetMarkers();
   updateStatus();
   map.setView([HOME.lat, HOME.lng], 7);
+  persistFleetState(true);
+  return true;
 }
 
 function selectShip(id) {
@@ -1849,9 +2225,11 @@ acceptDetourButton.addEventListener("click", acceptSuggestedDetour);
 
 escortModeButton.addEventListener("click", cycleEscortMode);
 
-applyPresetButton.addEventListener("click", () => {
-  applyScenarioPreset(scenarioPresetSelect.value);
-});
+if (INTERNAL_FEATURES.scenarioTools && applyPresetButton) {
+  applyPresetButton.addEventListener("click", () => {
+    applyScenarioPreset(scenarioPresetSelect.value);
+  });
+}
 
 undoWaypointButton.addEventListener("click", undoLastWaypoint);
 
@@ -1874,30 +2252,37 @@ warpButtons.forEach((button) => {
   button.addEventListener("click", () => setTimeWarp(Number(button.dataset.warp)));
 });
 
-flagshipSpeedControl.addEventListener("input", () => {
-  setDesignSetting("flagshipSpeedKmh", Number(flagshipSpeedControl.value));
-});
-flagshipSpeedControl.addEventListener("change", () => {
-  setDesignSetting("flagshipSpeedKmh", Number(flagshipSpeedControl.value), true);
-});
+if (INTERNAL_FEATURES.scenarioTools) {
+  flagshipSpeedControl.addEventListener("input", () => {
+    setDesignSetting("flagshipSpeedKmh", Number(flagshipSpeedControl.value));
+  });
+  flagshipSpeedControl.addEventListener("change", () => {
+    setDesignSetting("flagshipSpeedKmh", Number(flagshipSpeedControl.value), true);
+  });
 
-escortSpeedControl.addEventListener("input", () => {
-  setDesignSetting("escortSpeedScale", Number(escortSpeedControl.value));
-});
-escortSpeedControl.addEventListener("change", () => {
-  setDesignSetting("escortSpeedScale", Number(escortSpeedControl.value), true);
-});
+  escortSpeedControl.addEventListener("input", () => {
+    setDesignSetting("escortSpeedScale", Number(escortSpeedControl.value));
+  });
+  escortSpeedControl.addEventListener("change", () => {
+    setDesignSetting("escortSpeedScale", Number(escortSpeedControl.value), true);
+  });
 
-formationSpreadControl.addEventListener("input", () => {
-  setDesignSetting("formationSpread", Number(formationSpreadControl.value));
-});
-formationSpreadControl.addEventListener("change", () => {
-  setDesignSetting("formationSpread", Number(formationSpreadControl.value), true);
-});
+  formationSpreadControl.addEventListener("input", () => {
+    setDesignSetting("formationSpread", Number(formationSpreadControl.value));
+  });
+  formationSpreadControl.addEventListener("change", () => {
+    setDesignSetting("formationSpread", Number(formationSpreadControl.value), true);
+  });
 
-exportScenarioButton.addEventListener("click", exportScenario);
+  exportScenarioButton.addEventListener("click", exportScenario);
+  downloadScenarioButton.addEventListener("click", downloadScenarioExport);
+}
 
-downloadScenarioButton.addEventListener("click", downloadScenarioExport);
+copyStateButton?.addEventListener("click", copyStateJson);
+
+downloadStateButton?.addEventListener("click", downloadStateJson);
+
+clearStateButton?.addEventListener("click", clearSavedStateFromControl);
 
 homeButton.addEventListener("click", () => {
   waypointMode = false;
@@ -1905,12 +2290,20 @@ homeButton.addEventListener("click", () => {
   map.panTo([HOME.lat, HOME.lng]);
 });
 
-resetButton.addEventListener("click", resetFleet);
+resetButton.addEventListener("click", reloadPersistedFleetStateFromControl);
 
 skipIntroButton.addEventListener("click", completeIntro);
 
 createInitialTrails();
 syncDesignControls();
+updateStateInspector();
 addLog("Fleet motion toy online. Captain's Log uses local browser time.");
-startOpeningSequence();
+restoredFromPersistentState = restoreFleetState();
+if (restoredFromPersistentState) {
+  addLog("Persisted fleet state restored.");
+  startOpeningSequence({ loadOpeningRoute: false });
+} else {
+  addLog("No persisted fleet state found; opening baseline route loaded.");
+  startOpeningSequence({ loadOpeningRoute: true });
+}
 window.requestAnimationFrame(animationFrame);

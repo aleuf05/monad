@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -51,71 +51,7 @@
         </div>
 
         <p class="navigation-warning">Navigation v0.5 can suggest simple detours around rough land boxes. It is still approximate.</p>
-
-        <section class="design-console" aria-labelledby="designConsoleHeading">
-          <div class="panel-title-row">
-            <p class="eyebrow">Design Console</p>
-            <h3 id="designConsoleHeading">Scenario Tuning</h3>
-          </div>
-
-          <div class="preset-row">
-            <label>
-              <span>Scenario preset</span>
-              <select id="scenarioPresetSelect">
-                <option value="freeplay">Freeplay / Manual</option>
-                <option value="hormuz_transit">Hormuz Transit</option>
-                <option value="escort_screen_drill">Patrol Weave Review</option>
-                <option value="waypoint_threading">Waypoint Threading</option>
-              </select>
-            </label>
-            <button id="applyPresetButton" type="button">Apply Preset</button>
-          </div>
-
-          <div class="tuning-grid">
-            <label>
-              <span>MONAD speed</span>
-              <input id="flagshipSpeedControl" type="range" min="60" max="420" step="10" value="180">
-              <output id="flagshipSpeedOutput">180 km/h</output>
-            </label>
-            <label>
-              <span>Escort speed</span>
-              <input id="escortSpeedControl" type="range" min="0.8" max="1.8" step="0.05" value="1.00">
-              <output id="escortSpeedOutput">1.00x</output>
-            </label>
-            <label>
-              <span>Formation spread</span>
-              <input id="formationSpreadControl" type="range" min="0.5" max="2" step="0.05" value="1.00">
-              <output id="formationSpreadOutput">1.00x</output>
-            </label>
-          </div>
-
-          <div class="notes-grid">
-            <label>
-              <span>Variant name</span>
-              <input id="variantNameInput" type="text" value="hormuz_transit_v1" maxlength="80">
-            </label>
-            <label>
-              <span>What felt good?</span>
-              <textarea id="feltGoodInput" rows="2" placeholder="Example: escorts stayed readable during turns."></textarea>
-            </label>
-            <label>
-              <span>What felt wrong?</span>
-              <textarea id="feltWrongInput" rows="2" placeholder="Example: route recovery felt too easy."></textarea>
-            </label>
-            <label>
-              <span>Suggested change</span>
-              <textarea id="suggestedChangeInput" rows="2" placeholder="Example: add a timed threat near the exit lane."></textarea>
-            </label>
-          </div>
-
-          <div class="export-controls">
-            <button id="exportScenarioButton" type="button">Export Scenario JSON</button>
-            <button id="downloadScenarioButton" type="button" disabled>Download JSON</button>
-          </div>
-          <textarea id="scenarioExportOutput" class="scenario-export" rows="8" readonly placeholder="Exported scenario JSON appears here."></textarea>
-        </section>
-
-        <dl class="telemetry-grid">
+<dl class="telemetry-grid">
           <div>
             <dt>Current Position</dt>
             <dd id="currentPosition">--</dd>
@@ -148,7 +84,57 @@
             <dt>Escort Mode</dt>
             <dd id="escortModeStatus">Loose Screen</dd>
           </div>
+          <div>
+            <dt>Last State Saved</dt>
+            <dd id="lastStateSaved">Not saved yet</dd>
+          </div>
         </dl>
+
+        <section class="state-inspector" aria-labelledby="stateInspectorHeading">
+          <div class="panel-title-row">
+            <p class="eyebrow">State Inspector</p>
+            <h3 id="stateInspectorHeading">Persistence</h3>
+          </div>
+          <dl class="state-grid">
+            <div>
+              <dt>Schema</dt>
+              <dd id="stateSchemaValue">--</dd>
+            </div>
+            <div>
+              <dt>Saved</dt>
+              <dd id="stateSavedValue">--</dd>
+            </div>
+            <div>
+              <dt>Profile</dt>
+              <dd id="statePresetValue">--</dd>
+            </div>
+            <div>
+              <dt>Flagship</dt>
+              <dd id="stateFlagshipValue">--</dd>
+            </div>
+            <div>
+              <dt>Motion</dt>
+              <dd id="stateMotionValue">--</dd>
+            </div>
+            <div>
+              <dt>Route</dt>
+              <dd id="stateRouteValue">--</dd>
+            </div>
+            <div>
+              <dt>Escort</dt>
+              <dd id="stateEscortValue">--</dd>
+            </div>
+            <div>
+              <dt>Selected</dt>
+              <dd id="stateSelectionValue">--</dd>
+            </div>
+          </dl>
+          <div class="state-controls">
+            <button id="copyStateButton" type="button">Copy State JSON</button>
+            <button id="downloadStateButton" type="button">Download State JSON</button>
+            <button id="clearStateButton" type="button">Clear Saved State</button>
+          </div>
+        </section>
 
         <div class="time-warp" aria-label="Simulation speed controls">
           <button class="warp-button" type="button" data-warp="0">Pause</button>
@@ -169,7 +155,7 @@
           <button id="clearWaypointsButton" type="button" disabled>Clear Waypoints</button>
           <button id="cancelRouteButton" type="button" disabled>Cancel Route</button>
           <button id="homeButton" type="button">Return to Hormuz</button>
-          <button id="resetButton" class="secondary" type="button">Reset Fleet</button>
+          <button id="resetButton" class="secondary" type="button">Reload Saved State</button>
         </div>
 
         <section class="ship-panel" aria-labelledby="shipInfoHeading">

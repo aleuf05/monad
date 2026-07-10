@@ -68,38 +68,118 @@ MONAD at its current position.
 The Captain's Log uses local browser time for simple human readability. It is
 not persisted and is cleared when the page reloads.
 
-## Design Console
+## Quarantined Scenario Tools
 
-The Design Console is the non-engineer collaboration layer. It lets a playtester
-tune a small set of scenario parameters, play the result immediately, write
-plain-language notes, and export a structured JSON artifact.
+The Scenario Editor/Evaluator is intentionally out of the normal Fleet Motion
+experience. Its implementation is retained in `app.js` behind
+`INTERNAL_FEATURES.scenarioTools = false` for possible future restoration, but
+there are no UI entry points and it does not run in the default application
+flow.
 
-Scenario presets provide repeatable starting points:
+The active surface is the navigation engine: movement, routing, formation
+behavior, persistence, time warp, ship inspection, and the Captain's Log.
+## Persistent Fleet State
 
-- `Freeplay / Manual` leaves routing to the player.
-- `Hormuz Transit` loads a baseline movement route.
-- `Patrol Weave Review` loads wider escort spacing and the patrol maneuver mode.
-- `Waypoint Threading` loads a tight-screen waypoint route.
+Fleet Motion stores the current voyage in `localStorage` under the key
+`monad.fleetMotion.state`. Startup attempts to restore that state before loading
+any baseline route. If saved state exists, ordinary reloads and browser restarts
+resume the current voyage instead of silently returning MONAD to the Strait of
+Hormuz baseline.
 
-The export includes:
+The persisted schema is versioned:
 
-- Tuned parameters
-- Active scenario preset
-- Current MONAD and escort positions
-- Current route state
-- Designer notes
-- Standalone-toy constraints
+```json
+{
+  "schemaVersion": 1,
+  "savedAt": "ISO-8601 timestamp",
+  "activePresetId": "hormuz_transit",
+  "designSettings": {
+    "flagshipSpeedKmh": 180,
+    "escortSpeedScale": 1,
+    "formationSpread": 1
+  },
+  "flagship": {
+    "position": { "lat": 26.56, "lng": 56.25 },
+    "headingDegrees": 270,
+    "speedKmh": 120,
+    "engineOrderKmh": 180
+  },
+  "navigation": {
+    "destination": { "lat": 26.25, "lng": 55.35 },
+    "finalDestination": { "lat": 26.25, "lng": 55.35 },
+    "waypoints": [],
+    "routeQueue": [],
+    "waypointMode": false,
+    "selectedWaypointIndex": null,
+    "lastStatus": "Underway",
+    "lastNavigationMessage": "Clear"
+  },
+  "time": {
+    "timeWarp": 1,
+    "lastMovingWarp": 1,
+    "simulationClockSeconds": 0
+  },
+  "escorts": {
+    "modeIndex": 1,
+    "modeId": "loose",
+    "formation": [],
+    "ships": []
+  },
+  "selection": {
+    "selectedShipId": "monad"
+  }
+}
+```
 
-The export is local only. It is shown in the page for copy/paste and can be
-downloaded as a `.json` file. No backend, account, database, or deployment
-automation is involved.
+`Reload Saved State` reloads the current voyage from `localStorage`. It does not
+return MONAD to the Strait of Hormuz baseline. Applying a scenario preset still
+requires confirmation because it replaces the current voyage with a documented
+preset scenario.
+
+
+## Persistent State Manual Test Checklist
+
+1. Run the toy locally and let the opening route start.
+2. Move MONAD away from the baseline position by selecting a new destination.
+3. Change MONAD speed, time warp, and escort mode.
+4. Add at least one waypoint or route edit.
+5. Wait until `Last State Saved` updates.
+6. Reload the page.
+7. Confirm MONAD, escorts, heading, speed/order, time warp, route state, and escort mode are restored.
+8. Close and reopen the browser, then open the toy again.
+9. Confirm the same saved state is restored and startup does not teleport to the Strait of Hormuz baseline.
+10. Click `Reload Saved State`; confirm the page reloads the saved voyage from `localStorage`.
+11. Confirm the button does not teleport MONAD back to the Strait of Hormuz baseline.
+
+
+## State Inspector
+
+The State Inspector exposes the active canonical fleet-state model in the command
+panel. It is intended for LT/debug visibility, not as a simulation mechanic.
+
+It shows:
+
+- schema version
+- saved timestamp
+- active route profile
+- flagship position and heading
+- speed and time warp
+- route-leg and waypoint counts
+- escort mode and vessel count
+- selected ship
+
+Controls:
+
+- `Copy State JSON` forces a save and copies the persisted state JSON when browser permissions allow it.
+- `Download State JSON` forces a save and downloads the current persisted state JSON.
+- `Clear Saved State` removes the state from this browser after confirmation and pauses autosave for the current page session so the store is not immediately recreated by animation.
 
 ## Mk2 Combat Presentation Boundary
 
 V1 briefly explored a single-contact threat drill. Mk2 removes that combat-game
 presentation from the primary interface. The old threat code is retained only as
 a disabled internal path guarded by `INTERNAL_FEATURES.threatDrill = false`; it
-does not appear in the UI and does not affect normal exports.
+does not appear in the UI and does not affect normal operation.
 
 Implementation notes for the current motion model live in `ENGINEERING_NOTES.md`.
 
