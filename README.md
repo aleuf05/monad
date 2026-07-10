@@ -1,11 +1,19 @@
 ﻿# Monad
+# Monad
 
-Monad is a local agent engineering repository. The files currently present show an early Python-based agent program built around Gemini chat sessions, stateful JSON responses, and plaintext operational logs.
+**Monad is a human-directed software engineering organization built around durable artifacts, persistent operational memory, and AI-assisted development.**
 
-The project documentation describes Monad as a long-lived engineering program rather than a single experiment. The repository currently emphasizes scriptable agents, durable text documentation, and logs that can be kept under version control.
+Monad is not a single AI agent or a collection of scripts. It is an engineering methodology for building software through disciplined collaboration between humans and AI.
+
+Ideas become engineering packets. Engineering packets become implementations. Implementations become reviewed artifacts. Every decision expected to survive a watch is preserved as code, doctrine, or operational logs under version control.
+
+The human operator retains command. AI officers contribute planning, implementation, review, documentation, and analysis. The objective is not autonomous software development—it is a repeatable engineering process that becomes more capable, more observable, and easier to continue with every watch.
+
+> **Every watch leaves the ship stronger than it found it.**
+
+The Git repository is the operational memory of Monad. Conversations are working memory; repository artifacts are the authoritative engineering record. A new captain should be able to come aboard, read the logbook, and understand not only what the ship is, but why it became that way.
 
 ## Purpose
-
 This repo currently contains:
 
 - A baseline Gemini chat loop.
