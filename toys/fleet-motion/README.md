@@ -1,8 +1,12 @@
-﻿# Monad Fleet Motion Toy
+# Monad Fleet Motion Mk2
 
 A standalone browser experiment for moving a small simulated fleet across a
 real-world map. It is deliberately separate from the Monad Bridge, doctrine,
 agents, deployment automation, and production infrastructure.
+
+Mk2 is a command-visualization pass over the V1 prototype. The priority is
+legibility, motion feel, and a more deliberate operational display rather than
+deeper simulation realism.
 
 ## Run Locally
 
@@ -20,8 +24,8 @@ available.
 - Leaflet map with OpenStreetMap tiles
 - MONAD flagship and three formation escorts
 - Click-to-set-course navigation
-- Visible course vector
-- Constant-speed simulated movement
+- Visible course vector with a modest turn-arc presentation
+- Frame-based simulated movement with smoothed heading transitions
 - Eased acceleration, deceleration, and heading changes
 - Time warp controls for Pause, 1x, 10x, 100x, and 500x
 - Bounded, fading wake trails for each ship
@@ -39,8 +43,9 @@ available.
 - Scenario presets for repeatable playtest drills
 - Designer note fields for playtest observations and suggested changes
 - Exportable scenario JSON for non-engineer design handoff
-- Single-contact threat drill with automatic escort interception
-- Simple score: hostile contacts neutralized and screen breaches
+- Short skippable opening sequence
+- Passive-viewer startup route so the fleet appears active without input
+- Visual feedback for selection, waypoint creation, rejected navigation, route cancellation, escort mode changes, and reset
 - Faint formation-link lines showing escort relationship to MONAD
 - Live position, distance, ETA, and motion status
 - Pause/resume, return-to-Hormuz, and reset controls
@@ -71,9 +76,9 @@ plain-language notes, and export a structured JSON artifact.
 
 Scenario presets provide repeatable starting points:
 
-- `Freeplay / Manual` leaves routing and threats to the player.
+- `Freeplay / Manual` leaves routing to the player.
 - `Hormuz Transit` loads a baseline movement route.
-- `Escort Screen Drill` loads wider escort spacing and starts a hostile contact.
+- `Patrol Weave Review` loads wider escort spacing and the patrol maneuver mode.
 - `Waypoint Threading` loads a tight-screen waypoint route.
 
 The export includes:
@@ -82,7 +87,6 @@ The export includes:
 - Active scenario preset
 - Current MONAD and escort positions
 - Current route state
-- Current threat drill state and score
 - Designer notes
 - Standalone-toy constraints
 
@@ -90,23 +94,12 @@ The export is local only. It is shown in the page for copy/paste and can be
 downloaded as a `.json` file. No backend, account, database, or deployment
 automation is involved.
 
-## Threat Drill
+## Mk2 Combat Presentation Boundary
 
-`Spawn Threat` creates one hostile contact southeast of the fleet. The contact
-drives toward MONAD. If an escort comes within the intercept radius, the contact
-is neutralized. If the contact reaches MONAD's inner screen first, it records a
-breach.
-
-This is intentionally a toy mechanic:
-
-- No weapons model
-- No hit probability
-- No faction model
-- No live contacts
-- No tactical doctrine
-
-It exists only to make escort spacing, speed, route choice, and player notes more
-testable.
+V1 briefly explored a single-contact threat drill. Mk2 removes that combat-game
+presentation from the primary interface. The old threat code is retained only as
+a disabled internal path guarded by `INTERNAL_FEATURES.threatDrill = false`; it
+does not appear in the UI and does not affect normal exports.
 
 Implementation notes for the current motion model live in `ENGINEERING_NOTES.md`.
 
@@ -117,6 +110,7 @@ Implementation notes for the current motion model live in `ENGINEERING_NOTES.md`
 - Full coastline routing, terrain models, restricted waters, or real marine safety checks
 - Persistence, networking, authentication, or backend services
 - Connections to the Monad site, Bridge, doctrine, Qdrant, or agents
+- Weapons, damage, targeting, combat scoring, or tactical doctrine
 
 Navigation v0.6 uses manually defined rectangular land bounding boxes, manual
 waypoints, a small suggested-detour helper, and simple independent escort
