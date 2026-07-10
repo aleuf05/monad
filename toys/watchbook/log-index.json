@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-10T18:40:08.768460Z",
+  "sourceRoot": "logs/",
+  "entryCount": 7,
+  "latestLogTimestamp": "2026-07-10T00:00:00Z",
+  "counts": {
+    "byRole": {
+      "Admirals": 1,
+      "Captains": 5,
+      "Other": 1
+    },
+    "byEntity": {
+      "Admirals": 1,
+      "Captains": 5,
+      "Other": 1
+    },
+    "byYear": {
+      "2026": 7
+    }
+  },
+  "entries": [
+    {
+      "id": "logs-captains-2026-2026-07-10_toys-overboard-md",
+      "path": "logs/captains/2026/2026-07-10_toys-overboard.md",
+      "fetchPath": "../../logs/captains/2026/2026-07-10_toys-overboard.md",
+      "title": "Toys Overboard Watch Log",
+      "role": "Captains",
+      "entity": "Captains",
+      "year": "2026",
+      "date": "2026-07-10",
+      "sortTimestamp": "2026-07-10T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 1593,
+      "modifiedAt": "2026-07-10T11:02:39.196000Z",
+      "excerpt": "# Toys Overboard Watch Log Date: 2026-07-10 Operator: Lt. cgl Objective: place the newest Monad interactive artifact live on the public web. ## Artifact Selected Fleet Motion Mk2 from `toys/fleet-motion/` because it is..."
+    },
+    {
+      "id": "logs-public-ready-log",
+      "path": "logs/public-ready.log",
+      "fetchPath": "../../logs/public-ready.log",
+      "title": "2026-07-08 0800 - Monad public web route confirmed. Static site reachable through existing publi",
+      "role": "Other",
+      "entity": "Other",
+      "year": "2026",
+      "date": null,
+      "sortTimestamp": "2026-07-09T01:00:32.773000Z",
+      "fileType": "log",
+      "sizeBytes": 179,
+      "modifiedAt": "2026-07-09T01:00:32.773000Z",
+      "excerpt": "2026-07-08 0800 - Monad public web route confirmed. Static site reachable through existing public domain path. Fleet Command dashboard commissioned. Git remains source of truth."
+    },
+    {
+      "id": "logs-captains-2026-2026-07-08_rock64-granite-reverse-proxy-md",
+      "path": "logs/captains/2026/2026-07-08_rock64-granite-reverse-proxy.md",
+      "fetchPath": "../../logs/captains/2026/2026-07-08_rock64-granite-reverse-proxy.md",
+      "title": "2026-07-08 Rock64 to Granite Reverse Proxy Watch",
+      "role": "Captains",
+      "entity": "Captains",
+      "year": "2026",
+      "date": "2026-07-08",
+      "sortTimestamp": "2026-07-08T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 1053,
+      "modifiedAt": "2026-07-09T01:02:15.349000Z",
+      "excerpt": "# 2026-07-08 Rock64 to Granite Reverse Proxy Watch ## Objective Have public `cameronlampley.com` on rock64 reverse-proxy Monad traffic into granite. ## Result Success. `https://cameronlampley.com/monad/` returns HTTP 20..."
+    },
+    {
+      "id": "logs-captains-2026-2026-07-08_granite-deployment-watch-md",
+      "path": "logs/captains/2026/2026-07-08_granite-deployment-watch.md",
+      "fetchPath": "../../logs/captains/2026/2026-07-08_granite-deployment-watch.md",
+      "title": "0600 Granite Deployment Watch",
+      "role": "Captains",
+      "entity": "Captains",
+      "year": "2026",
+      "date": "2026-07-08",
+      "sortTimestamp": "2026-07-08T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 300,
+      "modifiedAt": "2026-07-09T01:00:32.729000Z",
+      "excerpt": "# 0600 Granite Deployment Watch - Monad repo cloned onto Granite at `~/dev/monad`. - `web/` deployed to `/var/www/monad`. - Caddy validated and reloaded. - `curl -I http://localhost/` returned HTTP 200. - Browser confir..."
+    },
+    {
+      "id": "logs-logs-captains-2026-2026-07-06_gemini-crossbrief-md",
+      "path": "logs/logs/captains/2026/2026-07-06_gemini-crossbrief.md",
+      "fetchPath": "../../logs/logs/captains/2026/2026-07-06_gemini-crossbrief.md",
+      "title": "Monad Cross-Briefing Log — Flagship Granite",
+      "role": "Captains",
+      "entity": "Captains",
+      "year": "2026",
+      "date": "2026-07-06",
+      "sortTimestamp": "2026-07-06T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 2373,
+      "modifiedAt": "2026-07-06T22:28:15.435000Z",
+      "excerpt": "# Monad Cross-Briefing Log — Flagship Granite **Date:** 2026-07-06 **Participants:** Admiral Cameron (Fleet Command), Captain T (Watch Command), Gemini (Cognitive Utility) ## Mission Objective Formalize the architectura..."
+    },
+    {
+      "id": "logs-captains-2026-2026-07-06_watch-morning-md",
+      "path": "logs/captains/2026/2026-07-06_watch-morning.md",
+      "fetchPath": "../../logs/captains/2026/2026-07-06_watch-morning.md",
+      "title": "Monad Ship's Log — Flagship Granite",
+      "role": "Captains",
+      "entity": "Captains",
+      "year": "2026",
+      "date": "2026-07-06",
+      "sortTimestamp": "2026-07-06T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 3386,
+      "modifiedAt": "2026-07-06T21:18:36.581000Z",
+      "excerpt": "# Monad Ship's Log — Flagship Granite **Date:** 2026-07-06 **Watch:** Morning Watch **Officer of the Watch:** Captain T ## Strategic Alignment * **Campaign:** Campaign 0 — Bootstrap the Fleet * **Objective:** Historical..."
+    },
+    {
+      "id": "logs-admirals-2026-2026-07-06_campaign-0-checkpoint-md",
+      "path": "logs/admirals/2026/2026-07-06_campaign-0-checkpoint.md",
+      "fetchPath": "../../logs/admirals/2026/2026-07-06_campaign-0-checkpoint.md",
+      "title": "Admiral's Log — Campaign 0 Checkpoint",
+      "role": "Admirals",
+      "entity": "Admirals",
+      "year": "2026",
+      "date": "2026-07-06",
+      "sortTimestamp": "2026-07-06T00:00:00Z",
+      "fileType": "md",
+      "sizeBytes": 3164,
+      "modifiedAt": "2026-07-06T21:23:04.933000Z",
+      "excerpt": "# Admiral's Log — Campaign 0 Checkpoint **Date:** 2026-07-06 **Campaign:** Campaign 0 — Bootstrap the Fleet **Commander:** Admiral Camero ## Strategic Objective Campaign 0 exists to bootstrap the Monad fleet. The object..."
+    }
+  ]
+}
