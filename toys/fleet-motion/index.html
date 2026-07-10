@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -18,7 +18,11 @@
         <p class="eyebrow">Standalone Navigation Experiment</p>
         <h1>Monad Fleet Motion</h1>
       </div>
-      <p class="instruction">Select any point on the map to set course.</p>
+      <div class="deck-meta" aria-label="Simulation context">
+        <span>AO Strait of Hormuz</span>
+        <span>Manual Conn</span>
+        <span>Static Demo</span>
+      </div>
     </header>
 
     <main class="map-shell">
@@ -37,7 +41,70 @@
           <span id="motionStatus" class="motion-status">Holding</span>
         </div>
 
-        <p class="navigation-warning">Navigation v0.2 uses direct routes and may cross land.</p>
+        <p class="navigation-warning">Navigation v0.5 can suggest simple detours around rough land boxes. It is still approximate.</p>
+
+        <section class="design-console" aria-labelledby="designConsoleHeading">
+          <div class="panel-title-row">
+            <p class="eyebrow">Design Console</p>
+            <h3 id="designConsoleHeading">Scenario Tuning</h3>
+          </div>
+
+          <div class="preset-row">
+            <label>
+              <span>Scenario preset</span>
+              <select id="scenarioPresetSelect">
+                <option value="freeplay">Freeplay / Manual</option>
+                <option value="hormuz_transit">Hormuz Transit</option>
+                <option value="escort_screen_drill">Escort Screen Drill</option>
+                <option value="waypoint_threading">Waypoint Threading</option>
+              </select>
+            </label>
+            <button id="applyPresetButton" type="button">Apply Preset</button>
+          </div>
+
+          <div class="tuning-grid">
+            <label>
+              <span>MONAD speed</span>
+              <input id="flagshipSpeedControl" type="range" min="60" max="420" step="10" value="180">
+              <output id="flagshipSpeedOutput">180 km/h</output>
+            </label>
+            <label>
+              <span>Escort speed</span>
+              <input id="escortSpeedControl" type="range" min="0.8" max="1.8" step="0.05" value="1.00">
+              <output id="escortSpeedOutput">1.00x</output>
+            </label>
+            <label>
+              <span>Formation spread</span>
+              <input id="formationSpreadControl" type="range" min="0.5" max="2" step="0.05" value="1.00">
+              <output id="formationSpreadOutput">1.00x</output>
+            </label>
+          </div>
+
+          <div class="notes-grid">
+            <label>
+              <span>Variant name</span>
+              <input id="variantNameInput" type="text" value="hormuz_transit_v1" maxlength="80">
+            </label>
+            <label>
+              <span>What felt good?</span>
+              <textarea id="feltGoodInput" rows="2" placeholder="Example: escorts stayed readable during turns."></textarea>
+            </label>
+            <label>
+              <span>What felt wrong?</span>
+              <textarea id="feltWrongInput" rows="2" placeholder="Example: route recovery felt too easy."></textarea>
+            </label>
+            <label>
+              <span>Suggested change</span>
+              <textarea id="suggestedChangeInput" rows="2" placeholder="Example: add a timed threat near the exit lane."></textarea>
+            </label>
+          </div>
+
+          <div class="export-controls">
+            <button id="exportScenarioButton" type="button">Export Scenario JSON</button>
+            <button id="downloadScenarioButton" type="button" disabled>Download JSON</button>
+          </div>
+          <textarea id="scenarioExportOutput" class="scenario-export" rows="8" readonly placeholder="Exported scenario JSON appears here."></textarea>
+        </section>
 
         <dl class="telemetry-grid">
           <div>
@@ -60,6 +127,26 @@
             <dt>Distance / ETA</dt>
             <dd id="distanceValue">--</dd>
           </div>
+          <div>
+            <dt>Navigation Check</dt>
+            <dd id="navigationStatus">Clear</dd>
+          </div>
+          <div>
+            <dt>Route Plan</dt>
+            <dd id="routeStatus">Direct course</dd>
+          </div>
+          <div>
+            <dt>Escort Mode</dt>
+            <dd id="escortModeStatus">Loose Screen</dd>
+          </div>
+          <div>
+            <dt>Threat Status</dt>
+            <dd id="threatStatus">No contact</dd>
+          </div>
+          <div>
+            <dt>Score</dt>
+            <dd id="scoreValue">0 neutralized / 0 breaches</dd>
+          </div>
         </dl>
 
         <div class="time-warp" aria-label="Simulation speed controls">
@@ -67,10 +154,21 @@
           <button class="warp-button active" type="button" data-warp="1">1x</button>
           <button class="warp-button" type="button" data-warp="10">10x</button>
           <button class="warp-button" type="button" data-warp="100">100x</button>
+          <button class="warp-button" type="button" data-warp="500">500x</button>
         </div>
 
         <div class="controls">
           <button id="pauseButton" type="button" disabled>Pause</button>
+          <button id="waypointButton" type="button">Add Waypoint</button>
+          <button id="suggestDetourButton" type="button" disabled>Suggest Detour</button>
+          <button id="acceptDetourButton" type="button" disabled>Accept Detour</button>
+          <button id="escortModeButton" type="button">Escort Mode</button>
+          <button id="spawnThreatButton" type="button">Spawn Threat</button>
+          <button id="resetThreatButton" type="button" disabled>Reset Threat</button>
+          <button id="undoWaypointButton" type="button" disabled>Undo Waypoint</button>
+          <button id="removeWaypointButton" type="button" disabled>Remove Selected</button>
+          <button id="clearWaypointsButton" type="button" disabled>Clear Waypoints</button>
+          <button id="cancelRouteButton" type="button" disabled>Cancel Route</button>
           <button id="homeButton" type="button">Return to Hormuz</button>
           <button id="resetButton" class="secondary" type="button">Reset Fleet</button>
         </div>
@@ -121,6 +219,6 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
-    <script src="app.js?v=1"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>
