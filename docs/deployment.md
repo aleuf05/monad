@@ -26,3 +26,7 @@ The script copies `web/` to `/var/www/monad/` with `rsync --delete`, validates t
 - Caddy root should remain `/var/www/monad`.
 - The Portainer reverse proxy path must not be disturbed.
 - Do not edit the live web root by hand when the repo copy can be deployed instead.
+
+## Public Artifacts
+
+Interactive artifacts that must be reachable under `https://cameronlampley.com/monad/` live inside `web/toys/`. Fleet Motion Mk2 is deployed from `web/toys/fleet-motion/` and uses relative local asset paths so it works beneath the `/monad/` base path.
