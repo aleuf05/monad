@@ -1,0 +1,265 @@
+:root {
+  color-scheme: dark;
+  --bg: #05080a;
+  --deck: #0b1114;
+  --panel: rgba(9, 16, 19, 0.92);
+  --panel-strong: #0d171b;
+  --line: rgba(180, 216, 209, 0.2);
+  --line-strong: rgba(138, 215, 193, 0.45);
+  --text: #e8f0ed;
+  --muted: #9aada9;
+  --amber: #d8b46a;
+  --signal: #8ad7c1;
+  --warn: #e0bc6f;
+  --shadow: rgba(0, 0, 0, 0.48);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px) 0 0 / 72px 72px,
+    radial-gradient(circle at 50% 0%, rgba(74, 112, 114, 0.2), transparent 44rem),
+    linear-gradient(180deg, #111a1d 0%, var(--bg) 72%);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.bridge-shell {
+  min-height: 100vh;
+  padding: clamp(14px, 2vw, 26px);
+}
+
+.bridge-header,
+.instrument {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 24px 80px var(--shadow), inset 0 0 70px rgba(0, 0, 0, 0.28);
+}
+
+.bridge-header {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(420px, 0.95fr);
+  gap: clamp(16px, 2vw, 28px);
+  align-items: end;
+  padding: clamp(16px, 2vw, 24px);
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--amber);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 7px;
+  font-size: clamp(2rem, 4.4vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin: 0;
+  font-size: clamp(1rem, 1.45vw, 1.35rem);
+  letter-spacing: 0;
+}
+
+.subtitle {
+  max-width: 760px;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+}
+
+.watch-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.watch-strip div,
+.status-list div {
+  border: 1px solid rgba(180, 216, 209, 0.16);
+  background: rgba(2, 6, 8, 0.48);
+  padding: 10px 11px;
+}
+
+.watch-strip span,
+dt {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.watch-strip strong,
+dd {
+  display: block;
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.watch-strip strong {
+  color: var(--signal);
+  font-size: 1rem;
+}
+
+.command-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(360px, 0.86fr);
+  grid-template-rows: minmax(540px, 62vh) minmax(360px, 38vh);
+  grid-template-areas:
+    "fleet periscope"
+    "watchbook engineering";
+  gap: clamp(12px, 1.6vw, 18px);
+  margin-top: clamp(12px, 1.6vw, 18px);
+}
+
+.instrument {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.instrument-fleet {
+  grid-area: fleet;
+}
+
+.instrument-periscope {
+  grid-area: periscope;
+}
+
+.instrument-watchbook {
+  grid-area: watchbook;
+}
+
+.engineering-panel {
+  grid-area: engineering;
+  grid-template-rows: auto auto 1fr;
+}
+
+.instrument-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(4, 9, 11, 0.66);
+}
+
+.instrument-header a {
+  flex: 0 0 auto;
+  color: var(--signal);
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.instrument-header a:hover,
+.instrument-header a:focus-visible {
+  color: var(--amber);
+  outline: none;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  background: #020405;
+}
+
+.status-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 14px;
+}
+
+.status-list div {
+  min-height: 72px;
+}
+
+dd {
+  color: var(--signal);
+}
+
+.engineering-note {
+  margin: 0 14px 14px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.is-watch {
+  color: var(--signal) !important;
+}
+
+.is-caution {
+  color: var(--warn) !important;
+}
+
+@media (max-width: 1180px) {
+  .bridge-header {
+    grid-template-columns: 1fr;
+  }
+
+  .watch-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .command-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(520px, 62vh) minmax(500px, 62vh) minmax(420px, 50vh) auto;
+    grid-template-areas:
+      "fleet"
+      "periscope"
+      "watchbook"
+      "engineering";
+  }
+}
+
+@media (max-width: 620px) {
+  .bridge-shell {
+    padding: 10px;
+  }
+
+  .bridge-header,
+  .instrument-header {
+    padding: 12px;
+  }
+
+  .watch-strip,
+  .status-list {
+    grid-template-columns: 1fr;
+  }
+
+  .command-grid {
+    grid-template-rows: 540px 520px 430px auto;
+  }
+}
