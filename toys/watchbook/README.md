@@ -20,6 +20,16 @@ toys/watchbook/log-index.json
 
 Run it again whenever new logs are added. The frontend discovers new logs through that generated manifest without code changes.
 
+## Sync for review
+
+From the repository root:
+
+```sh
+sh tools/telemetry-sync.sh
+```
+
+This regenerates the Watchbook index, runs lightweight syntax validation, and prints `git status --short` for operator review. It does not commit, push, deploy, or rewrite Git history. On Windows, run the same script from Git Bash with `bash tools/telemetry-sync.sh` if `sh` is not on `PATH`.
+
 ## Run locally
 
 Serve the repository root so the browser can fetch both the manifest and canonical log files:
