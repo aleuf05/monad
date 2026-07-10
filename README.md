@@ -1,4 +1,113 @@
-﻿# Monad
+# Monad
+
+**Monad is a human-directed software engineering experiment for building durable software artifacts with AI-assisted teams.**
+
+The project explores a simple question:
+
+> What changes when AI systems are treated not as isolated chatbots, but as participants in a disciplined engineering organization?
+
+Monad combines human direction, specialized AI roles, explicit engineering packets, operational logs, and version-controlled artifacts. The goal is not to remove the human from software development. The goal is to make collaboration between humans and AI more repeatable, inspectable, and useful over time.
+
+## Why Monad Exists
+
+Most AI-assisted development happens inside short-lived conversations. Useful decisions disappear into chat history, context is lost between sessions, and work becomes difficult to continue or audit.
+
+Monad treats the repository as the durable memory of the organization.
+
+Conversations are working memory. The repository is the record.
+
+Ideas become plans. Plans become implementations. Implementations become reviewed artifacts. Decisions that need to survive are preserved as code, documentation, doctrine, or logs.
+
+> **Every watch should leave the ship stronger than it found it.**
+
+## Operating Model
+
+Monad uses a naval command metaphor to make software work easier to reason about and more engaging to operate.
+
+The metaphor is playful, but the underlying process is practical:
+
+- A human operator retains authority over direction and execution.
+- AI collaborators can take on planning, implementation, review, documentation, and analysis roles.
+- Work is passed between roles through explicit engineering packets rather than vague conversational handoffs.
+- Important decisions are written down.
+- The repository remains the source of truth.
+
+The project is both a software experiment and an investigation into engineering methodology for the agentic era.
+
+## Current Repository
+
+The repository currently contains experiments in:
+
+- Stateful AI agents
+- Operational logging
+- Engineering doctrine
+- Durable project memory
+- AI-assisted software engineering workflows
+- Small standalone web experiments ("web toys")
+
+The codebase is evolving from individual prototypes into a collection of reusable engineering instruments.
+
+## Repository Layout
+
+The structure is intentionally evolving as Monad grows.
+
+Representative areas include:
+
+- `docs/` — doctrine, architecture, engineering notes, and watch logs.
+- `logs/` — operational records organized by role and watch.
+- `toys/` — standalone browser experiments and interface prototypes.
+- `projects/` — larger self-contained development efforts.
+- Python utilities and agent experiments.
+
+## Philosophy
+
+Monad is guided by a few durable principles:
+
+1. **Human command remains explicit.**
+   AI assistance does not erase human responsibility.
+
+2. **Artifacts outrank conversation.**
+   Important work must survive outside the chat that produced it.
+
+3. **Memory should be inspectable.**
+   A future engineer—or AI—should be able to understand why decisions were made.
+
+4. **Small working systems beat grand descriptions.**
+   Progress is measured by running software.
+
+5. **Process is part of the product.**
+   Monad studies how software can be built in the agentic era as much as it studies what software to build.
+
+## Current Status
+
+Monad is an active research and prototyping project.
+
+Current work focuses on:
+
+- AI engineering workflows
+- Durable operational memory
+- Engineering packet methodology
+- Human/AI collaboration patterns
+- Browser-based operational interfaces
+- Development tooling
+
+The long-term objective is a practical development environment where humans and AI collaborate through durable artifacts rather than ephemeral conversations.
+
+## Contributing
+
+The engineering process is still evolving, but thoughtful discussion, experiments, and small, well-documented improvements are welcome.
+
+Preference is given to:
+
+- Simple designs
+- Clear documentation
+- Small reviewable changes
+- Working software
+- Durable engineering artifacts
+
+## License
+
+License to be determined.﻿# Monad
 # Monad
 
 **Monad is a human-directed software engineering organization built around durable artifacts, persistent operational memory, and AI-assisted development.**
