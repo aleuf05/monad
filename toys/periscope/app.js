@@ -1,6 +1,11 @@
 const TAU = Math.PI * 2;
 const FIELD_OF_VIEW = 54;
 const MAX_RANGE = 14;
+const HORIZON_RATIO = 0.45;
+const ASSET_PATHS = {
+  sea: "assets/backgrounds/sea-horizon-mk2.png",
+  scout: "assets/sprites/scout-alpha.png",
+};
 
 const vessels = [
   {
@@ -76,6 +81,24 @@ const state = {
   contactButtonsReady: false,
 };
 
+const assets = {
+  sea: loadImage(ASSET_PATHS.sea),
+  scout: loadImage(ASSET_PATHS.scout),
+};
+
+function loadImage(src) {
+  const image = new Image();
+  const asset = { image, ready: false, failed: false };
+  image.onload = () => {
+    asset.ready = true;
+  };
+  image.onerror = () => {
+    asset.failed = true;
+  };
+  image.src = src;
+  return asset;
+}
+
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
@@ -130,10 +153,10 @@ function resizeCanvas() {
   }
 }
 
-function renderOcean(now) {
+function renderProceduralOcean(now) {
   const w = canvas.width;
   const h = canvas.height;
-  const horizon = h * 0.45;
+  const horizon = h * HORIZON_RATIO;
   const sky = ctx.createLinearGradient(0, 0, 0, horizon);
   sky.addColorStop(0, "#172027");
   sky.addColorStop(0.58, "#31404a");
@@ -167,6 +190,70 @@ function renderOcean(now) {
     }
     ctx.strokeStyle = i % 3 === 0 ? "rgba(189, 225, 219, 0.22)" : "rgba(55, 136, 144, 0.18)";
     ctx.stroke();
+  }
+}
+
+function renderSeaPlate(now) {
+  const w = canvas.width;
+  const h = canvas.height;
+  if (!assets.sea.ready) {
+    renderProceduralOcean(now);
+    return;
+  }
+
+  const image = assets.sea.image;
+  const sourceRatio = image.width / image.height;
+  let drawHeight = h;
+  let drawWidth = h * sourceRatio;
+  if (drawWidth < w) {
+    drawWidth = w;
+    drawHeight = w / sourceRatio;
+  }
+
+  const horizonCorrection = h * 0.025;
+  const drawY = (h - drawHeight) * 0.5 + horizonCorrection;
+  const pan = normalizeDegrees(state.bearing) / 360;
+  const period = drawWidth;
+  const drift = (now * 0.003) % period;
+  let drawX = -((pan * period + drift) % period);
+
+  ctx.save();
+  ctx.filter = "contrast(1.04) saturate(0.92) brightness(0.86)";
+  while (drawX < w) {
+    ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    drawX += period;
+  }
+  ctx.restore();
+}
+
+function renderAtmosphere(now) {
+  const w = canvas.width;
+  const h = canvas.height;
+  const horizon = h * HORIZON_RATIO;
+
+  const haze = ctx.createLinearGradient(0, horizon - h * 0.08, 0, horizon + h * 0.17);
+  haze.addColorStop(0, "rgba(205, 222, 218, 0.02)");
+  haze.addColorStop(0.45, "rgba(220, 225, 213, 0.22)");
+  haze.addColorStop(1, "rgba(20, 42, 48, 0)");
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, horizon - h * 0.1, w, h * 0.3);
+
+  ctx.fillStyle = "rgba(240, 219, 173, 0.18)";
+  ctx.fillRect(0, horizon - 1, w, Math.max(1, h * 0.002));
+
+  const glare = ctx.createRadialGradient(w * 0.62, h * 0.2, 0, w * 0.62, h * 0.2, w * 0.48);
+  glare.addColorStop(0, "rgba(255, 241, 198, 0.08)");
+  glare.addColorStop(1, "rgba(255, 241, 198, 0)");
+  ctx.fillStyle = glare;
+  ctx.fillRect(0, 0, w, h);
+
+  const grainStep = Math.max(7, Math.floor(w / 110));
+  ctx.fillStyle = "rgba(255, 255, 255, 0.025)";
+  for (let y = 0; y < h; y += grainStep) {
+    for (let x = (y / grainStep) % 2; x < w; x += grainStep * 2) {
+      const jitter = Math.sin(x * 19.19 + y * 7.31 + now * 0.001) * 0.5 + 0.5;
+      if (jitter > 0.72) ctx.fillRect(x, y, 1, 1);
+    }
   }
 }
 
@@ -204,14 +291,32 @@ function renderBridgeOptics() {
   }
 }
 
-function renderContact(contact) {
-  if (!contact.visible) return;
+function renderWake(contact, x, y, spriteWidth) {
   const w = canvas.width;
   const h = canvas.height;
-  const x = contact.x * w;
-  const y = contact.y * h;
-  const hull = w * 0.032 * contact.scale;
-  const mast = w * 0.035 * contact.scale;
+  const wakeWidth = spriteWidth * 1.18;
+  const wakeHeight = Math.max(5, h * 0.012 * contact.scale);
+
+  ctx.save();
+  ctx.translate(x - spriteWidth * 0.05, y + wakeHeight * 0.55);
+  ctx.strokeStyle = "rgba(225, 236, 228, 0.33)";
+  ctx.lineWidth = Math.max(1, w * 0.0015);
+  ctx.beginPath();
+  ctx.moveTo(-wakeWidth * 0.48, 0);
+  ctx.bezierCurveTo(-wakeWidth * 0.22, -wakeHeight, wakeWidth * 0.16, -wakeHeight * 0.8, wakeWidth * 0.52, 0);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(148, 188, 185, 0.18)";
+  ctx.beginPath();
+  ctx.moveTo(-wakeWidth * 0.42, wakeHeight * 0.7);
+  ctx.bezierCurveTo(-wakeWidth * 0.08, wakeHeight * 0.05, wakeWidth * 0.24, wakeHeight * 0.12, wakeWidth * 0.42, wakeHeight * 0.74);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function renderFallbackContactGlyph(contact, x, y, spriteWidth) {
+  const w = canvas.width;
+  const hull = spriteWidth * 0.18;
+  const mast = spriteWidth * 0.2;
 
   ctx.save();
   ctx.translate(x, y);
@@ -233,13 +338,18 @@ function renderContact(contact) {
   ctx.moveTo(-hull * 0.42, -mast * 0.42);
   ctx.lineTo(hull * 0.5, -mast * 0.42);
   ctx.stroke();
+  ctx.restore();
+}
 
+function renderContactLabel(contact, x, y, spriteHeight) {
+  const w = canvas.width;
+  const mastTop = y - spriteHeight * 0.68;
   ctx.fillStyle = "rgba(4, 9, 11, 0.7)";
   ctx.strokeStyle = "rgba(226, 240, 236, 0.25)";
   const labelWidth = Math.max(w * 0.19, 130);
   const labelHeight = 58;
-  const labelX = clamp(16, -x + 24, w - x - labelWidth - 24);
-  const labelY = -mast - labelHeight - 16;
+  const labelX = clamp(16, x - labelWidth * 0.5, w - labelWidth - 24);
+  const labelY = clamp(58, mastTop - labelHeight - 16, canvas.height - labelHeight - 28);
   ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
   ctx.strokeRect(labelX, labelY, labelWidth, labelHeight);
 
@@ -250,7 +360,36 @@ function renderContact(contact) {
   ctx.font = `${Math.max(10, w * 0.012)}px Segoe UI, sans-serif`;
   ctx.fillText(`Bearing ${formatBearing(contact.bearing)}`, labelX + 10, labelY + 35);
   ctx.fillText(`Range ${contact.range.toFixed(1)} nm`, labelX + 10, labelY + 50);
+}
+
+function renderContact(contact, now) {
+  if (!contact.visible) return;
+  const w = canvas.width;
+  const h = canvas.height;
+  const x = contact.x * w;
+  const bob = Math.sin(now * 0.003 + contact.baseBearing) * h * 0.004 * contact.scale;
+  const y = contact.y * h + bob;
+  const spriteWidth = w * 0.24 * contact.scale;
+  const spriteHeight = spriteWidth * 0.5;
+
+  ctx.save();
+  renderWake(contact, x, y, spriteWidth);
+  if (assets.scout.ready) {
+    ctx.globalAlpha = clamp(1.05 - contact.range / MAX_RANGE * 0.34, 0.62, 0.96);
+    ctx.filter = `blur(${(contact.range / MAX_RANGE * 0.7).toFixed(2)}px) contrast(0.96) brightness(${(0.82 + contact.scale * 0.24).toFixed(2)})`;
+    ctx.drawImage(
+      assets.scout.image,
+      x - spriteWidth * 0.5,
+      y - spriteHeight * 0.78,
+      spriteWidth,
+      spriteHeight
+    );
+  } else {
+    renderFallbackContactGlyph(contact, x, y, spriteWidth);
+  }
   ctx.restore();
+
+  renderContactLabel(contact, x, y, spriteHeight);
 }
 
 function updateBearingBand() {
@@ -324,11 +463,12 @@ function render(now) {
   }
   state.bearing = normalizeDegrees(state.bearing + shortestDelta(state.bearing, state.targetBearing) * 0.13);
 
-  renderOcean(now);
+  renderSeaPlate(now);
+  renderAtmosphere(now);
   renderBridgeOptics();
   const contacts = vessels.map((vessel) => projectContact(vesselState(vessel, now / 1000)));
   state.visibleContacts = contacts.filter((contact) => contact.visible);
-  contacts.forEach(renderContact);
+  contacts.forEach((contact) => renderContact(contact, now));
 
   bearingReadout.textContent = formatBearing(state.bearing);
   updateBearingBand();
