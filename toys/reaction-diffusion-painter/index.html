@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reaction-Diffusion Painter</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="stage" aria-label="Reaction-diffusion canvas area">
+        <div class="stage-header">
+          <div>
+            <h1>Reaction-Diffusion Painter</h1>
+            <p>Paint a chemical field and watch it grow.</p>
+          </div>
+          <span class="brand">A Monad toy</span>
+        </div>
+        <div class="canvas-wrap" id="canvasWrap">
+          <canvas
+            id="fieldCanvas"
+            aria-label="Animated chemical field. Drag or touch to paint new chemical seeds."
+            role="img"
+          ></canvas>
+          <div class="brush-cursor" id="brushCursor" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <aside class="controls" aria-label="Simulation controls">
+        <p class="hint">Paint on the field. Try a preset. Adjust feed and kill.</p>
+
+        <div class="button-row">
+          <button type="button" id="pauseButton" aria-pressed="false">Pause</button>
+          <button type="button" id="resetButton">Reset</button>
+          <button type="button" id="randomButton">Randomize</button>
+        </div>
+
+        <label class="field">
+          <span>Preset</span>
+          <select id="presetSelect">
+            <option value="coral">Coral</option>
+            <option value="mitosis">Mitosis</option>
+            <option value="worms">Worms</option>
+            <option value="labyrinth">Labyrinth</option>
+          </select>
+        </label>
+
+        <div class="slider-block">
+          <label for="feedSlider">
+            <span>Feed</span>
+            <output id="feedValue">0.0545</output>
+          </label>
+          <input id="feedSlider" type="range" min="0.0100" max="0.1000" step="0.0001" value="0.0545">
+        </div>
+
+        <div class="slider-block">
+          <label for="killSlider">
+            <span>Kill</span>
+            <output id="killValue">0.0620</output>
+          </label>
+          <input id="killSlider" type="range" min="0.0300" max="0.0800" step="0.0001" value="0.0620">
+        </div>
+
+        <div class="slider-block">
+          <label for="brushSlider">
+            <span>Brush size</span>
+            <output id="brushValue">12</output>
+          </label>
+          <input id="brushSlider" type="range" min="2" max="30" step="1" value="12">
+        </div>
+
+        <div class="slider-block">
+          <label for="speedSlider">
+            <span>Speed</span>
+            <output id="speedValue">5</output>
+          </label>
+          <input id="speedSlider" type="range" min="1" max="12" step="1" value="5">
+        </div>
+      </aside>
+    </main>
+  </body>
+</html>

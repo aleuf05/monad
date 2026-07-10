@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Watchbook</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Monad Operational Memory</p>
+        <h1>Watchbook</h1>
+      </div>
+      <div class="index-meta" id="indexMeta">Index pending</div>
+    </header>
+    <main class="watchbook-shell">
+      <aside class="sidebar" aria-label="Log navigation and filters">
+        <section class="summary" aria-label="Operational summary">
+          <div><span class="metric" id="totalLogs">--</span><span class="metric-label">Logs</span></div>
+          <div><span class="metric" id="latestLog">--</span><span class="metric-label">Latest</span></div>
+        </section>
+        <section class="filters" aria-label="Search and filters">
+          <label class="search-box"><span>Search logs</span><input id="searchInput" type="search" autocomplete="off" placeholder="title, path, or content"></label>
+          <div class="filter-grid">
+            <label><span>Role</span><select id="roleFilter"></select></label>
+            <label><span>Officer</span><select id="entityFilter"></select></label>
+            <label><span>Year</span><select id="yearFilter"></select></label>
+            <label><span>Type</span><select id="typeFilter"></select></label>
+          </div>
+        </section>
+        <section class="breakdown" aria-label="Counts by role"><h2>Counts</h2><div id="countsList"></div></section>
+        <nav class="log-list" aria-label="Log files">
+          <div class="list-head"><h2>Logs</h2><span id="resultCount">0 shown</span></div>
+          <ol id="logList"></ol>
+        </nav>
+      </aside>
+      <article class="reader" aria-live="polite">
+        <div class="reader-head">
+          <div>
+            <p class="eyebrow" id="readerRole">No log selected</p>
+            <h2 id="readerTitle">Select a log</h2>
+            <p class="source-path" id="sourcePath">Repository path appears here.</p>
+          </div>
+          <button id="copyCitationButton" type="button" disabled>Copy citation</button>
+        </div>
+        <div class="reader-tools"><span id="readerDetails">Browse the index or search across loaded log text.</span></div>
+        <div id="content" class="content empty-state"><p>Watchbook is read-only. It renders existing repository logs without editing, summarizing, or moving them.</p></div>
+      </article>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
