@@ -32,7 +32,7 @@ available.
 - Bounded, fading wake trails for each ship
 - Clickable ships with a current ship info panel
 - Captain's Log panel for course, warp, pause/resume, arrival, and reset events
-- Rough land exclusion boxes around obvious Strait of Hormuz demo-area landmasses
+- Rough land exclusion boxes retained for route-planning demos
 - Destination and direct-route rejection when a course crosses a land box
 - Manual waypoint routing with staged route legs
 - Route editing controls for undoing, selecting, removing, and canceling routes
@@ -49,7 +49,7 @@ available.
 - Visual feedback for selection, waypoint creation, rejected navigation, route cancellation, escort mode changes, and reset
 - Faint formation-link lines showing escort relationship to MONAD
 - Live position, distance, ETA, and motion status
-- Pause/resume, return-to-Hormuz, and reset controls
+- Pause/resume, return-to-station, and reset controls
 
 Use `Add Waypoint` to arm one waypoint placement, then click the map. After the
 waypoint is staged, the next normal map click sets the final destination and
@@ -84,30 +84,30 @@ behavior, persistence, time warp, ship inspection, and the Captain's Log.
 Fleet Motion stores the current voyage in `localStorage` under the key
 `monad.fleetMotion.state`. Startup attempts to restore that state before loading
 any baseline route. If saved state exists, ordinary reloads and browser restarts
-resume the current voyage instead of silently returning MONAD to the Strait of
-Hormuz baseline.
+resume the current voyage instead of silently returning MONAD to the Arabian
+Sea watch baseline.
 
 The persisted schema is versioned:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "savedAt": "ISO-8601 timestamp",
-  "activePresetId": "hormuz_transit",
+  "activePresetId": "arabian_sea_watch",
   "designSettings": {
     "flagshipSpeedKmh": 180,
     "escortSpeedScale": 1,
     "formationSpread": 1
   },
   "flagship": {
-    "position": { "lat": 26.56, "lng": 56.25 },
+    "position": { "lat": 20.5, "lng": 63.2 },
     "headingDegrees": 270,
     "speedKmh": 120,
     "engineOrderKmh": 180
   },
   "navigation": {
-    "destination": { "lat": 26.25, "lng": 55.35 },
-    "finalDestination": { "lat": 26.25, "lng": 55.35 },
+    "destination": { "lat": 20.28, "lng": 62.82 },
+    "finalDestination": { "lat": 20.28, "lng": 62.82 },
     "waypoints": [],
     "routeQueue": [],
     "waypointMode": false,
@@ -133,7 +133,7 @@ The persisted schema is versioned:
         "id": "traffic-dhow-01",
         "name": "DHOW LANTERN",
         "role": "civilian dhow",
-        "position": { "lat": 26.42, "lng": 55.95 },
+        "position": { "lat": 20.58, "lng": 63.29 },
         "speedKmh": 32,
         "headingDegrees": 312,
         "status": "Transiting"
@@ -157,7 +157,7 @@ These contacts are persisted under `contacts.ships` in the canonical browser
 state so Bridge Station can observe them without coupling to Fleet Motion's DOM.
 
 `Reload Saved State` reloads the current voyage from `localStorage`. It does not
-return MONAD to the Strait of Hormuz baseline. Applying a scenario preset still
+return MONAD to the Arabian Sea watch baseline. Applying a scenario preset still
 requires confirmation because it replaces the current voyage with a documented
 preset scenario.
 
@@ -172,9 +172,9 @@ preset scenario.
 6. Reload the page.
 7. Confirm MONAD, escorts, heading, speed/order, time warp, route state, and escort mode are restored.
 8. Close and reopen the browser, then open the toy again.
-9. Confirm the same saved state is restored and startup does not teleport to the Strait of Hormuz baseline.
+9. Confirm the same saved state is restored and startup does not teleport to the Arabian Sea watch baseline.
 10. Click `Reload Saved State`; confirm the page reloads the saved voyage from `localStorage`.
-11. Confirm the button does not teleport MONAD back to the Strait of Hormuz baseline.
+11. Confirm the button does not teleport MONAD back to the Arabian Sea watch baseline.
 
 
 ## State Inspector
