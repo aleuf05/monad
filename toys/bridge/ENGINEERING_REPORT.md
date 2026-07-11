@@ -88,6 +88,29 @@ Wired the newly built `toys/radio-console/` (see `logs/captains/2026/2026-07-11_
 - Measured the real fix iteratively rather than guessing a final number twice: a dedicated Playwright script loaded Radio Console inside a bare iframe at Bridge's actual embedded width and read back `getBoundingClientRect().height` for the shell and each internal panel, both before and after adding the embedded-trimming CSS (436px → 337px), which is what the final 360px panel height and the CSS trims above are based on.
 - Re-screenshotted after the fix, powered on via a real click (`frameLocator("...").locator("#powerButton").click()`) and forced an immediate transmission: Power/channel chips/volume/mute, the signal meter (now animating with real amber bars while "transmitting"), and a transcript entry are all visible within the panel on both desktop and mobile, with no scrolling required to reach the primary controls.
 
+## Mk V.1: Mobile Live Console Layout Fix
+
+The Validation Caveat above flagged that the 390×844 mobile layout hadn't been re-checked since Mk III's CSS/layout work. This watch closed that gap and found a real bug: at ≤900px, Periscope's panel rendered at 215px tall (iframe itself only 150px) while Fleet Motion and Radio Console both got their intended 360px — Periscope's own optics view (`.scope-frame`) sat below the visible fold, reachable only via an unindicated scroll inside the iframe. Present on screen, but not usable by a first-time visitor, per this sprint's own acceptance criteria.
+
+### Root Cause
+
+`.live-console`'s base rule (non-mobile) sets `grid-template-rows: minmax(0, 1fr) auto` — two explicit tracks sized for the desktop two-column layout (row 1: Fleet Motion + Periscope side by side; row 2: Radio Console spanning both columns). The `@media (max-width: 900px)` override switches to a single column and adds `grid-auto-rows: minmax(300px, 1fr)`, intended to give every stacked panel a fair minimum height, but never cleared the inherited `grid-template-rows`. With two explicit tracks still in force, the first two stacked items (Fleet Motion, then Periscope) were placed into those pre-existing tracks (`minmax(0,1fr)` and `auto`) instead of picking up `grid-auto-rows`. Fleet Motion's track was still flexible enough to look fine; Periscope landed in the `auto` track and collapsed to intrinsic content size. Radio Console, the only panel to actually fall into an auto-generated row, was masked by its own hardcoded `height: 360px`, which is why this went unnoticed.
+
+### Fix
+
+`toys/bridge/style.css`, `@media (max-width: 900px)` block: added `grid-template-rows: none;` alongside the existing `grid-template-columns: 1fr` and `grid-auto-rows: minmax(300px, 1fr)`, so all three stacked panels are sized by the same auto-row rule with no leftover two-row definition to fall into.
+
+### Validation Performed
+
+- Playwright at 390×844 against a local static server, before and after the fix. Before: Fleet Motion/Radio Console articles 360px, Periscope article 215px (iframe 150px), Periscope's `.scope-frame` at `top: 319` inside a 1265px-tall document — confirmed off-screen and not reachable without an unadvertised in-iframe scroll. After: all three articles measured 360px, Periscope's iframe grew to 295px.
+- Confirmed no horizontal overflow (`document.body.scrollWidth === window.innerWidth`) and zero console/page errors, both before and after.
+- Called `selectShip("escort-alpha")` inside the embedded Fleet Motion iframe at mobile width: Bridge's status rail updated to "Escort Alpha," confirming the selection-sync logic itself was unaffected by the CSS bug (this was a layout-only defect, not a regression in Mk III/Mk IV's sync work).
+- Scrolled inside Periscope's own iframe document post-fix and confirmed the scope view, bearing dial, and nearest-contact readout (`SCOUT ALPHA`, `252° / 140.7 nm`) are reachable.
+
+### Known Remaining Gap
+
+Even at its corrected 360px/295px height, Periscope's own internal document (1370px tall standalone, unchanged by this fix) still needs an in-iframe scroll to reach the scope view — Fleet Motion and Radio Console do not require this. Radio Console closed an equivalent problem for itself with an `is-embedded` body-class trim (see Mk V above); Periscope has no such embed-aware mode today. Giving Periscope the same treatment would touch `toys/periscope/app.js` and `style.css`, which is outside this sprint's stated boundary (Bridge-side layout and event-wiring only, no Fleet Motion/Periscope simulation or presentation changes) — recommended as the next follow-on sprint rather than folded in here.
+
 ## Recommended Next Watch
 
-A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`.
+A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`. Giving Periscope an embed-aware trim mode (mirroring Radio Console's `is-embedded` class) to eliminate the in-iframe scroll noted above is now the leading mobile-layout follow-up.
