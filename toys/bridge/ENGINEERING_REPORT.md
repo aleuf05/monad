@@ -21,6 +21,7 @@ None outside `toys/bridge/`.
 
 - Existing instruments are embedded with iframes and remain independently operable.
 - Bridge Station reads Fleet Motion's canonical browser-local state from `monad.fleetMotion.state` when available.
+- The Engineering Status panel also reports passive contact counts when Fleet Motion publishes `contacts.ships`.
 - The Engineering Status panel avoids fake telemetry and reports awaiting-state placeholders when no Fleet Motion state has been observed.
 - The layout is desktop-first but collapses to a single-column mobile command deck.
 

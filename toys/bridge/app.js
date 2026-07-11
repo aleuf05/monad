@@ -9,6 +9,7 @@
   const fleetStateValue = document.querySelector("#fleetStateValue");
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
+  const contactValue = document.querySelector("#contactValue");
   const commitValue = document.querySelector("#commitValue");
 
   function pad(value) {
@@ -44,11 +45,13 @@
       fleetStateValue.textContent = "Awaiting Fleet Motion";
       fleetPositionValue.textContent = "No state observed";
       routeValue.textContent = "No route observed";
+      contactValue.textContent = "No contacts observed";
       return;
     }
 
     const routeLegs = Array.isArray(state.navigation?.routeQueue) ? state.navigation.routeQueue.length : 0;
     const waypoints = Array.isArray(state.navigation?.waypoints) ? state.navigation.waypoints.length : 0;
+    const contacts = Array.isArray(state.contacts?.ships) ? state.contacts.ships : [];
     const motion = state.time?.timeWarp === 0 ? "Paused" : `${state.time?.timeWarp || 1}x`;
     const speed = Number(state.flagship?.speedKmh || 0);
     const moving = speed > 0.5 && state.time?.timeWarp !== 0;
@@ -62,6 +65,7 @@
       : `Observed / ${motion}`;
     fleetPositionValue.textContent = formatPosition(state.flagship?.position);
     routeValue.textContent = `${routeLegs} active leg${routeLegs === 1 ? "" : "s"} / ${waypoints} waypoint${waypoints === 1 ? "" : "s"}`;
+    contactValue.textContent = `${contacts.length} passive contact${contacts.length === 1 ? "" : "s"}`;
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";
     conditionValue.className = state.navigation?.lastNavigationMessage === "Clear" ? "is-watch" : "is-caution";

@@ -46,6 +46,7 @@ Current observed fields:
 - flagship position,
 - route leg count,
 - waypoint count,
+- passive contact count,
 - time warp,
 - motion status,
 - last navigation message.

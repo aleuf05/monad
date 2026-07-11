@@ -826,9 +826,48 @@ h1 {
   box-shadow: 0 0 10px rgba(232, 185, 93, 0.78);
 }
 
+.contact-dot {
+  position: relative;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-radius: 42% 58% 50% 50%;
+  background: rgba(38, 61, 74, 0.92);
+  box-shadow: 0 0 0 3px rgba(7, 26, 40, 0.38), 0 0 14px rgba(255, 255, 255, 0.22);
+}
+
+.contact-dot::before {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 2px;
+  height: 9px;
+  content: "";
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  transform: translateX(-50%) rotate(var(--heading, 0deg));
+  transform-origin: 50% calc(100% + 6px);
+}
+
+.contact-dot::after {
+  width: 6px;
+  height: 6px;
+  content: "";
+  border-radius: 50%;
+  background: #d9ecf0;
+}
+
 .ship-dot.selected {
   transform: scale(1.16);
   box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.5), 0 0 24px rgba(37, 217, 232, 0.8);
+}
+
+.contact-dot.selected {
+  transform: scale(1.16);
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.48), 0 0 20px rgba(123, 242, 162, 0.62);
 }
 
 .waypoint-dot {
@@ -942,8 +981,10 @@ h1 {
 }
 
 @media (max-width: 680px) {
+  html,
   body {
     overflow: auto;
+    overflow-x: hidden;
   }
 
   .command-bar {
