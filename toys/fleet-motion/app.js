@@ -897,6 +897,33 @@ function capitalizeStatus(status) {
 // reuses Fleet Motion's existing persistFleetState() write path unchanged
 // -- Periscope and Bridge inherit live data through the same
 // MonadFleetState contract they already read, with no changes on their end.
+// FleetCore's vessel ids never matched Fleet Motion's own ids ("escort-alpha"
+// vs "vessel.scout-alpha"), so this has always matched by array position
+// instead of id -- fine for escorts, since both sides happen to list
+// alpha/bravo/charlie in the same order, but WRONG for passive traffic:
+// FleetCore's snapshot order is alphabetical by id (coaster, dhow, gulf-star,
+// pilot-amber), Fleet Motion's own contactStates order is not (dhow, gulf-star,
+// pilot-amber, coaster). Positional matching there silently paired each
+// contact's on-screen name with a different vessel's real position -- e.g.
+// "DHOW LANTERN" rendering wherever the real Coaster Qeshm actually was.
+// Matched by name keyword instead: every FleetCore vessel name's last word
+// (ALPHA, LANTERN, STAR, AMBER, QESHM, ...) is a distinctive substring of
+// exactly one Fleet Motion entity's own name, regardless of either side's
+// array order.
+function matchByNameKeyword(entities, sourceVessels) {
+  const used = new Set();
+  return entities.map((entity) => {
+    const source = sourceVessels.find((vessel) => {
+      if (used.has(vessel.id)) return false;
+      const name = vessel.callsign || vessel.name || "";
+      const keyword = name.trim().split(/\s+/).pop()?.toUpperCase();
+      return keyword && entity.name?.toUpperCase().includes(keyword);
+    });
+    if (source) used.add(source.id);
+    return { entity, source };
+  });
+}
+
 function applyLiveSnapshot(snapshot) {
   const vessels = snapshot.vessels || [];
   const flagshipVessel = vessels.find((vessel) => vessel.kind === "flagship");
@@ -910,8 +937,7 @@ function applyLiveSnapshot(snapshot) {
     lastStatus = capitalizeStatus(flagshipVessel.status) || lastStatus;
   }
 
-  escortStates = escortStates.map((escort, index) => {
-    const source = scoutVessels[index];
+  escortStates = matchByNameKeyword(escortStates, scoutVessels).map(({ entity: escort, source }) => {
     if (!source) return escort;
     return {
       ...escort,
@@ -921,8 +947,7 @@ function applyLiveSnapshot(snapshot) {
     };
   });
 
-  contactStates = contactStates.map((contact, index) => {
-    const source = passiveVessels[index];
+  contactStates = matchByNameKeyword(contactStates, passiveVessels).map(({ entity: contact, source }) => {
     if (!source) return contact;
     return {
       ...contact,
