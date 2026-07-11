@@ -30,3 +30,8 @@ logs/public-ready.log
 
 # Exceptions: Allow explicit tracking of manual structural blueprints
 !logs/captains/**/*.md
+
+# Rust build output and local FleetCore runtime state
+target/
+fleetcore/target/
+data/fleetcore/

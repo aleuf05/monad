@@ -1,0 +1,111 @@
+{
+  "schema_version": "monad.fleetcore.world.v1",
+  "world_id": "monad.local",
+  "clock": {
+    "tick": 0,
+    "tick_duration_seconds": 1,
+    "time_scale": 1,
+    "state": "running",
+    "start_unix_seconds": 1783713600
+  },
+  "vessels": [
+    {
+      "id": "vessel.monad",
+      "name": "Monad",
+      "callsign": "MONAD",
+      "kind": "flagship",
+      "position": { "lat": 26.56, "lng": 56.25 },
+      "course": 270.0,
+      "speed_mps": 20.0,
+      "status": "underway",
+      "route": [{ "lat": 26.25, "lng": 55.35 }],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "vessel.scout-alpha",
+      "name": "Scout Alpha",
+      "callsign": "SCOUT ALPHA",
+      "kind": "scout",
+      "position": { "lat": 26.34, "lng": 55.93 },
+      "course": 286.0,
+      "speed_mps": 18.0,
+      "status": "underway",
+      "route": [{ "lat": 26.30, "lng": 55.70 }],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "vessel.scout-bravo",
+      "name": "Scout Bravo",
+      "callsign": "SCOUT BRAVO",
+      "kind": "scout",
+      "position": { "lat": 26.54, "lng": 56.63 },
+      "course": 238.0,
+      "speed_mps": 17.0,
+      "status": "underway",
+      "route": [{ "lat": 26.47, "lng": 56.36 }],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "vessel.scout-charlie",
+      "name": "Scout Charlie",
+      "callsign": "SCOUT CHARLIE",
+      "kind": "scout",
+      "position": { "lat": 26.74, "lng": 56.31 },
+      "course": 204.0,
+      "speed_mps": 16.0,
+      "status": "underway",
+      "route": [{ "lat": 26.58, "lng": 56.15 }],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "traffic.dhow-lantern",
+      "name": "Dhow Lantern",
+      "callsign": "DHOW LANTERN",
+      "kind": "passive-traffic",
+      "position": { "lat": 26.42, "lng": 55.95 },
+      "course": 312.0,
+      "speed_mps": 8.9,
+      "status": "transiting",
+      "route": [],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "traffic.gulf-star",
+      "name": "Tanker Gulf Star",
+      "callsign": "GULF STAR",
+      "kind": "passive-traffic",
+      "position": { "lat": 25.86, "lng": 55.34 },
+      "course": 72.0,
+      "speed_mps": 12.2,
+      "status": "transiting",
+      "route": [],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "traffic.pilot-amber",
+      "name": "Pilot Boat Amber",
+      "callsign": "PILOT AMBER",
+      "kind": "passive-traffic",
+      "position": { "lat": 26.72, "lng": 56.48 },
+      "course": 246.0,
+      "speed_mps": 10.6,
+      "status": "transiting",
+      "route": [],
+      "last_update": "2026-07-10T20:00:00Z"
+    },
+    {
+      "id": "traffic.coaster-qeshm",
+      "name": "Coaster Qeshm",
+      "callsign": "COASTER QESHM",
+      "kind": "passive-traffic",
+      "position": { "lat": 26.20, "lng": 56.88 },
+      "course": 286.0,
+      "speed_mps": 10.0,
+      "status": "transiting",
+      "route": [],
+      "last_update": "2026-07-10T20:00:00Z"
+    }
+  ],
+  "event_sequence": 0,
+  "watch_events": []
+}

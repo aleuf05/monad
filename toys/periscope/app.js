@@ -79,6 +79,7 @@ const state = {
   selectedId: null,
   visibleContacts: [],
   contactButtonsReady: false,
+  contactSourceKey: "",
 };
 
 const assets = {
@@ -127,6 +128,22 @@ function vesselState(vessel, elapsedSeconds) {
     bearing: normalizeDegrees(vessel.baseBearing + path * 180 + drift),
     range: clamp(range, 3.4, MAX_RANGE),
   };
+}
+
+function localContacts(elapsedSeconds) {
+  return vessels.map((vessel) => vesselState(vessel, elapsedSeconds));
+}
+
+function sharedContacts() {
+  const sharedState = window.MonadFleetState?.read?.();
+  const contacts = sharedState && window.MonadFleetState?.toScoutContacts
+    ? window.MonadFleetState.toScoutContacts(sharedState)
+    : [];
+  return contacts.length ? contacts : null;
+}
+
+function currentContacts(elapsedSeconds) {
+  return sharedContacts() || localContacts(elapsedSeconds);
 }
 
 function projectContact(contact) {
@@ -401,12 +418,14 @@ function updateBearingBand() {
 }
 
 function updateContactStrip(contacts) {
-  if (!state.contactButtonsReady) {
-    contactStrip.innerHTML = vessels.map((vessel) => `<button class="contact-card" type="button" data-vessel-id="${vessel.id}">
-      <strong>${vessel.callsign}</strong>
+  const sourceKey = contacts.map((contact) => contact.id).join("|");
+  if (!state.contactButtonsReady || state.contactSourceKey !== sourceKey) {
+    contactStrip.innerHTML = contacts.map((contact) => `<button class="contact-card" type="button" data-vessel-id="${contact.id}">
+      <strong>${contact.callsign}</strong>
       <span>Standing by</span>
     </button>`).join("");
     state.contactButtonsReady = true;
+    state.contactSourceKey = sourceKey;
   }
 
   contacts.forEach((contact) => {
@@ -466,7 +485,7 @@ function render(now) {
   renderSeaPlate(now);
   renderAtmosphere(now);
   renderBridgeOptics();
-  const contacts = vessels.map((vessel) => projectContact(vesselState(vessel, now / 1000)));
+  const contacts = currentContacts(now / 1000).map(projectContact);
   state.visibleContacts = contacts.filter((contact) => contact.visible);
   contacts.forEach((contact) => renderContact(contact, now));
 
@@ -532,8 +551,8 @@ detailsButton.addEventListener("click", () => {
 contactStrip.addEventListener("click", (event) => {
   const button = event.target.closest("[data-vessel-id]");
   if (!button) return;
-  const contact = vessels
-    .map((vessel) => projectContact(vesselState(vessel, performance.now() / 1000)))
+  const contact = currentContacts(performance.now() / 1000)
+    .map(projectContact)
     .find((item) => item.id === button.dataset.vesselId);
   selectVessel(contact);
 });
