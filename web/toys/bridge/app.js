@@ -24,25 +24,28 @@
   };
 
   // Fleet Motion (and, via the shared MonadFleetState contract it writes,
-  // Periscope) already supports an opt-in live FleetCore feed -- see
-  // toys/fleet-motion/README.md. Bridge composes that instrument rather
-  // than reimplementing it: passing Bridge's own `?live=1` (and optional
-  // `?fleetcoreServer=`) straight through to the embedded iframe's src.
-  // The iframe has no `src` in the HTML itself specifically so this is the
-  // only load it ever does -- setting `.src` after an unparambed default
-  // load would cause a visible reload flash.
-  const fleetMotionIframe = document.querySelector('[data-instrument-src="../fleet-motion/"]');
-  if (fleetMotionIframe) {
+  // Periscope) and Radio Console each independently support an opt-in live
+  // FleetCore feed -- see their own READMEs. Bridge composes those
+  // instruments rather than reimplementing them: passing Bridge's own
+  // `?live=1` (and optional `?fleetcoreServer=`) straight through to
+  // whichever embedded iframes declare a `data-instrument-src`. Those
+  // iframes have no `src` in the HTML itself specifically so this is the
+  // only load they ever do -- setting `.src` after an unparambed default
+  // load would cause a visible reload flash. Periscope and Watchbook keep
+  // a plain static `src` and are untouched by this: Periscope takes no
+  // query params (it just reads whatever Fleet Motion writes), and
+  // Watchbook has nothing to do with FleetCore at all.
+  const liveCapableIframes = Array.from(document.querySelectorAll("[data-instrument-src]"));
+  if (liveCapableIframes.length) {
     const bridgeParams = new URLSearchParams(window.location.search);
-    const baseSrc = fleetMotionIframe.dataset.instrumentSrc;
-    if (bridgeParams.has("live") || bridgeParams.has("fleetcoreServer")) {
-      const passthrough = new URLSearchParams();
-      if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
-      if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
-      fleetMotionIframe.src = `${baseSrc}?${passthrough.toString()}`;
-    } else {
-      fleetMotionIframe.src = baseSrc;
-    }
+    const passthrough = new URLSearchParams();
+    if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
+    if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
+    const query = passthrough.toString();
+    liveCapableIframes.forEach((iframe) => {
+      const baseSrc = iframe.dataset.instrumentSrc;
+      iframe.src = query ? `${baseSrc}?${query}` : baseSrc;
+    });
   }
 
   let hasObservedSelection = false;

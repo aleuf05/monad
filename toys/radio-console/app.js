@@ -1,9 +1,16 @@
-// Ambience-only bridge instrument: scripted transmissions, spoken aloud via
-// the browser's SpeechSynthesis API where available, over a synthesized
-// static bed and squelch pops built with Web Audio. No FleetCore
-// dependency -- see ../../fleetcore/ENGINEERING_REPORT.md's toy list for
-// why: this is presentation layer, not world state, and works identically
-// whether or not any live backend exists.
+// Ambience bridge instrument: transmissions spoken aloud via the browser's
+// SpeechSynthesis API where available, over a synthesized static bed and
+// squelch pops built with Web Audio. By default this is scripted -- picks
+// a random line from TRANSMISSIONS on a random timer -- and has no
+// FleetCore dependency at all, matching every other toy's public-page
+// default. Appending ?live=1 (or ?fleetcoreServer=ws://host:port/ws) opts
+// into event-driven mode instead: the scripted scheduler stops, and
+// transmissions fire only when fleetcore-serve's snapshots show a real
+// change (a vessel's status transition, a RecordWatchEvent message) --
+// read-only, same posture as Fleet Motion's live mode. Ambience mechanics
+// (static bed, squelch pop, mute/volume, channel filters, the speaking
+// indicator) are shared unchanged between both modes; only what triggers
+// transmit and what it says differs.
 const TRANSMISSIONS = [
   { channel: "fleet-comms", speaker: "Watch Officer", text: "Scout Alpha, Monad Actual, report position and status." },
   { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, holding station, all quiet." },
@@ -38,6 +45,7 @@ const SQUELCH_DURATION_S = 0.12;
 const powerButton = document.querySelector("#powerButton");
 const powerStatusEl = document.querySelector("#powerStatus");
 const channelCountEl = document.querySelector("#channelCount");
+const dataSourceEl = document.querySelector("#dataSourceValue");
 const channelChips = Array.from(document.querySelectorAll(".channel-chip"));
 const volumeSlider = document.querySelector("#volumeSlider");
 const muteButton = document.querySelector("#muteButton");
@@ -61,6 +69,25 @@ let audioContext = null;
 let masterGain = null;
 let staticGain = null;
 let noiseBuffer = null;
+
+let liveMode = false;
+let liveSocket = null;
+let liveReconnectTimer = null;
+let liveReconnectDelayMs = 1000;
+let livePumpTimer = null;
+let lastVesselStatus = null; // Map<vesselId, status>, null until the first live snapshot seeds it
+let lastWatchEventCount = 0;
+const liveQueue = [];
+const LIVE_CONNECT_TIMEOUT_MS = 2500;
+const LIVE_PUMP_INTERVAL_MS = 700;
+const VESSEL_CHANNEL = { flagship: "fleet-comms", scout: "fleet-comms", "passive-traffic": "traffic" };
+const STATUS_LINES = {
+  underway: "underway, course {course}, speed {speed} knots.",
+  transiting: "transiting, maintaining course and speed.",
+  holding: "holding station.",
+  paused: "standing by, clock paused.",
+  arrived: "arrived on station."
+};
 
 function updateChannelCount() {
   const count = state.activeChannels.size;
@@ -222,22 +249,165 @@ function speak(entry) {
   window.speechSynthesis.speak(utterance);
 }
 
-function transmit() {
-  const pool = TRANSMISSIONS.filter((entry) => state.activeChannels.has(entry.channel));
-  if (!pool.length) return;
-  const entry = pool[Math.floor(Math.random() * pool.length)];
+function transmitEntry(entry) {
   appendTranscript(entry);
   speak(entry);
 }
 
+function transmit() {
+  const pool = TRANSMISSIONS.filter((entry) => state.activeChannels.has(entry.channel));
+  if (!pool.length) return;
+  transmitEntry(pool[Math.floor(Math.random() * pool.length)]);
+}
+
 function scheduleNext() {
   window.clearTimeout(state.scheduleTimer);
-  if (!state.powered) return;
+  if (!state.powered || liveMode) return;
   const delay = MIN_INTERVAL_MS + Math.random() * (MAX_INTERVAL_MS - MIN_INTERVAL_MS);
   state.scheduleTimer = window.setTimeout(() => {
     if (state.activeChannels.size) transmit();
     scheduleNext();
   }, delay);
+}
+
+// --- Live mode: event-driven transmissions from a real fleetcore-serve ---
+//
+// watch_events only ever contains what a human explicitly recorded via a
+// RecordWatchEvent command -- in normal running it's usually empty, so
+// building "event-driven" purely on that field would mean the radio
+// almost never speaks. The actual continuous stream of real events is
+// vessel status transitions between snapshots (underway -> arrived, a new
+// contact appearing, etc.), diffed client-side the same way Fleet Motion's
+// applyLiveSnapshot() already renders positions from consecutive
+// snapshots. Both sources feed the same queue; RecordWatchEvent messages
+// (an actual human watch note) are queued first since they're rarer and
+// more deliberate than a routine status flip.
+
+function fleetCoreServerUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("fleetcoreServer") || `ws://${window.location.hostname || "localhost"}:4771/ws`;
+}
+
+function speedKnots(speedMps) {
+  return (Number(speedMps || 0) * 1.94384).toFixed(0);
+}
+
+function statusLineFor(vessel) {
+  const template = STATUS_LINES[vessel.status];
+  if (!template) return null;
+  return template
+    .replace("{course}", `${Math.round(Number(vessel.course || 0))}`)
+    .replace("{speed}", speedKnots(vessel.speed_mps));
+}
+
+function queueLiveEntry(entry) {
+  liveQueue.push(entry);
+}
+
+function speakerNameFor(vessel) {
+  // Matches TRANSMISSIONS' existing voice: MONAD refers to itself as
+  // "Monad Actual" in dialogue, everyone else by their title-case name.
+  if (vessel.kind === "flagship") return "Monad Actual";
+  return vessel.name || vessel.callsign || vessel.id;
+}
+
+function diffVesselStates(vessels) {
+  const seeding = lastVesselStatus === null;
+  if (seeding) lastVesselStatus = new Map();
+  vessels.forEach((vessel) => {
+    const previous = lastVesselStatus.get(vessel.id);
+    lastVesselStatus.set(vessel.id, vessel.status);
+    if (seeding || previous === vessel.status) return;
+    const line = statusLineFor(vessel);
+    if (!line) return;
+    const channel = VESSEL_CHANNEL[vessel.kind] || "fleet-comms";
+    const name = speakerNameFor(vessel);
+    queueLiveEntry({ channel, speaker: name, text: `${name}, ${line}` });
+  });
+}
+
+function diffWatchEvents(watchEvents) {
+  const events = watchEvents || [];
+  if (events.length <= lastWatchEventCount) {
+    lastWatchEventCount = events.length;
+    return;
+  }
+  events.slice(lastWatchEventCount).forEach((event) => {
+    queueLiveEntry({ channel: "fleet-comms", speaker: "Watch Officer", text: event.message });
+  });
+  lastWatchEventCount = events.length;
+}
+
+function applyLiveSnapshot(snapshot) {
+  diffWatchEvents(snapshot.watch_events);
+  diffVesselStates(snapshot.vessels || []);
+}
+
+function livePump() {
+  if (!state.powered || state.speaking || !liveQueue.length) return;
+  const next = liveQueue.find((entry) => state.activeChannels.has(entry.channel));
+  if (!next) {
+    liveQueue.length = 0; // Nothing filtered-in queued is worth holding onto once channels change.
+    return;
+  }
+  liveQueue.splice(liveQueue.indexOf(next), 1);
+  transmitEntry(next);
+}
+
+function enterLiveMode() {
+  liveMode = true;
+  window.clearTimeout(state.scheduleTimer);
+  if (dataSourceEl) {
+    dataSourceEl.textContent = "FleetCore Live";
+    dataSourceEl.classList.add("is-on");
+  }
+  livePumpTimer = window.setInterval(livePump, LIVE_PUMP_INTERVAL_MS);
+}
+
+function connectFleetCoreLive() {
+  let settled = false;
+  const socket = new WebSocket(fleetCoreServerUrl());
+  const timeout = setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    socket.close();
+  }, LIVE_CONNECT_TIMEOUT_MS);
+
+  socket.addEventListener("open", () => {
+    liveReconnectDelayMs = 1000;
+  });
+
+  socket.addEventListener("message", (event) => {
+    let message;
+    try {
+      message = JSON.parse(event.data);
+    } catch (error) {
+      return;
+    }
+    if (message.type !== "snapshot") return;
+    if (!settled) {
+      settled = true;
+      clearTimeout(timeout);
+      enterLiveMode();
+    }
+    applyLiveSnapshot(message.snapshot);
+  });
+
+  socket.addEventListener("close", () => {
+    if (!settled) {
+      settled = true;
+      clearTimeout(timeout);
+      return;
+    }
+    if (liveMode) {
+      liveReconnectTimer = setTimeout(() => {
+        liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
+        connectFleetCoreLive();
+      }, liveReconnectDelayMs);
+    }
+  });
+
+  liveSocket = socket;
 }
 
 function drawSignalMeter() {
@@ -320,3 +490,11 @@ try {
 
 updateChannelCount();
 drawSignalMeter();
+
+// Opt-in only, same reasoning as Fleet Motion's live mode: a browser's own
+// WebSocket connection-refused error can't be suppressed from application
+// code, and this toy is deployed publicly where fleetcore-serve isn't
+// reachable, so the connection attempt must never fire without this.
+if (new URLSearchParams(window.location.search).has("live") || new URLSearchParams(window.location.search).has("fleetcoreServer")) {
+  connectFleetCoreLive();
+}

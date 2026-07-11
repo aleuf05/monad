@@ -21,9 +21,13 @@ Then open `http://localhost:8080/toys/radio-console/`. Click **Power On** — br
 - A continuous filtered-noise static bed plays under everything, ducking down while a transmission is "on the air" and rising again during dead air — a squelch pop brackets each transmission.
 - Channel chips (multi-select) control which categories are monitored; Volume and Mute control the Web Audio output and speech volume together.
 
-## No FleetCore dependency
+## Default: no FleetCore dependency
 
-This is presentation layer, not world state — it does not read from or write to FleetCore, and works identically whether a live FleetCore server exists, is unreachable, or was never built at all. If a later version wants chatter to reference live fleet state (e.g. an actual position report pulled from a running world), that's an additive read-only consumer of `docs/architecture/fleetcore-api.md`'s `GET /snapshot`, not a change to this toy's core model.
+By default this is presentation layer, not world state — it does not read from or write to FleetCore, and works identically whether a live FleetCore server exists, is unreachable, or was never built at all.
+
+## Optional Live Mode (FleetCore)
+
+Appending `?live=1` (or `?fleetcoreServer=ws://host:port/ws`) opts into event-driven chatter instead of the scripted random scheduler: a read-only WebSocket connection to `fleetcore-serve` (see `docs/architecture/fleetcore-api.md`), and transmissions fire only when a snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — rather than on a random timer. The static bed, squelch pop, mute/volume, and channel filters are unchanged; only what triggers a transmission and what it says differs. There's no live "Weather" channel — FleetCore has no weather concept — so that channel simply produces nothing while live (still toggleable, just silent). Same opt-in-only posture as Fleet Motion: the connection is never attempted without the query param, since a failed `WebSocket` attempt logs a browser-native console error no application code can suppress, and this toy is deployed publicly where `fleetcore-serve` isn't reachable.
 
 ## Graceful degradation
 
@@ -32,6 +36,4 @@ This is presentation layer, not world state — it does not read from or write t
 
 ## Not yet done
 
-- Not wired into Bridge Station's composited Live Console — it's a standalone instrument for now, matching how `toys/fleetcore-live/` shipped standalone before any Bridge integration decision was made.
-- No live-fleet-state-aware chatter (the v2 stretch goal in the original request).
 - No real broadcast source integration (the stretch goal in the original request) — deliberately decoupled so this works standalone regardless of whether that's ever built.

@@ -77,7 +77,7 @@
                 </div>
                 <a href="../radio-console/" target="_blank" rel="noreferrer">Open standalone</a>
               </header>
-              <iframe title="Radio Console instrument" src="../radio-console/"></iframe>
+              <iframe title="Radio Console instrument" data-instrument-src="../radio-console/"></iframe>
             </article>
           </article>
 
@@ -152,7 +152,7 @@
               </div>
             </dl>
             <p class="engineering-note">
-              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state. Radio Console runs alongside them for ambience — it shares the panel, not the fleet-state contract; it is a pure presentation layer with no read or write path into Fleet Motion's canonical state.
+              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state. Radio Console runs alongside them for ambience — it shares the panel, not the fleet-state contract; it has no read or write path into Fleet Motion's canonical state. It does have its own independent, optional FleetCore connection (event-driven chatter instead of scripted, when Bridge itself is loaded with <code>?live=1</code>) — a separate channel to the same server, not a path through Fleet Motion's state.
             </p>
           </article>
 
