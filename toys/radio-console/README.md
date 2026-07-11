@@ -21,13 +21,11 @@ Then open `http://localhost:8080/toys/radio-console/`. Click **Power On** — br
 - A continuous filtered-noise static bed plays under everything, ducking down while a transmission is "on the air" and rising again during dead air — a squelch pop brackets each transmission.
 - Channel chips (multi-select) control which categories are monitored; Volume and Mute control the Web Audio output and speech volume together.
 
-## Default: no FleetCore dependency
+## Live Mode (FleetCore)
 
-By default this is presentation layer, not world state — it does not read from or write to FleetCore, and works identically whether a live FleetCore server exists, is unreachable, or was never built at all.
+Every page load attempts a read-only WebSocket connection to `fleetcore-serve` (Admiral's call, 2026-07-11: live is the default now, no longer opt-in) — see `docs/architecture/fleetcore-api.md`. If one lands, event-driven chatter replaces the scripted random scheduler: transmissions fire only when a snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — rather than on a random timer. The static bed, squelch pop, mute/volume, and channel filters are unchanged; only what triggers a transmission and what it says differs. There's no live "Weather" channel — FleetCore has no weather concept — so that channel simply produces nothing while live (still toggleable, just silent).
 
-## Optional Live Mode (FleetCore)
-
-Appending `?live=1` (or `?fleetcoreServer=ws://host:port/ws`) opts into event-driven chatter instead of the scripted random scheduler: a read-only WebSocket connection to `fleetcore-serve` (see `docs/architecture/fleetcore-api.md`), and transmissions fire only when a snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — rather than on a random timer. The static bed, squelch pop, mute/volume, and channel filters are unchanged; only what triggers a transmission and what it says differs. There's no live "Weather" channel — FleetCore has no weather concept — so that channel simply produces nothing while live (still toggleable, just silent). Same opt-in-only posture as Fleet Motion: the connection is never attempted without the query param, since a failed `WebSocket` attempt logs a browser-native console error no application code can suppress, and this toy is deployed publicly where `fleetcore-serve` isn't reachable.
+If nothing answers in time (no reachable `fleetcore-serve`, or the public reverse-proxy path isn't finished — see `docs/deployment.md`), this stays exactly what it always was: presentation layer, not world state, scripted chatter on a random timer, no FleetCore dependency. `?fleetcoreServer=ws://host:port/ws` overrides the server URL if the default (derived from the page's own origin) isn't right. Making the connection attempt unconditional rather than opt-in means a failed attempt now logs a browser-native console error no application code can suppress on any page load where FleetCore isn't reachable — an accepted tradeoff, not an oversight; see `docs/deployment.md` for why.
 
 ## Graceful degradation
 

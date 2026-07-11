@@ -1,16 +1,17 @@
 // Ambience bridge instrument: transmissions spoken aloud via the browser's
 // SpeechSynthesis API where available, over a synthesized static bed and
-// squelch pops built with Web Audio. By default this is scripted -- picks
-// a random line from TRANSMISSIONS on a random timer -- and has no
-// FleetCore dependency at all, matching every other toy's public-page
-// default. Appending ?live=1 (or ?fleetcoreServer=ws://host:port/ws) opts
-// into event-driven mode instead: the scripted scheduler stops, and
-// transmissions fire only when fleetcore-serve's snapshots show a real
-// change (a vessel's status transition, a RecordWatchEvent message) --
-// read-only, same posture as Fleet Motion's live mode. Ambience mechanics
+// squelch pops built with Web Audio. Every page load attempts a read-only
+// FleetCore connection (see connectFleetCoreLive()); once one lands, the
+// scripted scheduler stops and transmissions fire only when
+// fleetcore-serve's snapshots show a real change (a vessel's status
+// transition, a RecordWatchEvent message) instead of a random timer.
+// Until/unless that happens -- no server reachable, or it times out --
+// this stays exactly what it always was: a random line from TRANSMISSIONS
+// every 6-16 seconds, no FleetCore dependency at all. Ambience mechanics
 // (static bed, squelch pop, mute/volume, channel filters, the speaking
 // indicator) are shared unchanged between both modes; only what triggers
-// transmit and what it says differs.
+// transmit and what it says differs. ?fleetcoreServer= overrides the
+// server URL if needed.
 const TRANSMISSIONS = [
   { channel: "fleet-comms", speaker: "Watch Officer", text: "Scout Alpha, Monad Actual, report position and status." },
   { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, holding station, all quiet." },
@@ -285,7 +286,16 @@ function scheduleNext() {
 
 function fleetCoreServerUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("fleetcoreServer") || `ws://${window.location.hostname || "localhost"}:4771/ws`;
+  if (params.get("fleetcoreServer")) return params.get("fleetcoreServer");
+  // Under the public /monad/ path, port 4771 isn't reachable directly --
+  // route through Caddy's /monad/fleetcore-ws/ reverse proxy instead (see
+  // docs/deployment.md). Anywhere else (LAN root, local dev server),
+  // fleetcore-serve is reachable directly on its own port.
+  if (window.location.pathname.startsWith("/monad/")) {
+    const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return `${scheme}//${window.location.host}/monad/fleetcore-ws/ws`;
+  }
+  return `ws://${window.location.hostname || "localhost"}:4771/ws`;
 }
 
 function speedKnots(speedMps) {
@@ -491,10 +501,11 @@ try {
 updateChannelCount();
 drawSignalMeter();
 
-// Opt-in only, same reasoning as Fleet Motion's live mode: a browser's own
-// WebSocket connection-refused error can't be suppressed from application
-// code, and this toy is deployed publicly where fleetcore-serve isn't
-// reachable, so the connection attempt must never fire without this.
-if (new URLSearchParams(window.location.search).has("live") || new URLSearchParams(window.location.search).has("fleetcoreServer")) {
-  connectFleetCoreLive();
-}
+// Live is the default now (Admiral's call, 2026-07-11), matching Fleet
+// Motion: every page load attempts a FleetCore connection. Scripted
+// chatter still works exactly as before unless/until a snapshot actually
+// arrives; a failed attempt fails closed and silently at the application
+// level (see connectFleetCoreLive()'s timeout), it's only the accepted
+// browser-native console error tradeoff that changed, not the fallback
+// behavior. ?fleetcoreServer= still overrides the server URL if needed.
+connectFleetCoreLive();

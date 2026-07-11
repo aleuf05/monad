@@ -789,7 +789,16 @@ function syncExternalSelection() {
 
 function fleetCoreServerUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("fleetcoreServer") || `ws://${window.location.hostname || "localhost"}:4771/ws`;
+  if (params.get("fleetcoreServer")) return params.get("fleetcoreServer");
+  // Under the public /monad/ path, port 4771 isn't reachable directly --
+  // route through Caddy's /monad/fleetcore-ws/ reverse proxy instead (see
+  // docs/deployment.md). Anywhere else (LAN root, local dev server),
+  // fleetcore-serve is reachable directly on its own port.
+  if (window.location.pathname.startsWith("/monad/")) {
+    const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return `${scheme}//${window.location.host}/monad/fleetcore-ws/ws`;
+  }
+  return `ws://${window.location.hostname || "localhost"}:4771/ws`;
 }
 
 // One connection attempt to a live FleetCore server. Fails closed and
@@ -2728,14 +2737,14 @@ if (restoredFromPersistentState) {
   startOpeningSequence({ loadOpeningRoute: true });
 }
 window.requestAnimationFrame(animationFrame);
-// Opt-in only: attempting a connection unconditionally would fire a
-// WebSocket connection-refused error to the console on every single public
-// page load, since fleetcore-serve isn't publicly reachable there. That
-// error is native browser network logging, not something a try/catch or a
-// close-event handler can suppress -- the only clean way to keep the
-// public deployment's console silent is to never attempt the connection
-// there at all. Append ?live=1 (or ?fleetcoreServer=ws://host:port/ws,
-// which implies it) to opt in on a LAN where FleetCore actually exists.
-if (new URLSearchParams(window.location.search).has("live") || new URLSearchParams(window.location.search).has("fleetcoreServer")) {
-  connectFleetCoreLive();
-}
+// Live is the default now (Admiral's call, 2026-07-11): every page load
+// attempts a FleetCore connection, not just ?live=1 ones. Local simulation
+// still starts immediately above and keeps running uninterrupted unless/
+// until a snapshot actually arrives -- if fleetcore-serve is unreachable
+// or the public Caddy/rock64 proxy isn't finished yet, this fails closed
+// exactly as before (silently, after LIVE_CONNECT_TIMEOUT_MS), just no
+// longer gated behind a query param. Accepted tradeoff: a failed
+// connection attempt logs a browser-native console error that no
+// application code can suppress -- previously the reason this was opt-in
+// only. ?fleetcoreServer= still overrides the server URL if needed.
+connectFleetCoreLive();
