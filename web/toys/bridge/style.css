@@ -137,7 +137,7 @@ dd {
 
 .station-deck {
   min-width: 0;
-  min-height: min(760px, calc(100vh - 190px));
+  min-height: min(1000px, calc(100vh - 190px));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
@@ -222,9 +222,15 @@ dd {
 .live-console {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: clamp(10px, 1.4vw, 16px);
   padding: clamp(10px, 1.4vw, 16px);
   min-height: 0;
+}
+
+.live-instrument-compact {
+  grid-column: 1 / -1;
+  height: 360px;
 }
 
 .live-instrument {
@@ -355,7 +361,7 @@ dd {
   }
 
   .station-deck {
-    min-height: min(720px, 72vh);
+    min-height: min(940px, 78vh);
   }
 
   .side-rail {

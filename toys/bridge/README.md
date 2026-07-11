@@ -1,6 +1,6 @@
 # Monad Bridge Station
 
-Bridge Station Mk III is the unified command console for Vessel Monad. It gives the operator one front door for Fleet Motion, Periscope Station, Watchbook, and Bridge-owned engineering state while preserving every instrument as an independently runnable static artifact.
+Bridge Station Mk V is the unified command console for Vessel Monad. It gives the operator one front door for Fleet Motion, Periscope Station, Radio Console, Watchbook, and Bridge-owned engineering state while preserving every instrument as an independently runnable static artifact.
 
 ## Run Locally
 
@@ -20,7 +20,7 @@ The Bridge is static HTML, CSS, and JavaScript. It requires no backend, database
 
 ## Included Stations
 
-- Live Console: Fleet Motion and Periscope Station rendered side by side (stacked on narrow viewports), both visible at once with no click required.
+- Live Console: Fleet Motion and Periscope Station rendered side by side (stacked on narrow viewports), both visible at once with no click required, with Radio Console running as a third, shorter panel below them for ambience.
 - Watchbook: the read-only operational log viewer, reached through its own tab.
 - Engineering: Bridge-owned state rail for runtime condition, shared fleet state, contacts, and station status.
 
@@ -40,6 +40,12 @@ Selection sync is bidirectional. Fleet Motion writes `selection.selectedShipId` 
 
 Fleet Motion adopts an externally-written selection (i.e. one it didn't just write itself) on every animation frame rather than on its own throttled poll — this isn't just responsiveness, it's required for correctness. Fleet Motion is still the periodic writer of the rest of `MonadFleetState`, and if it only checked for Periscope's selection on a separate, independently-throttled timer, there was a real window where its own next scheduled write would fire on stale local state and silently overwrite Periscope's selection before Fleet Motion ever noticed the change. Checking every frame, immediately before any write decision, closes that race by construction rather than by tuning throttle intervals.
 
+## Mk V: Radio Console
+
+Radio Console (`toys/radio-console/`) runs as a third Live Console panel, below Fleet Motion and Periscope rather than beside them — it's a much shorter instrument (scripted chatter, controls, a compact signal meter and transcript) than the two full-height map/optics panels, so `.live-console`'s grid gives it its own full-width row (`grid-template-rows: minmax(0, 1fr) auto`) instead of squeezing into the two-column split.
+
+Unlike Fleet Motion and Periscope, Radio Console shares no state with the rest of Bridge — it is a pure ambience/presentation layer requested explicitly to have no read or write path into `MonadFleetState` or FleetCore. Its own script detects `window.self !== window.top` and applies an `is-embedded` body class that trims its layout (hides the subtitle and eyebrow, shrinks headings and control padding, caps the transcript's visible height) specifically for Bridge's fixed, much shorter panel height — the same page otherwise runs full-size when opened standalone. See `toys/radio-console/README.md` for what the toy itself does.
+
 ## Shared State
 
 Bridge Station reads Fleet Motion's browser-local canonical state from `localStorage` key `monad.fleetMotion.state` through `toys/shared/fleet-state.js` when that state is available on the same origin. It does not mutate that state.
@@ -56,6 +62,6 @@ If no Fleet Motion state has been written yet, the Bridge shows honest awaiting-
 - No replacement of existing instruments.
 - No WebGL or shader work.
 
-## Mk V Direction
+## Mk VI Direction
 
-Bridge Station Mk V could add a richer contact list in the Bridge rail and direct station handoff actions such as selecting a contact then opening Periscope on its bearing. The Mk IV selection-sync gap (Periscope-originated selections not propagating) is closed — see `ENGINEERING_REPORT.md`.
+A richer contact list in the Bridge rail and direct station handoff actions (selecting a contact then opening Periscope on its bearing) remain open, as does Radio Console's own v2/stretch scope (chatter that references live fleet state; a real broadcast source as a selectable channel — see `toys/radio-console/README.md`, both deliberately deferred). The Mk IV selection-sync gap (Periscope-originated selections not propagating) stays closed.
