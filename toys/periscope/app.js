@@ -88,6 +88,7 @@ const bearingReadout = document.querySelector("#bearingReadout");
 const bearingBand = document.querySelector("#bearingBand");
 const contactStrip = document.querySelector("#contactStrip");
 const detailsButton = document.querySelector("#detailsButton");
+const fieldNote = document.querySelector("#fieldNote");
 const magnificationReadout = document.querySelector("#magnificationReadout");
 const magnificationButtons = Array.from(document.querySelectorAll("[data-magnification]"));
 const panelEmpty = document.querySelector("#panelEmpty");
@@ -113,6 +114,11 @@ const state = {
   contactSourceKey: "",
   acquiredSourceKey: "",
   opticsMode: "wide",
+  acquisitionCue: {
+    contactId: null,
+    startedAt: 0,
+    label: "",
+  },
 };
 
 const assets = {
@@ -470,6 +476,45 @@ function renderContactLabel(contact, x, y, spriteHeight) {
   ctx.fillText(`Range ${contact.range.toFixed(1)} nm`, labelX + 10, labelY + 50);
 }
 
+function renderAcquisitionCue(contact, x, y, spriteWidth, spriteHeight, now) {
+  const cue = state.acquisitionCue;
+  const isSelected = state.selectedId === contact.id;
+  const elapsed = cue.contactId === contact.id ? now - cue.startedAt : Number.POSITIVE_INFINITY;
+  const pulseActive = elapsed >= 0 && elapsed < 1600;
+  if (!isSelected && !pulseActive) return;
+
+  const w = canvas.width;
+  const pulse = pulseActive ? 1 - elapsed / 1600 : 0;
+  const lift = spriteHeight * 0.42;
+  const ringRadius = Math.max(spriteWidth * (0.34 + pulse * 0.18), w * 0.035);
+
+  ctx.save();
+  ctx.translate(x, y - lift);
+  ctx.strokeStyle = pulseActive
+    ? `rgba(216, 180, 106, ${(0.18 + pulse * 0.5).toFixed(3)})`
+    : "rgba(138, 215, 193, 0.26)";
+  ctx.lineWidth = Math.max(1.5, w * 0.0025);
+  ctx.setLineDash([Math.max(5, w * 0.01), Math.max(4, w * 0.008)]);
+  ctx.beginPath();
+  ctx.arc(0, 0, ringRadius, 0, TAU);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.strokeStyle = "rgba(226, 240, 236, 0.34)";
+  ctx.lineWidth = Math.max(1, w * 0.0016);
+  ctx.beginPath();
+  ctx.moveTo(-ringRadius * 1.28, 0);
+  ctx.lineTo(-ringRadius * 0.72, 0);
+  ctx.moveTo(ringRadius * 0.72, 0);
+  ctx.lineTo(ringRadius * 1.28, 0);
+  ctx.moveTo(0, -ringRadius * 1.15);
+  ctx.lineTo(0, -ringRadius * 0.66);
+  ctx.moveTo(0, ringRadius * 0.66);
+  ctx.lineTo(0, ringRadius * 1.15);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function renderContact(contact, now) {
   if (!contact.visible) return;
   const w = canvas.width;
@@ -500,6 +545,7 @@ function renderContact(contact, now) {
   }
   ctx.restore();
 
+  renderAcquisitionCue(contact, x, y, spriteWidth, spriteHeight, now);
   renderContactLabel(contact, x, y, spriteHeight);
 }
 
@@ -526,6 +572,15 @@ function updateOpticsControls() {
   });
 }
 
+function triggerAcquisitionCue(contact, label = "Contact acquired") {
+  if (!contact) return;
+  state.acquisitionCue = {
+    contactId: contact.id,
+    startedAt: performance.now(),
+    label: `${label}: ${contact.callsign}`,
+  };
+}
+
 function focusContactForOptics() {
   const contacts = currentContacts(performance.now() / 1000);
   const projected = contacts.map(projectContact);
@@ -538,6 +593,7 @@ function focusContactForOptics() {
   if (!nearest) return;
   state.targetBearing = normalizeDegrees(nearest.bearing);
   state.velocity = 0;
+  triggerAcquisitionCue(nearest, "Optics centered");
 }
 
 function setOpticsMode(mode) {
@@ -582,6 +638,7 @@ function updateDetailsButton() {
 
 function selectVessel(contact, { propagate = false } = {}) {
   if (!contact) return;
+  const changed = state.selectedId !== contact.id;
   state.selectedId = contact.id;
   panelEmpty.hidden = true;
   panelContent.hidden = false;
@@ -592,6 +649,9 @@ function selectVessel(contact, { propagate = false } = {}) {
   panelReport.textContent = contact.report;
   panelBearing.textContent = formatBearing(contact.bearing);
   panelRange.textContent = `${contact.range.toFixed(1)} nm`;
+  if (changed) {
+    triggerAcquisitionCue(contact);
+  }
   if (propagate) propagateSelection(contact);
 }
 
@@ -618,6 +678,24 @@ function updateSelectedPanel(contacts) {
   }
 }
 
+function updateFieldNote() {
+  if (!fieldNote) return;
+  const cue = state.acquisitionCue;
+  const cueAge = performance.now() - cue.startedAt;
+  if (cue.contactId && cueAge >= 0 && cueAge < 2400) {
+    fieldNote.textContent = cue.label;
+    fieldNote.classList.add("is-acquiring");
+    return;
+  }
+  const selected = state.visibleContacts.find((contact) => contact.id === state.selectedId);
+  if (selected) {
+    fieldNote.textContent = `Tracking ${selected.callsign}`;
+  } else {
+    fieldNote.textContent = "Drag to rotate bearing";
+  }
+  fieldNote.classList.toggle("is-acquiring", Boolean(selected));
+}
+
 function render(now) {
   resizeCanvas();
 
@@ -642,6 +720,7 @@ function render(now) {
   updateContactStrip(contacts);
   updateDetailsButton();
   updateSelectedPanel(contacts);
+  updateFieldNote();
 
   requestAnimationFrame(render);
 }
