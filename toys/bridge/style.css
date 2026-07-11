@@ -37,11 +37,12 @@ body {
 
 .bridge-shell {
   min-height: 100vh;
-  padding: clamp(14px, 2vw, 26px);
+  padding: clamp(12px, 1.8vw, 24px);
 }
 
 .bridge-header,
-.instrument {
+.instrument,
+.station-deck {
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: 0 24px 80px var(--shadow), inset 0 0 70px rgba(0, 0, 0, 0.28);
@@ -127,15 +128,54 @@ dd {
   font-size: 1rem;
 }
 
-.command-grid {
+.console-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(360px, 0.86fr);
-  grid-template-rows: minmax(540px, 62vh) minmax(360px, 38vh);
-  grid-template-areas:
-    "fleet periscope"
-    "watchbook engineering";
+  grid-template-columns: minmax(0, 1fr) minmax(310px, 0.33fr);
   gap: clamp(12px, 1.6vw, 18px);
   margin-top: clamp(12px, 1.6vw, 18px);
+}
+
+.station-deck {
+  min-width: 0;
+  min-height: min(760px, calc(100vh - 190px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.station-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(138, 215, 193, 0.14);
+}
+
+.station-tab {
+  min-height: 50px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: rgba(4, 9, 11, 0.86);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.station-tab:hover,
+.station-tab:focus-visible {
+  color: var(--text);
+  outline: 2px solid rgba(138, 215, 193, 0.55);
+  outline-offset: -2px;
+}
+
+.station-tab.is-active {
+  border-bottom-color: var(--amber);
+  background: rgba(13, 23, 27, 0.98);
+  color: var(--signal);
 }
 
 .instrument {
@@ -146,20 +186,24 @@ dd {
   overflow: hidden;
 }
 
-.instrument-fleet {
-  grid-area: fleet;
+.station-panel {
+  border: 0;
+  box-shadow: none;
+  background: rgba(4, 8, 10, 0.65);
 }
 
-.instrument-periscope {
-  grid-area: periscope;
+.station-panel[hidden] {
+  display: none;
 }
 
-.instrument-watchbook {
-  grid-area: watchbook;
+.side-rail {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: clamp(12px, 1.6vw, 18px);
 }
 
 .engineering-panel {
-  grid-area: engineering;
   grid-template-rows: auto auto 1fr;
 }
 
@@ -173,7 +217,8 @@ dd {
   background: rgba(4, 9, 11, 0.66);
 }
 
-.instrument-header a {
+.instrument-header a,
+.station-links a {
   flex: 0 0 auto;
   color: var(--signal);
   font-size: 0.78rem;
@@ -181,7 +226,9 @@ dd {
 }
 
 .instrument-header a:hover,
-.instrument-header a:focus-visible {
+.instrument-header a:focus-visible,
+.station-links a:hover,
+.station-links a:focus-visible {
   color: var(--amber);
   outline: none;
 }
@@ -196,14 +243,14 @@ iframe {
 
 .status-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
   margin: 0;
   padding: 14px;
 }
 
 .status-list div {
-  min-height: 72px;
+  min-height: 64px;
 }
 
 dd {
@@ -216,6 +263,25 @@ dd {
   line-height: 1.5;
 }
 
+.station-summary {
+  grid-template-rows: auto auto;
+}
+
+.station-links {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.station-links a {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  border: 1px solid rgba(180, 216, 209, 0.16);
+  background: rgba(2, 6, 8, 0.48);
+  padding: 0 11px;
+}
+
 .is-watch {
   color: var(--signal) !important;
 }
@@ -225,7 +291,8 @@ dd {
 }
 
 @media (max-width: 1180px) {
-  .bridge-header {
+  .bridge-header,
+  .console-layout {
     grid-template-columns: 1fr;
   }
 
@@ -233,18 +300,17 @@ dd {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .command-grid {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(520px, 62vh) minmax(500px, 62vh) minmax(420px, 50vh) auto;
-    grid-template-areas:
-      "fleet"
-      "periscope"
-      "watchbook"
-      "engineering";
+  .station-deck {
+    min-height: min(720px, 72vh);
+  }
+
+  .side-rail {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.45fr);
+    grid-template-rows: auto;
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 720px) {
   .bridge-shell {
     padding: 10px;
   }
@@ -255,11 +321,19 @@ dd {
   }
 
   .watch-strip,
-  .status-list {
+  .side-rail {
     grid-template-columns: 1fr;
   }
 
-  .command-grid {
-    grid-template-rows: 540px 520px 430px auto;
+  .station-deck {
+    min-height: 68vh;
+  }
+
+  .station-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .station-tab {
+    min-height: 44px;
   }
 }
