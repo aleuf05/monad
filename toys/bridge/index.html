@@ -68,6 +68,17 @@
               </header>
               <iframe title="Periscope Station instrument" src="../periscope/"></iframe>
             </article>
+
+            <article class="instrument live-instrument live-instrument-compact" id="liveRadio" data-live-instrument="radio-console">
+              <header class="instrument-header">
+                <div>
+                  <p class="eyebrow">Ambience</p>
+                  <h2>Radio Console</h2>
+                </div>
+                <a href="../radio-console/" target="_blank" rel="noreferrer">Open standalone</a>
+              </header>
+              <iframe title="Radio Console instrument" src="../radio-console/"></iframe>
+            </article>
           </article>
 
           <article class="instrument station-panel" id="panel-watchbook" data-station-panel="watchbook" role="tabpanel" aria-labelledby="tab-watchbook" hidden>
@@ -101,7 +112,7 @@
               </div>
               <div>
                 <dt>Current Sprint</dt>
-                <dd>Bridge Station Mk III</dd>
+                <dd>Bridge Station Mk V</dd>
               </div>
               <div>
                 <dt>Commander Status</dt>
@@ -137,7 +148,7 @@
               </div>
             </dl>
             <p class="engineering-note">
-              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state.
+              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state. Radio Console runs alongside them for ambience — it shares the panel, not the fleet-state contract; it is a pure presentation layer with no read or write path into Fleet Motion's canonical state.
             </p>
           </article>
 

@@ -1,4 +1,4 @@
-# Bridge Station Mk IV Engineering Report
+# Bridge Station Mk V Engineering Report
 
 ## Summary
 
@@ -70,6 +70,24 @@ Mk III shipped with selecting a contact directly in Periscope (`selectVessel()` 
 
 Fleet Motion's own splash/loading overlay is visible over its map on the initial screenshot in the sandboxed run; this is Fleet Motion's existing intro-sequence behavior (also present in the Mk II tabbed layout) and is unrelated to either sprint's changes. Mk IV verification did not re-check the 390×844 mobile layout, since neither sprint touched CSS/layout — only selection-sync JavaScript.
 
+## Mk V: Radio Console Integration
+
+Wired the newly built `toys/radio-console/` (see `logs/captains/2026/2026-07-11_radio-console-v1.md`) into Bridge as a third Live Console panel, at Admiral C's direction after the standalone toy was already built and verified. Unlike Fleet Motion and Periscope, Radio Console has no `MonadFleetState` read or write path — it's pure ambience, so this integration is purely layout/embedding, not another state-sync sprint.
+
+### Implementation Notes
+
+- `toys/bridge/index.html`: added a third `<article class="instrument live-instrument live-instrument-compact" id="liveRadio">` inside `#panel-console`, matching the existing header/iframe/"Open standalone" pattern used by Fleet Motion and Periscope.
+- `toys/bridge/style.css`: `.live-console` gained `grid-template-rows: minmax(0, 1fr) auto` — the two big instruments keep the flexible top row, Radio Console gets a new `.live-instrument-compact` class (`grid-column: 1 / -1; height: 360px`) spanning both columns in a shorter row below rather than becoming an awkward third item in a fixed two-column grid. `.station-deck`'s `min-height` budget was raised (760px→1000px base, 720px→940px at the 1180px breakpoint) to make room without compressing Fleet Motion/Periscope's map area.
+- The 360px height figure isn't a guess — it came from directly measuring Radio Console's own rendered layout at Bridge's actual embedded width (~490px) via a Playwright script, after the toy-side embedded trimming below reduced its natural height from ~436px to ~337px, then adding a small margin.
+- `toys/radio-console/`'s own `app.js` and `style.css` gained an embedding-aware mode: `window.self !== window.top` (wrapped in try/catch, since a cross-origin check would throw) adds an `is-embedded` class to `<body>`, and `style.css` uses that class to hide the subtitle/eyebrow, shrink headings and control padding, and cap the transcript's visible height — specifically for Bridge's fixed short panel. The same page still renders at full size when opened standalone (`toys/radio-console/README.md`, `Open standalone` link). A separate change lowered Radio Console's own two-column-to-one-column stacking breakpoint from 780px to 420px, because Bridge's ~490px-wide panel column would otherwise fall inside the old breakpoint and stack signal/transcript vertically — taller, not shorter, exactly backwards from what embedding needed. 390px phones in standalone mode still fall below 420px and stack as before.
+
+### Validation Performed
+
+- Playwright, both desktop (1440×900) and mobile (390×844): confirmed the Radio Console iframe loads (`#powerButton` reachable via `frameLocator`), no horizontal overflow on mobile, zero console errors or page errors across every run.
+- First attempt used a 220px compact-panel height with no embedded-mode trimming at all: screenshots showed Radio Console's panel cut off right after the status strip — Power/channel/volume controls, the signal meter, and the transcript were all below the fold and, because `.station-deck` uses `overflow: hidden`, genuinely inaccessible, not just requiring a scroll. Caught by looking at the actual rendered screenshot, not by inspecting the CSS in isolation.
+- Measured the real fix iteratively rather than guessing a final number twice: a dedicated Playwright script loaded Radio Console inside a bare iframe at Bridge's actual embedded width and read back `getBoundingClientRect().height` for the shell and each internal panel, both before and after adding the embedded-trimming CSS (436px → 337px), which is what the final 360px panel height and the CSS trims above are based on.
+- Re-screenshotted after the fix, powered on via a real click (`frameLocator("...").locator("#powerButton").click()`) and forced an immediate transmission: Power/channel chips/volume/mute, the signal meter (now animating with real amber bars while "transmitting"), and a transcript entry are all visible within the panel on both desktop and mobile, with no scrolling required to reach the primary controls.
+
 ## Recommended Next Watch
 
-A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions.
+A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`.
