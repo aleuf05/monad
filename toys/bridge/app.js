@@ -10,7 +10,16 @@
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
   const contactValue = document.querySelector("#contactValue");
+  const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
+  const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
+  const stationPanels = Array.from(document.querySelectorAll("[data-station-panel]"));
+
+  const stationLabels = {
+    plot: "Command Plot",
+    periscope: "Periscope",
+    watchbook: "Watchbook"
+  };
 
   function pad(value) {
     return String(value).padStart(2, "0");
@@ -37,6 +46,53 @@
     } catch (error) {
       return null;
     }
+  }
+
+  function selectStation(station, focusTab = false) {
+    const nextTab = stationTabs.find((tab) => tab.dataset.station === station) || stationTabs[0];
+    const nextStation = nextTab?.dataset.station;
+    if (!nextStation) return;
+
+    stationTabs.forEach((tab) => {
+      const active = tab.dataset.station === nextStation;
+      tab.classList.toggle("is-active", active);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+    });
+
+    stationPanels.forEach((panel) => {
+      const active = panel.dataset.stationPanel === nextStation;
+      panel.classList.toggle("is-active", active);
+      panel.hidden = !active;
+    });
+
+    if (activeStationValue) {
+      activeStationValue.textContent = stationLabels[nextStation] || nextStation;
+    }
+    if (focusTab) {
+      nextTab.focus();
+    }
+  }
+
+  function handleTabKeydown(event) {
+    const currentIndex = stationTabs.indexOf(event.currentTarget);
+    if (currentIndex === -1) return;
+
+    let nextIndex = currentIndex;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % stationTabs.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + stationTabs.length) % stationTabs.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = stationTabs.length - 1;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    selectStation(stationTabs[nextIndex].dataset.station, true);
   }
 
   function updateSharedState() {
@@ -85,11 +141,17 @@
     updateSharedState();
   }
 
+  stationTabs.forEach((tab) => {
+    tab.addEventListener("click", () => selectStation(tab.dataset.station));
+    tab.addEventListener("keydown", handleTabKeydown);
+  });
+
   window.addEventListener("storage", (event) => {
     if (event.key === FLEET_STATE_KEY) updateSharedState();
   });
 
   commitValue.textContent = "main / static runtime";
+  selectStation("plot");
   tick();
   setInterval(tick, 1000);
 })();
