@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const FLEET_STATE_KEY = "monad.fleetMotion.state";
+  const FLEET_STATE_KEY = window.MonadFleetState?.storageKey || "monad.fleetMotion.state";
   const watchTime = document.querySelector("#watchTime");
   const shipStatus = document.querySelector("#shipStatus");
   const alertLevel = document.querySelector("#alertLevel");
@@ -28,6 +28,9 @@
   }
 
   function parseFleetState() {
+    if (window.MonadFleetState?.read) {
+      return window.MonadFleetState.read();
+    }
     try {
       const raw = localStorage.getItem(FLEET_STATE_KEY);
       return raw ? JSON.parse(raw) : null;
@@ -45,13 +48,17 @@
       fleetStateValue.textContent = "Awaiting Fleet Motion";
       fleetPositionValue.textContent = "No state observed";
       routeValue.textContent = "No route observed";
-      contactValue.textContent = "No contacts observed";
+      if (contactValue) contactValue.textContent = "No contacts observed";
       return;
     }
 
     const routeLegs = Array.isArray(state.navigation?.routeQueue) ? state.navigation.routeQueue.length : 0;
     const waypoints = Array.isArray(state.navigation?.waypoints) ? state.navigation.waypoints.length : 0;
-    const contacts = Array.isArray(state.contacts?.ships) ? state.contacts.ships : [];
+    const contacts = window.MonadFleetState?.toScoutContacts
+      ? window.MonadFleetState.toScoutContacts(state)
+      : Array.isArray(state.contacts?.ships)
+        ? state.contacts.ships
+        : [];
     const motion = state.time?.timeWarp === 0 ? "Paused" : `${state.time?.timeWarp || 1}x`;
     const speed = Number(state.flagship?.speedKmh || 0);
     const moving = speed > 0.5 && state.time?.timeWarp !== 0;
@@ -65,7 +72,9 @@
       : `Observed / ${motion}`;
     fleetPositionValue.textContent = formatPosition(state.flagship?.position);
     routeValue.textContent = `${routeLegs} active leg${routeLegs === 1 ? "" : "s"} / ${waypoints} waypoint${waypoints === 1 ? "" : "s"}`;
-    contactValue.textContent = `${contacts.length} passive contact${contacts.length === 1 ? "" : "s"}`;
+    if (contactValue) {
+      contactValue.textContent = `${contacts.length} shared contact${contacts.length === 1 ? "" : "s"}`;
+    }
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";
     conditionValue.className = state.navigation?.lastNavigationMessage === "Clear" ? "is-watch" : "is-caution";
