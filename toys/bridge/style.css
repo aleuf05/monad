@@ -145,7 +145,7 @@ dd {
 
 .station-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1px;
   border-bottom: 1px solid var(--line);
   background: rgba(138, 215, 193, 0.14);
@@ -194,6 +194,37 @@ dd {
 
 .station-panel[hidden] {
   display: none;
+}
+
+.live-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(10px, 1.4vw, 16px);
+  padding: clamp(10px, 1.4vw, 16px);
+  min-height: 0;
+}
+
+.live-instrument {
+  min-height: 0;
+}
+
+@keyframes syncPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(216, 180, 106, 0.65);
+    border-color: var(--amber);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(216, 180, 106, 0);
+    border-color: var(--amber);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(216, 180, 106, 0);
+    border-color: var(--line);
+  }
+}
+
+.live-instrument.is-sync-pulse {
+  animation: syncPulse 900ms ease-out;
 }
 
 .side-rail {
@@ -307,6 +338,18 @@ dd {
   .side-rail {
     grid-template-columns: minmax(0, 1fr) minmax(260px, 0.45fr);
     grid-template-rows: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .live-console {
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(300px, 1fr);
+    overflow-y: auto;
+  }
+
+  .station-deck {
+    min-height: min(820px, 84vh);
   }
 }
 

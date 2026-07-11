@@ -15,12 +15,16 @@
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
   const stationPanels = Array.from(document.querySelectorAll("[data-station-panel]"));
+  const liveInstruments = Array.from(document.querySelectorAll("[data-live-instrument]"));
 
   const stationLabels = {
-    plot: "Command Plot",
-    periscope: "Periscope",
+    console: "Live Console",
     watchbook: "Watchbook"
   };
+
+  let hasObservedSelection = false;
+  let lastSelectedShipId = null;
+  let syncCueTimeout = null;
 
   function pad(value) {
     return String(value).padStart(2, "0");
@@ -96,8 +100,27 @@
     selectStation(stationTabs[nextIndex].dataset.station, true);
   }
 
+  function triggerSyncCue() {
+    liveInstruments.forEach((panel) => panel.classList.remove("is-sync-pulse"));
+    // Force reflow so re-adding the class restarts the CSS animation even if a
+    // pulse is already mid-flight when a second selection change lands.
+    void document.body.offsetWidth;
+    liveInstruments.forEach((panel) => panel.classList.add("is-sync-pulse"));
+    if (syncCueTimeout) clearTimeout(syncCueTimeout);
+    syncCueTimeout = setTimeout(() => {
+      liveInstruments.forEach((panel) => panel.classList.remove("is-sync-pulse"));
+    }, 900);
+  }
+
   function updateSharedState() {
     const state = parseFleetState();
+    const selectedShipId = state?.selection?.selectedShipId ?? null;
+    if (hasObservedSelection && selectedShipId !== lastSelectedShipId) {
+      triggerSyncCue();
+    }
+    lastSelectedShipId = selectedShipId;
+    hasObservedSelection = true;
+
     if (!state) {
       shipStatus.textContent = "Standing watch";
       alertLevel.textContent = "Nominal";
@@ -164,7 +187,7 @@
   });
 
   commitValue.textContent = "main / static runtime";
-  selectStation("plot");
+  selectStation("console");
   tick();
   setInterval(tick, 1000);
 })();

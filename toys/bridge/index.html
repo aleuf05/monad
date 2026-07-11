@@ -38,37 +38,36 @@
       <section class="console-layout" aria-label="Unified bridge console">
         <section class="station-deck" aria-label="Bridge station tabs">
           <nav class="station-tabs" aria-label="Bridge instruments" role="tablist">
-            <button class="station-tab is-active" type="button" id="tab-plot" data-station="plot" role="tab" aria-selected="true" aria-controls="panel-plot">
-              <span>Command Plot</span>
-            </button>
-            <button class="station-tab" type="button" id="tab-periscope" data-station="periscope" role="tab" aria-selected="false" aria-controls="panel-periscope" tabindex="-1">
-              <span>Periscope</span>
+            <button class="station-tab is-active" type="button" id="tab-console" data-station="console" role="tab" aria-selected="true" aria-controls="panel-console">
+              <span>Live Console</span>
             </button>
             <button class="station-tab" type="button" id="tab-watchbook" data-station="watchbook" role="tab" aria-selected="false" aria-controls="panel-watchbook" tabindex="-1">
               <span>Watchbook</span>
             </button>
           </nav>
 
-          <article class="instrument station-panel is-active" id="panel-plot" data-station-panel="plot" role="tabpanel" aria-labelledby="tab-plot">
-            <header class="instrument-header">
-              <div>
-                <p class="eyebrow">Operational Plot</p>
-                <h2>Fleet Motion</h2>
-              </div>
-              <a href="../fleet-motion/" target="_blank" rel="noreferrer">Open standalone</a>
-            </header>
-            <iframe title="Fleet Motion instrument" src="../fleet-motion/"></iframe>
-          </article>
+          <article class="station-panel is-active live-console" id="panel-console" data-station-panel="console" role="tabpanel" aria-labelledby="tab-console">
+            <article class="instrument live-instrument" id="liveFleetMotion" data-live-instrument="fleet-motion">
+              <header class="instrument-header">
+                <div>
+                  <p class="eyebrow">Operational Plot</p>
+                  <h2>Fleet Motion</h2>
+                </div>
+                <a href="../fleet-motion/" target="_blank" rel="noreferrer">Open standalone</a>
+              </header>
+              <iframe title="Fleet Motion instrument" src="../fleet-motion/"></iframe>
+            </article>
 
-          <article class="instrument station-panel" id="panel-periscope" data-station-panel="periscope" role="tabpanel" aria-labelledby="tab-periscope" hidden>
-            <header class="instrument-header">
-              <div>
-                <p class="eyebrow">Optical Watch</p>
-                <h2>Periscope Station</h2>
-              </div>
-              <a href="../periscope/" target="_blank" rel="noreferrer">Open standalone</a>
-            </header>
-            <iframe title="Periscope Station instrument" src="../periscope/"></iframe>
+            <article class="instrument live-instrument" id="livePeriscope" data-live-instrument="periscope">
+              <header class="instrument-header">
+                <div>
+                  <p class="eyebrow">Optical Watch</p>
+                  <h2>Periscope Station</h2>
+                </div>
+                <a href="../periscope/" target="_blank" rel="noreferrer">Open standalone</a>
+              </header>
+              <iframe title="Periscope Station instrument" src="../periscope/"></iframe>
+            </article>
           </article>
 
           <article class="instrument station-panel" id="panel-watchbook" data-station-panel="watchbook" role="tabpanel" aria-labelledby="tab-watchbook" hidden>
@@ -102,7 +101,7 @@
               </div>
               <div>
                 <dt>Current Sprint</dt>
-                <dd>Bridge Station Mk II</dd>
+                <dd>Bridge Station Mk III</dd>
               </div>
               <div>
                 <dt>Commander Status</dt>
@@ -130,7 +129,7 @@
               </div>
               <div>
                 <dt>Active Station</dt>
-                <dd id="activeStationValue">Command Plot</dd>
+                <dd id="activeStationValue">Live Console</dd>
               </div>
               <div>
                 <dt>Last Commit</dt>
@@ -138,7 +137,7 @@
               </div>
             </dl>
             <p class="engineering-note">
-              Bridge Station composes live instruments without replacing them. Shared state is read from Fleet Motion's browser-local canonical state.
+              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state.
             </p>
           </article>
 
