@@ -5,10 +5,12 @@ const VESSEL_COLORS = {
 };
 
 const linkStatusEl = document.querySelector("#linkStatus");
+const authorityStatusEl = document.querySelector("#authorityStatus");
 const clockStateEl = document.querySelector("#clockState");
 const tickReadoutEl = document.querySelector("#tickReadout");
 const simTimeReadoutEl = document.querySelector("#simTimeReadout");
 const serverUrlInput = document.querySelector("#serverUrl");
+const commandTokenInput = document.querySelector("#commandToken");
 const connectButton = document.querySelector("#connectButton");
 const pauseResumeButton = document.querySelector("#pauseResumeButton");
 const timeScaleInput = document.querySelector("#timeScaleInput");
@@ -27,6 +29,8 @@ const state = {
   reconnectDelayMs: 1000,
   reconnectTimer: null,
   intentionalClose: false,
+  connected: false,
+  commandAuthority: false,
   hasCenteredMap: false,
   lastClockState: null,
   selectedId: null,
@@ -57,7 +61,19 @@ function setLinkStatus(text, disconnected) {
   linkStatusEl.classList.toggle("is-disconnected", Boolean(disconnected));
 }
 
-function setControlsEnabled(enabled) {
+function setAuthorityStatus(text, authorized) {
+  authorityStatusEl.textContent = text;
+  authorityStatusEl.classList.toggle("is-authorized", Boolean(authorized));
+  state.commandAuthority = Boolean(authorized);
+  updateControlsEnabled();
+}
+
+// Controls only ever enable when both connected AND holding command
+// authority -- the server is read-only by default (see Sprint.md), so a
+// connected-but-unauthorized visitor must not see live-looking buttons that
+// the server will just reject.
+function updateControlsEnabled() {
+  const enabled = state.connected && state.commandAuthority;
   pauseResumeButton.disabled = !enabled;
   timeScaleInput.disabled = !enabled;
   applyTimeScaleButton.disabled = !enabled;
@@ -74,15 +90,23 @@ function connect() {
 
   const url = serverUrlInput.value.trim();
   if (!url) return;
+  const token = commandTokenInput.value.trim();
+  const connectUrl = token
+    ? `${url}${url.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
+    : url;
 
   setLinkStatus("Connecting…", false);
-  setControlsEnabled(false);
+  setAuthorityStatus("—", false);
+  state.connected = false;
+  updateControlsEnabled();
 
-  const socket = new WebSocket(url);
+  const socket = new WebSocket(connectUrl);
   state.socket = socket;
 
   socket.addEventListener("open", () => {
     setLinkStatus("Live", false);
+    state.connected = true;
+    updateControlsEnabled();
   });
 
   socket.addEventListener("message", (event) => {
@@ -93,7 +117,12 @@ function connect() {
       console.warn("FleetCore Live: malformed message", error);
       return;
     }
-    if (message.type === "snapshot") {
+    if (message.type === "connected") {
+      setAuthorityStatus(
+        message.command_authority ? "Command" : "Read-only",
+        message.command_authority
+      );
+    } else if (message.type === "snapshot") {
       applySnapshot(message.snapshot);
     } else if (message.type === "error") {
       console.warn("FleetCore Live: server rejected a command:", message.message);
@@ -102,7 +131,9 @@ function connect() {
 
   socket.addEventListener("close", () => {
     setLinkStatus("Disconnected", true);
-    setControlsEnabled(false);
+    setAuthorityStatus("—", false);
+    state.connected = false;
+    updateControlsEnabled();
     if (!state.intentionalClose) scheduleReconnect();
   });
 
@@ -126,7 +157,6 @@ function sendCommand(command) {
 }
 
 function applySnapshot(snapshot) {
-  setControlsEnabled(true);
   clockStateEl.textContent = snapshot.clock_state === "running" ? "Running" : "Paused";
   tickReadoutEl.textContent = String(snapshot.tick);
   simTimeReadoutEl.textContent = snapshot.sim_time;
