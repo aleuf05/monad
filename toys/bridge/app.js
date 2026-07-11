@@ -8,10 +8,12 @@
   const conditionValue = document.querySelector("#conditionValue");
   const fleetStateValue = document.querySelector("#fleetStateValue");
   const dataSourceValue = document.querySelector("#dataSourceValue");
+  const commandAuthorityValue = document.querySelector("#commandAuthorityValue");
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
   const contactValue = document.querySelector("#contactValue");
   const selectedVesselValue = document.querySelector("#selectedVesselValue");
+  const contactRosterList = document.querySelector("#contactRosterList");
   const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
@@ -146,6 +148,73 @@
     }, 900);
   }
 
+  // Additive write path into MonadFleetState.selection, same pattern
+  // toys/periscope/app.js's own propagateSelection() already uses for a
+  // contact picked directly on the scope: read the full shared state,
+  // override only selection.selectedShipId, write the whole object back.
+  // Bridge still never touches any other field. Fleet Motion and
+  // Periscope each pick this up the normal way (Fleet Motion checks it
+  // every frame, Periscope on its own poll) via the native `storage`
+  // event, since they're separate browsing contexts (iframes) from
+  // Bridge's own top-level document. That event does NOT fire back into
+  // the document that made the write, though, so Bridge calls
+  // updateSharedState() itself right after writing rather than waiting
+  // on its own 1s tick() to notice -- that's also what lets the existing
+  // sync-pulse logic (comparing against lastSelectedShipId) fire for a
+  // roster click the same way it already does for an iframe-originated one.
+  function selectContact(id) {
+    const sharedState = window.MonadFleetState?.read?.();
+    if (!sharedState || sharedState.selection?.selectedShipId === id) return;
+    window.MonadFleetState.write({
+      ...sharedState,
+      selection: { ...sharedState.selection, selectedShipId: id }
+    });
+    updateSharedState();
+  }
+
+  function renderContactRoster(state, contacts) {
+    if (!contactRosterList) return;
+    contactRosterList.innerHTML = "";
+    if (!state) {
+      contactRosterList.innerHTML = '<li class="contact-roster-empty">No contacts observed</li>';
+      return;
+    }
+    const selectedShipId = state.selection?.selectedShipId ?? null;
+    const entries = [
+      {
+        id: "monad",
+        name: "MONAD",
+        classLabel: "Flagship",
+        detail: formatPosition(state.flagship?.position)
+      },
+      ...contacts.map((contact) => ({
+        id: contact.id,
+        name: contact.callsign || contact.name,
+        classLabel: contact.class === "passive-traffic" ? "Local Traffic" : "Fleet Screen",
+        detail: `BRG ${String(Math.round(contact.bearing)).padStart(3, "0")}° / RNG ${contact.range.toFixed(1)} nm`
+      }))
+    ];
+    entries.forEach((entry) => {
+      const li = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      const isSelected = selectedShipId === entry.id;
+      button.className = `contact-roster-item${isSelected ? " is-selected" : ""}`;
+      button.setAttribute("aria-pressed", String(isSelected));
+      const nameEl = document.createElement("span");
+      nameEl.className = "contact-roster-name";
+      nameEl.textContent = entry.name;
+      const metaEl = document.createElement("span");
+      metaEl.className = "contact-roster-meta";
+      metaEl.textContent = `${entry.classLabel} · ${entry.detail}`;
+      button.appendChild(nameEl);
+      button.appendChild(metaEl);
+      button.addEventListener("click", () => selectContact(entry.id));
+      li.appendChild(button);
+      contactRosterList.appendChild(li);
+    });
+  }
+
   function updateSharedState() {
     const state = parseFleetState();
     const selectedShipId = state?.selection?.selectedShipId ?? null;
@@ -168,6 +237,11 @@
         dataSourceValue.textContent = "Awaiting Fleet Motion";
         dataSourceValue.className = "";
       }
+      if (commandAuthorityValue) {
+        commandAuthorityValue.textContent = "Awaiting Fleet Motion";
+        commandAuthorityValue.className = "";
+      }
+      renderContactRoster(null, []);
       return;
     }
 
@@ -205,13 +279,30 @@
         selectedVesselValue.textContent = selected ? selected.name : "No selection observed";
       }
     }
+    renderContactRoster(state, contacts);
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";
     conditionValue.className = state.navigation?.lastNavigationMessage === "Clear" ? "is-watch" : "is-caution";
+    const isLive = state.dataSource === "fleetcore-live";
     if (dataSourceValue) {
-      const isLive = state.dataSource === "fleetcore-live";
       dataSourceValue.textContent = isLive ? "FleetCore Live" : "Fleet Motion (Local Sim)";
       dataSourceValue.className = isLive ? "is-live" : "";
+    }
+    // liveCommandAuthority only means anything once actually live -- Fleet
+    // Motion's own var is false by default and never toggles true outside
+    // a live "connected" message, but be explicit here too rather than
+    // trust a local-sim state to always carry it as false.
+    if (commandAuthorityValue) {
+      if (!isLive) {
+        commandAuthorityValue.textContent = "N/A (Local Sim)";
+        commandAuthorityValue.className = "";
+      } else if (state.liveCommandAuthority) {
+        commandAuthorityValue.textContent = "Granted";
+        commandAuthorityValue.className = "is-live";
+      } else {
+        commandAuthorityValue.textContent = "Read-Only";
+        commandAuthorityValue.className = "is-caution";
+      }
     }
   }
 

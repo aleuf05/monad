@@ -269,8 +269,14 @@ function autoAcquireSharedContact(contacts) {
   const acquireKey = selected ? `selected:${selected.id}` : `nearest:${shared.map((contact) => contact.id).join("|")}`;
   if (state.acquiredSourceKey === acquireKey) return;
   state.acquiredSourceKey = acquireKey;
-  state.bearing = normalizeDegrees(preferred.bearing);
-  state.targetBearing = state.bearing;
+  // Only set targetBearing, not bearing itself -- the render loop's existing
+  // per-frame smoothing (state.bearing += shortestDelta(...) * 0.13) is what
+  // turns the scope toward it, same as a manual drag. Setting both here would
+  // jump-cut the whole ocean view in one frame instead of swinging to it,
+  // which reads as a glitch rather than "the operator turned the periscope" --
+  // especially for a large bearing change, which the Bridge contact roster
+  // makes a lot more common than it used to be.
+  state.targetBearing = normalizeDegrees(preferred.bearing);
   state.velocity = 0;
   selectVessel(preferred);
 }

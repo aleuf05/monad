@@ -574,6 +574,11 @@ function createCanonicalFleetState() {
     schemaVersion: FLEET_STATE_SCHEMA_VERSION,
     savedAt: now,
     dataSource: liveMode ? "fleetcore-live" : "local-simulation",
+    // liveCommandAuthority is false whenever not live and only ever
+    // becomes true from a real "connected" message (see
+    // connectFleetCoreLive()), so passing the var straight through is
+    // already correct in both modes -- no liveMode ternary needed.
+    liveCommandAuthority,
     activePresetId,
     designSettings: { ...designSettings },
     flagship: {

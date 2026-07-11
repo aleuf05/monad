@@ -294,6 +294,66 @@ dd {
   color: var(--signal);
 }
 
+.contact-roster {
+  padding: 0 14px 14px;
+}
+
+.contact-roster-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.contact-roster-empty {
+  color: var(--muted);
+  font-size: 0.78rem;
+  padding: 8px 0;
+}
+
+.contact-roster-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 11px;
+  border: 1px solid rgba(180, 216, 209, 0.16);
+  background: rgba(2, 6, 8, 0.48);
+  color: var(--signal);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.contact-roster-item:hover,
+.contact-roster-item:focus-visible {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.contact-roster-item.is-selected {
+  border-color: var(--amber);
+  background: rgba(230, 184, 106, 0.1);
+}
+
+.contact-roster-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.contact-roster-meta {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.contact-roster-item.is-selected .contact-roster-meta {
+  color: var(--amber);
+}
+
 .engineering-note {
   margin: 0 14px 14px;
   color: var(--muted);

@@ -51,3 +51,11 @@ The artifact uses only static HTML, CSS, JavaScript, Canvas 2D, and local image 
 When Fleet Motion has written browser-local shared state, Periscope derives
 contacts from `toys/shared/fleet-state.js`. When no shared state exists, it falls
 back to local demo contacts so the station remains independently runnable.
+
+When the shared selection changes — from Fleet Motion, from Bridge's contact
+roster, or from another Periscope instance — Periscope turns (slews) its
+bearing toward the newly selected contact over about 2-3 seconds rather than
+cutting to it instantly, the same motion a manual drag produces. This matters
+more since selections can now originate from Bridge's own roster, which can
+jump to any contact regardless of how far its bearing is from whatever
+Periscope was already pointed at.

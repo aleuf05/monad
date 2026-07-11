@@ -127,6 +127,10 @@
                 <dd id="dataSourceValue">Awaiting Fleet Motion</dd>
               </div>
               <div>
+                <dt>Command Authority</dt>
+                <dd id="commandAuthorityValue">Awaiting Fleet Motion</dd>
+              </div>
+              <div>
                 <dt>Fleet Position</dt>
                 <dd id="fleetPositionValue">No state observed</dd>
               </div>
@@ -151,8 +155,14 @@
                 <dd id="commitValue">Runtime static build</dd>
               </div>
             </dl>
+            <div class="contact-roster" aria-label="Contact roster">
+              <p class="eyebrow">Contact Roster</p>
+              <ul id="contactRosterList" class="contact-roster-list">
+                <li class="contact-roster-empty">No contacts observed</li>
+              </ul>
+            </div>
             <p class="engineering-note">
-              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state. Radio Console runs alongside them for ambience — it shares the panel, not the fleet-state contract; it has no read or write path into Fleet Motion's canonical state. It does have its own independent, optional FleetCore connection (event-driven chatter instead of scripted, when Bridge itself is loaded with <code>?live=1</code>) — a separate channel to the same server, not a path through Fleet Motion's state.
+              Bridge Station composes live instruments without replacing them. Fleet Motion and Periscope run side by side in the Live Console, and a selection change in either instrument pulses the other via Fleet Motion's browser-local canonical state. Radio Console runs alongside them for ambience — it shares the panel, not the fleet-state contract; it has no read or write path into Fleet Motion's canonical state. It does have its own independent, optional FleetCore connection (event-driven chatter instead of scripted, when Bridge itself is loaded with <code>?live=1</code>) — a separate channel to the same server, not a path through Fleet Motion's state. Selecting a contact from the roster above writes into that same shared state, the same additive path Periscope's own contact selection already uses — Bridge still never mutates anything beyond <code>selection.selectedShipId</code>.
             </p>
           </article>
 
