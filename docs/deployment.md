@@ -51,7 +51,7 @@ Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge
 
 `web/toys/fleetcore-live/` is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike every other public artifact in this repo, which are all fully self-contained static pages.
 
-**Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`) — its command channel has no authentication, so anyone who can reach it can pause the world or spawn contacts for every connected client, and binding all interfaces would make that reachable the moment any firewall/NAT in front of the host allowed the port through. Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
+**Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`), and its write path (`POST /command`, and any command sent over `/ws`) requires a `--command-token` to be configured at all — with none set, the server is fully read-only regardless of what any client presents (see `docs/architecture/fleetcore-api.md`, "Command Authority"). Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
 
 ```sh
 cargo build --release --manifest-path fleetcore/Cargo.toml --bin serve
@@ -60,6 +60,15 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now fleetcore-serve
 sudo systemctl status fleetcore-serve
 ```
+
+As shipped, `scripts/fleetcore-serve.service` does not set `--command-token`, so the public deployment is read-only by default — visitors can watch the world tick but not touch it. To grant command authority (to yourself, or to anyone you give the token to), edit the unit's `ExecStart` line to add `--command-token <a-real-secret-you-choose>`, then:
+
+```sh
+sudo systemctl daemon-reload
+sudo systemctl restart fleetcore-serve
+```
+
+Whoever holds that token can then paste it into `toys/fleetcore-live/`'s "Command Token" field to unlock the Pause/Resume/time-scale controls. Treat it like any other shared secret — it grants control of the live world for every visitor at once, not just the person holding it.
 
 **Exposing it publicly.** Add a `handle_path` block to `/etc/caddy/Caddyfile`, matching the existing `/portainer/*` pattern, so the public path proxies to the loopback-only server:
 
@@ -78,4 +87,4 @@ sudo systemctl reload caddy
 
 **Unverified:** `cameronlampley.com` reaches Granite through a separate reverse proxy on rock64 (see the "Public Hatch" note in `web/command-deck.html`), which this deployment doc doesn't have visibility into. Whether rock64 passes WebSocket upgrade requests through to Granite's Caddy is not confirmed — if `wss://cameronlampley.com/monad/fleetcore-ws/ws` doesn't connect after the steps above, check rock64's proxy config for WebSocket support before assuming Caddy or `fleetcore-serve` is at fault. `http://localhost/monad/fleetcore-ws/snapshot` on Granite itself is the right first check to isolate Caddy/fleetcore-serve from rock64.
 
-**Known limitation, accepted for now:** the live world is shared by every visitor and has no authentication — pausing the clock, changing time scale, or any future write-capable control affects everyone connected, and there's no per-visitor isolation. This was an explicit, informed choice (not an oversight) when deploying this artifact; add auth before treating this as anything more than a demo.
+**Known limitation, accepted for now:** the live world is shared by every visitor, and the `--command-token` gate is all-or-nothing — there's no per-visitor isolation and no way to give one person pause/resume without also giving them everything else in the `Command` surface. Anyone holding the token affects every connected visitor at once. This was an explicit, informed choice (not an oversight) when deploying this artifact; add per-token scoping before treating this as anything more than a single-operator demo.

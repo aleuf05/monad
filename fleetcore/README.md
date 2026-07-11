@@ -60,7 +60,7 @@ Use `--state-dir <path>` and `--seed <path>` to override defaults.
 cargo run --manifest-path fleetcore/Cargo.toml --bin serve -- --port 4771
 ```
 
-Flags (all optional): `--port` (default `4771`), `--state-dir`, `--seed`, `--tick-ms` (real milliseconds per simulation tick, default `1000`).
+Flags (all optional): `--port` (default `4771`), `--state-dir`, `--seed`, `--tick-ms` (real milliseconds per simulation tick, default `1000`), `--command-token <token>` (grants command authority to whoever presents this token; omit it and the server is fully read-only — see Command Authority below), `--bind-all` (bind `0.0.0.0` instead of the loopback-only default; only do this once a reverse proxy/TLS/auth story is actually in place).
 
 On startup the server loads `--state-dir`'s persisted world, or falls back to the seed if none exists yet, then:
 
@@ -68,10 +68,15 @@ On startup the server loads `--state-dir`'s persisted world, or falls back to th
 - Persists `world.json` after every tick, and a numbered checkpoint plus `snapshots/snapshot.json` every 60 ticks (to avoid flooding the checkpoints directory at one-second cadence).
 - Broadcasts a fresh `WorldSnapshot` to every connected WebSocket client after each tick or applied command.
 
-Endpoints:
+Endpoints — full contract, payload shapes, and error responses are in `docs/architecture/fleetcore-api.md`:
 
-- `GET /snapshot` — current `WorldSnapshot` as JSON (CORS-open, for curl or a plain `fetch()`).
-- `GET /ws` — WebSocket. On connect, the server immediately sends `{"type":"snapshot","snapshot":{...}}`. It sends another `snapshot` message after every tick or applied command. A client sends a raw `Command` JSON object (the same tagged shape the CLI commands map to, e.g. `{"type":"pause-clock"}` or `{"type":"set-time-scale","scale":5}`) to mutate the world; the server replies to a bad command with `{"type":"error","message":"..."}` on the broadcast channel rather than closing the connection.
+- `GET /snapshot` — current `WorldSnapshot` as JSON. No auth, CORS-open.
+- `POST /command` — apply a `Command` (JSON body, same tagged shape the CLI commands map to). Requires `Authorization: Bearer <token>`.
+- `GET /ws` — WebSocket. Optional `?token=<token>` on the connect URL grants command authority for that connection. On connect the server sends `{"type":"connected","command_authority":true|false}` then the current `{"type":"snapshot","snapshot":{...}}`, then another `snapshot` message after every subsequent tick or applied command from any client. An authorized connection can send a raw `Command` JSON object to mutate the world; an unauthorized one gets `{"type":"error","message":"..."}` back instead.
+
+### Command Authority
+
+Read-only by default: with no `--command-token` set, every write from every transport is rejected, unconditionally. Set `--command-token <token>` to grant write access to whoever presents it (`Authorization: Bearer <token>` over HTTP, `?token=<token>` on the WebSocket connect URL). There is no per-token scoping yet — a valid token grants unrestricted authority over the whole `Command` surface, not a subset, and this world is shared, so holding the token affects every connected instrument and visitor, not just the caller.
 
 `toys/fleetcore-live/` is the reference browser client for this protocol.
 
@@ -117,5 +122,5 @@ The CLI still only exports static JSON snapshots to disk. The live server (`flee
 - CLI checkpoints are written every mutating command; the live server checkpoints every 60 ticks instead to avoid flooding the checkpoints directory at one-second tick cadence.
 - Replay compares full snapshot JSON rather than a compact hash.
 - The CLI uses manual argument parsing while the command surface is still small.
-- The live server holds exactly one `World` per process — no multi-world routing, no auth, no per-client permissions. Any connected client can issue any command.
+- The live server holds exactly one `World` per process — no multi-world routing. The `--command-token` gate (see Command Authority above) is all-or-nothing: no per-client permissions, no scoping to a subset of commands, no rate limiting, and no way to revoke a token short of restarting the process with a new one.
 - `--tick-ms` and the seed's `tick_duration_seconds` are independent knobs; at defaults they're both 1000ms/1s so wall clock and sim clock track 1:1 at `time_scale: 1`, but that's a coincidence of the current seed, not an enforced invariant.

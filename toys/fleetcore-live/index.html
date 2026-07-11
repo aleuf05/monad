@@ -22,6 +22,10 @@
             <strong id="linkStatus">Connecting&hellip;</strong>
           </div>
           <div>
+            <span>Authority</span>
+            <strong id="authorityStatus">&mdash;</strong>
+          </div>
+          <div>
             <span>Clock</span>
             <strong id="clockState">&mdash;</strong>
           </div>
@@ -41,6 +45,10 @@
           <span>Server</span>
           <input id="serverUrl" type="text" value="ws://localhost:4771/ws" spellcheck="false">
         </label>
+        <label>
+          <span>Command Token</span>
+          <input id="commandToken" type="password" placeholder="read-only without one" autocomplete="off" spellcheck="false">
+        </label>
         <button id="connectButton" class="console-button" type="button">Connect</button>
         <div class="clock-controls">
           <button id="pauseResumeButton" class="console-button secondary" type="button" disabled>Pause</button>
@@ -51,6 +59,7 @@
           <button id="applyTimeScaleButton" class="console-button secondary" type="button" disabled>Apply</button>
         </div>
       </section>
+      <p class="auth-note">This world is shared by every visitor. Without a command token the view is read-only; holding a valid token grants command authority over the live world for everyone connected, not just you.</p>
 
       <section class="console-layout">
         <article class="map-panel">

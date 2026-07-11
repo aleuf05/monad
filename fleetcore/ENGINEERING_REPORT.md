@@ -1,59 +1,59 @@
-# FleetCore v2 Engineering Report
+# FleetCore v3 Engineering Report
 
 ## Summary
 
-FleetCore v1 proved that the deterministic world model (`World`, `Command`, `snapshot`, `persistence`) works and replays exactly. It was explicitly scoped to never run as a live process — "FleetCore v1 does not implement networking... WebSockets" was a stated non-goal.
+FleetCore v1 proved the deterministic world model works and replays exactly, explicitly scoped to never run live. FleetCore v2 lifted that restriction: `fleetcore-serve` (`src/bin/serve.rs`) wraps the same library in a tokio runtime, ticking a `World` in real time and serving it over HTTP and WebSocket.
 
-FleetCore v2 lifts that restriction. A new binary, `fleetcore-serve` (`src/bin/serve.rs`), wraps the same library in a tokio runtime: it holds one `World` in memory, ticks it in real time, and serves it over HTTP (`GET /snapshot`) and WebSocket (`GET /ws`) so any number of browsers can watch — and, by sending a `Command` over the socket, mutate — one canonical world at once. This is the first time Monad has a real backend process instead of a static file tree. A new reference client, `toys/fleetcore-live/`, consumes it: a Leaflet map plus vessel list and watch-event log driven entirely by server-pushed snapshots, with no local simulation of its own.
+FleetCore v3 implements `Sprint.md` ("Engineering Packet: FleetCore API 1.0"), a mission packet that reached this repo after v2 was already built and deployed. Its acceptance criteria are now met: `GET /snapshot` and a new `POST /command` form a plain JSON-over-HTTP read/write API, and — its sharpest requirement — the server is **read-only by default**, with **explicit grant required for command authority** via a `--command-token` flag. Before this, any client that could open the WebSocket could issue any command, including pausing the world for every connected visitor; this was flagged as a known limitation in the v2 report and is now closed. `docs/architecture/fleetcore-api.md` is the API contract doc Sprint.md's Deliverable 5 asked for, aimed at a future toy author who doesn't need to read `World`'s internals.
 
-The CLI (`src/main.rs`) is unmodified. Both binaries share the same library crate; the live server does not reimplement any simulation logic.
+**Flag for Captain T** (per Sprint.md's own reporting instruction to flag scope conflicts rather than resolve them silently): Sprint.md lists "Networking beyond what v1 requires (no push/WebSocket commitment yet)" as explicitly out of scope. FleetCore v2's WebSocket transport was already built, verified, and deployed to `toys/fleetcore-live/` before this packet was read. Removing it now would regress a working, deployed feature to satisfy a scope line for functionality that already exists and is in use. It was kept, and the plain JSON-over-HTTP contract Sprint.md actually asks for (`GET /snapshot`, `POST /command`) was added alongside it as a first-class, independent transport — not a WebSocket-only workaround. If that reconciliation is wrong, it's a command-intent question, not one this report can resolve on its own.
 
 ## Created Artifacts
 
+- `docs/architecture/fleetcore-api.md`
+
+## Modified Artifacts
+
 - `fleetcore/src/bin/serve.rs`
+- `fleetcore/README.md`
+- `fleetcore/ENGINEERING_REPORT.md`
 - `toys/fleetcore-live/index.html`
 - `toys/fleetcore-live/app.js`
 - `toys/fleetcore-live/style.css`
 - `toys/fleetcore-live/README.md`
 
-## Modified Artifacts
-
-- `fleetcore/Cargo.toml` (added `tokio`, `axum`, `futures-util`)
-- `fleetcore/Cargo.lock`
-- `fleetcore/README.md`
-- `fleetcore/ENGINEERING_REPORT.md`
-
 ## Implementation Notes
 
-- `AppState` (`Arc<Mutex<World>>` + `Arc<StorePaths>` + a `tokio::sync::broadcast::Sender<String>`) is shared across the tick loop and every WebSocket connection.
-- The tick loop runs on a `tokio::time::interval` (default 1000ms, `--tick-ms`), and only advances the world when `world.clock.is_running()` — matching `pause-clock`/`resume-clock` semantics that already existed in `World::apply_command`. Each tick calls `apply_command(Command::Step { ticks: 1 })`, the same call path the CLI's `step`/`run` commands use, so a tick from the live server produces an indistinguishable `Event` from a CLI-driven one.
-- Persistence cadence is deliberately different from the CLI's per-command persistence: `save_world` (a single small file, atomic tmp+rename) runs every tick, but `save_checkpoint` (a new numbered file) and `write_snapshot` (the on-disk `snapshots/snapshot.json` export) only run every 60 ticks. At 1 tick/second, the CLI's original per-command cadence would write a new checkpoint file once a second forever; the live server checkpoints roughly once a minute instead. `events.jsonl` still gets one line per tick, same as the CLI would for an equivalent number of `step 1` calls — event-log growth at ~1 line/second was accepted as reasonable for a prototype/demo server rather than solved with log rotation.
-- Wire protocol: server -> client messages are tagged `{"type":"snapshot","snapshot":{...}}` or `{"type":"error","message":"..."}`; client -> server messages are a raw `Command` JSON object using the same `#[serde(tag = "type", rename_all = "kebab-case")]` shape the CLI already parses positional arguments into (e.g. `{"type":"set-time-scale","scale":5}`). No new command vocabulary was introduced — the live server is a new transport for the existing `Command` enum, not a new command surface.
-- A malformed or rejected command (e.g. an unknown vessel id) returns an `error` message over the broadcast channel rather than closing the connection or panicking; `World::apply_command`'s existing `Result<Event, String>` already carried enough information for this.
-- No CORS middleware dependency was added. WebSocket connections are not subject to the browser's CORS/same-origin policy, so `/ws` needed nothing. `GET /snapshot` gets a manually attached `Access-Control-Allow-Origin: *` header on the response tuple instead of pulling in `tower-http`.
-- `toys/fleetcore-live/` intentionally does not go through `MonadFleetState`/localStorage or `fromFleetCoreSnapshot()` — it renders `WorldSnapshot` directly. Fleet Motion, Periscope, and Bridge are untouched by this sprint; wiring one of them to consume the live server instead of running its own local physics loop is out of scope here (see Recommended v3 Direction).
+- `AppState` gained `command_token: Option<Arc<str>>` and an `authorized(&self, presented: Option<&str>) -> bool` method: `None` for either side of the comparison (no token configured, or none presented) is always unauthorized — there is no way to be "open" by omission. `Arc<str>` rather than `String` because the token is cloned into every `AppState` handed to every connection handler but never mutated.
+- **HTTP write path:** `POST /command` reads `Authorization: Bearer <token>` via a `bearer_token(&HeaderMap)` helper, checks it against `state.authorized()`, and on success runs the same `apply_and_broadcast()` helper the WebSocket path uses — the two transports cannot drift in what "applying a command" means, because they share one function. Responses: `401` unauthorized, `400` invalid JSON, `422` a valid command `World::apply_command` rejected, `200` with the new `WorldSnapshot` on success.
+- **WebSocket auth:** the token travels as a `?token=` query parameter on the `/ws` connect URL, extracted via an `axum::extract::Query<WsAuthParams>` extractor, checked once at connection time (not per-message). The result is captured in a `bool` closed over by that connection's `handle_socket`/`handle_client_message` calls. A new `ServerMessage::Connected { command_authority: bool }` is sent once, immediately after connecting and before the first snapshot, so a client knows its own authority level without inferring it from whether a command happens to succeed.
+- An unauthorized WebSocket connection still receives every broadcast snapshot (reads stay open) — only `handle_client_message` short-circuits, replying with a plain-language `error` message ("read-only connection: reconnect with a valid ?token= to gain command authority") instead of attempting to parse or apply anything it sends.
+- `--bind-all` was added alongside the token work, not because Sprint.md asked for it, but because building and testing the token gate meant running the server with a real secret for the first time — which made the pre-existing `0.0.0.0` bind (a leftover default from v2, never actually exposed publicly) impossible to justify leaving in place a moment longer. Default is now `127.0.0.1`; `--bind-all` opts back into `0.0.0.0` explicitly. See "Caught During This Sprint" below — this was found and fixed before the token gate existed, as a prerequisite to trusting the token gate at all.
+- `toys/fleetcore-live/`'s UI gained a password-type "Command Token" field and an "Authority" status readout (`#authorityStatus`, "Read-only" or "Command"). Control-enabled state (`updateControlsEnabled()`) now requires both a live connection *and* command authority — previously it only required a connection, which meant a read-only visitor would have seen live-looking, clickable Pause/Time-scale controls that the server would silently reject. `commandAuthority` is set from the `Connected` message, not inferred.
+
+## Caught During This Sprint: 0.0.0.0 bind before any auth existed
+
+Deploying FleetCore Live's backend for the first time (before this sprint's token work began), the server was started with its v2 default bind of `0.0.0.0` on a host (Granite) with no local firewall (`ufw` disabled, confirmed via `ufw status` / `/etc/ufw/ufw.conf`). At that point there was no `--command-token` yet — meaning an unauthenticated, fully-open command channel would have been reachable from outside the host the instant any firewall/NAT in front of it allowed the port through, which could not be verified from Granite alone (the public domain routes through a separate rock64 host whose port-forwarding rules aren't visible here). The process was killed within the same watch before any browser ever connected to it publicly, the code changed to bind `127.0.0.1` by default, and the process restarted loopback-only before deployment continued. This predates and is independent of the `--command-token` work above; token auth on top of a loopback-only bind is defense in depth, not a replacement for it — a public bind with a token would still trust the reverse proxy/network path entirely, which isn't yet reviewed for this deployment.
 
 ## Validation Performed
 
-- No Rust toolchain was present in this environment; installed one via `rustup` (user-space, `~/.cargo`, no sudo) since `apt`'s cargo/rustc required a password this session didn't have.
-- Ran `cargo build` on the pre-existing crate first to confirm the v1 baseline still compiled before changing anything.
-- Ran `cargo fmt --check` (found and fixed one formatting diff in the new file), `cargo clippy --all-targets -- -D warnings` (clean), and `cargo test` (the existing `determinism.rs` integration test still passes) after adding the server.
-- Started `fleetcore-serve` against a scratch `--state-dir` and confirmed with `curl http://127.0.0.1:4771/snapshot` that it returns a valid `WorldSnapshot` and the tick advances between requests.
-- Wrote a throwaway Node script using Node 24's built-in `WebSocket` client to drive the `/ws` protocol directly: confirmed the initial snapshot arrives on connect, `pause-clock` freezes `tick` in subsequent broadcasts, `set-time-scale` changes `time_scale` in the next snapshot, `resume-clock` un-freezes it, and a deliberately invalid command (`set-route` for an unknown vessel id) returns `{"type":"error",...}` instead of dropping the connection.
-- Confirmed `world.json` and `events.jsonl` were being written to the scratch state directory during the run.
-- Installed Playwright's Chromium (browser binary only, no `--with-deps`; system package install via `sudo` wasn't available) and drove `toys/fleetcore-live/` end-to-end against the running server: confirmed the link status reaches "Live", 8 vessel markers render on the map matching the seed world's flagship/3 scouts/4 passive contacts, clicking a vessel in the list highlights it and opens its map popup, clicking Pause holds the tick number steady across a 2.5s wait, and clicking Resume with time scale set to 10 advances the tick again. Captured all `console` and `pageerror` events: none were emitted.
+- `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `cargo test` (existing `determinism.rs` unaffected) all clean after the auth changes, same as after the v2 changes.
+- HTTP: `curl`-verified all four `POST /command` outcomes against a scratch server started with `--command-token secret123`: `GET /snapshot` with no auth succeeds; `POST /command` with no `Authorization` header returns `401`; with the wrong token returns `401`; with the correct token returns `200` and the command visibly takes effect (confirmed clock state flips to `paused` in a follow-up `GET /snapshot`).
+- WebSocket: a throwaway Node script (Node 24's built-in `WebSocket`) connected three times — no token, wrong token, correct token — and for each: read the `connected` message's `command_authority` value, then always attempted to send a command regardless. No-token and wrong-token connections both reported `command_authority: false` and got the read-only `error` message back, never applying the command. The correct-token connection reported `command_authority: true` and the command was applied (`time_scale` changed to `7` in the next broadcast).
+- Also verified against a server started with **no** `--command-token` flag at all (the true out-of-the-box default, not just an unmatched token): `POST /command` with an arbitrary bearer token still returned `401` — confirming there's no way to accidentally leave the gate open by only half-configuring it.
+- Browser: installed Playwright's Chromium (already cached from the v2 sprint), drove `toys/fleetcore-live/` against a scratch auth-enabled server twice — once with no token entered, once with the correct token. Read-only run: "Authority" showed "Read-only," the Pause button was disabled, and it was not clicked. Authorized run: "Authority" showed "Command," the Pause button was enabled, clicking it paused the clock and the UI reflected it. Zero console errors or warnings across both runs.
+- Restarted the actual production `fleetcore-serve` process on Granite with the new binary (no `--command-token`, matching the read-only default) and confirmed via its own `/snapshot` that the real persisted world (tick count continuous across the restart, not reset) survived the upgrade.
 
 ## Known Limitations
 
-- The live server holds exactly one `World` per process: no multi-world routing, no authentication, no per-client permissions or rate limiting. Any client that can open the WebSocket can issue any command, including pausing the clock for everyone.
-- No reconnect-safe command queue: a command sent while briefly disconnected is simply dropped (the browser client already implements reconnect-with-backoff for the read path, but there's no retry for in-flight writes).
-- `--tick-ms` and the seed's `tick_duration_seconds` are independent knobs that happen to both default to 1000ms/1s; nothing enforces they stay related.
-- Event-log growth is unbounded (~1 line/tick/second of uptime) — fine for a prototype/demo run, not for a long-lived deployment.
-- `toys/fleetcore-live/` has no mobile-specific layout pass beyond the CSS grid's single-breakpoint stack, unlike Bridge's dedicated mobile verification.
-- Fleet Motion, Periscope, and Bridge still run entirely on their own client-side simulations; none of them talk to FleetCore. `fromFleetCoreSnapshot()` in `toys/shared/fleet-state.js` remains unused.
+- The `--command-token` gate is all-or-nothing: no per-client permissions, no scoping to a subset of `Command` variants, no rate limiting, and no revocation short of restarting the process with a different token.
+- Error replies (both "invalid command" and "read-only, unauthorized") still go out on the broadcast channel to every connected client, not just the one that triggered them — a pre-existing v2 simplification, not new to this sprint, still not fixed.
+- No reconnect-safe command queue; a write attempted while briefly disconnected is dropped, matching v2.
+- Event-log growth remains unbounded per tick of uptime, matching v2.
+- Fleet Motion, Periscope, and Bridge still run their own client-side simulations and don't talk to FleetCore; unchanged from v2.
 
-## Recommended FleetCore v3 Direction
+## Recommended Next Direction
 
-1. Pick one existing toy (Fleet Motion is the obvious candidate — it already owns "sole writer" status in the `MonadFleetState` contract) and make it a live-mode FleetCore client: suspend its local physics loop (`persistenceSuspended` already exists as a kill switch) when a FleetCore server is reachable, and relay incoming snapshots through `fromFleetCoreSnapshot()` into `MonadFleetState.write()` so Periscope and Bridge inherit live sync for free without any changes of their own.
-2. Add a bounded event-log strategy (rotation or periodic compaction into a checkpoint) before running the live server unattended for long periods.
-3. Add minimal auth or a read-only mode for public deployment — right now anyone who can reach `/ws` can pause the fleet.
+1. Per-client/per-token scoping (e.g. a read/pause-only token distinct from a full-control token) if multiple people need different levels of access to the same live world.
+2. Fix error-reply targeting so a rejected or unauthorized command only replies to its own connection, not every connected client.
+3. Everything already listed in the v2 report's "Recommended FleetCore v3 Direction" that this sprint didn't address (event-log rotation, an existing toy becoming a live FleetCore client) still applies — renumber as v4 direction now that v3 has shipped.

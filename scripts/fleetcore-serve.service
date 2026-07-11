@@ -7,14 +7,21 @@ Type=simple
 User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
+# No --command-token below: read-only by default, matching Sprint.md ("Read-only
+# default for toys; explicit grant required for command authority"). To grant
+# command authority, add ` --command-token <a-real-secret-you-choose>` to
+# ExecStart, then `sudo systemctl daemon-reload && sudo systemctl restart
+# fleetcore-serve`. Whoever holds that token can control the live world for
+# every connected visitor at once -- see docs/architecture/fleetcore-api.md.
 ExecStart=/home/cgl/dev/monad/fleetcore/target/release/serve --port 4771
 Restart=on-failure
 RestartSec=2
 # Loopback-only (fleetcore-serve's own default -- see fleetcore/src/bin/serve.rs).
 # Reachable publicly only through the /monad/fleetcore-ws/ Caddy reverse proxy
-# documented in docs/deployment.md. Do not add --bind-all here without adding
-# authentication first: this server's command channel has none, so anyone who
-# can reach it can pause the world or spawn contacts for every connected client.
+# documented in docs/deployment.md. Do not add --bind-all here without also
+# reviewing exposure: even with a --command-token set, binding all interfaces
+# puts a live process directly on the internet the moment any firewall/NAT in
+# front of it allows the port through.
 NoNewPrivileges=true
 PrivateTmp=true
 

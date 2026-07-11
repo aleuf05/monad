@@ -82,8 +82,12 @@ h1 {
 
 .status-strip {
   display: grid;
-  grid-template-columns: repeat(2, minmax(6.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
   gap: 0.75rem 1.5rem;
+}
+
+.status-strip strong.is-authorized {
+  color: var(--amber);
 }
 
 .status-strip div {
@@ -131,6 +135,17 @@ h1 {
 
 .connect-row input[type="text"] {
   min-width: 16rem;
+}
+
+.connect-row input[type="password"] {
+  min-width: 12rem;
+}
+
+.auth-note {
+  margin: -0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  max-width: 46rem;
 }
 
 .connect-row input {
