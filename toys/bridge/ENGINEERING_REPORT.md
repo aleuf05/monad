@@ -128,6 +128,26 @@ Closes the Mk V.1 Known Remaining Gap. Periscope's own document was still taller
 - Playwright, standalone `toys/periscope/` at 390×844: confirmed `body.is-embedded` is never applied (`window.self === window.top`), and the page renders with its full header, full optics bar, and original sizing — unaffected by any of the above.
 - Zero console/page errors captured across every run.
 
+## Mk V.3: Command Token Field
+
+Bridge's Status Board gained a Command Authority row (Granted/Read-Only/N/A) in the prior watch (see the Bridge Command Authority Rail log), but the only way to actually change it was editing the URL's `?commandToken=` param and reloading the entire page — a poor fit for a page that calls itself a unified command console.
+
+### Implementation Notes
+
+- `toys/bridge/index.html`: a `<form id="commandTokenForm">` with a `type="password"` input and an Apply button, placed in the Engineering panel right after the status list (adjacent to the Command Authority row it controls).
+- `toys/bridge/app.js`: `applyCommandToken(token)` targets only `#liveFleetMotion iframe` — Radio Console also matches the existing `[data-instrument-src]` selector but ignores `commandToken` entirely, and reloading it on every token change would cut off whatever it's currently playing for no reason. It rebuilds that one iframe's `src` via `URL`/`searchParams` (preserving whatever `live`/`fleetcoreServer` params are already on it) and mirrors the token into Bridge's own address bar with `history.replaceState` so a refresh doesn't drop authority the operator just granted. Submitting an empty value clears the param and drops back to read-only, both on the iframe and in the URL.
+- This is a deliberate, operator-triggered reload of one iframe, not the "never touch `.src` twice" case the initial-load code comment warns against (that one is specifically about avoiding an unwanted flash on first load).
+- The token is exposed in the iframe's `src` and Bridge's own URL exactly as it already was via the manual `?commandToken=` URL param — this doesn't introduce a new exposure, just a more convenient way to set the same thing. The input still masks on-screen entry (`type="password"`).
+
+### Validation Performed
+
+Playwright against the real `fleetcore-serve` already running on this box (`--command-token bridge-3-0-lan`):
+
+- Loaded Bridge with `?live=1` (no token): Command Authority read "Read-Only," Data Source read "FleetCore Live."
+- Typed `bridge-3-0-lan` into the new field and submitted: Fleet Motion's iframe `src` gained `&commandToken=bridge-3-0-lan`, Bridge's own URL gained the same param via `replaceState`, Command Authority flipped to "Granted," and Fleet Motion's own Pause control (previously disabled read-only) became enabled — all without Bridge itself reloading.
+- Cleared the field and resubmitted: iframe `src` and page URL both dropped `commandToken`, Command Authority reverted to "Read-Only."
+- Zero console/page errors across the whole run.
+
 ## Recommended Next Watch
 
-A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`. Periscope's contact strip can still grow tall enough to push the vessel detail panel below the fold when many contacts are present (it wraps to 3-column rows) — untouched by this watch and worth a look if it comes up again.
+Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`. Periscope's contact strip can still grow tall enough to push the vessel detail panel below the fold when many contacts are present (it wraps to 3-column rows) — untouched by any recent watch and worth a look if it comes up again. The Command Token field has no client-side format validation and no feedback for a submitted-but-rejected token beyond the Command Authority row itself staying "Read-Only" a second later — acceptable for now since that's the same signal an invalid URL-param token already gave, but a more immediate "token rejected" cue would be a reasonable small follow-up.

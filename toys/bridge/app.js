@@ -14,6 +14,8 @@
   const contactValue = document.querySelector("#contactValue");
   const selectedVesselValue = document.querySelector("#selectedVesselValue");
   const contactRosterList = document.querySelector("#contactRosterList");
+  const commandTokenForm = document.querySelector("#commandTokenForm");
+  const commandTokenInput = document.querySelector("#commandTokenInput");
   const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
@@ -55,6 +57,47 @@
     liveCapableIframes.forEach((iframe) => {
       const baseSrc = iframe.dataset.instrumentSrc;
       iframe.src = query ? `${baseSrc}?${query}` : baseSrc;
+    });
+  }
+
+  // Granting command authority today means editing the URL and reloading
+  // all of Bridge, which is a bad fit for something billing itself as a
+  // command console. This reloads only the Fleet Motion iframe -- Radio
+  // Console also matches [data-instrument-src] above but ignores
+  // commandToken entirely, and reloading it for no reason would cut off
+  // whatever it's currently playing. Unlike the initial load above (which
+  // deliberately avoids ever touching .src twice to prevent a load flash),
+  // this reload is operator-triggered on submit, so it's expected.
+  const fleetMotionIframe = document.querySelector("#liveFleetMotion iframe");
+
+  function applyCommandToken(token) {
+    if (!fleetMotionIframe) return;
+    const currentSrc = fleetMotionIframe.src || fleetMotionIframe.dataset.instrumentSrc;
+    if (!currentSrc) return;
+    const nextSrc = new URL(currentSrc, window.location.href);
+    if (token) {
+      nextSrc.searchParams.set("commandToken", token);
+    } else {
+      nextSrc.searchParams.delete("commandToken");
+    }
+    fleetMotionIframe.src = nextSrc.toString();
+
+    // Mirrors the token into Bridge's own URL (same exposure the existing
+    // ?commandToken= passthrough already has) so a page refresh doesn't
+    // silently drop authority the operator just granted.
+    const pageUrl = new URL(window.location.href);
+    if (token) {
+      pageUrl.searchParams.set("commandToken", token);
+    } else {
+      pageUrl.searchParams.delete("commandToken");
+    }
+    window.history.replaceState(null, "", pageUrl);
+  }
+
+  if (commandTokenForm) {
+    commandTokenForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyCommandToken(commandTokenInput.value.trim());
     });
   }
 

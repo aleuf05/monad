@@ -74,6 +74,10 @@ The Status Board's **Command Authority** row surfaces whether that token actuall
 - No replacement of existing instruments.
 - No WebGL or shader work.
 
+## Command Token
+
+The Engineering panel's Command Token field grants live command authority without editing the URL or reloading Bridge: paste a token and click Apply to reload only the embedded Fleet Motion iframe with `?commandToken=` set (clearing the field and re-applying drops authority again). Bridge itself never holds, checks, or defaults the token — it only forwards it into Fleet Motion's iframe `src` and mirrors it into Bridge's own address bar, the same as the `?commandToken=` URL param it has always accepted. Radio Console does not use this field; it has its own independent connection unaffected by command tokens.
+
 ## Mk VI Direction
 
-A richer contact list in the Bridge rail and direct station handoff actions (selecting a contact then opening Periscope on its bearing) remain open, as does Radio Console's own v2/stretch scope (chatter that references live fleet state; a real broadcast source as a selectable channel — see `toys/radio-console/README.md`, both deliberately deferred). The Mk IV selection-sync gap (Periscope-originated selections not propagating) stays closed. Periscope now has an `is-embedded` trim mode of its own (see Mk V.2 in ENGINEERING_REPORT.md), closing the mobile-layout follow-up noted above.
+Radio Console's own v2/stretch scope (chatter that references live fleet state; a real broadcast source as a selectable channel — see `toys/radio-console/README.md`) remains deliberately deferred. The Mk IV selection-sync gap (Periscope-originated selections not propagating) stays closed. Periscope has an `is-embedded` trim mode of its own (Mk V.2), and Bridge now has both a native Contact Roster and a Command Token field (Mk V.3) — closing the "richer contact rail / direct station handoff" and "command authority from Bridge's own chrome" items this direction previously called out.
