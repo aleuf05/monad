@@ -2,7 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "monad.fleetMotion.state";
-  const SCHEMA_VERSION = 1;
+  const SCHEMA_VERSION = 2;
   const KMH_TO_KNOTS = 0.539956803;
   const KM_TO_NAUTICAL_MILES = 0.539956803;
   const CONTACT_COLORS = ["#8ad7c1", "#d8b46a", "#94bfe8", "#d9ecf0", "#9ee6f0", "#e8c989"];

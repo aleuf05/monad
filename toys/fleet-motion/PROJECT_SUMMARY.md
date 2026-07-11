@@ -14,7 +14,7 @@ It uses Leaflet with OpenStreetMap tiles loaded from a CDN. There is no backend,
 
 Implemented capabilities:
 
-- Real map centered near the Strait of Hormuz.
+- Real map centered on an open Arabian Sea watch area.
 - MONAD flagship plus three escort vessels.
 - Click-to-set-course movement.
 - Constant simulated speed with Pause, 1x, 10x, 100x, and 500x time controls.
@@ -36,7 +36,7 @@ Implemented capabilities:
   avoidance.
 - Operator-selectable escort screen modes with visible formation-link lines.
 - Polished command-console presentation with clearer hierarchy and denser telemetry cells.
-- Reset and return-to-Hormuz controls.
+- Reset and return-to-station controls.
 
 ## Design Intent
 
@@ -62,7 +62,7 @@ The toy favors visible decisions over hidden intelligence. Route planning is man
 - Wake rendering uses multiple bounded SVG segments; this is visually richer but heavier than one flat polyline per vessel.
 - Movement is approximate lat/lon interpolation, not maritime navigation.
 - Motion smoothing is visual interpolation, not a physical propulsion model.
-- There is no persistence. Reloading the page clears the route and log.
+- Browser-local persistence restores the current voyage; the Captain's Log still resets on reload.
 - There is no real AIS, weather, currents, traffic, hazards, or restricted-water data.
 - It is not suitable for real navigation.
 

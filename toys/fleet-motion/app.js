@@ -1,4 +1,4 @@
-const HOME = { lat: 26.56, lng: 56.25 };
+const HOME = { lat: 20.5, lng: 63.2 };
 const BASE_SPEED_KMH = 180;
 const ARRIVAL_RADIUS_KM = 0.08;
 const SLOWDOWN_DISTANCE_KM = 12;
@@ -10,12 +10,12 @@ const ESCORT_DRIFT_LAT = 0.035;
 const ESCORT_DRIFT_LNG = 0.045;
 const ESCORT_SLOT_RESPONSE_SECONDS = 0.7;
 const NPC_OPERATION_BOUNDS = {
-  south: 25.05,
-  north: 27.05,
-  west: 54.65,
-  east: 57.65
+  south: 19.5,
+  north: 21.5,
+  west: 62.0,
+  east: 64.4
 };
-const THREAT_START = { lat: 26.42, lng: 57.18 };
+const THREAT_START = { lat: 20.64, lng: 63.52 };
 const THREAT_SPEED_KMH = 240;
 const THREAT_INTERCEPT_RADIUS_KM = 9;
 const THREAT_BREACH_RADIUS_KM = 6;
@@ -27,7 +27,7 @@ const TRAIL_LIMIT = 180;
 const TRAIL_REDRAW_MIN_POINTS = 2;
 const LOG_LIMIT = 9;
 const INTRO_DURATION_MS = 4800;
-const FLEET_STATE_SCHEMA_VERSION = 1;
+const FLEET_STATE_SCHEMA_VERSION = 2;
 const FLEET_STATE_STORAGE_KEY = "monad.fleetMotion.state";
 const FLEET_STATE_SAVE_INTERVAL_MS = 1200;
 const DESIGN_DEFAULTS = {
@@ -47,20 +47,20 @@ const SCENARIO_PRESETS = {
     spawnThreat: false,
     notePrompt: "Manual sandbox. Tune parameters, click a destination, and record what changed."
   },
-  hormuz_transit: {
-    id: "hormuz_transit",
-    label: "Hormuz Transit",
-    variantName: "hormuz_transit",
+  arabian_sea_watch: {
+    id: "arabian_sea_watch",
+    label: "Arabian Sea Watch",
+    variantName: "arabian_sea_watch",
     settings: {
       flagshipSpeedKmh: 180,
       escortSpeedScale: 1,
       formationSpread: 1
     },
     escortModeId: "loose",
-    destination: { lat: 26.25, lng: 55.35 },
+    destination: { lat: 20.28, lng: 62.82 },
     waypoints: [],
     spawnThreat: false,
-    notePrompt: "Baseline crossing. Judge whether the route and escort spacing are readable."
+    notePrompt: "Open-water watch. Judge whether nearby traffic and escort spacing are readable."
   },
   escort_screen_drill: {
     id: "escort_screen_drill",
@@ -72,7 +72,7 @@ const SCENARIO_PRESETS = {
       formationSpread: 1.25
     },
     escortModeId: "patrol",
-    destination: { lat: 26.62, lng: 55.05 },
+    destination: { lat: 20.78, lng: 62.76 },
     waypoints: [],
     spawnThreat: false,
     notePrompt: "Patrol weave review. Judge whether escorts read as independent but coherent."
@@ -87,8 +87,8 @@ const SCENARIO_PRESETS = {
       formationSpread: 0.75
     },
     escortModeId: "tight",
-    destination: { lat: 26.35, lng: 57.25 },
-    waypoints: [{ lat: 26.62, lng: 56.85 }],
+    destination: { lat: 20.18, lng: 63.78 },
+    waypoints: [{ lat: 20.72, lng: 63.48 }],
     spawnThreat: false,
     notePrompt: "Waypoint route. Judge whether manual routing feels understandable and recoverable."
   }
@@ -117,16 +117,16 @@ const ESCORT_MODES = [
   }
 ];
 const FORMATION = [
-  { id: "escort-alpha", name: "ESCORT ALPHA", lat: -0.22, lng: -0.32 },
-  { id: "escort-bravo", name: "ESCORT BRAVO", lat: -0.02, lng: 0.38 },
-  { id: "escort-charlie", name: "ESCORT CHARLIE", lat: 0.18, lng: 0.16 }
+  { id: "escort-alpha", name: "ESCORT ALPHA", lat: -0.07, lng: -0.09 },
+  { id: "escort-bravo", name: "ESCORT BRAVO", lat: -0.015, lng: 0.1 },
+  { id: "escort-charlie", name: "ESCORT CHARLIE", lat: 0.08, lng: 0.04 }
 ];
 const NPC_CONTACTS = [
   {
     id: "traffic-dhow-01",
     name: "DHOW LANTERN",
     role: "civilian dhow",
-    position: { lat: 26.42, lng: 55.95 },
+    position: { lat: 20.58, lng: 63.29 },
     headingDegrees: 312,
     speedKmh: 32
   },
@@ -134,7 +134,7 @@ const NPC_CONTACTS = [
     id: "traffic-tanker-02",
     name: "TANKER GULF STAR",
     role: "merchant tanker",
-    position: { lat: 25.86, lng: 55.34 },
+    position: { lat: 20.42, lng: 63.05 },
     headingDegrees: 72,
     speedKmh: 44
   },
@@ -142,7 +142,7 @@ const NPC_CONTACTS = [
     id: "traffic-patrol-03",
     name: "PILOT BOAT AMBER",
     role: "harbor pilot",
-    position: { lat: 26.72, lng: 56.48 },
+    position: { lat: 20.55, lng: 63.08 },
     headingDegrees: 246,
     speedKmh: 38
   },
@@ -150,7 +150,7 @@ const NPC_CONTACTS = [
     id: "traffic-coaster-04",
     name: "COASTER QESHM",
     role: "coastal freighter",
-    position: { lat: 26.2, lng: 56.88 },
+    position: { lat: 20.36, lng: 63.28 },
     headingDegrees: 286,
     speedKmh: 36
   }
@@ -171,7 +171,7 @@ const LAND_ZONES = [
     east: 56.25
   },
   {
-    name: "Hormuz Island",
+    name: "Legacy Island Box",
     south: 27.02,
     north: 27.16,
     west: 56.36,
@@ -199,7 +199,7 @@ const map = L.map("map", {
   minZoom: 3,
   worldCopyJump: true
 });
-map.setView([26.42, 55.7], 6, { animate: false });
+map.setView([HOME.lat, HOME.lng], 7, { animate: false });
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
@@ -481,7 +481,7 @@ function createBaselineFleetState() {
   return {
     schemaVersion: FLEET_STATE_SCHEMA_VERSION,
     savedAt: null,
-    activePresetId: "hormuz_transit",
+    activePresetId: "arabian_sea_watch",
     designSettings: { ...DESIGN_DEFAULTS },
     flagship: {
       position: { ...HOME },
@@ -1643,7 +1643,7 @@ function buildScenarioArtifact() {
     schemaVersion: 1,
     exportedAt: new Date().toISOString(),
     scenario: {
-      area: "Strait of Hormuz",
+      area: "Arabian Sea",
       presetId: activePresetId,
       presetLabel: SCENARIO_PRESETS[activePresetId]?.label || "Freeplay / Manual",
       variantName: variantNameInput?.value.trim() || activePresetId || "manual",
@@ -1752,7 +1752,7 @@ function downloadScenarioExport() {
 }
 
 function loadPassiveOpeningRoute() {
-  const preset = SCENARIO_PRESETS.hormuz_transit;
+  const preset = SCENARIO_PRESETS.arabian_sea_watch;
   activePresetId = preset.id;
   if (scenarioPresetSelect) scenarioPresetSelect.value = preset.id;
   designSettings = { ...preset.settings };
@@ -1768,7 +1768,7 @@ function loadPassiveOpeningRoute() {
   headingDegrees = bearingDegrees(flagship, destination);
   lastStatus = "Underway";
   lastNavigationMessage = "Clear";
-  addLog("Opening route loaded: Hormuz Transit.");
+  addLog("Opening route loaded: Arabian Sea Watch.");
 }
 
 function completeIntro() {
@@ -2264,7 +2264,7 @@ function setTimeWarp(nextWarp) {
 }
 
 function resetFleet({ requireConfirmation = true } = {}) {
-  if (requireConfirmation && !window.confirm("Reset Fleet Motion to the documented Strait of Hormuz baseline? This clears the persisted voyage.")) {
+  if (requireConfirmation && !window.confirm("Reset Fleet Motion to the documented Arabian Sea watch baseline? This clears the persisted voyage.")) {
     return false;
   }
   flagship = { ...HOME };
@@ -2290,7 +2290,7 @@ function resetFleet({ requireConfirmation = true } = {}) {
   renderedEscortHeadings = null;
   renderedContactHeadings = null;
   createInitialTrails();
-  addLog("Fleet reset to Strait of Hormuz station.");
+  addLog("Fleet reset to Arabian Sea watch station.");
   flashAt(flagship, "feedback-pulse reset");
   updateFleetMarkers();
   updateStatus();
