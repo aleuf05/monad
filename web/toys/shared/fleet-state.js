@@ -49,6 +49,7 @@
       ...candidate,
       schemaVersion: SCHEMA_VERSION,
       savedAt: candidate.savedAt || null,
+      dataSource: candidate.dataSource || "local-simulation",
       activePresetId: candidate.activePresetId || "freeplay",
       flagship: {
         ...(candidate.flagship || {}),
@@ -196,6 +197,7 @@
     return normalizeFleetMotionState({
       schemaVersion: SCHEMA_VERSION,
       savedAt: snapshot.sim_time || null,
+      dataSource: "fleetcore-live",
       activePresetId: "fleetcore",
       flagship: {
         position: clonePoint(flagship?.position),

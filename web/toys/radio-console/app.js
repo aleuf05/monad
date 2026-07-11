@@ -157,10 +157,17 @@ function duckStatic(down) {
 }
 
 function setSpeaking(speaking) {
+  const wasSpeaking = state.speaking;
   state.speaking = speaking;
   speakingIndicatorEl.textContent = speaking ? "Transmitting…" : "Standing by…";
   speakingIndicatorEl.classList.toggle("is-speaking", speaking);
   duckStatic(speaking);
+  // Squelch pop belongs to the channel closing (PTT release, static
+  // snapping back up), not to a transmission starting -- it was firing on
+  // the wrong edge before this fix.
+  if (wasSpeaking && !speaking) {
+    playSquelch();
+  }
 }
 
 function appendTranscript(entry) {
@@ -220,7 +227,6 @@ function transmit() {
   if (!pool.length) return;
   const entry = pool[Math.floor(Math.random() * pool.length)];
   appendTranscript(entry);
-  playSquelch();
   speak(entry);
 }
 

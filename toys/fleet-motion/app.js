@@ -559,6 +559,7 @@ function createCanonicalFleetState() {
   return {
     schemaVersion: FLEET_STATE_SCHEMA_VERSION,
     savedAt: now,
+    dataSource: liveMode ? "fleetcore-live" : "local-simulation",
     activePresetId,
     designSettings: { ...designSettings },
     flagship: {

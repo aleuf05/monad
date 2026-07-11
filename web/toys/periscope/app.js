@@ -137,6 +137,7 @@ const canvas = document.querySelector("#periscopeCanvas");
 const frame = document.querySelector("#scopeFrame");
 const ctx = canvas.getContext("2d");
 const bearingReadout = document.querySelector("#bearingReadout");
+const dataSourceReadout = document.querySelector("#dataSourceReadout");
 const bearingBand = document.querySelector("#bearingBand");
 const contactStrip = document.querySelector("#contactStrip");
 const detailsButton = document.querySelector("#detailsButton");
@@ -165,6 +166,7 @@ const state = {
   contactButtonsReady: false,
   contactSourceKey: "",
   acquiredSourceKey: "",
+  dataSource: null,
   opticsMode: "wide",
   acquisitionCue: {
     contactId: null,
@@ -245,7 +247,12 @@ function sharedContacts() {
   const contacts = sharedState && window.MonadFleetState?.toScoutContacts
     ? window.MonadFleetState.toScoutContacts(sharedState)
     : [];
-  return contacts.length ? contacts : null;
+  if (!contacts.length) {
+    state.dataSource = null;
+    return null;
+  }
+  state.dataSource = sharedState.dataSource || "local-simulation";
+  return contacts;
 }
 
 function currentContacts(elapsedSeconds) {
@@ -820,6 +827,26 @@ function updateFieldNote() {
   fieldNote.classList.toggle("is-acquiring", Boolean(selected));
 }
 
+// Mirrors Fleet Motion's own Data Source indicator: Periscope has always
+// composited whatever Fleet Motion writes to MonadFleetState (live or not)
+// with zero code changes, but had no way to tell a viewer which one it's
+// currently looking at. state.dataSource is set as a side effect of
+// sharedContacts() (null when there's no shared state to read at all, in
+// which case Periscope falls back to its own local demo contacts).
+function updateDataSourceIndicator() {
+  if (!dataSourceReadout) return;
+  if (state.dataSource === "fleetcore-live") {
+    dataSourceReadout.textContent = "FleetCore Live";
+    dataSourceReadout.classList.add("is-live");
+  } else if (state.dataSource) {
+    dataSourceReadout.textContent = "Fleet Motion (Local Sim)";
+    dataSourceReadout.classList.remove("is-live");
+  } else {
+    dataSourceReadout.textContent = "Local Demo";
+    dataSourceReadout.classList.remove("is-live");
+  }
+}
+
 function render(now) {
   resizeCanvas();
 
@@ -845,6 +872,7 @@ function render(now) {
   updateDetailsButton();
   updateSelectedPanel(contacts);
   updateFieldNote();
+  updateDataSourceIndicator();
 
   requestAnimationFrame(render);
 }

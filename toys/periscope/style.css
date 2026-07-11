@@ -138,6 +138,10 @@ h2 {
   font-size: 0.92rem;
 }
 
+.optics-status strong.is-live {
+  color: var(--amber);
+}
+
 .magnification-control {
   display: grid;
   grid-template-columns: repeat(3, minmax(48px, 1fr));
