@@ -35,7 +35,12 @@ toys/periscope/assets/
 |-- source/
 |   `-- scout-sprite-chromakey.png
 `-- sprites/
-    `-- scout-alpha.png
+    |-- scout-alpha.png
+    |-- vessel-scout.svg
+    |-- vessel-tanker.svg
+    |-- vessel-dhow.svg
+    |-- vessel-pilot.svg
+    `-- vessel-coaster.svg
 ```
 
 `source/` stores generated or foundry source plates. Runtime code should
@@ -46,11 +51,16 @@ Current prototype asset dimensions:
 - `sea-horizon-mk2.png`: 2172 x 724 px, RGB.
 - `scout-alpha.png`: 1774 x 887 px, transparent PNG.
 - `scout-sprite-chromakey.png`: 1774 x 887 px source plate.
+- `vessel-scout.svg`: transparent scout/escort runtime silhouette.
+- `vessel-tanker.svg`: transparent merchant tanker runtime silhouette.
+- `vessel-dhow.svg`: transparent civilian dhow runtime silhouette.
+- `vessel-pilot.svg`: transparent harbor pilot boat runtime silhouette.
+- `vessel-coaster.svg`: transparent coastal freighter/coaster runtime silhouette.
 
 Runtime naming should continue to use `sea-horizon-mk2.png` for the wide sea
-plate and `scout-alpha.png`, `scout-bravo.png`, and `scout-charlie.png` for
-future cleaned scout variants. Mk II currently references only `scout-alpha.png`
-to avoid missing-asset console noise.
+plate. Class-correct vessel assets use the `vessel-*.svg` naming pattern until
+the asset foundry replaces them with final PNG/WebP cutouts. `scout-alpha.png`
+remains as a fallback prototype sprite.
 
 ## Optics Constants
 
@@ -84,12 +94,16 @@ Model selection is deferred. Mk II proves the compositing architecture first.
 - Background panning is tied to normalized bearing so drag motion feels connected to the optics.
 - The horizon ratio is fixed at `0.45`, matching the generated sea plate and Mk I visual composition.
 - Scout scale comes from range projection, then receives optics-tier magnification.
+- Vessel class controls apparent physical size after distance projection; tankers
+  are larger than pilot boats or dhows at comparable range.
+- Distance controls vertical placement relative to the horizon; far contacts sit
+  near the horizon and near contacts sit lower in the water.
 - Wake rendering is intentionally light and non-physical; it is a depth cue, not a fleet simulation.
 - Atmospheric effects are generated in Canvas so the experience remains self-contained.
 
 ## Known Limitations
 
-- All visible scouts currently share one prototype sprite.
+- The SVG vessel set is class-correct but still illustrative, not final photographic asset-foundry output.
 - The panoramic background is not a true seamless 360-degree environment.
 - Alpha cleanup is acceptable for prototype scale but should be refined before close-up presentation.
 - Distant blur is simulated with Canvas `filter`; older browsers may ignore it and fall back to a sharper sprite.

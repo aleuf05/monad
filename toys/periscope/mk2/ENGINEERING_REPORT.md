@@ -11,6 +11,7 @@ This packet owns:
 - `toys/periscope/app.js`
 - `toys/periscope/index.html`
 - `toys/periscope/style.css`
+- `toys/periscope/assets/sprites/`
 - `toys/periscope/README.md`
 - `toys/periscope/mk2/REQUIREMENTS.md`
 - `toys/periscope/mk2/ENGINEERING_REPORT.md`
@@ -29,6 +30,11 @@ This packet must not touch:
 - `assets/backgrounds/sea-horizon-mk2.png`
 - `assets/source/scout-sprite-chromakey.png`
 - `assets/sprites/scout-alpha.png`
+- `assets/sprites/vessel-scout.svg`
+- `assets/sprites/vessel-tanker.svg`
+- `assets/sprites/vessel-dhow.svg`
+- `assets/sprites/vessel-pilot.svg`
+- `assets/sprites/vessel-coaster.svg`
 - `mk2/REQUIREMENTS.md`
 - `mk2/ENGINEERING_REPORT.md`
 
@@ -45,6 +51,33 @@ This packet must not touch:
 - Replaced the visible contact glyph with a transparent scout sprite when assets load.
 - Kept procedural ocean and geometric contact rendering as graceful fallbacks.
 - Preserved scout projection, drag bearing controls, contact strip selection, Details button, and vessel panel updates.
+
+## Vessel Asset Registry Checkpoint
+
+This packet adds class-correct vessel rendering and horizon-aware placement:
+
+- Added transparent SVG runtime sprites for scout, tanker, dhow, pilot boat, and
+  coastal freighter/coaster contacts.
+- Added a Periscope-side vessel profile registry that maps shared contact class
+  text to sprite, apparent physical size, waterline, and haze behavior.
+- Separated distance placement from physical vessel size: range now places a
+  contact relative to the horizon, while class controls apparent vessel scale.
+- Distant contacts now sit closer to the horizon instead of drifting down into
+  foreground water.
+- Tankers render larger than pilot boats or dhows at comparable range.
+- Existing `scout-alpha.png` remains available as a fallback if a class sprite
+  is missing or fails to load.
+
+Validation performed:
+
+- `node --check toys/periscope/app.js`.
+- `git diff --check` on the modified Periscope files.
+- Served the repository root with `python -m http.server 8790 --bind 127.0.0.1`.
+- Seeded browser-local shared fleet state with scout, tanker, dhow, pilot boat,
+  and coaster contacts.
+- Loaded `http://127.0.0.1:8790/toys/periscope/` in Chrome through Playwright.
+- Verified class contacts populated, tanker tracking worked, the canvas rendered,
+  and no console errors or failed asset requests appeared.
 
 ## Validation Performed
 
