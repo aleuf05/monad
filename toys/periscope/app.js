@@ -427,6 +427,33 @@ function renderWake(contact, x, y, spriteWidth) {
   ctx.restore();
 }
 
+function renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight) {
+  const w = canvas.width;
+  const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
+  const pocketWidth = spriteWidth * (1.2 + rangeRatio * 0.48);
+  const pocketHeight = spriteHeight * (0.64 + rangeRatio * 0.26);
+  const centerY = y - spriteHeight * 0.32;
+  const gradient = ctx.createRadialGradient(x, centerY, 0, x, centerY, pocketWidth * 0.58);
+
+  gradient.addColorStop(0, `rgba(3, 8, 10, ${(0.24 + rangeRatio * 0.2).toFixed(3)})`);
+  gradient.addColorStop(0.62, `rgba(6, 18, 20, ${(0.16 + rangeRatio * 0.11).toFixed(3)})`);
+  gradient.addColorStop(1, "rgba(6, 18, 20, 0)");
+
+  ctx.save();
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.ellipse(x, centerY, pocketWidth * 0.5, pocketHeight * 0.5, 0, 0, TAU);
+  ctx.fill();
+
+  ctx.strokeStyle = `rgba(232, 240, 237, ${(0.13 + rangeRatio * 0.12).toFixed(3)})`;
+  ctx.lineWidth = Math.max(1, w * 0.0012);
+  ctx.beginPath();
+  ctx.moveTo(x - pocketWidth * 0.44, y + spriteHeight * 0.02);
+  ctx.lineTo(x + pocketWidth * 0.44, y + spriteHeight * 0.02);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function renderFallbackContactGlyph(contact, x, y, spriteWidth) {
   const w = canvas.width;
   const hull = spriteWidth * 0.18;
@@ -530,13 +557,29 @@ function renderContact(contact, now) {
 
   ctx.save();
   renderWake(contact, x, y, spriteWidth);
+  renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight);
   if (assets.scout.ready) {
-    ctx.globalAlpha = clamp(1.05 - contact.range / MAX_RANGE * 0.34, 0.62, 0.96);
-    ctx.filter = `blur(${(contact.range / MAX_RANGE * 0.52 / optics.backgroundZoom).toFixed(2)}px) contrast(${(0.94 + optics.magnification * 0.006).toFixed(2)}) brightness(${(0.82 + contact.scale * 0.18).toFixed(2)})`;
+    const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
+    const drawX = x - spriteWidth * 0.5;
+    const drawY = y - spriteHeight * 0.78;
+    ctx.save();
+    ctx.globalAlpha = clamp(0.54 + rangeRatio * 0.16, 0.54, 0.72);
+    ctx.filter = "brightness(0) blur(0.35px)";
     ctx.drawImage(
       assets.scout.image,
-      x - spriteWidth * 0.5,
-      y - spriteHeight * 0.78,
+      drawX + Math.max(1, w * 0.002),
+      drawY + Math.max(1, h * 0.002),
+      spriteWidth,
+      spriteHeight
+    );
+    ctx.restore();
+
+    ctx.globalAlpha = clamp(1.03 - rangeRatio * 0.16, 0.78, 0.98);
+    ctx.filter = `blur(${(rangeRatio * 0.32 / optics.backgroundZoom).toFixed(2)}px) contrast(${(1.04 + optics.magnification * 0.008).toFixed(2)}) saturate(0.94) brightness(${(0.92 + contact.scale * 0.14).toFixed(2)})`;
+    ctx.drawImage(
+      assets.scout.image,
+      drawX,
+      drawY,
       spriteWidth,
       spriteHeight
     );
