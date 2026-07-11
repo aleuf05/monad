@@ -441,3 +441,79 @@ dd {
     text-overflow: ellipsis;
   }
 }
+
+/* Bridge Station embeds this toy as one of three fixed-height Live Console
+   panels; the width-based mobile breakpoints above assume a full phone
+   screen's worth of vertical room and actually make the embedded case
+   worse (e.g. stacking the header instead of keeping it compact). These
+   overrides win regardless of viewport width because is-embedded is only
+   ever set by app.js's window.self !== window.top check. Standalone runs
+   at toys/periscope/ never get this class and render exactly as before. */
+body.is-embedded .station-shell {
+  padding: 0;
+}
+
+body.is-embedded .bridge {
+  min-height: 100vh;
+  border: 0;
+  padding: 10px;
+  gap: 8px;
+}
+
+body.is-embedded .eyebrow {
+  display: none;
+}
+
+body.is-embedded .station-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+body.is-embedded h1 {
+  font-size: 1rem;
+}
+
+body.is-embedded .bearing-readout {
+  min-width: 0;
+  width: auto;
+  padding: 4px 8px;
+}
+
+body.is-embedded .bearing-readout span {
+  font-size: 0.6rem;
+}
+
+body.is-embedded .bearing-readout strong {
+  font-size: 0.95rem;
+}
+
+body.is-embedded .optics-bar {
+  display: flex;
+  flex-direction: row;
+  padding: 6px 8px;
+}
+
+body.is-embedded .optics-status + .optics-status {
+  display: none;
+}
+
+body.is-embedded .magnification-control button {
+  min-height: 30px;
+  font-size: 0.7rem;
+}
+
+body.is-embedded .scope-frame {
+  width: min(70vw, 62vh);
+  border-width: 8px;
+}
+
+body.is-embedded .contact-strip {
+  min-height: 0;
+  margin-top: 8px;
+}
+
+body.is-embedded .vessel-panel {
+  min-height: 0;
+  padding: 12px;
+}

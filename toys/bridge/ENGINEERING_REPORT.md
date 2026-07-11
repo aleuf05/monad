@@ -111,6 +111,23 @@ The Validation Caveat above flagged that the 390×844 mobile layout hadn't been 
 
 Even at its corrected 360px/295px height, Periscope's own internal document (1370px tall standalone, unchanged by this fix) still needs an in-iframe scroll to reach the scope view — Fleet Motion and Radio Console do not require this. Radio Console closed an equivalent problem for itself with an `is-embedded` body-class trim (see Mk V above); Periscope has no such embed-aware mode today. Giving Periscope the same treatment would touch `toys/periscope/app.js` and `style.css`, which is outside this sprint's stated boundary (Bridge-side layout and event-wiring only, no Fleet Motion/Periscope simulation or presentation changes) — recommended as the next follow-on sprint rather than folded in here.
 
+## Mk V.2: Periscope Embed-Aware Mobile Trim
+
+Closes the Mk V.1 Known Remaining Gap. Periscope's own document was still taller than its Bridge panel even after Mk V.1's grid fix gave it a fair share of height — reaching the scope view required an in-iframe scroll with no visible hint that it was there.
+
+### Implementation Notes
+
+- `toys/periscope/app.js`: added the same `window.self !== window.top` (try/catch-wrapped) check Radio Console already uses, applying an `is-embedded` class to `<body>`. Standalone `toys/periscope/` never sets this class and is visually unchanged.
+- `toys/periscope/style.css`: added `body.is-embedded` overrides — hides the eyebrow label, shrinks the `<h1>` and bearing readout, collapses the optics bar back to a single compact row and drops its redundant magnification-text readout (the button group's `is-active` state already conveys the same information), reduces shell/bridge padding and gaps, and lets `.scope-frame` size itself to the embedded viewport (`min(70vw, 62vh)`) instead of the standalone sizing.
+- These overrides deliberately win regardless of viewport width, unlike Periscope's existing width-based `@media` breakpoints. Those breakpoints assume a full phone screen's worth of vertical room and were found to make the embedded case *worse* at Bridge's ~348px panel width — e.g. `@media (max-width: 520px)` stacks the header into two rows instead of one, exactly the kind of regression Radio Console's own README already flagged for its analogous breakpoint problem (`toys/radio-console/README.md`'s embedding notes). `is-embedded` overrides are scoped by embedding context, not viewport width, so they apply cleanly on top without fighting those rules.
+
+### Validation Performed
+
+- Playwright, embedded inside Bridge at 390×844: `.scope-frame` moved from `top: 319px` (Mk V.1 baseline, unreachable without scroll) to `top: 112px`, `height: 183px` — fully inside the panel's 295px iframe viewport with no scroll needed. The contact strip starts just below the fold (`top: 303px`) rather than requiring the much longer scroll it did before.
+- Playwright, embedded inside Bridge at 1440×900 (desktop): zero console/page errors.
+- Playwright, standalone `toys/periscope/` at 390×844: confirmed `body.is-embedded` is never applied (`window.self === window.top`), and the page renders with its full header, full optics bar, and original sizing — unaffected by any of the above.
+- Zero console/page errors captured across every run.
+
 ## Recommended Next Watch
 
-A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`. Giving Periscope an embed-aware trim mode (mirroring Radio Console's `is-embedded` class) to eliminate the in-iframe scroll noted above is now the leading mobile-layout follow-up.
+A richer Bridge-native contact rail and direct station handoff (select a contact on Bridge, open Periscope already slewed to its bearing) remain good follow-on steps now that selection sync is bidirectional in both directions. Radio Console's own v2 (live-fleet-state-aware chatter) and stretch goal (real broadcast source) remain fully deferred, per the original feature request's own priority note — see `toys/radio-console/README.md`. Periscope's contact strip can still grow tall enough to push the vessel detail panel below the fold when many contacts are present (it wraps to 3-column rows) — untouched by this watch and worth a look if it comes up again.

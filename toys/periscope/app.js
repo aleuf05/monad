@@ -940,6 +940,20 @@ contactStrip.addEventListener("click", (event) => {
   selectVessel(contact, { propagate: true });
 });
 
+// Bridge Station embeds this toy as one of three fixed-height Live Console
+// panels; this toy's own page also runs standalone at full page height.
+// See style.css's body.is-embedded rules for what actually changes.
+try {
+  if (window.self !== window.top) {
+    document.body.classList.add("is-embedded");
+  }
+} catch (error) {
+  // Cross-origin embedding would throw reading window.top; treat that the
+  // same as embedded, since a same-origin check failing at all means this
+  // definitely isn't the standalone top-level page.
+  document.body.classList.add("is-embedded");
+}
+
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 updateOpticsControls();
