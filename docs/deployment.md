@@ -43,9 +43,9 @@ Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches
 
 Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge" page (different codebase, reads `web/bridge-state.json`) and is not related to `web/toys/bridge/`. Both are linked from `web/command-deck.html` under different labels ("Bridge" vs. "Bridge Station"). `web/index.html` is no longer that homepage — see below.
 
-## Site Root Redirects to Bridge Station
+## Site Root Is the Front Door — Links to Every Toy
 
-`web/index.html` is a redirect page (instant meta-refresh plus a JS fallback and a visible manual link), not the homepage. It sends visitors straight into `toys/bridge/`. The former homepage content — mission, doctrine, fleet roster, Ship's Log entry form — is preserved intact at `web/command-deck.html` and reachable from the redirect page's fallback link. Update `web/command-deck.html` (not `web/index.html`) when changing homepage copy or adding new artifact launch cards.
+`web/index.html` was briefly a redirect straight into `toys/bridge/` (see git history if that behavior is ever wanted back). It's the homepage again: mission/doctrine/fleet roster/Ship's Log content, plus an "Interactive Artifact" section (`#artifacts`) linking every deployed public toy — Radio Console, FleetCore Live, Bridge Station, Fleet Motion, Periscope Station, Reaction-Diffusion Painter. `web/command-deck.html` is kept as an identical mirror (same content, distinct `<title>`) so the old URL still works — **update both together**, `web/index.html` is not the single source of truth here. Add a new `.artifact-launch-layout` card to both whenever a new toy gets deployed publicly.
 
 ## FleetCore Live Backend
 
