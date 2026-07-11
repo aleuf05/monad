@@ -35,3 +35,4 @@ logs/public-ready.log
 target/
 fleetcore/target/
 data/fleetcore/
+logs/fleetcore-serve.log

@@ -30,6 +30,15 @@ const DEFAULT_SEED_PATH: &str = "fleetcore/data/seed-world.json";
 const DEFAULT_PORT: u16 = 4771;
 const DEFAULT_TICK_MS: u64 = 1000;
 const CHECKPOINT_EVERY_TICKS: u64 = 60;
+// Loopback-only by default: this server has no authentication, so anyone who
+// can open the WebSocket can issue commands (including pausing the world for
+// every connected client). Binding 0.0.0.0 would make that reachable from
+// outside the host the moment any firewall/NAT in front of it allows the
+// port through. The intended public path is a same-host reverse proxy (e.g.
+// Caddy) terminating TLS and forwarding to this loopback address -- use
+// --bind-all only once that's actually in place and the exposure is a
+// deliberate, reviewed decision, not a default.
+const DEFAULT_BIND_HOST: &str = "127.0.0.1";
 
 #[derive(Clone)]
 struct AppState {
@@ -67,6 +76,12 @@ async fn run() -> Result<(), String> {
         Some(value) => value.parse().map_err(|_| "invalid --tick-ms".to_string())?,
         None => DEFAULT_TICK_MS,
     };
+    let bind_all = take_flag(&mut args, "--bind-all");
+    let bind_host = if bind_all {
+        "0.0.0.0"
+    } else {
+        DEFAULT_BIND_HOST
+    };
 
     let paths = StorePaths::new(state_dir, seed_path);
     ensure_dirs(&paths)?;
@@ -95,11 +110,11 @@ async fn run() -> Result<(), String> {
         .route("/ws", get(ws_handler))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(("0.0.0.0", port))
+    let listener = tokio::net::TcpListener::bind((bind_host, port))
         .await
-        .map_err(|err| format!("failed to bind port {port}: {err}"))?;
+        .map_err(|err| format!("failed to bind {bind_host}:{port}: {err}"))?;
     println!(
-        "fleetcore live server listening: ws://0.0.0.0:{port}/ws  http://0.0.0.0:{port}/snapshot"
+        "fleetcore live server listening: ws://{bind_host}:{port}/ws  http://{bind_host}:{port}/snapshot"
     );
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
@@ -239,5 +254,14 @@ fn take_option(args: &mut Vec<String>, name: &str) -> Option<String> {
         }
     } else {
         None
+    }
+}
+
+fn take_flag(args: &mut Vec<String>, name: &str) -> bool {
+    if let Some(index) = args.iter().position(|arg| arg == name) {
+        args.remove(index);
+        true
+    } else {
+        false
     }
 }

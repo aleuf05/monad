@@ -469,7 +469,7 @@ function updateDetailsButton() {
   detailsButton.dataset.vesselId = nearest.id;
 }
 
-function selectVessel(contact) {
+function selectVessel(contact, { propagate = false } = {}) {
   if (!contact) return;
   state.selectedId = contact.id;
   panelEmpty.hidden = true;
@@ -481,6 +481,22 @@ function selectVessel(contact) {
   panelReport.textContent = contact.report;
   panelBearing.textContent = formatBearing(contact.bearing);
   panelRange.textContent = `${contact.range.toFixed(1)} nm`;
+  if (propagate) propagateSelection(contact);
+}
+
+// Additive write path into MonadFleetState.selection: a contact picked directly
+// in Periscope (rather than acquired from Fleet Motion) only matters cross-
+// instrument if it round-trips back into shared state. Only fires for contacts
+// sourced from shared state (`contact.source` is set) — Periscope's own local
+// demo vessels have no matching id in Fleet Motion's state to select.
+function propagateSelection(contact) {
+  if (!contact.source) return;
+  const sharedState = window.MonadFleetState?.read?.();
+  if (!sharedState || sharedState.selection?.selectedShipId === contact.id) return;
+  window.MonadFleetState.write({
+    ...sharedState,
+    selection: { ...sharedState.selection, selectedShipId: contact.id }
+  });
 }
 
 function updateSelectedPanel(contacts) {
@@ -561,12 +577,12 @@ frame.addEventListener("click", (event) => {
     .map((item) => ({ item, distance: Math.hypot(item.x - x, item.y - y) }))
     .filter(({ distance }) => distance < 0.14)
     .sort((a, b) => a.distance - b.distance)[0]?.item;
-  if (contact) selectVessel(contact);
+  if (contact) selectVessel(contact, { propagate: true });
 });
 
 detailsButton.addEventListener("click", () => {
   const contact = state.visibleContacts.find((item) => item.id === detailsButton.dataset.vesselId);
-  selectVessel(contact);
+  selectVessel(contact, { propagate: true });
 });
 
 contactStrip.addEventListener("click", (event) => {
@@ -575,7 +591,7 @@ contactStrip.addEventListener("click", (event) => {
   const contact = currentContacts(performance.now() / 1000)
     .map(projectContact)
     .find((item) => item.id === button.dataset.vesselId);
-  selectVessel(contact);
+  selectVessel(contact, { propagate: true });
 });
 
 window.addEventListener("resize", resizeCanvas);
