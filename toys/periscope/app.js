@@ -2,6 +2,35 @@ const TAU = Math.PI * 2;
 const FIELD_OF_VIEW = 54;
 const MAX_RANGE = 14;
 const HORIZON_RATIO = 0.45;
+const OPTICS_TIERS = {
+  wide: {
+    id: "wide",
+    label: "1x wide watch",
+    magnification: 1,
+    fov: 54,
+    spriteBoost: 1,
+    backgroundZoom: 1,
+    reticleDensity: 1,
+  },
+  standard: {
+    id: "standard",
+    label: "4x observation",
+    magnification: 4,
+    fov: 28,
+    spriteBoost: 1.35,
+    backgroundZoom: 1.13,
+    reticleDensity: 1.25,
+  },
+  close: {
+    id: "close",
+    label: "10x inspection",
+    magnification: 10,
+    fov: 14,
+    spriteBoost: 1.72,
+    backgroundZoom: 1.28,
+    reticleDensity: 1.55,
+  },
+};
 const ASSET_PATHS = {
   sea: "assets/backgrounds/sea-horizon-mk2.png",
   scout: "assets/sprites/scout-alpha.png",
@@ -59,6 +88,8 @@ const bearingReadout = document.querySelector("#bearingReadout");
 const bearingBand = document.querySelector("#bearingBand");
 const contactStrip = document.querySelector("#contactStrip");
 const detailsButton = document.querySelector("#detailsButton");
+const magnificationReadout = document.querySelector("#magnificationReadout");
+const magnificationButtons = Array.from(document.querySelectorAll("[data-magnification]"));
 const panelEmpty = document.querySelector("#panelEmpty");
 const panelContent = document.querySelector("#panelContent");
 const panelCallsign = document.querySelector("#panelCallsign");
@@ -81,6 +112,7 @@ const state = {
   contactButtonsReady: false,
   contactSourceKey: "",
   acquiredSourceKey: "",
+  opticsMode: "wide",
 };
 
 const assets = {
@@ -118,6 +150,10 @@ function shortestDelta(from, to) {
 
 function formatBearing(value) {
   return `${String(Math.round(normalizeDegrees(value))).padStart(3, "0")}°`;
+}
+
+function currentOptics() {
+  return OPTICS_TIERS[state.opticsMode] || OPTICS_TIERS.wide;
 }
 
 function vesselState(vessel, elapsedSeconds) {
@@ -164,16 +200,18 @@ function autoAcquireSharedContact(contacts) {
 }
 
 function projectContact(contact) {
+  const optics = currentOptics();
   const relative = shortestDelta(state.bearing, contact.bearing);
-  const visible = Math.abs(relative) <= FIELD_OF_VIEW / 2;
+  const visible = Math.abs(relative) <= optics.fov / 2;
   const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
   return {
     ...contact,
     relative,
     visible,
-    x: 0.5 + relative / FIELD_OF_VIEW,
+    x: 0.5 + relative / optics.fov,
     y: 0.61 - (1 - rangeRatio) * 0.27,
-    scale: 1 - rangeRatio * 0.42,
+    scale: (1 - rangeRatio * 0.42) * optics.spriteBoost,
+    optics,
   };
 }
 
@@ -230,6 +268,7 @@ function renderProceduralOcean(now) {
 function renderSeaPlate(now) {
   const w = canvas.width;
   const h = canvas.height;
+  const optics = currentOptics();
   if (!assets.sea.ready) {
     renderProceduralOcean(now);
     return;
@@ -237,22 +276,24 @@ function renderSeaPlate(now) {
 
   const image = assets.sea.image;
   const sourceRatio = image.width / image.height;
-  let drawHeight = h;
+  let drawHeight = h * optics.backgroundZoom;
   let drawWidth = h * sourceRatio;
   if (drawWidth < w) {
     drawWidth = w;
     drawHeight = w / sourceRatio;
   }
+  drawWidth *= optics.backgroundZoom;
+  drawHeight *= optics.backgroundZoom;
 
-  const horizonCorrection = h * 0.025;
+  const horizonCorrection = h * (0.025 + (optics.magnification - 1) * 0.002);
   const drawY = (h - drawHeight) * 0.5 + horizonCorrection;
   const pan = normalizeDegrees(state.bearing) / 360;
   const period = drawWidth;
-  const drift = (now * 0.003) % period;
+  const drift = (now * 0.0022 / optics.backgroundZoom) % period;
   let drawX = -((pan * period + drift) % period);
 
   ctx.save();
-  ctx.filter = "contrast(1.04) saturate(0.92) brightness(0.86)";
+  ctx.filter = `contrast(${(1.04 + optics.magnification * 0.004).toFixed(3)}) saturate(0.9) brightness(${(0.87 - optics.magnification * 0.008).toFixed(3)})`;
   while (drawX < w) {
     ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
     drawX += period;
@@ -263,6 +304,7 @@ function renderSeaPlate(now) {
 function renderAtmosphere(now) {
   const w = canvas.width;
   const h = canvas.height;
+  const optics = currentOptics();
   const horizon = h * HORIZON_RATIO;
 
   const haze = ctx.createLinearGradient(0, horizon - h * 0.08, 0, horizon + h * 0.17);
@@ -276,10 +318,28 @@ function renderAtmosphere(now) {
   ctx.fillRect(0, horizon - 1, w, Math.max(1, h * 0.002));
 
   const glare = ctx.createRadialGradient(w * 0.62, h * 0.2, 0, w * 0.62, h * 0.2, w * 0.48);
-  glare.addColorStop(0, "rgba(255, 241, 198, 0.08)");
+  glare.addColorStop(0, `rgba(255, 241, 198, ${(0.08 + optics.magnification * 0.006).toFixed(3)})`);
   glare.addColorStop(1, "rgba(255, 241, 198, 0)");
   ctx.fillStyle = glare;
   ctx.fillRect(0, 0, w, h);
+
+  const shimmerHeight = h * 0.16;
+  ctx.save();
+  ctx.globalAlpha = clamp(0.16 + optics.magnification * 0.014, 0.16, 0.3);
+  ctx.strokeStyle = "rgba(232, 240, 237, 0.2)";
+  ctx.lineWidth = Math.max(1, w * 0.001);
+  for (let i = 0; i < 9; i += 1) {
+    const y = horizon + h * 0.025 + i * shimmerHeight * 0.08;
+    const phase = now * 0.0015 + i * 0.72;
+    ctx.beginPath();
+    for (let x = -20; x <= w + 20; x += 24) {
+      const wave = Math.sin(x * 0.026 + phase) * h * 0.0025;
+      if (x === -20) ctx.moveTo(x, y + wave);
+      else ctx.lineTo(x, y + wave);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
 
   const grainStep = Math.max(7, Math.floor(w / 110));
   ctx.fillStyle = "rgba(255, 255, 255, 0.025)";
@@ -294,19 +354,29 @@ function renderAtmosphere(now) {
 function renderBridgeOptics() {
   const w = canvas.width;
   const h = canvas.height;
+  const optics = currentOptics();
   const cx = w / 2;
   const cy = h / 2;
   const radius = w * 0.485;
 
   ctx.strokeStyle = "rgba(229, 242, 238, 0.18)";
   ctx.lineWidth = w * 0.002;
-  for (let i = -2; i <= 2; i += 1) {
-    const y = cy + i * h * 0.092;
+  const horizontalTicks = Math.round(2 * optics.reticleDensity);
+  for (let i = -horizontalTicks; i <= horizontalTicks; i += 1) {
+    const y = cy + i * h * 0.092 / optics.reticleDensity;
     ctx.beginPath();
-    ctx.moveTo(cx - radius * 0.54, y);
-    ctx.lineTo(cx + radius * 0.54, y);
+    ctx.moveTo(cx - radius * 0.5, y);
+    ctx.lineTo(cx + radius * 0.5, y);
     ctx.stroke();
   }
+
+  ctx.strokeStyle = "rgba(229, 242, 238, 0.22)";
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - radius * 0.48);
+  ctx.lineTo(cx, cy + radius * 0.48);
+  ctx.moveTo(cx - radius * 0.08, cy);
+  ctx.lineTo(cx + radius * 0.08, cy);
+  ctx.stroke();
 
   ctx.strokeStyle = "rgba(216, 180, 106, 0.42)";
   ctx.lineWidth = w * 0.003;
@@ -314,8 +384,8 @@ function renderBridgeOptics() {
   ctx.arc(cx, cy, radius * 0.76, Math.PI * 1.15, Math.PI * 1.85);
   ctx.stroke();
 
-  for (let i = -3; i <= 3; i += 1) {
-    const angle = -Math.PI / 2 + i * 0.14;
+  for (let i = -4; i <= 4; i += 1) {
+    const angle = -Math.PI / 2 + i * 0.105 / optics.reticleDensity;
     const inner = radius * 0.72;
     const outer = radius * (i === 0 ? 0.84 : 0.79);
     ctx.beginPath();
@@ -323,6 +393,10 @@ function renderBridgeOptics() {
     ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
     ctx.stroke();
   }
+
+  ctx.fillStyle = "rgba(226, 240, 236, 0.68)";
+  ctx.font = `${Math.max(10, w * 0.012)}px Segoe UI, sans-serif`;
+  ctx.fillText(`${optics.magnification}x / ${optics.fov} deg FOV`, w * 0.075, h * 0.89);
 }
 
 function renderWake(contact, x, y, spriteWidth) {
@@ -400,9 +474,10 @@ function renderContact(contact, now) {
   if (!contact.visible) return;
   const w = canvas.width;
   const h = canvas.height;
+  const optics = currentOptics();
   const x = contact.x * w;
   const bobSeed = Number.isFinite(contact.baseBearing) ? contact.baseBearing : contact.bearing;
-  const bob = Math.sin(now * 0.003 + bobSeed) * h * 0.004 * contact.scale;
+  const bob = Math.sin(now * 0.003 + bobSeed) * h * 0.004 * contact.scale / optics.backgroundZoom;
   const y = contact.y * h + bob;
   const spriteWidth = w * 0.24 * contact.scale;
   const spriteHeight = spriteWidth * 0.5;
@@ -412,7 +487,7 @@ function renderContact(contact, now) {
   renderWake(contact, x, y, spriteWidth);
   if (assets.scout.ready) {
     ctx.globalAlpha = clamp(1.05 - contact.range / MAX_RANGE * 0.34, 0.62, 0.96);
-    ctx.filter = `blur(${(contact.range / MAX_RANGE * 0.7).toFixed(2)}px) contrast(0.96) brightness(${(0.82 + contact.scale * 0.24).toFixed(2)})`;
+    ctx.filter = `blur(${(contact.range / MAX_RANGE * 0.52 / optics.backgroundZoom).toFixed(2)}px) contrast(${(0.94 + optics.magnification * 0.006).toFixed(2)}) brightness(${(0.82 + contact.scale * 0.18).toFixed(2)})`;
     ctx.drawImage(
       assets.scout.image,
       x - spriteWidth * 0.5,
@@ -430,10 +505,46 @@ function renderContact(contact, now) {
 
 function updateBearingBand() {
   const marks = [];
-  for (let offset = -30; offset <= 30; offset += 10) {
+  const optics = currentOptics();
+  const half = Math.ceil(optics.fov / 2 / 5) * 5;
+  const step = optics.fov <= 16 ? 5 : 10;
+  for (let offset = -half; offset <= half; offset += step) {
     marks.push(`<span>${formatBearing(state.bearing + offset)}</span>`);
   }
   bearingBand.innerHTML = marks.join("");
+}
+
+function updateOpticsControls() {
+  const optics = currentOptics();
+  if (magnificationReadout) {
+    magnificationReadout.textContent = optics.label;
+  }
+  magnificationButtons.forEach((button) => {
+    const active = button.dataset.magnification === optics.id;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function focusContactForOptics() {
+  const contacts = currentContacts(performance.now() / 1000);
+  const projected = contacts.map(projectContact);
+  const selected = projected.find((contact) => contact.id === state.selectedId);
+  const visible = projected
+    .filter((contact) => contact.visible)
+    .sort((first, second) => Math.abs(first.relative) - Math.abs(second.relative))[0];
+  const nearest = selected || visible || projected
+    .sort((first, second) => Math.abs(first.relative) - Math.abs(second.relative))[0];
+  if (!nearest) return;
+  state.targetBearing = normalizeDegrees(nearest.bearing);
+  state.velocity = 0;
+}
+
+function setOpticsMode(mode) {
+  if (!OPTICS_TIERS[mode] || state.opticsMode === mode) return;
+  state.opticsMode = mode;
+  focusContactForOptics();
+  updateOpticsControls();
 }
 
 function updateContactStrip(contacts) {
@@ -585,6 +696,10 @@ detailsButton.addEventListener("click", () => {
   selectVessel(contact, { propagate: true });
 });
 
+magnificationButtons.forEach((button) => {
+  button.addEventListener("click", () => setOpticsMode(button.dataset.magnification));
+});
+
 contactStrip.addEventListener("click", (event) => {
   const button = event.target.closest("[data-vessel-id]");
   if (!button) return;
@@ -596,4 +711,5 @@ contactStrip.addEventListener("click", (event) => {
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
+updateOpticsControls();
 requestAnimationFrame(render);
