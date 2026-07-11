@@ -34,4 +34,9 @@ This page never sends a `Command` over the WebSocket and presents no controls th
 
 - Contact labels in the optics panel are decluttered by a simple screen-space collision offset (see `LABEL_COLLISION_PX` in `app.js`), not a true label-placement algorithm — dense contact clusters at certain bearings may still stack more rows than ideal.
 - No visual asset investment (no photographic sea-plate, no vessel sprites) — flat canvas rendering only, matching "lean by default." `toys/periscope/`'s photographic/sprite work was deliberately not ported here.
-- Internal-facing vs. public-facing is an open question per the scope packet itself — not deployed anywhere as of this build. See the watch log for what that would require (the same pending Caddy reverse-proxy step from FleetCore Live's own deployment).
+
+## Deployment: LAN-only
+
+Deployed at `http://192.168.0.100:8090/toys/bridge-2/` — reachable from Granite's LAN, not from the public internet. See `docs/deployment.md`'s "Bridge Station 2.0 — LAN-Only Deployment" section for exactly why this needed its own port rather than the usual `/var/www/monad` path (short version: that path is public too, via rock64's proxy, regardless of whether anything links to it), and for the `fleetcore-serve --bind-all` change this required.
+
+Both the LAN web server and `fleetcore-serve --bind-all` are ad hoc processes — neither survives a Granite reboot. Not yet made durable via systemd (would need `sudo`, same blocker documented for `fleetcore-serve`'s own systemd unit).

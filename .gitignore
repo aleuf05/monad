@@ -36,3 +36,4 @@ target/
 fleetcore/target/
 data/fleetcore/
 logs/fleetcore-serve.log
+logs/lan-web-server.log
