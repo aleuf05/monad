@@ -47,13 +47,26 @@ Deploying FleetCore Live's backend for the first time (before this sprint's toke
 ## Known Limitations
 
 - The `--command-token` gate is all-or-nothing: no per-client permissions, no scoping to a subset of `Command` variants, no rate limiting, and no revocation short of restarting the process with a different token.
-- Error replies (both "invalid command" and "read-only, unauthorized") still go out on the broadcast channel to every connected client, not just the one that triggered them — a pre-existing v2 simplification, not new to this sprint, still not fixed.
+- ~~Error replies (both "invalid command" and "read-only, unauthorized") still go out on the broadcast channel to every connected client, not just the one that triggered them~~ — fixed in the v3.1 polish pass below.
 - No reconnect-safe command queue; a write attempted while briefly disconnected is dropped, matching v2.
 - Event-log growth remains unbounded per tick of uptime, matching v2.
 - Fleet Motion, Periscope, and Bridge still run their own client-side simulations and don't talk to FleetCore; unchanged from v2.
 
+## Polish Pass (v3.1)
+
+A follow-up pass fixing the one correctness item v3 left open, plus a visual/UX pass on `toys/fleetcore-live/` — the newest toy in the repo, functionally complete but the plainest-looking of the four, and never given a dedicated mobile-viewport check the way Bridge got.
+
+**Error-reply targeting (`fleetcore/src/bin/serve.rs`).** Every WebSocket connection now gets its own `tokio::sync::mpsc::unbounded_channel`, merged via `tokio::select!` with that connection's broadcast subscription inside `send_task`. `handle_client_message` and `send_error` now take a reference to that connection's sender instead of `&AppState`, so a rejected or unauthorized command replies only to whoever sent it. Verified with two simultaneous unauthorized WebSocket clients: a "victim" that only watches and an "offender" that deliberately sends a doomed command — the victim's message log never contained the resulting `error`, the offender's did. Successful commands are unaffected; `apply_and_broadcast` still broadcasts the resulting snapshot to everyone, which is correct — a state change should reach every viewer, only the rejection notice shouldn't.
+
+**`toys/fleetcore-live/` visual/UX pass.**
+- A small pulsing dot next to the Link status (`.live-dot.is-live`, a `liveBreath` CSS animation) — cheap, direct reinforcement that this is a real live feed, not a static page, which is the entire point of this toy.
+- A one-shot amber flash on the Tick readout (`#tickReadout.is-pulse`, a `tickPulse` keyframe) whenever `snapshot.tick` changes from its previously seen value — a visual heartbeat proving the world is actually advancing, not just a static number that happens to say "running."
+- A visible, auto-dismissing feedback banner (`#commandFeedback`) for rejected/unauthorized commands. Previously these only reached `console.warn` — a first-time visitor without devtools open would click Pause, nothing would happen, and there'd be no explanation anywhere on the page.
+- Mobile check at 390×844 (the same viewport Bridge was verified against): no horizontal overflow, `.status-strip`'s grid already used `auto-fit` so it wrapped correctly, no changes were actually needed — this closes the "no mobile-specific layout pass" item the v2 report flagged as a known gap, with the finding being that nothing was broken, not that something got fixed.
+
+Validation: `cargo fmt --check` / `cargo clippy --all-targets -- -D warnings` / `cargo test` all clean. Two-client WebSocket script confirmed error targeting (above). Playwright confirmed the live dot gains `is-live` on connect, the tick-pulse class is present immediately after a tick change, and the feedback banner shows on trigger and auto-hides after 5s. Restarted the production `fleetcore-serve` process with the fixed binary and confirmed the real persisted world survived the restart (tick count continuous). Redeployed `web/toys/fleetcore-live/` and reconfirmed both localhost and `https://cameronlampley.com/monad/toys/fleetcore-live/` serve the updated client.
+
 ## Recommended Next Direction
 
 1. Per-client/per-token scoping (e.g. a read/pause-only token distinct from a full-control token) if multiple people need different levels of access to the same live world.
-2. Fix error-reply targeting so a rejected or unauthorized command only replies to its own connection, not every connected client.
-3. Everything already listed in the v2 report's "Recommended FleetCore v3 Direction" that this sprint didn't address (event-log rotation, an existing toy becoming a live FleetCore client) still applies — renumber as v4 direction now that v3 has shipped.
+2. Everything already listed in the v2 report's "Recommended FleetCore v3 Direction" that neither v3 nor this polish pass addressed (event-log rotation, an existing toy becoming a live FleetCore client) still applies — renumber as v4 direction now that v3 and its polish pass have shipped.

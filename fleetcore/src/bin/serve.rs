@@ -37,7 +37,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::sync::{broadcast, Mutex};
+use tokio::sync::{broadcast, mpsc, Mutex};
 
 const DEFAULT_STATE_DIR: &str = "data/fleetcore";
 const DEFAULT_SEED_PATH: &str = "fleetcore/data/seed-world.json";
@@ -263,7 +263,12 @@ async fn ws_handler(
 
 async fn handle_socket(socket: WebSocket, state: AppState, authorized: bool) {
     let (mut sender, mut receiver) = socket.split();
-    let mut rx = state.tx.subscribe();
+    let mut broadcast_rx = state.tx.subscribe();
+    // A rejected or unauthorized command should only ever reply to the
+    // connection that sent it, not every connection subscribed to the
+    // broadcast channel -- this direct channel carries exactly that, merged
+    // into the same outgoing stream as broadcast snapshots below.
+    let (direct_tx, mut direct_rx) = mpsc::unbounded_channel::<String>();
 
     {
         let world = state.world.lock().await;
@@ -281,8 +286,18 @@ async fn handle_socket(socket: WebSocket, state: AppState, authorized: bool) {
     }
 
     let mut send_task = tokio::spawn(async move {
-        while let Ok(json) = rx.recv().await {
-            if sender.send(Message::Text(json)).await.is_err() {
+        loop {
+            let outgoing = tokio::select! {
+                broadcast = broadcast_rx.recv() => match broadcast {
+                    Ok(json) => json,
+                    Err(_) => break,
+                },
+                direct = direct_rx.recv() => match direct {
+                    Some(json) => json,
+                    None => break,
+                },
+            };
+            if sender.send(Message::Text(outgoing)).await.is_err() {
                 break;
             }
         }
@@ -292,7 +307,7 @@ async fn handle_socket(socket: WebSocket, state: AppState, authorized: bool) {
     let mut recv_task = tokio::spawn(async move {
         while let Some(Ok(message)) = receiver.next().await {
             if let Message::Text(text) = message {
-                handle_client_message(&recv_state, &text, authorized).await;
+                handle_client_message(&recv_state, &text, authorized, &direct_tx).await;
             }
         }
     });
@@ -303,10 +318,15 @@ async fn handle_socket(socket: WebSocket, state: AppState, authorized: bool) {
     }
 }
 
-async fn handle_client_message(state: &AppState, text: &str, authorized: bool) {
+async fn handle_client_message(
+    state: &AppState,
+    text: &str,
+    authorized: bool,
+    reply: &mpsc::UnboundedSender<String>,
+) {
     if !authorized {
         send_error(
-            state,
+            reply,
             "read-only connection: reconnect with a valid ?token= to gain command authority"
                 .to_string(),
         );
@@ -316,13 +336,13 @@ async fn handle_client_message(state: &AppState, text: &str, authorized: bool) {
         Ok(command) => command,
         Err(err) => {
             eprintln!("fleetcore-serve: invalid command from client: {err}");
-            send_error(state, format!("invalid command: {err}"));
+            send_error(reply, format!("invalid command: {err}"));
             return;
         }
     };
     if let Err(err) = apply_and_broadcast(state, command).await {
         eprintln!("fleetcore-serve: command rejected: {err}");
-        send_error(state, err);
+        send_error(reply, err);
     }
 }
 
@@ -344,9 +364,9 @@ async fn apply_and_broadcast(state: &AppState, command: Command) -> Result<World
     Ok(snap)
 }
 
-fn send_error(state: &AppState, message: String) {
+fn send_error(reply: &mpsc::UnboundedSender<String>, message: String) {
     if let Ok(json) = serde_json::to_string(&ServerMessage::Error { message }) {
-        let _ = state.tx.send(json);
+        let _ = reply.send(json);
     }
 }
 

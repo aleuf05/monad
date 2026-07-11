@@ -5,12 +5,14 @@ const VESSEL_COLORS = {
 };
 
 const linkStatusEl = document.querySelector("#linkStatus");
+const liveDotEl = document.querySelector("#liveDot");
 const authorityStatusEl = document.querySelector("#authorityStatus");
 const clockStateEl = document.querySelector("#clockState");
 const tickReadoutEl = document.querySelector("#tickReadout");
 const simTimeReadoutEl = document.querySelector("#simTimeReadout");
 const serverUrlInput = document.querySelector("#serverUrl");
 const commandTokenInput = document.querySelector("#commandToken");
+const commandFeedbackEl = document.querySelector("#commandFeedback");
 const connectButton = document.querySelector("#connectButton");
 const pauseResumeButton = document.querySelector("#pauseResumeButton");
 const timeScaleInput = document.querySelector("#timeScaleInput");
@@ -33,6 +35,8 @@ const state = {
   commandAuthority: false,
   hasCenteredMap: false,
   lastClockState: null,
+  lastTick: null,
+  commandFeedbackTimer: null,
   selectedId: null,
   markers: new Map(),
   renderedWatchEventCount: 0
@@ -59,6 +63,16 @@ function vesselIcon(kind, selected) {
 function setLinkStatus(text, disconnected) {
   linkStatusEl.textContent = text;
   linkStatusEl.classList.toggle("is-disconnected", Boolean(disconnected));
+  liveDotEl.classList.toggle("is-live", text === "Live");
+}
+
+function showCommandFeedback(message) {
+  clearTimeout(state.commandFeedbackTimer);
+  commandFeedbackEl.textContent = message;
+  commandFeedbackEl.hidden = false;
+  state.commandFeedbackTimer = setTimeout(() => {
+    commandFeedbackEl.hidden = true;
+  }, 5000);
 }
 
 function setAuthorityStatus(text, authorized) {
@@ -126,6 +140,7 @@ function connect() {
       applySnapshot(message.snapshot);
     } else if (message.type === "error") {
       console.warn("FleetCore Live: server rejected a command:", message.message);
+      showCommandFeedback(message.message);
     }
   });
 
@@ -160,6 +175,14 @@ function applySnapshot(snapshot) {
   clockStateEl.textContent = snapshot.clock_state === "running" ? "Running" : "Paused";
   tickReadoutEl.textContent = String(snapshot.tick);
   simTimeReadoutEl.textContent = snapshot.sim_time;
+  if (state.lastTick !== null && snapshot.tick !== state.lastTick) {
+    // Retrigger the one-shot pulse animation even if it's already mid-flight
+    // from the previous tick: remove the class, force a reflow, re-add it.
+    tickReadoutEl.classList.remove("is-pulse");
+    void tickReadoutEl.offsetWidth;
+    tickReadoutEl.classList.add("is-pulse");
+  }
+  state.lastTick = snapshot.tick;
   if (state.lastClockState !== snapshot.clock_state) {
     pauseResumeButton.textContent = snapshot.clock_state === "running" ? "Pause" : "Resume";
     state.lastClockState = snapshot.clock_state;
