@@ -27,20 +27,28 @@
   // Periscope) and Radio Console each independently support an opt-in live
   // FleetCore feed -- see their own READMEs. Bridge composes those
   // instruments rather than reimplementing them: passing Bridge's own
-  // `?live=1` (and optional `?fleetcoreServer=`) straight through to
-  // whichever embedded iframes declare a `data-instrument-src`. Those
-  // iframes have no `src` in the HTML itself specifically so this is the
-  // only load they ever do -- setting `.src` after an unparambed default
-  // load would cause a visible reload flash. Periscope and Watchbook keep
-  // a plain static `src` and are untouched by this: Periscope takes no
-  // query params (it just reads whatever Fleet Motion writes), and
-  // Watchbook has nothing to do with FleetCore at all.
+  // `?live=1` (and optional `?fleetcoreServer=`, `?commandToken=`) straight
+  // through to whichever embedded iframes declare a `data-instrument-src`.
+  // Those iframes have no `src` in the HTML itself specifically so this is
+  // the only load they ever do -- setting `.src` after an unparambed
+  // default load would cause a visible reload flash. Periscope and
+  // Watchbook keep a plain static `src` and are untouched by this:
+  // Periscope takes no query params (it just reads whatever Fleet Motion
+  // writes), and Watchbook has nothing to do with FleetCore at all.
+  //
+  // `commandToken` is the one param here that grants write access to the
+  // shared FleetCore world (docs/architecture/fleetcore-api.md) -- Bridge
+  // never stores or defaults it, purely forwards whatever the operator put
+  // in its own URL, same as fleetcoreServer. No token is baked in anywhere
+  // in this file for the same reason toys/fleet-motion/app.js doesn't bake
+  // one into its own bundle: this page can be the public deployment too.
   const liveCapableIframes = Array.from(document.querySelectorAll("[data-instrument-src]"));
   if (liveCapableIframes.length) {
     const bridgeParams = new URLSearchParams(window.location.search);
     const passthrough = new URLSearchParams();
     if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
     if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
+    if (bridgeParams.has("commandToken")) passthrough.set("commandToken", bridgeParams.get("commandToken"));
     const query = passthrough.toString();
     liveCapableIframes.forEach((iframe) => {
       const baseSrc = iframe.dataset.instrumentSrc;

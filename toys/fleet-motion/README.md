@@ -211,15 +211,32 @@ Implementation notes for the current motion model live in `ENGINEERING_NOTES.md`
 
 ## Live Mode (FleetCore)
 
-Every page load attempts a read-only connection to `fleetcore-serve` (Admiral's call, 2026-07-11: live is the default now, no longer opt-in). If one lands within a couple seconds, Fleet Motion suspends its own local physics and every interactive control (waypoint routing, escort mode, time warp, detour suggestions — none of these have a FleetCore equivalent yet) and renders live vessel positions from broadcast snapshots instead. It's read-only — this never sends a `Command`, only consumes snapshots — and it writes what it renders into the same `MonadFleetState` contract it always has, so Periscope and Bridge inherit live data with no changes on their end.
+Every page load attempts a connection to `fleetcore-serve` (Admiral's call, 2026-07-11: live is the default now, no longer opt-in). If one lands within a couple seconds, Fleet Motion suspends its own local physics and renders live vessel positions from broadcast snapshots instead. It writes what it renders into the same `MonadFleetState` contract it always has, so Periscope and Bridge inherit live data with no changes on their end.
+
+Read-only by default, same as any other FleetCore client (`docs/architecture/fleetcore-api.md`): no `?commandToken=` in the URL means every control still just observes. Supplying `?commandToken=<token>` requests command authority on connect (`?token=` on the `/ws` URL); if the server grants it, the controls with a real FleetCore command behind them come alive:
+
+- **Set Waypoint** — staged multi-leg routing works exactly like local mode (arm with the button, click to stage, Shift-click to stage more, a plain click finalizes) but the finalize step sends the whole staged route as one `set-route` Command (`route: Vec<Position>` in `fleetcore/src/command.rs` — this was never just a single point) instead of running local route physics.
+- **Undo/Remove/Clear Waypoint** — edit the staged (not-yet-sent) route client-side, same as local mode; nothing is sent to the server until you finalize.
+- **Cancel Route** — sends `set-route` with an empty route, which `world.rs` treats as "clear course, go to Holding." A real command, not a local reset.
+- **Pause / Time Warp** — sends `pause-clock`, `resume-clock`, and `set-time-scale`. These are **global, not per-vessel**: pausing or changing speed affects the whole shared world's clock for every connected visitor, not just this view — treat holding a command token as holding the clock for everyone currently watching, same warning `docs/architecture/fleetcore-api.md` gives for command authority generally.
+
+The rough land-hazard boxes stop blocking waypoint placement in live mode — they're a local-simulation-only heuristic FleetCore has no terrain concept for, so enforcing them client-side against a real command would just be a lie about what's actually possible; they're still drawn as visual/geographic reference.
+
+**Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water stay disabled in live mode regardless of authority** — there's no FleetCore command for any of them (no formation-mode concept, no terrain/detour concept, no reset/teleport). A visible note above the control panel explains this instead of leaving a wall of grey buttons unexplained.
+
+No token is hardcoded anywhere in this file, unlike `toys/bridge-station-3.0/`'s bundle: this page is also the public deployment, and "fleetcore-serve isn't publicly reachable" is a network fact that can change, not a promise this code should rely on.
 
 If nothing answers in time (no reachable `fleetcore-serve`, or the public reverse-proxy path isn't finished — see `docs/deployment.md`), Fleet Motion falls back to exactly what it's always been: a standalone local simulation, no backend, fully interactive. `?fleetcoreServer=ws://host:port/ws` overrides the server URL if the default (derived from the page's own origin) isn't right. See `docs/architecture/fleetcore-api.md` for the wire protocol, and `logs/captains/2026/2026-07-11_fleet-motion-live-mode.md` for why this doesn't reuse `applyCanonicalFleetState()` (it would reset trail history and the current selection on every incoming snapshot). Making this the default, rather than opt-in, trades away the guarantee of a silent console on every public page load in exchange for FleetCore data reaching every visitor, not just ones who know the query param — see `docs/deployment.md` for the public-exposure tradeoffs that decision required.
+
+## Reset to Open Water
+
+`resetFleet()` — flagship at HOME (open water, mid-Arabian Sea), escorts back in formation, passive contacts back at their scattered baseline positions — has existed since early Mk2 but was only ever reachable through the quarantined scenario-preset UI (`INTERNAL_FEATURES.scenarioTools = false`, still off). `Reset to Open Water` exposes it directly as its own button, without touching that quarantine. Local-mode only: it's an instant client-side teleport, and FleetCore has no reset/teleport command (only `set-route`, which moves a vessel over real ticks) — see Live Mode above for why it's disabled live rather than approximated.
 
 ## Intentionally Out of Scope
 
 - Realistic marine navigation or great-circle routing
 - Full coastline routing, terrain models, restricted waters, or real marine safety checks
-- Sending commands to FleetCore (live mode is read-only; see above)
+- Escort Mode, Suggest/Accept Detour, Return to Station, and instant reset/teleport in live mode — no FleetCore command exists for any of these yet; see Live Mode above
 - Connections to the Monad site, Bridge, doctrine, Qdrant, or agents
 - Weapons, damage, targeting, combat scoring, or tactical doctrine
 

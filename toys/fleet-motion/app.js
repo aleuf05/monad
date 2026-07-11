@@ -366,7 +366,9 @@ const removeWaypointButton = document.querySelector("#removeWaypointButton");
 const clearWaypointsButton = document.querySelector("#clearWaypointsButton");
 const cancelRouteButton = document.querySelector("#cancelRouteButton");
 const homeButton = document.querySelector("#homeButton");
+const resetToBaselineButton = document.querySelector("#resetToBaselineButton");
 const resetButton = document.querySelector("#resetButton");
+const liveModeNoteEl = document.querySelector("#liveModeNote");
 const warpButtons = document.querySelectorAll(".warp-button");
 const dataSourceValue = document.querySelector("#dataSourceValue");
 const dataSourceBadge = document.querySelector("#dataSourceBadge");
@@ -454,16 +456,28 @@ let lastKnownSelectionId = selectedShipId;
 // Motion stops running its own local physics (see the liveMode guard in
 // advanceFleet()) and instead renders positions straight from the server's
 // broadcast snapshots -- see connectFleetCoreLive()/applyLiveSnapshot()
-// near the bottom of this file. Deliberately read-only: this does not send
-// any Command back to FleetCore, it only consumes GET-equivalent snapshot
-// data over the WebSocket. When unreachable (e.g. the public deployment,
-// where fleetcore-serve isn't publicly exposed), this whole path times out
-// once and Fleet Motion behaves exactly as it always has.
+// near the bottom of this file. Read-only by default, the same as any
+// other FleetCore client (docs/architecture/fleetcore-api.md) -- command
+// authority is only granted if a `?commandToken=` is present in the URL
+// and the server accepts it (see liveCommandAuthority below). No token
+// baked into this bundle, unlike toys/bridge-station-3.0/: this file is
+// also served from the public deployment, where fleetcore-serve isn't
+// reachable, but "isn't reachable" is a network fact, not a promise --
+// a hardcoded token here would command the shared fleet for everyone the
+// moment that stops being true. When no live server answers at all, this
+// whole path times out once and Fleet Motion behaves exactly as it always
+// has.
 let liveMode = false;
 let liveSocket = null;
 let liveReconnectTimer = null;
 let liveReconnectDelayMs = 1000;
 let liveMapCentered = false;
+// Mirrors the server's clock.state ("running"/"paused"), which time_scale
+// alone can't express -- a paused world can still have a nonzero scale
+// waiting to resume at. Only meaningful once liveMode is true.
+let liveClockState = "running";
+let liveCommandAuthority = false;
+let liveFlagshipId = null;
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_KMH_PER_MPS = 3.6;
 
@@ -801,6 +815,18 @@ function fleetCoreServerUrl() {
   return `ws://${window.location.hostname || "localhost"}:4771/ws`;
 }
 
+// Command authority is opt-in per docs/architecture/fleetcore-api.md: pass
+// `?token=<token>` on the /ws connect URL to request it. No default and no
+// baked-in value -- see the liveMode comment above for why. An operator
+// (or Bridge, forwarding its own `?commandToken=`) supplies this via URL.
+function liveConnectUrl() {
+  const base = fleetCoreServerUrl();
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("commandToken");
+  if (!token) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`;
+}
+
 // One connection attempt to a live FleetCore server. Fails closed and
 // silently: if nothing answers within LIVE_CONNECT_TIMEOUT_MS, Fleet
 // Motion just proceeds exactly as it always has (local simulation). This
@@ -809,7 +835,7 @@ function fleetCoreServerUrl() {
 // delay or degrade the normal standalone experience there.
 function connectFleetCoreLive() {
   let settled = false;
-  const socket = new WebSocket(fleetCoreServerUrl());
+  const socket = new WebSocket(liveConnectUrl());
   const timeout = setTimeout(() => {
     if (settled) return;
     settled = true;
@@ -825,6 +851,16 @@ function connectFleetCoreLive() {
     try {
       message = JSON.parse(event.data);
     } catch (error) {
+      return;
+    }
+    if (message.type === "connected") {
+      liveCommandAuthority = Boolean(message.command_authority);
+      updateLiveWriteControlsAvailability();
+      updateLiveModeNote();
+      return;
+    }
+    if (message.type === "error") {
+      addLog(`Command rejected — ${message.message}`);
       return;
     }
     if (message.type !== "snapshot") return;
@@ -848,7 +884,12 @@ function connectFleetCoreLive() {
       // Was live and got disconnected mid-session: keep trying rather than
       // silently falling back to local physics, which would read as a
       // confusing regression to anyone watching rather than a connection
-      // hiccup.
+      // hiccup. Command authority doesn't carry over an open socket, so
+      // don't assume it survives the gap either -- the next "connected"
+      // message re-grants it if the token still checks out.
+      liveCommandAuthority = false;
+      updateLiveWriteControlsAvailability();
+      updateLiveModeNote();
       liveReconnectTimer = setTimeout(() => {
         liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
         connectFleetCoreLive();
@@ -859,25 +900,67 @@ function connectFleetCoreLive() {
   liveSocket = socket;
 }
 
-function disableLiveControls() {
+// These have no FleetCore command behind them at all, in any mode, with
+// any authority: Suggest/Accept Detour is a client-only land-avoidance
+// heuristic FleetCore's Command enum has no terrain concept for; Escort
+// Mode is cosmetic client-side formation drift that live snapshots
+// overwrite every tick regardless; Return to Station is a fixed local-demo
+// waypoint with no shared-world meaning; Reset to Open Water instantly
+// teleports local state, and FleetCore has no reset/teleport command --
+// only set-route, which moves a vessel over real ticks, not instantly.
+// Permanently disabled while live, not authority-gated, so the visitor
+// isn't misled into thinking a token would unlock them.
+function disableLiveOnlyControls() {
   [
-    pauseButton, waypointButton, suggestDetourButton, acceptDetourButton,
-    escortModeButton, undoWaypointButton, removeWaypointButton,
-    clearWaypointsButton, cancelRouteButton, homeButton
+    suggestDetourButton, acceptDetourButton, escortModeButton,
+    homeButton, resetToBaselineButton
   ].forEach((button) => {
     if (button) button.disabled = true;
   });
+}
+
+// Everything here DOES have a real FleetCore command (set-route,
+// pause-clock, resume-clock, set-time-scale) -- availability tracks
+// liveCommandAuthority, not a permanent live-mode disable. undo/remove/
+// clear-waypoint stay additionally gated by their own state checks in
+// updateStatus() (nothing staged yet, etc.); this function only handles
+// the authority half of that gate.
+function updateLiveWriteControlsAvailability() {
+  const blocked = liveMode && !liveCommandAuthority;
+  [waypointButton, pauseButton, undoWaypointButton, removeWaypointButton, clearWaypointsButton, cancelRouteButton]
+    .forEach((button) => {
+      if (button) button.disabled = blocked;
+    });
   warpButtons.forEach((button) => {
-    button.disabled = true;
+    button.disabled = blocked;
   });
+  updateStatus();
+}
+
+function updateLiveModeNote() {
+  if (!liveModeNoteEl) return;
+  if (!liveMode) {
+    liveModeNoteEl.hidden = true;
+    return;
+  }
+  liveModeNoteEl.hidden = false;
+  liveModeNoteEl.textContent = liveCommandAuthority
+    ? "Live command authority granted: Set Waypoint (staged multi-leg routes included), Cancel Route, and Pause/Time Warp send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
+    : "Live, read-only: no command token presented, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with one — FleetCore has no command for them yet.";
 }
 
 function enterLiveMode() {
   liveMode = true;
-  disableLiveControls();
+  disableLiveOnlyControls();
+  updateLiveWriteControlsAvailability();
+  updateLiveModeNote();
   if (dataSourceValue) dataSourceValue.textContent = "FleetCore Live";
   if (dataSourceBadge) dataSourceBadge.textContent = "Live Data";
-  addLog("FleetCore server acquired. Rendering live world state (read-only).");
+  addLog(
+    liveCommandAuthority
+      ? "FleetCore server acquired. Command authority granted — Set Waypoint, Cancel Route, Pause, and Time Warp now command the real fleet."
+      : "FleetCore server acquired. Rendering live world state (read-only)."
+  );
 }
 
 function capitalizeStatus(status) {
@@ -935,6 +1018,14 @@ function applyLiveSnapshot(snapshot) {
     headingDegrees = flagshipVessel.course ?? headingDegrees;
     currentSpeedKmh = Number(flagshipVessel.speed_mps || 0) * LIVE_KMH_PER_MPS;
     lastStatus = capitalizeStatus(flagshipVessel.status) || lastStatus;
+    liveFlagshipId = flagshipVessel.id || liveFlagshipId;
+    // Server truth for the course line and the Destination/Cancel Route
+    // readouts, replacing the local guesses those fields hold in
+    // non-live mode. Empty route means "no active course" -- matches
+    // world.rs's own set-route handling (empty route -> Holding).
+    routeQueue = clonePoints(flagshipVessel.route);
+    destination = routeQueue[0] || null;
+    finalDestination = routeQueue.length ? routeQueue[routeQueue.length - 1] : null;
   }
 
   escortStates = matchByNameKeyword(escortStates, scoutVessels).map(({ entity: escort, source }) => {
@@ -959,8 +1050,13 @@ function applyLiveSnapshot(snapshot) {
   });
 
   simulationClockSeconds = Number(snapshot.tick) || simulationClockSeconds;
-  timeWarp = Number(snapshot.time_scale) || timeWarp;
-  lastMovingWarp = timeWarp || lastMovingWarp;
+  liveClockState = snapshot.clock_state || liveClockState;
+  const liveScale = Number(snapshot.time_scale) || lastMovingWarp || 1;
+  lastMovingWarp = liveScale;
+  // timeWarp is the UI's single "effective speed" number (0 = paused) in
+  // both modes -- clock_state carries the pause bit here since, unlike
+  // local sim, a live world can be paused at any nonzero time_scale.
+  timeWarp = liveClockState === "paused" ? 0 : liveScale;
   lastNavigationMessage = "Live FleetCore feed";
 
   if (!liveMapCentered && flagshipVessel) {
@@ -2170,16 +2266,22 @@ function updateStatus() {
       : waypoints.length
         ? `${waypoints.length} waypoint${waypoints.length === 1 ? "" : "s"} staged; click destination`
         : "Direct course";
-  pauseButton.disabled = liveMode || (!destination && timeWarp !== 0);
+  // Live mode gates these on command authority (set once by
+  // updateLiveWriteControlsAvailability, which calls back into this
+  // function) on top of the same state checks non-live mode already used
+  // -- a live visitor without a token sees the same disabled state as
+  // before; one with a token sees exactly local mode's own logic.
+  const liveWriteBlocked = liveMode && !liveCommandAuthority;
+  pauseButton.disabled = liveMode ? liveWriteBlocked : (!destination && timeWarp !== 0);
   waypointButton.classList.toggle("active", waypointMode);
   suggestDetourButton.hidden = !pendingDetour && !suggestedDetour;
   acceptDetourButton.hidden = !suggestedDetour;
   suggestDetourButton.disabled = !pendingDetour || Boolean(suggestedDetour);
   acceptDetourButton.disabled = !suggestedDetour;
-  undoWaypointButton.disabled = !waypoints.length;
-  removeWaypointButton.disabled = selectedWaypointIndex === null || !waypoints[selectedWaypointIndex];
-  clearWaypointsButton.disabled = !waypoints.length && !routeQueue.length && !destination;
-  cancelRouteButton.disabled = !destination && !routeQueue.length;
+  undoWaypointButton.disabled = liveWriteBlocked || !waypoints.length;
+  removeWaypointButton.disabled = liveWriteBlocked || selectedWaypointIndex === null || !waypoints[selectedWaypointIndex];
+  clearWaypointsButton.disabled = liveWriteBlocked || (!waypoints.length && !routeQueue.length && !destination);
+  cancelRouteButton.disabled = liveWriteBlocked || (!destination && !routeQueue.length);
   escortModeButton.textContent = `Escort: ${mode.label}`;
   updateWarpControls();
   updateMarkerIcons();
@@ -2243,7 +2345,13 @@ function setDestination(position) {
 function addWaypoint(position) {
   const waypoint = { lat: position.lat, lng: position.lng };
   const start = waypoints.length ? waypoints[waypoints.length - 1] : flagship;
-  const navigationCheck = checkNavigation(start, waypoint);
+  // The LAND_ZONES hazard check is a local-simulation-only heuristic --
+  // FleetCore has no terrain model, so a real vessel_id isn't actually
+  // blocked by these boxes. Rejecting a live waypoint against a rule the
+  // server doesn't enforce would just be a client-side lie about what's
+  // possible; skip it live and let the staged route go to the server as
+  // clicked, same as toys/bridge-station-3.0/ already does.
+  const navigationCheck = liveMode ? { clear: true, reason: "Clear" } : checkNavigation(start, waypoint);
   const oneShotMode = waypointMode;
 
   if (!navigationCheck.clear) {
@@ -2477,6 +2585,10 @@ function animationFrame(timestamp) {
 }
 
 function setTimeWarp(nextWarp) {
+  if (liveMode) {
+    sendLiveTimeWarp(nextWarp);
+    return;
+  }
   const previousWarp = timeWarp;
   timeWarp = nextWarp;
   if (nextWarp > 0) {
@@ -2619,6 +2731,10 @@ function removeSelectedWaypoint() {
 }
 
 function cancelActiveRoute() {
+  if (liveMode) {
+    sendLiveCancelRoute();
+    return;
+  }
   if (!destination && !routeQueue.length) {
     return;
   }
@@ -2640,13 +2756,83 @@ function cancelActiveRoute() {
 }
 
 map.on("click", (event) => {
-  if (liveMode) return;
+  if (liveMode) {
+    if (waypointMode || event.originalEvent.shiftKey) {
+      addWaypoint(event.latlng);
+      return;
+    }
+    sendLiveRoute(event.latlng);
+    return;
+  }
   if (waypointMode || event.originalEvent.shiftKey) {
     addWaypoint(event.latlng);
     return;
   }
   setDestination(event.latlng);
 });
+
+// The one write path into live mode's navigation. Mirrors local mode's
+// setDestination() gesture exactly (staged waypoints via addWaypoint(),
+// finalized on a plain click) but sends the whole staged route -- FleetCore's
+// set-route takes a real Vec<Position>, not just one point
+// (fleetcore/src/command.rs) -- as one Command over the same WebSocket the
+// snapshots arrive on, instead of running local route physics. The next
+// broadcast snapshot is what actually moves MONAD; local waypoint markers
+// are cleared immediately since they were only ever a staging UI, not the
+// live truth. waypointButton/pauseButton/warp are only enabled when
+// liveCommandAuthority is true (updateLiveWriteControlsAvailability), so
+// reaching here means authority was granted.
+function sendLiveRoute(latlng) {
+  if (!liveCommandAuthority || !liveFlagshipId || !liveSocket || liveSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  const finalPoint = { lat: latlng.lat, lng: latlng.lng };
+  const route = [...waypoints, finalPoint];
+  liveSocket.send(JSON.stringify({ type: "set-route", vessel_id: liveFlagshipId, route }));
+  waypointMode = false;
+  waypoints = [];
+  selectedWaypointIndex = null;
+  redrawWaypoints();
+  flashAt(finalPoint);
+  addLog(`Route command sent — ${route.length} leg${route.length === 1 ? "" : "s"}. Awaiting live world response.`);
+  updateStatus();
+}
+
+// Real cancel: sends an empty route, which world.rs's set-route handler
+// treats as "clear route, go to Holding" -- not a local-only reset like
+// clearRoutePlan() (which only clears the staged, not-yet-sent waypoints
+// list and needs no command at all).
+function sendLiveCancelRoute() {
+  if (!liveCommandAuthority || !liveFlagshipId || !liveSocket || liveSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  liveSocket.send(JSON.stringify({ type: "set-route", vessel_id: liveFlagshipId, route: [] }));
+  waypointMode = false;
+  waypoints = [];
+  selectedWaypointIndex = null;
+  redrawWaypoints();
+  addLog("Cancel Route command sent — awaiting live world response.");
+  updateStatus();
+}
+
+function sendLiveTimeWarp(nextWarp) {
+  if (!liveCommandAuthority || !liveSocket || liveSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  if (nextWarp === 0) {
+    liveSocket.send(JSON.stringify({ type: "pause-clock" }));
+    addLog("Pause command sent.");
+    return;
+  }
+  // set-time-scale doesn't itself resume a paused clock (world.rs keeps
+  // the two orthogonal), so a paused world needs both commands to actually
+  // start moving again at the requested speed.
+  if (liveClockState === "paused") {
+    liveSocket.send(JSON.stringify({ type: "resume-clock" }));
+  }
+  liveSocket.send(JSON.stringify({ type: "set-time-scale", scale: nextWarp }));
+  addLog(`Time-scale command sent — ${nextWarp}x. This affects every connected visitor's clock, not just this view.`);
+}
 flagshipMarker.on("click", (event) => {
   L.DomEvent.stopPropagation(event);
   selectShip("monad");
@@ -2743,6 +2929,15 @@ homeButton.addEventListener("click", () => {
   waypointMode = false;
   setDestination(HOME);
   map.panTo([HOME.lat, HOME.lng]);
+});
+
+// resetFleet() already builds exactly this tableau (flagship at HOME,
+// escorts in formation, contacts scattered) -- it just had no visible
+// entry point before now, only reachable through the quarantined scenario-
+// preset UI (INTERNAL_FEATURES.scenarioTools). This exposes it directly,
+// without touching that quarantine.
+resetToBaselineButton.addEventListener("click", () => {
+  resetFleet({ requireConfirmation: true });
 });
 
 resetButton.addEventListener("click", reloadPersistedFleetStateFromControl);
