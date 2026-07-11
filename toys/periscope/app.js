@@ -398,10 +398,12 @@ function renderContact(contact, now) {
   const w = canvas.width;
   const h = canvas.height;
   const x = contact.x * w;
-  const bob = Math.sin(now * 0.003 + contact.baseBearing) * h * 0.004 * contact.scale;
+  const bobSeed = Number.isFinite(contact.baseBearing) ? contact.baseBearing : contact.bearing;
+  const bob = Math.sin(now * 0.003 + bobSeed) * h * 0.004 * contact.scale;
   const y = contact.y * h + bob;
   const spriteWidth = w * 0.24 * contact.scale;
   const spriteHeight = spriteWidth * 0.5;
+  if (![x, y, spriteWidth, spriteHeight].every(Number.isFinite)) return;
 
   ctx.save();
   renderWake(contact, x, y, spriteWidth);
