@@ -1,0 +1,22 @@
+[Unit]
+Description=Monad FleetCore live server
+After=network.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/home/cgl/dev/monad/fleetcore/target/release/serve --port 4771
+Restart=on-failure
+RestartSec=2
+# Loopback-only (fleetcore-serve's own default -- see fleetcore/src/bin/serve.rs).
+# Reachable publicly only through the /monad/fleetcore-ws/ Caddy reverse proxy
+# documented in docs/deployment.md. Do not add --bind-all here without adding
+# authentication first: this server's command channel has none, so anyone who
+# can reach it can pause the world or spawn contacts for every connected client.
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
