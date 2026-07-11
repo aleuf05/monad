@@ -72,6 +72,8 @@ Periscope architecture:
   and contact projection.
 - Added acquisition assist so switching magnification recenters on the selected
   or nearest contact instead of dropping the vessel out of view.
+- Added a short acquisition cue: selected or re-centered contacts receive a
+  reticle pulse, and the field note names the acquired contact.
 - Updated Mk II requirements with current asset dimensions and runtime naming
   conventions.
 
