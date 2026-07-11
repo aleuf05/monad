@@ -112,6 +112,59 @@ h2 {
   font-size: 1.35rem;
 }
 
+.optics-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(196, 229, 223, 0.16);
+  background: rgba(4, 9, 11, 0.46);
+  padding: 10px;
+}
+
+.optics-status span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.optics-status strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--signal);
+  font-size: 0.92rem;
+}
+
+.magnification-control {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(48px, 1fr));
+  gap: 6px;
+}
+
+.magnification-control button {
+  min-height: 40px;
+  border: 1px solid rgba(196, 229, 223, 0.22);
+  background: rgba(8, 14, 16, 0.72);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.magnification-control button:hover,
+.magnification-control button:focus-visible {
+  border-color: rgba(216, 180, 106, 0.72);
+  outline: none;
+}
+
+.magnification-control button.is-active {
+  border-color: rgba(138, 215, 193, 0.68);
+  background: rgba(12, 33, 34, 0.82);
+  color: var(--signal);
+}
+
 .scope-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(250px, 340px);
@@ -207,6 +260,12 @@ h2 {
   color: rgba(226, 240, 236, 0.78);
   font-size: 0.8rem;
   white-space: nowrap;
+}
+
+.field-note.is-acquiring {
+  border-color: rgba(216, 180, 106, 0.48);
+  background: rgba(20, 17, 9, 0.68);
+  color: rgba(255, 236, 190, 0.92);
 }
 
 .details-button {
@@ -335,6 +394,10 @@ dd {
     align-items: stretch;
   }
 
+  .optics-bar {
+    align-items: stretch;
+  }
+
   .scope-frame {
     width: min(92vw, 72vh);
   }
@@ -357,6 +420,10 @@ dd {
   .bearing-readout {
     width: 100%;
     text-align: left;
+  }
+
+  .optics-bar {
+    display: grid;
   }
 
   .scope-frame {
