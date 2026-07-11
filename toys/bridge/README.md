@@ -31,6 +31,8 @@ Each embedded instrument remains available as a standalone artifact through its 
 
 Bridge Station reads Fleet Motion's browser-local canonical state from `localStorage` key `monad.fleetMotion.state` when that state is available on the same origin. It does not mutate that state.
 
+The Engineering Status panel observes flagship state, active route counts, and passive local-traffic contact counts when Fleet Motion has saved them.
+
 If no Fleet Motion state has been written yet, the Bridge shows honest awaiting-state placeholders rather than fake telemetry.
 
 ## Boundaries

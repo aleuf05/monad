@@ -23,6 +23,7 @@ available.
 
 - Leaflet map with OpenStreetMap tiles
 - MONAD flagship and three formation escorts
+- Four passive local-traffic NPC contacts
 - Click-to-set-course navigation
 - Visible course vector with a modest turn-arc presentation
 - Frame-based simulated movement with smoothed heading transitions
@@ -125,11 +126,35 @@ The persisted schema is versioned:
     "formation": [],
     "ships": []
   },
+  "contacts": {
+    "mode": "passive",
+    "ships": [
+      {
+        "id": "traffic-dhow-01",
+        "name": "DHOW LANTERN",
+        "role": "civilian dhow",
+        "position": { "lat": 26.42, "lng": 55.95 },
+        "speedKmh": 32,
+        "headingDegrees": 312,
+        "status": "Transiting"
+      }
+    ]
+  },
   "selection": {
     "selectedShipId": "monad"
   }
 }
 ```
+
+## Passive Traffic NPCs
+
+Fleet Motion includes four deliberately simple local-traffic contacts. They are
+not tactical units and do not plan routes. Each contact holds a speed and
+heading, turns when it reaches the toy's operating bounds or a rough land box,
+and remains selectable through the existing ship details panel.
+
+These contacts are persisted under `contacts.ships` in the canonical browser
+state so Bridge Station can observe them without coupling to Fleet Motion's DOM.
 
 `Reload Saved State` reloads the current voyage from `localStorage`. It does not
 return MONAD to the Strait of Hormuz baseline. Applying a scenario preset still
@@ -166,6 +191,7 @@ It shows:
 - speed and time warp
 - route-leg and waypoint counts
 - escort mode and vessel count
+- passive contact count
 - selected ship
 
 Controls:
