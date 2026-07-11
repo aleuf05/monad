@@ -16,6 +16,8 @@ Separate artifact, not a successor. Deliberately not touched or replaced:
 
 Both currently exist because they answer different questions: 2.0 proves FleetCore's real API works end to end; 2.1 is a UI/interaction reference for what commanding a vessel could look like, not yet wired to anything real.
 
+**Update:** `toys/bridge-station-3.0/` is the merge of the two — this component's UI wired to real `fleetcore-serve` data, with Set Waypoint sending a real `Command`. This project (2.1) is left as-is, a frozen mock-data reference, not superseded or deleted.
+
 ## Run locally
 
 ```sh
