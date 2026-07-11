@@ -1,367 +1,247 @@
 # Monad
 
-**Monad** is an AI-assisted software engineering project focused on building interactive software artifacts through disciplined collaboration between human operators and AI agents.
+Monad is an AI-assisted software engineering workspace. The current product
+thread is a maritime command environment: a set of browser instruments, a shared
+fleet-state layer, and an emerging deterministic world model called FleetCore.
 
-Rather than treating language models as one-shot code generators, Monad organizes development as an engineering team. Human operators define goals, architecture, and priorities while specialized AI agents contribute implementation, design, review, documentation, and experimentation.
+The repository is intentionally experimental, but the newest artifacts are meant
+to be runnable, inspectable, and documented.
 
-The current flagship effort is a browser-based maritime command environment that serves as both a software product and a laboratory for modern agentic engineering workflows.
+## Start Here
 
----
+The main browser entry point is the Bridge:
 
-# Vision
-
-Monad explores a simple question:
-
-> **What happens when software development itself becomes an engineered system?**
-
-Instead of building one application, Monad aims to build a development process capable of rapidly producing many high-quality software artifacts.
-
-Every completed artifact improves both the repository and the engineering methodology used to create the next one.
-
----
-
-# Current Focus
-
-The current development effort centers around a growing maritime command simulation composed of independent bridge instruments that share a common operational picture.
-
-Current initiatives include:
-
-- Fleet Motion
-- Bridge Station
-- Periscope Station
-- Watchbook
-- FleetCore
-- Engineering documentation
-- Experimental visualization toys
-
-While the maritime setting provides an engaging operational framework, the underlying objective is broader:
-
-**Build better software through better engineering.**
-
----
-
-# Project Philosophy
-
-Monad follows several guiding principles.
-
-## AI as Engineering Staff
-
-AI models are treated as specialized engineering officers rather than simple code generators.
-
-Examples include:
-
-- architecture
-- implementation
-- documentation
-- testing
-- design reviews
-- research
-
-Each model contributes according to its strengths.
-
----
-
-## Human Direction
-
-Humans remain responsible for:
-
-- project direction
-- architectural decisions
-- engineering judgment
-- evaluation
-- acceptance
-- iteration
-
-The goal is collaboration rather than automation.
-
----
-
-## Durable Artifacts
-
-Every successful watch should leave behind something that survives it.
-
-Examples include:
-
-- working software
-- documentation
-- specifications
-- engineering reports
-- architecture decisions
-- reusable assets
-
-Conversation is valuable.
-
-Artifacts are better.
-
----
-
-# Current Architecture
-
-The project is converging toward a clean separation between simulation and presentation.
-
-```text
-                 FleetCore
-        (Canonical World Model)
-                    │
-          Shared World State
-                    │
-     ┌──────────────┼──────────────┐
-     │              │              │
-Fleet Motion   Periscope    Bridge Station
-                    │
-              Human Operators
+```powershell
+cd "G:\My Drive\monad"
+python -m http.server 8080
 ```
 
-Bridge instruments render and interact with the world.
+Open:
 
-FleetCore ultimately owns the authoritative simulation state.
+```text
+http://localhost:8080/toys/bridge/
+```
 
----
+Bridge Station is the unified command console. It embeds the live browser
+instruments and shows Bridge-owned engineering state. The individual instruments
+still run independently.
 
-# Current Components
+## Current Front Door
 
-## Fleet Motion
+### Bridge Station
 
-Primary navigation and fleet visualization.
+Path:
 
-Features include:
+```text
+toys/bridge/
+```
 
-- tactical map
-- escort formation
-- route visualization
-- shared fleet state
+Bridge Station is the flagship browser artifact. It composes Fleet Motion,
+Periscope Station, Watchbook, and an engineering/status rail into one command
+deck. It reads shared browser-local fleet state through `toys/shared/fleet-state.js`.
 
----
+Run it from the repository root with the local HTTP server command above.
 
-## Periscope Station
+## Main Browser Instruments
 
-Optical observation instrument.
+### Fleet Motion
 
-Current capabilities include:
+Path:
 
-- Canvas 2D rendering
-- photographic compositing
-- shared contact selection
-- synchronized bridge state
+```text
+toys/fleet-motion/
+```
 
----
+Fleet Motion is the browser-side fleet movement and navigation toy. It renders
+Monad, escorts, local passive traffic, routes, wakes, and operator controls on a
+Leaflet map. It writes the browser-local shared fleet state that Bridge and
+Periscope can observe.
 
-## Bridge Station
+### Periscope Station
 
-Unified command interface integrating multiple bridge instruments into a common operational picture.
+Path:
 
----
+```text
+toys/periscope/
+```
+
+Periscope is a Canvas 2D optical watch instrument. It renders an atmospheric
+sea view and vessel contacts derived from the shared fleet state when available,
+with a local fallback when standalone.
+
+### Watchbook
+
+Path:
+
+```text
+toys/watchbook/
+```
+
+Watchbook is a read-only browser viewer for repository logs. Its generated
+manifest is `toys/watchbook/log-index.json`; the plaintext `logs/` tree remains
+canonical.
+
+### FleetCore Live
+
+Path:
+
+```text
+toys/fleetcore-live/
+```
+
+FleetCore Live is a thin browser client for the FleetCore live server. Unlike
+Fleet Motion and Periscope, it does not run its own simulation. It displays
+snapshots streamed by the FleetCore server.
 
 ## FleetCore
 
-FleetCore is the emerging deterministic simulation engine that will eventually become the canonical world model for Monad.
-
-Current goals include:
-
-- deterministic simulation
-- replay
-- persistence
-- snapshots
-- canonical entity state
-- clean browser interfaces
-
-FleetCore is intentionally developed separately from browser rendering to maintain clean architectural boundaries.
-
----
-
-## Watchbook
-
-Operational log viewer and historical record of engineering watches.
-
----
-
-## Experimental Artifacts
-
-The repository also contains smaller engineering experiments used to refine development workflow and explore new ideas.
-
-Examples include:
-
-- reaction-diffusion visualization
-- rendering experiments
-- simulation prototypes
-- interface concepts
-
----
-
-# Engineering Workflow
-
-Monad follows an iterative engineering process.
+Path:
 
 ```text
-Idea
-
-↓
-
-Architecture
-
-↓
-
-Mission Packet
-
-↓
-
-Implementation
-
-↓
-
-Evaluation
-
-↓
-
-Iteration
-
-↓
-
-Commit
-
-↓
-
-Push
-
-↓
-
-Repeat
+fleetcore/
 ```
 
-Mission packets define scope.
+FleetCore is Monad's Rust world-model prototype. It owns deterministic maritime
+state: vessels, routes, simulation clock, commands, events, persistence, replay,
+and snapshots.
 
-Engineering reports document results.
+Common commands:
 
-Every successful iteration becomes part of the repository.
+```powershell
+cargo run --manifest-path fleetcore/Cargo.toml -- init
+cargo run --manifest-path fleetcore/Cargo.toml -- inspect
+cargo run --manifest-path fleetcore/Cargo.toml -- step 30
+cargo run --manifest-path fleetcore/Cargo.toml -- snapshot
+cargo test --manifest-path fleetcore/Cargo.toml
+```
 
----
+Live server:
 
-# Repository Organization
+```powershell
+cargo run --manifest-path fleetcore/Cargo.toml --bin serve -- --port 4771
+```
 
-Typical repository organization includes:
+See `fleetcore/README.md` and `docs/architecture/fleetcore-api.md` for the
+current protocol and limitations.
+
+## Shared Browser State
+
+Path:
+
+```text
+toys/shared/fleet-state.js
+```
+
+This file defines the browser-side fleet-state helper used by the Bridge and
+Periscope. Fleet Motion remains the main writer in the static browser-toy path.
+FleetCore has its own authoritative world model and can be adapted into this
+shape when needed.
+
+## Other Artifacts
+
+```text
+toys/reaction-diffusion-painter/
+```
+
+A standalone Gray-Scott reaction-diffusion painting toy.
+
+```text
+web/
+```
+
+Static public-site material and mirrored deployed toy assets.
 
 ```text
 docs/
-    architecture/
-    engineering/
-    logs/
-
-fleetcore/
-
-toys/
-    bridge/
-    fleet-motion/
-    periscope/
-    reaction-diffusion/
-
-assets/
-
-README.md
 ```
 
-The exact structure continues to evolve as the project grows.
+Architecture notes, deployment notes, FleetCore design documents, and operating
+doctrine.
 
----
+```text
+logs/
+```
 
-# Current Status
+Plaintext operational logs used by Watchbook.
 
-## Completed
+```text
+tools/
+```
 
-- Browser-based bridge environment
-- Fleet Motion
-- Periscope Station
-- Shared bridge state
-- Bridge Station integration
-- Engineering documentation
-- FleetCore architecture
-- FleetCore deterministic prototype
-- AI-assisted engineering workflow
+Small utility scripts, including Watchbook index generation and telemetry sync.
 
-## In Progress
+## Repository Layout
 
-- Persistent world simulation
-- Maritime traffic
-- FleetCore expansion
-- Engineering station
-- Additional bridge instruments
+```text
+.
+|-- docs/
+|   |-- architecture/
+|   `-- deployment/
+|-- fleetcore/
+|   |-- src/
+|   |-- data/
+|   `-- tests/
+|-- logs/
+|-- tools/
+|-- toys/
+|   |-- bridge/
+|   |-- fleet-motion/
+|   |-- fleetcore-live/
+|   |-- periscope/
+|   |-- reaction-diffusion-painter/
+|   |-- shared/
+|   `-- watchbook/
+|-- web/
+|-- bridge.py
+|-- bridge_web.py
+|-- duo_chain.py
+|-- helmsman_v2.py
+`-- README.md
+```
 
-## Future
+## Development Notes
 
-- Persistent daemon
-- Weather systems
-- Autonomous agents
-- Replay visualization
-- Expanded operational theaters
-- Richer engineering simulation
+- Most browser toys are static HTML, CSS, and JavaScript.
+- Fleet Motion uses Leaflet/OpenStreetMap tiles, so it needs network access for
+  map tiles unless cached.
+- Periscope uses Canvas 2D and local image assets.
+- FleetCore is Rust and uses Cargo.
+- No top-level build step exists for the static browser artifacts.
+- Serve from the repository root when testing cross-toy browser state.
 
----
+## Useful Local Commands
 
-# Technology
+Run the main Bridge:
 
-Current technologies include:
+```powershell
+cd "G:\My Drive\monad"
+python -m http.server 8080
+```
 
-- HTML5
-- CSS
-- JavaScript
-- Canvas 2D
-- Git
-- GitHub
+Regenerate Watchbook index:
 
-Current AI engineering collaborators include multiple state-of-the-art language models used for architecture, implementation, documentation, and review.
+```powershell
+python tools/build-log-index.py
+```
 
-Future development includes a Rust-based FleetCore simulation engine.
+Check JavaScript syntax for a toy:
 
----
+```powershell
+node --check toys/bridge/app.js
+```
 
-# Development Principles
+Run FleetCore tests:
 
-Monad values:
+```powershell
+cargo test --manifest-path fleetcore/Cargo.toml
+```
 
-- incremental progress
-- architecture before complexity
-- clean interfaces
-- deterministic systems
-- human oversight
-- thoughtful documentation
-- reusable artifacts
+## Status
 
-The objective is not simply to write code faster.
+Monad is under active development. The Bridge is the best place to start today.
+FleetCore is the direction for a persistent authoritative world, while the
+current browser instruments remain useful standalone engineering artifacts.
 
-The objective is to build better systems by improving the engineering process itself.
+## License
 
----
-
-# Roadmap
-
-Near Term
-
-- FleetCore v1
-- Maritime traffic
-- Shared state stabilization
-- Additional bridge instrumentation
-
-Mid Term
-
-- Persistent world simulation
-- Replay engine
-- Weather integration
-- Richer operational scenarios
-
-Long Term
-
-- Autonomous engineering agents
-- Persistent operational world
-- Expanded simulation domains
-- General-purpose AI-assisted engineering platform
-
----
-
-# License
-
-License information will be added as the project matures.
-
----
-
-> **Monad**
->
-> *Build the process. Build the artifacts. Build the future.*
+License information has not been finalized.
