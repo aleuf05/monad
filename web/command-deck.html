@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad — Command Deck</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="scanline" aria-hidden="true"></div>
+
+    <main class="bridge-shell">
+      <section class="hero panel" id="hero">
+        <div class="hero-signal">
+          <span class="signal-ring"></span>
+          <span class="signal-core"></span>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow">Command Deck / Watch Active</p>
+          <h1>MONAD</h1>
+          <p class="tagline">A system that builds itself</p>
+          <p class="subline">Persistent memory. Rented cognition. Continuous evolution.</p>
+          <div class="command-row">
+            <button class="console-button" type="button" data-jump="#watch">Engage Watch</button>
+            <button class="console-button secondary" type="button" data-jump="#doctrine">Review Doctrine</button>
+            <a class="console-button link-button" href="bridge.html">Bridge</a>
+            <a class="console-button link-button" href="logs.html">Ship's Log</a>
+            <a class="console-button link-button" href="fleet.html">Fleet Command</a>
+            <a class="console-button link-button" href="toys/fleet-motion/">Fleet Motion Mk2</a>
+            <a class="console-button link-button" href="toys/bridge/">Bridge Station</a>
+          </div>
+        </div>
+        <button class="hero-compass" type="button" data-jump="#fleet" aria-label="Open fleet deck">
+          <span></span>
+        </button>
+      </section>
+
+      <section class="watch panel" id="watch">
+        <div class="section-head">
+          <span class="anchor-mark">A</span>
+          <h2>Current Watch</h2>
+        </div>
+        <div class="watch-grid">
+          <div>
+            <p class="label">Campaign</p>
+            <p class="readout">Campaign 0 - Bootstrap the Fleet</p>
+          </div>
+          <div>
+            <p class="label">Current Mission</p>
+            <p>Establish the fleet. Build the loops. Preserve the record.</p>
+          </div>
+          <div>
+            <p class="label">Priorities</p>
+            <div class="priority-list" role="group" aria-label="Current priorities">
+              <button type="button" class="priority-chip is-active" data-priority="Logging">Logging</button>
+              <button type="button" class="priority-chip is-active" data-priority="Memory">Memory</button>
+              <button type="button" class="priority-chip is-active" data-priority="Doctrine">Doctrine</button>
+              <button type="button" class="priority-chip is-active" data-priority="Evolution">Evolution</button>
+            </div>
+          </div>
+          <div class="console-readout" aria-live="polite">
+            <p class="label">Signal</p>
+            <p id="watchSignal">All priorities are active. Fleet bootstrap remains green.</p>
+          </div>
+          <div class="console-readout">
+            <p class="label">Public Hatch</p>
+            <p>Online: cameronlampley.com/monad/ routes through rock64 into granite.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="artifact-launch panel" id="artifacts">
+        <div class="section-head">
+          <span class="anchor-mark">T</span>
+          <h2>Interactive Artifact</h2>
+        </div>
+        <div class="artifact-launch-layout">
+          <div>
+            <p class="label">Newest Toy</p>
+            <h3>Bridge Station</h3>
+            <p>Composited command console: Fleet Motion and Periscope run side by side, and selecting a ship in either instrument visibly re-syncs the other through Monad's shared fleet-state contract.</p>
+          </div>
+          <a class="console-button artifact-button" href="toys/bridge/">Launch Bridge Station</a>
+        </div>
+        <div class="artifact-launch-layout">
+          <div>
+            <p class="label">Toy</p>
+            <h3>Fleet Motion Mk2</h3>
+            <p>Static command visualization over the Arabian Sea with a passive opening route, formation escorts, time warp controls, waypoint routing, and local scenario export.</p>
+          </div>
+          <a class="console-button artifact-button" href="toys/fleet-motion/">Launch Fleet Motion Mk2</a>
+        </div>
+      </section>
+      <section class="fleet panel" id="fleet">
+        <div class="section-head">
+          <span class="anchor-mark">F</span>
+          <h2>The Fleet</h2>
+        </div>
+        <div class="fleet-layout">
+          <div class="fleet-grid" role="list">
+            <button class="fleet-card is-selected" type="button" data-role="Admiral" role="listitem">
+              <span class="fleet-icon compass">N</span>
+              <h3>Admiral</h3>
+              <p>Sets the course. Holds the vision.</p>
+            </button>
+            <button class="fleet-card" type="button" data-role="Captains" role="listitem">
+              <span class="fleet-icon wheel">W</span>
+              <h3>Captains</h3>
+              <p>Lead the watches. Keep the logs.</p>
+            </button>
+            <button class="fleet-card" type="button" data-role="Helmsmen" role="listitem">
+              <span class="fleet-icon helm">H</span>
+              <h3>Helmsmen</h3>
+              <p>Run the loops. Carry the memory.</p>
+            </button>
+            <button class="fleet-card" type="button" data-role="Chronicler" role="listitem">
+              <span class="fleet-icon book">B</span>
+              <h3>Chronicler</h3>
+              <p>Preserves the story. Protects the record.</p>
+            </button>
+            <button class="fleet-card" type="button" data-role="Comms" role="listitem">
+              <span class="fleet-icon comms">R</span>
+              <h3>Comms</h3>
+              <p>Share the signal. Connect the fleet.</p>
+            </button>
+            <button class="fleet-card" type="button" data-role="Public Affairs" role="listitem">
+              <span class="fleet-icon public">P</span>
+              <h3>Public Affairs</h3>
+              <p>Tell the story. Inspire the crew.</p>
+            </button>
+          </div>
+          <aside class="role-console" aria-live="polite">
+            <p class="label">Selected Station</p>
+            <h3 id="roleTitle">Admiral</h3>
+            <p id="roleBrief">Sets mission bearing, resolves strategic ambiguity, and keeps Campaign 0 pointed toward a durable fleet.</p>
+            <dl>
+              <div>
+                <dt>Watch Order</dt>
+                <dd id="roleOrder">Define the north star.</dd>
+              </div>
+              <div>
+                <dt>Signal Color</dt>
+                <dd id="roleColor">Cyan</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+      </section>
+
+      <section class="doctrine panel" id="doctrine">
+        <div class="section-head">
+          <span class="anchor-mark">D</span>
+          <h2>The Monad Doctrine</h2>
+        </div>
+        <div class="doctrine-layout">
+          <ol class="doctrine-list">
+            <li><button class="doctrine-button is-selected" type="button" data-doctrine="remember">We remember.</button></li>
+            <li><button class="doctrine-button" type="button" data-doctrine="think">We think.</button></li>
+            <li><button class="doctrine-button" type="button" data-doctrine="evolve">We evolve.</button></li>
+            <li><button class="doctrine-button" type="button" data-doctrine="endure">We endure.</button></li>
+            <li><button class="doctrine-button" type="button" data-doctrine="explore">We explore.</button></li>
+          </ol>
+          <aside class="doctrine-console" aria-live="polite">
+            <p class="label">Doctrine Channel</p>
+            <h3 id="doctrineTitle">We remember.</h3>
+            <p id="doctrineBrief">Memory is the vessel. Every watch leaves a trace the next watch can inherit.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="log panel" id="log">
+        <div class="section-head">
+          <span class="anchor-mark">L</span>
+          <h2>Operational Log</h2>
+        </div>
+        <form class="log-controls" id="logForm">
+          <label>
+            <span>Event</span>
+            <select id="eventType">
+              <option>startup</option>
+              <option>prompt</option>
+              <option>thinking</option>
+              <option>response</option>
+              <option>state_update</option>
+              <option>error</option>
+              <option>shutdown</option>
+            </select>
+          </label>
+          <label>
+            <span>Status</span>
+            <select id="eventStatus">
+              <option>Active</option>
+              <option>Complete</option>
+              <option>Filed</option>
+              <option>Stable</option>
+              <option>Review</option>
+            </select>
+          </label>
+          <label class="log-note">
+            <span>Entry</span>
+            <input id="eventNote" type="text" maxlength="72" value="Manual bridge check">
+          </label>
+          <button class="console-button" type="submit">Append</button>
+        </form>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Watch</th>
+                <th>Event</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="logBody">
+              <tr>
+                <td>06:20</td>
+                <td>0001</td>
+                <td>Agent watch initialized</td>
+                <td>Complete</td>
+              </tr>
+              <tr>
+                <td>06:47</td>
+                <td>0001</td>
+                <td>Memory index checked</td>
+                <td>Stable</td>
+              </tr>
+              <tr>
+                <td>07:12</td>
+                <td>0002</td>
+                <td>Doctrine loop revised</td>
+                <td>Filed</td>
+              </tr>
+              <tr>
+                <td>07:44</td>
+                <td>0002</td>
+                <td>Fleet signal broadcast</td>
+                <td>Active</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="hierarchy panel" id="hierarchy">
+        <div class="section-head">
+          <span class="anchor-mark">H</span>
+          <h2>Data Hierarchy</h2>
+        </div>
+        <div class="hierarchy-layout">
+          <div class="pyramid" aria-label="Doctrine to cache data hierarchy">
+            <button type="button" class="hierarchy-step is-selected" data-layer="Doctrine">Doctrine</button>
+            <button type="button" class="hierarchy-step" data-layer="Logs">Logs</button>
+            <button type="button" class="hierarchy-step" data-layer="State">State</button>
+            <button type="button" class="hierarchy-step" data-layer="Indexes">Indexes</button>
+            <button type="button" class="hierarchy-step" data-layer="Cache">Cache</button>
+          </div>
+          <aside class="layer-console" aria-live="polite">
+            <p class="label">Selected Layer</p>
+            <h3 id="layerTitle">Doctrine</h3>
+            <p id="layerBrief">Persistent and canonical. Doctrine explains why the fleet exists and how it behaves under pressure.</p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="status-bar">
+      <span><b>Drydock:</b> Kubuntu - Windows - macOS</span>
+      <span><b>Engine:</b> Gemini API</span>
+      <span><b>Memory:</b> Qdrant Vector DB</span>
+      <span><b>Protocol:</b> Doctrine + Discipline</span>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+  </body>
+</html>
