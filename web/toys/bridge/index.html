@@ -55,7 +55,7 @@
                 </div>
                 <a href="../fleet-motion/" target="_blank" rel="noreferrer">Open standalone</a>
               </header>
-              <iframe title="Fleet Motion instrument" src="../fleet-motion/"></iframe>
+              <iframe title="Fleet Motion instrument" data-instrument-src="../fleet-motion/"></iframe>
             </article>
 
             <article class="instrument live-instrument" id="livePeriscope" data-live-instrument="periscope">
@@ -87,12 +87,9 @@
                 <p class="eyebrow">Operational Logs</p>
                 <h2>Watchbook</h2>
               </div>
-              <a href="../../logs.html" target="_blank" rel="noreferrer">Open Ship's Log</a>
+              <a href="../watchbook/" target="_blank" rel="noreferrer">Open standalone</a>
             </header>
-            <div class="watchbook-redirect">
-              <p>Watchbook's full log browser is a local development tool and isn't published on this site. Read Monad's watch logs on the public Ship's Log page instead.</p>
-              <a href="../../logs.html" target="_blank" rel="noreferrer">Open Ship's Log &rarr;</a>
-            </div>
+            <iframe title="Watchbook instrument" src="../watchbook/"></iframe>
           </article>
         </section>
 
@@ -124,6 +121,10 @@
               <div>
                 <dt>Shared Fleet State</dt>
                 <dd id="fleetStateValue">Awaiting Fleet Motion</dd>
+              </div>
+              <div>
+                <dt>Data Source</dt>
+                <dd id="dataSourceValue">Awaiting Fleet Motion</dd>
               </div>
               <div>
                 <dt>Fleet Position</dt>

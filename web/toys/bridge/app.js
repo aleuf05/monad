@@ -7,6 +7,7 @@
   const alertLevel = document.querySelector("#alertLevel");
   const conditionValue = document.querySelector("#conditionValue");
   const fleetStateValue = document.querySelector("#fleetStateValue");
+  const dataSourceValue = document.querySelector("#dataSourceValue");
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
   const contactValue = document.querySelector("#contactValue");
@@ -21,6 +22,28 @@
     console: "Live Console",
     watchbook: "Watchbook"
   };
+
+  // Fleet Motion (and, via the shared MonadFleetState contract it writes,
+  // Periscope) already supports an opt-in live FleetCore feed -- see
+  // toys/fleet-motion/README.md. Bridge composes that instrument rather
+  // than reimplementing it: passing Bridge's own `?live=1` (and optional
+  // `?fleetcoreServer=`) straight through to the embedded iframe's src.
+  // The iframe has no `src` in the HTML itself specifically so this is the
+  // only load it ever does -- setting `.src` after an unparambed default
+  // load would cause a visible reload flash.
+  const fleetMotionIframe = document.querySelector('[data-instrument-src="../fleet-motion/"]');
+  if (fleetMotionIframe) {
+    const bridgeParams = new URLSearchParams(window.location.search);
+    const baseSrc = fleetMotionIframe.dataset.instrumentSrc;
+    if (bridgeParams.has("live") || bridgeParams.has("fleetcoreServer")) {
+      const passthrough = new URLSearchParams();
+      if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
+      if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
+      fleetMotionIframe.src = `${baseSrc}?${passthrough.toString()}`;
+    } else {
+      fleetMotionIframe.src = baseSrc;
+    }
+  }
 
   let hasObservedSelection = false;
   let lastSelectedShipId = null;
@@ -130,6 +153,10 @@
       routeValue.textContent = "No route observed";
       if (contactValue) contactValue.textContent = "No contacts observed";
       if (selectedVesselValue) selectedVesselValue.textContent = "No selection observed";
+      if (dataSourceValue) {
+        dataSourceValue.textContent = "Awaiting Fleet Motion";
+        dataSourceValue.className = "";
+      }
       return;
     }
 
@@ -170,6 +197,11 @@
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";
     conditionValue.className = state.navigation?.lastNavigationMessage === "Clear" ? "is-watch" : "is-caution";
+    if (dataSourceValue) {
+      const isLive = state.dataSource === "fleetcore-live";
+      dataSourceValue.textContent = isLive ? "FleetCore Live" : "Fleet Motion (Local Sim)";
+      dataSourceValue.className = isLive ? "is-live" : "";
+    }
   }
 
   function tick() {

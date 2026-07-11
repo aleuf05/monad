@@ -327,6 +327,10 @@ dd {
   color: var(--warn) !important;
 }
 
+.is-live {
+  color: var(--amber) !important;
+}
+
 @media (max-width: 1180px) {
   .bridge-header,
   .console-layout {

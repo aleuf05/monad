@@ -54,6 +54,10 @@ The Engineering Status panel observes flagship state, active route counts, selec
 
 If no Fleet Motion state has been written yet, the Bridge shows honest awaiting-state placeholders rather than fake telemetry.
 
+## Optional Live Mode (FleetCore)
+
+Fleet Motion's embedded iframe has no `src` in the Live Console's HTML by design — Bridge sets it once at load, passing its own `?live=1` (and optional `?fleetcoreServer=`) straight through to Fleet Motion unchanged. Loading Bridge itself at `?live=1` puts the embedded Fleet Motion into FleetCore's live, read-only feed instead of local simulation; Periscope needs no changes to inherit it, since it already composites whatever Fleet Motion writes to `MonadFleetState`. Without the query param, Bridge's default public load is unaffected — same single iframe load, same local simulation, same behavior as before this existed. The Status Board's new "Data Source" row reflects whichever mode is active. See `toys/fleet-motion/README.md` for the underlying live-mode contract.
+
 ## Boundaries
 
 - No backend services.
