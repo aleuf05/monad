@@ -19,7 +19,7 @@
         <section class="status-strip" aria-label="Connection status">
           <div>
             <span>Link</span>
-            <strong id="linkStatus">Connecting&hellip;</strong>
+            <strong><span id="liveDot" class="live-dot" aria-hidden="true"></span><span id="linkStatus">Connecting&hellip;</span></strong>
           </div>
           <div>
             <span>Authority</span>
@@ -60,6 +60,7 @@
         </div>
       </section>
       <p class="auth-note">This world is shared by every visitor. Without a command token the view is read-only; holding a valid token grants command authority over the live world for everyone connected, not just you.</p>
+      <p id="commandFeedback" class="command-feedback" role="status" hidden></p>
 
       <section class="console-layout">
         <article class="map-panel">

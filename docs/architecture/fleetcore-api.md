@@ -60,7 +60,7 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
 
 **After that**, the server sends a new `{"type":"snapshot","snapshot":{...}}` message after every tick and after every successfully applied command (from any client, HTTP or WebSocket) — a WebSocket client never needs to poll.
 
-**To issue a command**, send a raw `Command` JSON object as a text frame (same shape as the HTTP body). If the connection lacks command authority, or the command is malformed, or `World::apply_command` rejects it, the server responds with `{"type":"error","message":"..."}`. Known simplification: error replies currently go out on the same broadcast channel as snapshots, so every connected client sees another client's rejected command, not just the sender — narrowing this to a per-connection reply is a reasonable follow-up, not yet done.
+**To issue a command**, send a raw `Command` JSON object as a text frame (same shape as the HTTP body). If the connection lacks command authority, or the command is malformed, or `World::apply_command` rejects it, the server replies with `{"type":"error","message":"..."}` to that connection only — other connected clients never see it. A *successful* command still broadcasts its resulting `{"type":"snapshot",...}` to every connected client, which is correct: a real state change should reach every viewer, only the rejection notice for a bad attempt shouldn't.
 
 ## Payload Shapes
 
