@@ -41,7 +41,12 @@
 
   function normalizeFleetMotionState(candidate) {
     if (!candidate || candidate.schemaVersion !== SCHEMA_VERSION) return null;
+    // Every nested object spreads the candidate first, then overrides only the
+    // fields this contract cares about — producers (Fleet Motion) can carry
+    // extra fields (designSettings, waypointMode, ...) through a write/read
+    // round trip without this contract silently dropping them.
     return {
+      ...candidate,
       schemaVersion: SCHEMA_VERSION,
       savedAt: candidate.savedAt || null,
       activePresetId: candidate.activePresetId || "freeplay",
@@ -50,6 +55,7 @@
         position: clonePoint(candidate.flagship?.position)
       },
       navigation: {
+        ...(candidate.navigation || {}),
         destination: clonePoint(candidate.navigation?.destination),
         finalDestination: clonePoint(candidate.navigation?.finalDestination),
         waypoints: (candidate.navigation?.waypoints || []).map(clonePoint).filter(Boolean),
@@ -58,11 +64,13 @@
         lastNavigationMessage: candidate.navigation?.lastNavigationMessage || "Clear"
       },
       time: {
+        ...(candidate.time || {}),
         timeWarp: Number(candidate.time?.timeWarp ?? 1),
         lastMovingWarp: Number(candidate.time?.lastMovingWarp ?? 1),
         simulationClockSeconds: Number(candidate.time?.simulationClockSeconds ?? 0)
       },
       escorts: {
+        ...(candidate.escorts || {}),
         modeId: candidate.escorts?.modeId || "loose",
         ships: (candidate.escorts?.ships || []).map((ship) => ({
           ...ship,
@@ -74,6 +82,7 @@
         })).filter((ship) => ship.position)
       },
       contacts: {
+        ...(candidate.contacts || {}),
         mode: candidate.contacts?.mode || "passive",
         ships: (candidate.contacts?.ships || []).map((ship) => ({
           ...ship,
@@ -84,6 +93,10 @@
             : normalizeDegrees(ship.headingDegrees),
           status: ship.status || "Transiting"
         })).filter((ship) => ship.position)
+      },
+      selection: {
+        ...(candidate.selection || {}),
+        selectedShipId: candidate.selection?.selectedShipId ?? null
       }
     };
   }
@@ -110,7 +123,7 @@
       .replace(/\b\w/g, (letter) => letter.toUpperCase());
   }
 
-  function contactFromVessel(vessel, origin, index, source) {
+  function contactFromVessel(vessel, origin, index, source, selectedId) {
     const position = clonePoint(vessel.position);
     if (!position || !origin) return null;
     const callsign = vessel.callsign || vessel.name || vessel.id;
@@ -136,7 +149,8 @@
       speed: Number(vessel.speedKmh || 0) * KMH_TO_KNOTS,
       lastUpdate: new Date().toISOString(),
       confidence: 1,
-      source
+      source,
+      selected: selectedId != null && String(vessel.id) === String(selectedId)
     };
   }
 
@@ -144,6 +158,7 @@
     const normalized = normalizeFleetMotionState(state);
     const origin = normalized?.flagship?.position;
     if (!normalized || !origin) return [];
+    const selectedId = normalized.selection?.selectedShipId ?? null;
     const escorts = normalized.escorts.ships.map((ship, index) =>
       contactFromVessel(
         {
@@ -153,7 +168,8 @@
         },
         origin,
         index,
-        "fleet-motion-escort"
+        "fleet-motion-escort",
+        selectedId
       )
     );
     const passive = normalized.contacts.ships.map((ship, index) =>
@@ -165,7 +181,8 @@
         },
         origin,
         escorts.length + index,
-        "fleet-motion-passive-contact"
+        "fleet-motion-passive-contact",
+        selectedId
       )
     );
     return [...escorts, ...passive].filter(Boolean);
