@@ -1,4 +1,4 @@
-const HOME = { lat: 26.56, lng: 56.25 };
+const HOME = { lat: 20.5, lng: 63.2 };
 const BASE_SPEED_KMH = 180;
 const ARRIVAL_RADIUS_KM = 0.08;
 const SLOWDOWN_DISTANCE_KM = 12;
@@ -9,7 +9,13 @@ const ESCORT_SLOT_RADIUS_KM = 0.12;
 const ESCORT_DRIFT_LAT = 0.035;
 const ESCORT_DRIFT_LNG = 0.045;
 const ESCORT_SLOT_RESPONSE_SECONDS = 0.7;
-const THREAT_START = { lat: 26.42, lng: 57.18 };
+const NPC_OPERATION_BOUNDS = {
+  south: 19.5,
+  north: 21.5,
+  west: 62.0,
+  east: 64.4
+};
+const THREAT_START = { lat: 20.64, lng: 63.52 };
 const THREAT_SPEED_KMH = 240;
 const THREAT_INTERCEPT_RADIUS_KM = 9;
 const THREAT_BREACH_RADIUS_KM = 6;
@@ -21,8 +27,8 @@ const TRAIL_LIMIT = 180;
 const TRAIL_REDRAW_MIN_POINTS = 2;
 const LOG_LIMIT = 9;
 const INTRO_DURATION_MS = 4800;
-const FLEET_STATE_SCHEMA_VERSION = 1;
-const FLEET_STATE_STORAGE_KEY = "monad.fleetMotion.state";
+const FLEET_STATE_SCHEMA_VERSION = window.MonadFleetState.schemaVersion;
+const FLEET_STATE_STORAGE_KEY = window.MonadFleetState.storageKey;
 const FLEET_STATE_SAVE_INTERVAL_MS = 1200;
 const DESIGN_DEFAULTS = {
   flagshipSpeedKmh: BASE_SPEED_KMH,
@@ -41,20 +47,20 @@ const SCENARIO_PRESETS = {
     spawnThreat: false,
     notePrompt: "Manual sandbox. Tune parameters, click a destination, and record what changed."
   },
-  hormuz_transit: {
-    id: "hormuz_transit",
-    label: "Hormuz Transit",
-    variantName: "hormuz_transit",
+  arabian_sea_watch: {
+    id: "arabian_sea_watch",
+    label: "Arabian Sea Watch",
+    variantName: "arabian_sea_watch",
     settings: {
       flagshipSpeedKmh: 180,
       escortSpeedScale: 1,
       formationSpread: 1
     },
     escortModeId: "loose",
-    destination: { lat: 26.25, lng: 55.35 },
+    destination: { lat: 20.28, lng: 62.82 },
     waypoints: [],
     spawnThreat: false,
-    notePrompt: "Baseline crossing. Judge whether the route and escort spacing are readable."
+    notePrompt: "Open-water watch. Judge whether nearby traffic and escort spacing are readable."
   },
   escort_screen_drill: {
     id: "escort_screen_drill",
@@ -66,7 +72,7 @@ const SCENARIO_PRESETS = {
       formationSpread: 1.25
     },
     escortModeId: "patrol",
-    destination: { lat: 26.62, lng: 55.05 },
+    destination: { lat: 20.78, lng: 62.76 },
     waypoints: [],
     spawnThreat: false,
     notePrompt: "Patrol weave review. Judge whether escorts read as independent but coherent."
@@ -81,8 +87,8 @@ const SCENARIO_PRESETS = {
       formationSpread: 0.75
     },
     escortModeId: "tight",
-    destination: { lat: 26.35, lng: 57.25 },
-    waypoints: [{ lat: 26.62, lng: 56.85 }],
+    destination: { lat: 20.18, lng: 63.78 },
+    waypoints: [{ lat: 20.72, lng: 63.48 }],
     spawnThreat: false,
     notePrompt: "Waypoint route. Judge whether manual routing feels understandable and recoverable."
   }
@@ -111,9 +117,43 @@ const ESCORT_MODES = [
   }
 ];
 const FORMATION = [
-  { id: "escort-alpha", name: "ESCORT ALPHA", lat: -0.22, lng: -0.32 },
-  { id: "escort-bravo", name: "ESCORT BRAVO", lat: -0.02, lng: 0.38 },
-  { id: "escort-charlie", name: "ESCORT CHARLIE", lat: 0.18, lng: 0.16 }
+  { id: "escort-alpha", name: "ESCORT ALPHA", lat: -0.07, lng: -0.09 },
+  { id: "escort-bravo", name: "ESCORT BRAVO", lat: -0.015, lng: 0.1 },
+  { id: "escort-charlie", name: "ESCORT CHARLIE", lat: 0.08, lng: 0.04 }
+];
+const NPC_CONTACTS = [
+  {
+    id: "traffic-dhow-01",
+    name: "DHOW LANTERN",
+    role: "civilian dhow",
+    position: { lat: 20.58, lng: 63.29 },
+    headingDegrees: 312,
+    speedKmh: 32
+  },
+  {
+    id: "traffic-tanker-02",
+    name: "TANKER GULF STAR",
+    role: "merchant tanker",
+    position: { lat: 20.42, lng: 63.05 },
+    headingDegrees: 72,
+    speedKmh: 44
+  },
+  {
+    id: "traffic-patrol-03",
+    name: "PILOT BOAT AMBER",
+    role: "harbor pilot",
+    position: { lat: 20.55, lng: 63.08 },
+    headingDegrees: 246,
+    speedKmh: 38
+  },
+  {
+    id: "traffic-coaster-04",
+    name: "COASTER QESHM",
+    role: "coastal freighter",
+    position: { lat: 20.36, lng: 63.28 },
+    headingDegrees: 286,
+    speedKmh: 36
+  }
 ];
 const LAND_ZONES = [
   {
@@ -131,7 +171,7 @@ const LAND_ZONES = [
     east: 56.25
   },
   {
-    name: "Hormuz Island",
+    name: "Legacy Island Box",
     south: 27.02,
     north: 27.16,
     west: 56.36,
@@ -159,7 +199,7 @@ const map = L.map("map", {
   minZoom: 3,
   worldCopyJump: true
 });
-map.setView([26.42, 55.7], 6, { animate: false });
+map.setView([HOME.lat, HOME.lng], 7, { animate: false });
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
@@ -174,6 +214,16 @@ function shipIcon(kind, selected = false, heading = 0) {
     html: `<span class="ship-dot ${kind}${selectedClass}" style="--heading:${heading}deg"></span>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2]
+  });
+}
+
+function contactIcon(selected = false, heading = 0) {
+  const selectedClass = selected ? " selected" : "";
+  return L.divIcon({
+    className: "fleet-dot",
+    html: `<span class="contact-dot${selectedClass}" style="--heading:${heading}deg"></span>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
   });
 }
 
@@ -281,6 +331,15 @@ const escortMarkers = FORMATION.map((escort) =>
     .addTo(map)
 );
 
+const contactMarkers = NPC_CONTACTS.map((contact) =>
+  L.marker([contact.position.lat, contact.position.lng], {
+    icon: contactIcon(false, contact.headingDegrees),
+    title: contact.name
+  })
+    .bindTooltip(contact.name, { permanent: true, direction: "bottom", offset: [0, 12], className: "contact-label" })
+    .addTo(map)
+);
+
 const trailColors = ["#e8b95d", ...FORMATION.map(() => "#25d9e8")];
 const trailLayers = [
   L.layerGroup().addTo(map),
@@ -296,6 +355,7 @@ const warpValue = document.querySelector("#warpValue");
 const navigationStatus = document.querySelector("#navigationStatus");
 const routeStatus = document.querySelector("#routeStatus");
 const escortModeStatus = document.querySelector("#escortModeStatus");
+const trafficStatus = document.querySelector("#trafficStatus");
 const pauseButton = document.querySelector("#pauseButton");
 const waypointButton = document.querySelector("#waypointButton");
 const suggestDetourButton = document.querySelector("#suggestDetourButton");
@@ -340,6 +400,7 @@ const stateFlagshipValue = document.querySelector("#stateFlagshipValue");
 const stateMotionValue = document.querySelector("#stateMotionValue");
 const stateRouteValue = document.querySelector("#stateRouteValue");
 const stateEscortValue = document.querySelector("#stateEscortValue");
+const stateContactValue = document.querySelector("#stateContactValue");
 const stateSelectionValue = document.querySelector("#stateSelectionValue");
 const copyStateButton = document.querySelector("#copyStateButton");
 const downloadStateButton = document.querySelector("#downloadStateButton");
@@ -375,11 +436,13 @@ let headingDegrees = null;
 let renderedHeading = null;
 let renderedSelection = null;
 let renderedEscortHeadings = null;
+let renderedContactHeadings = null;
 let escortModeIndex = 1;
 let logEntries = [];
 let shipTrails = [];
 let simulationClockSeconds = 0;
 let escortStates = createEscortStates();
+let contactStates = createContactStates();
 let lastPersistedAt = null;
 let lastPersistenceAttemptMs = 0;
 let restoredFromPersistentState = false;
@@ -395,6 +458,16 @@ function createEscortStates() {
   }));
 }
 
+function createContactStates() {
+  return NPC_CONTACTS.map((contact) => ({
+    ...contact,
+    position: clonePoint(contact.position),
+    speedKmh: contact.speedKmh,
+    headingDegrees: contact.headingDegrees,
+    status: "Transiting",
+    lastTurnSeconds: 0
+  }));
+}
 
 function clonePoint(point) {
   return point ? { lat: Number(point.lat), lng: Number(point.lng) } : null;
@@ -408,7 +481,7 @@ function createBaselineFleetState() {
   return {
     schemaVersion: FLEET_STATE_SCHEMA_VERSION,
     savedAt: null,
-    activePresetId: "hormuz_transit",
+    activePresetId: "arabian_sea_watch",
     designSettings: { ...DESIGN_DEFAULTS },
     flagship: {
       position: { ...HOME },
@@ -442,6 +515,18 @@ function createBaselineFleetState() {
         speedKmh: escort.speedKmh,
         headingDegrees: escort.headingDegrees,
         blocked: escort.blocked
+      }))
+    },
+    contacts: {
+      mode: "passive",
+      ships: createContactStates().map((contact) => ({
+        id: contact.id,
+        name: contact.name,
+        role: contact.role,
+        position: clonePoint(contact.position),
+        speedKmh: contact.speedKmh,
+        headingDegrees: contact.headingDegrees,
+        status: contact.status
       }))
     },
     selection: {
@@ -491,6 +576,18 @@ function createCanonicalFleetState() {
         blocked: escort.blocked
       }))
     },
+    contacts: {
+      mode: "passive",
+      ships: contactStates.map((contact) => ({
+        id: contact.id,
+        name: contact.name,
+        role: contact.role,
+        position: clonePoint(contact.position),
+        speedKmh: contact.speedKmh,
+        headingDegrees: contact.headingDegrees,
+        status: contact.status
+      }))
+    },
     selection: {
       selectedShipId
     }
@@ -510,6 +607,7 @@ function normalizeFleetState(candidate) {
     navigation: { ...baseline.navigation, ...(candidate.navigation || {}) },
     time: { ...baseline.time, ...(candidate.time || {}) },
     escorts: { ...baseline.escorts, ...(candidate.escorts || {}) },
+    contacts: { ...baseline.contacts, ...(candidate.contacts || {}) },
     selection: { ...baseline.selection, ...(candidate.selection || {}) }
   };
 }
@@ -558,11 +656,26 @@ function applyCanonicalFleetState(state) {
       blocked: Boolean(saved?.blocked)
     };
   });
+  contactStates = NPC_CONTACTS.map((contact, index) => {
+    const saved = (normalized.contacts.ships || []).find((ship) => ship.id === contact.id) || normalized.contacts.ships?.[index];
+    const savedPosition = clonePoint(saved?.position);
+    const savedPositionIsUsable = savedPosition && contactCanOccupy(savedPosition);
+    const position = savedPositionIsUsable ? savedPosition : clonePoint(contact.position);
+    return {
+      ...contact,
+      position,
+      speedKmh: Number(saved?.speedKmh) || contact.speedKmh,
+      headingDegrees: saved?.headingDegrees ?? contact.headingDegrees,
+      status: savedPositionIsUsable ? saved?.status || "Transiting" : "Transiting",
+      lastTurnSeconds: 0
+    };
+  });
 
   selectedShipId = normalized.selection.selectedShipId || "monad";
   renderedHeading = null;
   renderedSelection = null;
   renderedEscortHeadings = null;
+  renderedContactHeadings = null;
   syncDesignControls();
   redrawWaypoints();
   createInitialTrails();
@@ -601,7 +714,9 @@ function persistFleetState(force = false) {
   lastPersistenceAttemptMs = nowMs;
   try {
     const state = createCanonicalFleetState();
-    localStorage.setItem(FLEET_STATE_STORAGE_KEY, JSON.stringify(state));
+    if (!window.MonadFleetState.write(state)) {
+      throw new Error("Shared fleet state contract rejected this state");
+    }
     lastPersistedAt = state.savedAt;
     updateLastSavedIndicator();
     updateStateInspector();
@@ -615,11 +730,8 @@ function persistFleetState(force = false) {
 
 function restoreFleetState() {
   try {
-    const raw = localStorage.getItem(FLEET_STATE_STORAGE_KEY);
-    if (!raw) {
-      return false;
-    }
-    return applyCanonicalFleetState(JSON.parse(raw));
+    const state = window.MonadFleetState.read();
+    return state ? applyCanonicalFleetState(state) : false;
   } catch (error) {
     console.warn("Fleet state restore failed", error);
     return false;
@@ -668,6 +780,9 @@ function updateStateInspector() {
   stateMotionValue.textContent = `${formatSpeed(currentSpeedKmh)} / ${timeWarp === 0 ? "paused" : `${timeWarp}x`}`;
   stateRouteValue.textContent = `${routeLegs} leg${routeLegs === 1 ? "" : "s"} / ${waypointCount} waypoint${waypointCount === 1 ? "" : "s"}`;
   stateEscortValue.textContent = `${mode.label} / ${escortStates.length} ships`;
+  if (stateContactValue) {
+    stateContactValue.textContent = `${contactStates.length} passive`;
+  }
   stateSelectionValue.textContent = getSelectedShip().name;
 }
 
@@ -819,6 +934,39 @@ function bearingDegrees(start, end) {
     Math.cos(startLatitude) * Math.sin(endLatitude) -
     Math.sin(startLatitude) * Math.cos(endLatitude) * Math.cos(longitudeDelta);
   return (toDegrees(Math.atan2(y, x)) + 360) % 360;
+}
+
+function pointAtDistance(start, bearing, distance) {
+  const earthRadiusKm = 6371;
+  const angularDistance = distance / earthRadiusKm;
+  const bearingRadians = toRadians(bearing);
+  const startLat = toRadians(start.lat);
+  const startLng = toRadians(start.lng);
+  const endLat = Math.asin(
+    Math.sin(startLat) * Math.cos(angularDistance) +
+      Math.cos(startLat) * Math.sin(angularDistance) * Math.cos(bearingRadians)
+  );
+  const endLng = startLng + Math.atan2(
+    Math.sin(bearingRadians) * Math.sin(angularDistance) * Math.cos(startLat),
+    Math.cos(angularDistance) - Math.sin(startLat) * Math.sin(endLat)
+  );
+  return {
+    lat: toDegrees(endLat),
+    lng: ((toDegrees(endLng) + 540) % 360) - 180
+  };
+}
+
+function pointInOperationBounds(point) {
+  return (
+    point.lat >= NPC_OPERATION_BOUNDS.south &&
+    point.lat <= NPC_OPERATION_BOUNDS.north &&
+    point.lng >= NPC_OPERATION_BOUNDS.west &&
+    point.lng <= NPC_OPERATION_BOUNDS.east
+  );
+}
+
+function contactCanOccupy(point) {
+  return pointInOperationBounds(point) && !LAND_ZONES.some((zone) => pointInZone(point, zone));
 }
 
 function pointInZone(point, zone) {
@@ -1053,6 +1201,10 @@ function getShipPosition(id) {
   if (id === "monad") {
     return { ...flagship };
   }
+  const contact = contactStates.find((ship) => ship.id === id);
+  if (contact) {
+    return { ...contact.position };
+  }
   const escort = escortStates.find((ship) => ship.id === id) || escortStates[0];
   return { ...escort.position };
 }
@@ -1066,6 +1218,20 @@ function getSelectedShip() {
       position: getShipPosition("monad"),
       speedKmh: currentSpeedKmh,
       headingDegrees,
+      blocked: false
+    };
+  }
+  const contact = contactStates.find((ship) => ship.id === selectedShipId);
+  if (contact) {
+    return {
+      id: contact.id,
+      name: contact.name,
+      kind: "contact",
+      role: contact.role,
+      position: getShipPosition(contact.id),
+      speedKmh: contact.speedKmh,
+      headingDegrees: contact.headingDegrees,
+      status: contact.status,
       blocked: false
     };
   }
@@ -1223,21 +1389,30 @@ function updateMarkerIcons() {
   const escortHeadings = escortStates
     .map((escort) => Math.round(escort.headingDegrees === null ? heading : escort.headingDegrees))
     .join("|");
+  const contactHeadings = contactStates
+    .map((contact) => `${contact.id}:${Math.round(contact.headingDegrees)}`)
+    .join("|");
   if (
     renderedHeading === heading &&
     renderedSelection === selectedShipId &&
-    renderedEscortHeadings === escortHeadings
+    renderedEscortHeadings === escortHeadings &&
+    renderedContactHeadings === contactHeadings
   ) {
     return;
   }
   renderedHeading = heading;
   renderedSelection = selectedShipId;
   renderedEscortHeadings = escortHeadings;
+  renderedContactHeadings = contactHeadings;
   flagshipMarker.setIcon(shipIcon("flagship", selectedShipId === "monad", heading));
   escortMarkers.forEach((marker, index) => {
     const escort = escortStates[index];
     const escortHeading = Math.round(escort.headingDegrees === null ? heading : escort.headingDegrees);
     marker.setIcon(shipIcon("escort", selectedShipId === escort.id, escortHeading));
+  });
+  contactMarkers.forEach((marker, index) => {
+    const contact = contactStates[index];
+    marker.setIcon(contactIcon(selectedShipId === contact.id, Math.round(contact.headingDegrees)));
   });
 }
 
@@ -1250,6 +1425,10 @@ function updateFleetMarkers() {
       [flagship.lat, flagship.lng],
       [escort.position.lat, escort.position.lng]
     ]);
+  });
+  contactMarkers.forEach((marker, index) => {
+    const contact = contactStates[index];
+    marker.setLatLng([contact.position.lat, contact.position.lng]);
   });
 
   courseLine.setLatLngs(
@@ -1366,6 +1545,8 @@ function updateShipInfo() {
   const mode = currentEscortMode();
   const status = selected.id === "monad"
     ? currentStatus()
+    : selected.kind === "contact"
+      ? selected.status
     : selected.blocked
       ? "Holding"
       : selected.speedKmh > 1
@@ -1381,6 +1562,8 @@ function updateShipInfo() {
     ? finalDestination
       ? formatPosition(finalDestination)
       : "No course set"
+    : selected.kind === "contact"
+      ? selected.role
     : `${mode.label} slot`;
 }
 
@@ -1459,7 +1642,7 @@ function buildScenarioArtifact() {
     schemaVersion: 1,
     exportedAt: new Date().toISOString(),
     scenario: {
-      area: "Strait of Hormuz",
+      area: "Arabian Sea",
       presetId: activePresetId,
       presetLabel: SCENARIO_PRESETS[activePresetId]?.label || "Freeplay / Manual",
       variantName: variantNameInput?.value.trim() || activePresetId || "manual",
@@ -1568,7 +1751,7 @@ function downloadScenarioExport() {
 }
 
 function loadPassiveOpeningRoute() {
-  const preset = SCENARIO_PRESETS.hormuz_transit;
+  const preset = SCENARIO_PRESETS.arabian_sea_watch;
   activePresetId = preset.id;
   if (scenarioPresetSelect) scenarioPresetSelect.value = preset.id;
   designSettings = { ...preset.settings };
@@ -1584,7 +1767,7 @@ function loadPassiveOpeningRoute() {
   headingDegrees = bearingDegrees(flagship, destination);
   lastStatus = "Underway";
   lastNavigationMessage = "Clear";
-  addLog("Opening route loaded: Hormuz Transit.");
+  addLog("Opening route loaded: Arabian Sea Watch.");
 }
 
 function completeIntro() {
@@ -1721,6 +1904,9 @@ function updateStatus() {
     : "No course set";
   speedValue.textContent = formatSpeed(currentSpeedKmh);
   escortModeStatus.textContent = mode.label;
+  if (trafficStatus) {
+    trafficStatus.textContent = `${contactStates.length} passive contact${contactStates.length === 1 ? "" : "s"}`;
+  }
   if (destination) {
     const remaining = distanceKm(flagship, destination);
     distanceValue.textContent = timeWarp === 0
@@ -1980,6 +2166,30 @@ function advanceEscort(escort, index, elapsedSeconds) {
   escort.blocked = false;
 }
 
+function turnPassiveContact(contact) {
+  contact.headingDegrees = (contact.headingDegrees + 105 + Math.abs(Math.sin(simulationClockSeconds + contact.id.length)) * 80) % 360;
+  contact.status = "Course adjusted";
+  contact.lastTurnSeconds = simulationClockSeconds;
+}
+
+function advancePassiveContact(contact, elapsedSeconds) {
+  const stepDistance = contact.speedKmh * timeWarp * (elapsedSeconds / 3600);
+  if (stepDistance <= 0) {
+    return;
+  }
+
+  const nextPosition = pointAtDistance(contact.position, contact.headingDegrees, stepDistance);
+  if (!contactCanOccupy(nextPosition)) {
+    turnPassiveContact(contact);
+    return;
+  }
+
+  contact.position = nextPosition;
+  contact.status = simulationClockSeconds - contact.lastTurnSeconds < 18
+    ? "Settling on new course"
+    : "Transiting";
+}
+
 function advanceFleet(elapsedSeconds) {
   if (timeWarp === 0) {
     return;
@@ -2015,6 +2225,7 @@ function advanceFleet(elapsedSeconds) {
   }
 
   escortStates.forEach((escort, index) => advanceEscort(escort, index, elapsedSeconds));
+  contactStates.forEach((contact) => advancePassiveContact(contact, elapsedSeconds));
   advanceThreat(elapsedSeconds);
   updateFleetMarkers();
   updateStatus();
@@ -2052,7 +2263,7 @@ function setTimeWarp(nextWarp) {
 }
 
 function resetFleet({ requireConfirmation = true } = {}) {
-  if (requireConfirmation && !window.confirm("Reset Fleet Motion to the documented Strait of Hormuz baseline? This clears the persisted voyage.")) {
+  if (requireConfirmation && !window.confirm("Reset Fleet Motion to the documented Arabian Sea watch baseline? This clears the persisted voyage.")) {
     return false;
   }
   flagship = { ...HOME };
@@ -2062,6 +2273,7 @@ function resetFleet({ requireConfirmation = true } = {}) {
   currentSpeedKmh = 0;
   simulationClockSeconds = 0;
   escortStates = createEscortStates();
+  contactStates = createContactStates();
   threat = null;
   score = {
     neutralized: 0,
@@ -2075,8 +2287,9 @@ function resetFleet({ requireConfirmation = true } = {}) {
   renderedHeading = null;
   renderedSelection = null;
   renderedEscortHeadings = null;
+  renderedContactHeadings = null;
   createInitialTrails();
-  addLog("Fleet reset to Strait of Hormuz station.");
+  addLog("Fleet reset to Arabian Sea watch station.");
   flashAt(flagship, "feedback-pulse reset");
   updateFleetMarkers();
   updateStatus();
@@ -2206,6 +2419,12 @@ escortMarkers.forEach((marker, index) => {
   marker.on("click", (event) => {
     L.DomEvent.stopPropagation(event);
     selectShip(FORMATION[index].id);
+  });
+});
+contactMarkers.forEach((marker, index) => {
+  marker.on("click", (event) => {
+    L.DomEvent.stopPropagation(event);
+    selectShip(NPC_CONTACTS[index].id);
   });
 });
 

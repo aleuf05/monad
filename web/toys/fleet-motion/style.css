@@ -826,9 +826,59 @@ h1 {
   box-shadow: 0 0 10px rgba(232, 185, 93, 0.78);
 }
 
+.contact-dot {
+  position: relative;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid #ffffff;
+  border-radius: 44% 56% 50% 50%;
+  background: rgba(230, 184, 106, 0.96);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.46), 0 0 18px rgba(230, 184, 106, 0.5);
+}
+
+.contact-dot::before {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 2px;
+  height: 12px;
+  content: "";
+  border-radius: 999px;
+  background: #ffffff;
+  transform: translateX(-50%) rotate(var(--heading, 0deg));
+  transform-origin: 50% calc(100% + 6px);
+}
+
+.contact-dot::after {
+  width: 8px;
+  height: 8px;
+  content: "";
+  border-radius: 50%;
+  background: var(--navy);
+}
+
+.contact-label {
+  border: 1px solid rgba(230, 184, 106, 0.42);
+  color: #fff7dc;
+  background: rgba(7, 26, 40, 0.88);
+  box-shadow: 0 6px 16px rgba(7, 26, 40, 0.28);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .ship-dot.selected {
   transform: scale(1.16);
   box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.5), 0 0 24px rgba(37, 217, 232, 0.8);
+}
+
+.contact-dot.selected {
+  transform: scale(1.16);
+  border-color: var(--green);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.48), 0 0 20px rgba(123, 242, 162, 0.62);
 }
 
 .waypoint-dot {
@@ -942,8 +992,10 @@ h1 {
 }
 
 @media (max-width: 680px) {
+  html,
   body {
     overflow: auto;
+    overflow-x: hidden;
   }
 
   .command-bar {
