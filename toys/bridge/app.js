@@ -10,6 +10,7 @@
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
   const contactValue = document.querySelector("#contactValue");
+  const selectedVesselValue = document.querySelector("#selectedVesselValue");
   const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
@@ -105,6 +106,7 @@
       fleetPositionValue.textContent = "No state observed";
       routeValue.textContent = "No route observed";
       if (contactValue) contactValue.textContent = "No contacts observed";
+      if (selectedVesselValue) selectedVesselValue.textContent = "No selection observed";
       return;
     }
 
@@ -130,6 +132,17 @@
     routeValue.textContent = `${routeLegs} active leg${routeLegs === 1 ? "" : "s"} / ${waypoints} waypoint${waypoints === 1 ? "" : "s"}`;
     if (contactValue) {
       contactValue.textContent = `${contacts.length} shared contact${contacts.length === 1 ? "" : "s"}`;
+    }
+    if (selectedVesselValue) {
+      const selectedShipId = state.selection?.selectedShipId;
+      if (!selectedShipId) {
+        selectedVesselValue.textContent = "No selection observed";
+      } else if (selectedShipId === "monad") {
+        selectedVesselValue.textContent = "Flagship Monad";
+      } else {
+        const selected = contacts.find((contact) => contact.id === selectedShipId);
+        selectedVesselValue.textContent = selected ? selected.name : "No selection observed";
+      }
     }
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";

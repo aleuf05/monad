@@ -149,15 +149,18 @@ function currentContacts(elapsedSeconds) {
 
 function autoAcquireSharedContact(contacts) {
   const shared = contacts.filter((contact) => contact.source);
-  const sourceKey = shared.map((contact) => contact.id).join("|");
-  if (!shared.length || state.acquiredSourceKey === sourceKey) return;
-  state.acquiredSourceKey = sourceKey;
-  const preferred = shared
-    .slice()
-    .sort((first, second) => first.range - second.range)[0];
+  if (!shared.length) return;
+  // Fleet Motion's selected ship (if it's one of these contacts) always wins over
+  // the nearest-range fallback, and re-aims live whenever that selection changes.
+  const selected = shared.find((contact) => contact.selected);
+  const preferred = selected || shared.slice().sort((first, second) => first.range - second.range)[0];
+  const acquireKey = selected ? `selected:${selected.id}` : `nearest:${shared.map((contact) => contact.id).join("|")}`;
+  if (state.acquiredSourceKey === acquireKey) return;
+  state.acquiredSourceKey = acquireKey;
   state.bearing = normalizeDegrees(preferred.bearing);
   state.targetBearing = state.bearing;
   state.velocity = 0;
+  selectVessel(preferred);
 }
 
 function projectContact(contact) {

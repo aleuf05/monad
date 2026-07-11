@@ -27,8 +27,8 @@ const TRAIL_LIMIT = 180;
 const TRAIL_REDRAW_MIN_POINTS = 2;
 const LOG_LIMIT = 9;
 const INTRO_DURATION_MS = 4800;
-const FLEET_STATE_SCHEMA_VERSION = 2;
-const FLEET_STATE_STORAGE_KEY = "monad.fleetMotion.state";
+const FLEET_STATE_SCHEMA_VERSION = window.MonadFleetState.schemaVersion;
+const FLEET_STATE_STORAGE_KEY = window.MonadFleetState.storageKey;
 const FLEET_STATE_SAVE_INTERVAL_MS = 1200;
 const DESIGN_DEFAULTS = {
   flagshipSpeedKmh: BASE_SPEED_KMH,
@@ -714,7 +714,9 @@ function persistFleetState(force = false) {
   lastPersistenceAttemptMs = nowMs;
   try {
     const state = createCanonicalFleetState();
-    localStorage.setItem(FLEET_STATE_STORAGE_KEY, JSON.stringify(state));
+    if (!window.MonadFleetState.write(state)) {
+      throw new Error("Shared fleet state contract rejected this state");
+    }
     lastPersistedAt = state.savedAt;
     updateLastSavedIndicator();
     updateStateInspector();
@@ -728,11 +730,8 @@ function persistFleetState(force = false) {
 
 function restoreFleetState() {
   try {
-    const raw = localStorage.getItem(FLEET_STATE_STORAGE_KEY);
-    if (!raw) {
-      return false;
-    }
-    return applyCanonicalFleetState(JSON.parse(raw));
+    const state = window.MonadFleetState.read();
+    return state ? applyCanonicalFleetState(state) : false;
   } catch (error) {
     console.warn("Fleet state restore failed", error);
     return false;
