@@ -36,9 +36,9 @@ The station tabs are keyboard-operable with Arrow keys, Home, and End. The engin
 
 ## Selection Sync
 
-Fleet Motion writes `selection.selectedShipId` through the shared `MonadFleetState` contract (throttled to roughly every 1.2s, sooner via the same-origin `storage` event). Periscope reads that value on every animation frame and re-aims to the selected ship. Bridge Station polls the same state once a second and, in addition to the storage-event listener it already used to keep its status rail current, now detects any change in `selectedShipId` and fires a brief amber pulse on both Live Console panels so the sync reads as an intentional feature rather than something the visitor has to notice on their own.
+Selection sync is bidirectional. Fleet Motion writes `selection.selectedShipId` through the shared `MonadFleetState` contract (throttled to roughly every 1.2s, sooner via the same-origin `storage` event). Periscope reads that value on every animation frame and re-aims to the selected ship, and — as of Mk IV — a contact selected directly in Periscope (click on the scope, the details button, or the contact strip) writes `selectedShipId` back into the same shared state, so Fleet Motion's map and Bridge's status rail update to match. Bridge Station polls the shared state once a second and, in addition to the storage-event listener it already used to keep its status rail current, detects any change in `selectedShipId` regardless of which instrument caused it and fires a brief amber pulse on both Live Console panels so the sync reads as an intentional feature rather than something the visitor has to notice on their own.
 
-Periscope's own click-to-select interaction is local to Periscope only — it does not write back to `MonadFleetState`, so selecting a contact directly in Periscope does not (yet) update Fleet Motion or the Bridge status rail. See `ENGINEERING_REPORT.md` for this as a documented follow-up rather than a schema change made mid-sprint.
+Fleet Motion adopts an externally-written selection (i.e. one it didn't just write itself) on every animation frame rather than on its own throttled poll — this isn't just responsiveness, it's required for correctness. Fleet Motion is still the periodic writer of the rest of `MonadFleetState`, and if it only checked for Periscope's selection on a separate, independently-throttled timer, there was a real window where its own next scheduled write would fire on stale local state and silently overwrite Periscope's selection before Fleet Motion ever noticed the change. Checking every frame, immediately before any write decision, closes that race by construction rather than by tuning throttle intervals.
 
 ## Shared State
 
@@ -56,6 +56,6 @@ If no Fleet Motion state has been written yet, the Bridge shows honest awaiting-
 - No replacement of existing instruments.
 - No WebGL or shader work.
 
-## Mk IV Direction
+## Mk V Direction
 
-Bridge Station Mk IV should close the Periscope-to-Fleet-Motion selection gap (likely by giving Periscope a narrow, additive write path into `MonadFleetState.selection` rather than expanding the schema Fleet Motion owns), add a richer contact list in the Bridge rail, and consider direct station handoff actions such as selecting a contact then opening Periscope on its bearing.
+Bridge Station Mk V could add a richer contact list in the Bridge rail and direct station handoff actions such as selecting a contact then opening Periscope on its bearing. The Mk IV selection-sync gap (Periscope-originated selections not propagating) is closed — see `ENGINEERING_REPORT.md`.
