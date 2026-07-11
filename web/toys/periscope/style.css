@@ -191,8 +191,10 @@ h2 {
   background: #020405;
   box-shadow:
     0 0 0 1px rgba(226, 240, 236, 0.16),
+    0 0 0 7px rgba(2, 4, 5, 0.9),
     0 30px 90px rgba(0, 0, 0, 0.68),
     inset 0 0 0 9px rgba(113, 151, 150, 0.16),
+    inset 0 0 34px rgba(138, 215, 193, 0.08),
     inset 0 0 90px rgba(0, 0, 0, 0.85);
   overflow: hidden;
   touch-action: none;
@@ -216,10 +218,26 @@ h2 {
   inset: 0;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 35% 24%, rgba(255, 255, 255, 0.13), transparent 18%),
-    radial-gradient(circle, transparent 49%, rgba(0, 0, 0, 0.42) 74%, rgba(0, 0, 0, 0.86) 100%);
+    linear-gradient(118deg, transparent 12%, rgba(235, 255, 250, 0.11) 27%, transparent 37%),
+    radial-gradient(circle at 35% 24%, rgba(255, 255, 255, 0.15), transparent 18%),
+    radial-gradient(circle at 62% 48%, transparent 44%, rgba(23, 55, 61, 0.12) 58%, rgba(0, 0, 0, 0.45) 82%, rgba(0, 0, 0, 0.9) 100%);
   mix-blend-mode: screen;
-  opacity: 0.5;
+  opacity: 0.62;
+}
+
+.glass-sheen::before,
+.glass-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 4.5%;
+  border-radius: 50%;
+  border: 1px solid rgba(138, 215, 193, 0.12);
+}
+
+.glass-sheen::after {
+  inset: 8.5%;
+  border-color: rgba(216, 180, 106, 0.09);
+  transform: translateX(2px);
 }
 
 .bearing-band {
@@ -259,11 +277,13 @@ h2 {
   bottom: 9%;
   transform: translateX(-50%);
   padding: 7px 11px;
-  border: 1px solid rgba(226, 240, 236, 0.16);
-  background: rgba(4, 8, 10, 0.58);
+  border: 1px solid rgba(226, 240, 236, 0.2);
+  background: rgba(4, 8, 10, 0.68);
   color: rgba(226, 240, 236, 0.78);
   font-size: 0.8rem;
   white-space: nowrap;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(4px);
 }
 
 .field-note.is-acquiring {
@@ -277,10 +297,11 @@ h2 {
   right: 11%;
   bottom: 14%;
   border: 1px solid rgba(138, 215, 193, 0.45);
-  background: rgba(11, 28, 30, 0.82);
+  background: rgba(11, 28, 30, 0.88);
   color: var(--text);
   padding: 8px 12px;
   cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
 }
 
 .details-button:hover,
@@ -329,6 +350,12 @@ h2 {
 .contact-card.is-visible {
   border-color: rgba(138, 215, 193, 0.62);
   background: rgba(12, 33, 34, 0.82);
+}
+
+.contact-card.is-selected {
+  border-color: rgba(216, 180, 106, 0.78);
+  background:
+    linear-gradient(180deg, rgba(216, 180, 106, 0.14), rgba(12, 33, 34, 0.82));
 }
 
 .contact-card:hover,
@@ -440,4 +467,80 @@ dd {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+}
+
+/* Bridge Station embeds this toy as one of three fixed-height Live Console
+   panels; the width-based mobile breakpoints above assume a full phone
+   screen's worth of vertical room and actually make the embedded case
+   worse (e.g. stacking the header instead of keeping it compact). These
+   overrides win regardless of viewport width because is-embedded is only
+   ever set by app.js's window.self !== window.top check. Standalone runs
+   at toys/periscope/ never get this class and render exactly as before. */
+body.is-embedded .station-shell {
+  padding: 0;
+}
+
+body.is-embedded .bridge {
+  min-height: 100vh;
+  border: 0;
+  padding: 10px;
+  gap: 8px;
+}
+
+body.is-embedded .eyebrow {
+  display: none;
+}
+
+body.is-embedded .station-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+body.is-embedded h1 {
+  font-size: 1rem;
+}
+
+body.is-embedded .bearing-readout {
+  min-width: 0;
+  width: auto;
+  padding: 4px 8px;
+}
+
+body.is-embedded .bearing-readout span {
+  font-size: 0.6rem;
+}
+
+body.is-embedded .bearing-readout strong {
+  font-size: 0.95rem;
+}
+
+body.is-embedded .optics-bar {
+  display: flex;
+  flex-direction: row;
+  padding: 6px 8px;
+}
+
+body.is-embedded .optics-status + .optics-status {
+  display: none;
+}
+
+body.is-embedded .magnification-control button {
+  min-height: 30px;
+  font-size: 0.7rem;
+}
+
+body.is-embedded .scope-frame {
+  width: min(70vw, 62vh);
+  border-width: 8px;
+}
+
+body.is-embedded .contact-strip {
+  min-height: 0;
+  margin-top: 8px;
+}
+
+body.is-embedded .vessel-panel {
+  min-height: 0;
+  padding: 12px;
 }

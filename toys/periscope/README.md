@@ -4,7 +4,9 @@ A standalone, client-side observation station for Fleet Motion's Scout Flotilla.
 
 Periscope is not a game, combat simulator, targeting interface, or networked service. It is a browser window into the current Monad operating world.
 
-Mk II adds a photographic rendering prototype: a panoramic sea plate, atmospheric Canvas effects, and a transparent scout sprite while preserving the Mk I controls and data model.
+Mk II adds a photographic rendering prototype: a panoramic sea plate, atmospheric Canvas effects, and transparent vessel sprites while preserving the Mk I controls and data model.
+
+Mk III adds an optics-glass visual pass: stronger distance haze, range-stable horizon placement, class-aware wake treatment, selected-contact focus, lens edge darkening, subtle chromatic fringe, and dust/glass overlays.
 
 ## Run locally
 
@@ -38,6 +40,14 @@ The artifact uses only static HTML, CSS, JavaScript, Canvas 2D, and local image 
 - Optics tiers adjust horizontal FOV, reticle density, long-lens shimmer, background zoom, and sprite scale.
 - If image assets are missing, the station falls back to the Mk I procedural ocean and geometric contact glyphs.
 - Mk II requirements, rendering notes, and asset pipeline guidance live in `mk2/REQUIREMENTS.md`.
+
+## Mk III Optics Glass
+
+- Far contacts fade through a distance veil instead of disappearing or floating over foreground water.
+- Selected contacts receive a sharper contrast pocket and a restrained reticle focus cue.
+- Wake width and strength vary by vessel class.
+- The final Canvas pass adds vignette, edge glass, chromatic ring offset, glint, and lens dust.
+- No WebGL, shader, backend, or data-contract change is required.
 
 ## Boundaries
 

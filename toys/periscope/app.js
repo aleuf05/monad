@@ -50,6 +50,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 0.95,
     waterline: 0.76,
     haze: 0.88,
+    wake: 0.86,
+    contrast: 1.02,
   },
   tanker: {
     label: "Tanker",
@@ -57,6 +59,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 1.78,
     waterline: 0.7,
     haze: 0.72,
+    wake: 1.42,
+    contrast: 0.96,
   },
   dhow: {
     label: "Dhow",
@@ -64,6 +68,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 0.72,
     waterline: 0.72,
     haze: 1,
+    wake: 0.52,
+    contrast: 1.08,
   },
   pilot: {
     label: "Pilot Boat",
@@ -71,6 +77,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 0.66,
     waterline: 0.74,
     haze: 1,
+    wake: 0.72,
+    contrast: 1.12,
   },
   coaster: {
     label: "Coaster",
@@ -78,6 +86,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 1.14,
     waterline: 0.72,
     haze: 0.88,
+    wake: 1.04,
+    contrast: 1,
   },
   fallback: {
     label: "Vessel",
@@ -85,6 +95,8 @@ const VESSEL_RENDER_PROFILES = {
     size: 0.92,
     waterline: 0.74,
     haze: 0.92,
+    wake: 0.82,
+    contrast: 1,
   },
 };
 
@@ -288,9 +300,10 @@ function projectContact(contact) {
   const visible = Math.abs(relative) <= optics.fov / 2;
   const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
   const proximity = 1 - rangeRatio;
-  const horizonY = HORIZON_RATIO + 0.035;
-  const waterlineY = clamp(horizonY + proximity * 0.19, horizonY, 0.71);
-  const baseScale = 0.42 + proximity * 0.52;
+  const horizonY = HORIZON_RATIO + 0.028;
+  const rangeCompression = Math.pow(proximity, 1.32);
+  const waterlineY = clamp(horizonY + rangeCompression * 0.225, horizonY, 0.73);
+  const baseScale = 0.34 + Math.pow(proximity, 0.74) * 0.6;
   return {
     ...contact,
     profile,
@@ -299,6 +312,7 @@ function projectContact(contact) {
     x: 0.5 + relative / optics.fov,
     y: waterlineY,
     rangeRatio,
+    horizonY,
     scale: baseScale * profile.size * optics.spriteBoost,
     optics,
   };
@@ -414,15 +428,16 @@ function renderAtmosphere(now) {
 
   const shimmerHeight = h * 0.16;
   ctx.save();
-  ctx.globalAlpha = clamp(0.16 + optics.magnification * 0.014, 0.16, 0.3);
-  ctx.strokeStyle = "rgba(232, 240, 237, 0.2)";
+  ctx.globalAlpha = clamp(0.13 + optics.magnification * 0.012, 0.13, 0.26);
+  ctx.strokeStyle = "rgba(232, 240, 237, 0.18)";
   ctx.lineWidth = Math.max(1, w * 0.001);
-  for (let i = 0; i < 9; i += 1) {
-    const y = horizon + h * 0.025 + i * shimmerHeight * 0.08;
-    const phase = now * 0.0015 + i * 0.72;
+  for (let i = 0; i < 13; i += 1) {
+    const depth = i / 12;
+    const y = horizon + h * 0.018 + Math.pow(depth, 1.55) * shimmerHeight;
+    const phase = now * (0.0012 + depth * 0.0005) + i * 0.72;
     ctx.beginPath();
     for (let x = -20; x <= w + 20; x += 24) {
-      const wave = Math.sin(x * 0.026 + phase) * h * 0.0025;
+      const wave = Math.sin(x * (0.022 + depth * 0.02) + phase) * h * (0.0015 + depth * 0.0028);
       if (x === -20) ctx.moveTo(x, y + wave);
       else ctx.lineTo(x, y + wave);
     }
@@ -438,6 +453,59 @@ function renderAtmosphere(now) {
       if (jitter > 0.72) ctx.fillRect(x, y, 1, 1);
     }
   }
+}
+
+function renderOpticsGlass(now) {
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = w * 0.5;
+
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+
+  const vignette = ctx.createRadialGradient(cx, cy, radius * 0.36, cx, cy, radius * 0.98);
+  vignette.addColorStop(0, "rgba(0, 0, 0, 0)");
+  vignette.addColorStop(0.58, "rgba(1, 5, 7, 0.06)");
+  vignette.addColorStop(0.82, "rgba(0, 0, 0, 0.38)");
+  vignette.addColorStop(1, "rgba(0, 0, 0, 0.84)");
+  ctx.fillStyle = vignette;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = "rgba(138, 215, 193, 0.16)";
+  ctx.lineWidth = Math.max(1, w * 0.003);
+  ctx.beginPath();
+  ctx.arc(cx - w * 0.004, cy, radius * 0.92, 0, TAU);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(216, 180, 106, 0.11)";
+  ctx.beginPath();
+  ctx.arc(cx + w * 0.005, cy, radius * 0.918, 0, TAU);
+  ctx.stroke();
+
+  const glint = ctx.createLinearGradient(w * 0.18, h * 0.08, w * 0.56, h * 0.42);
+  glint.addColorStop(0, "rgba(255, 255, 255, 0)");
+  glint.addColorStop(0.45, "rgba(236, 255, 247, 0.055)");
+  glint.addColorStop(0.56, "rgba(236, 255, 247, 0.015)");
+  glint.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = glint;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.fillStyle = "rgba(225, 240, 236, 0.06)";
+  for (let i = 0; i < 38; i += 1) {
+    const seed = Math.sin(i * 91.7 + 4.3) * 10000;
+    const x = (seed - Math.floor(seed)) * w;
+    const ySeed = Math.sin(i * 57.2 + 9.1) * 10000;
+    const y = (ySeed - Math.floor(ySeed)) * h;
+    const dx = x - cx;
+    const dy = y - cy;
+    if (dx * dx + dy * dy > radius * radius * 0.78) continue;
+    const pulse = 0.55 + Math.sin(now * 0.0008 + i) * 0.18;
+    ctx.globalAlpha = clamp(pulse, 0.28, 0.72);
+    ctx.fillRect(x, y, Math.max(1, w * 0.0012), Math.max(1, w * 0.0012));
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 
 function renderBridgeOptics() {
@@ -491,12 +559,16 @@ function renderBridgeOptics() {
 function renderWake(contact, x, y, spriteWidth) {
   const w = canvas.width;
   const h = canvas.height;
-  const wakeWidth = spriteWidth * 1.18;
-  const wakeHeight = Math.max(5, h * 0.012 * contact.scale);
+  const rangeFade = 1 - clamp(contact.rangeRatio * 0.72, 0, 0.72);
+  const wakeStrength = (contact.profile?.wake || 0.8) * rangeFade;
+  if (wakeStrength < 0.18) return;
+  const wakeWidth = spriteWidth * (0.94 + wakeStrength * 0.34);
+  const wakeHeight = Math.max(4, h * 0.011 * contact.scale * (0.72 + wakeStrength * 0.3));
 
   ctx.save();
   ctx.translate(x - spriteWidth * 0.05, y + wakeHeight * 0.55);
-  ctx.strokeStyle = "rgba(225, 236, 228, 0.33)";
+  ctx.globalAlpha = clamp(wakeStrength, 0.18, 0.9);
+  ctx.strokeStyle = "rgba(225, 236, 228, 0.3)";
   ctx.lineWidth = Math.max(1, w * 0.0015);
   ctx.beginPath();
   ctx.moveTo(-wakeWidth * 0.48, 0);
@@ -513,13 +585,14 @@ function renderWake(contact, x, y, spriteWidth) {
 function renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight) {
   const w = canvas.width;
   const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
+  const selectedBoost = state.selectedId === contact.id ? 0.16 : 0;
   const pocketWidth = spriteWidth * (1.2 + rangeRatio * 0.48);
   const pocketHeight = spriteHeight * (0.64 + rangeRatio * 0.26);
   const centerY = y - spriteHeight * 0.32;
   const gradient = ctx.createRadialGradient(x, centerY, 0, x, centerY, pocketWidth * 0.58);
 
-  gradient.addColorStop(0, `rgba(3, 8, 10, ${(0.24 + rangeRatio * 0.2).toFixed(3)})`);
-  gradient.addColorStop(0.62, `rgba(6, 18, 20, ${(0.16 + rangeRatio * 0.11).toFixed(3)})`);
+  gradient.addColorStop(0, `rgba(3, 8, 10, ${(0.22 + rangeRatio * 0.18 + selectedBoost).toFixed(3)})`);
+  gradient.addColorStop(0.62, `rgba(6, 18, 20, ${(0.14 + rangeRatio * 0.1 + selectedBoost * 0.5).toFixed(3)})`);
   gradient.addColorStop(1, "rgba(6, 18, 20, 0)");
 
   ctx.save();
@@ -533,6 +606,32 @@ function renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight) {
   ctx.beginPath();
   ctx.moveTo(x - pocketWidth * 0.44, y + spriteHeight * 0.02);
   ctx.lineTo(x + pocketWidth * 0.44, y + spriteHeight * 0.02);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function renderDistanceVeil(contact, x, y, spriteWidth, spriteHeight) {
+  const w = canvas.width;
+  const h = canvas.height;
+  const far = clamp((contact.rangeRatio - 0.42) / 0.58, 0, 1);
+  if (far <= 0) return;
+  const veil = ctx.createLinearGradient(0, y - spriteHeight * 0.72, 0, y + spriteHeight * 0.16);
+  veil.addColorStop(0, `rgba(219, 229, 220, ${(0.22 * far).toFixed(3)})`);
+  veil.addColorStop(0.56, `rgba(204, 223, 218, ${(0.34 * far).toFixed(3)})`);
+  veil.addColorStop(1, "rgba(204, 223, 218, 0)");
+
+  ctx.save();
+  ctx.fillStyle = veil;
+  ctx.beginPath();
+  ctx.ellipse(x, y - spriteHeight * 0.34, spriteWidth * 0.68, spriteHeight * 0.62, 0, 0, TAU);
+  ctx.fill();
+
+  ctx.globalAlpha = 0.28 * far;
+  ctx.strokeStyle = "rgba(235, 235, 215, 0.55)";
+  ctx.lineWidth = Math.max(1, w * 0.001);
+  ctx.beginPath();
+  ctx.moveTo(x - spriteWidth * 0.62, h * contact.horizonY);
+  ctx.lineTo(x + spriteWidth * 0.62, h * contact.horizonY);
   ctx.stroke();
   ctx.restore();
 }
@@ -567,13 +666,15 @@ function renderFallbackContactGlyph(contact, x, y, spriteWidth) {
 
 function renderContactLabel(contact, x, y, spriteHeight) {
   const w = canvas.width;
+  const isSelected = state.selectedId === contact.id;
   const mastTop = y - spriteHeight * 0.68;
-  ctx.fillStyle = "rgba(4, 9, 11, 0.7)";
-  ctx.strokeStyle = "rgba(226, 240, 236, 0.25)";
+  ctx.fillStyle = isSelected ? "rgba(4, 13, 14, 0.82)" : "rgba(4, 9, 11, 0.68)";
+  ctx.strokeStyle = isSelected ? "rgba(138, 215, 193, 0.56)" : "rgba(226, 240, 236, 0.25)";
   const labelWidth = Math.max(w * 0.19, 130);
   const labelHeight = 58;
-  const labelX = clamp(16, x - labelWidth * 0.5, w - labelWidth - 24);
-  const labelY = clamp(58, mastTop - labelHeight - 16, canvas.height - labelHeight - 28);
+  const rowLift = (contact.labelRow || 0) * (labelHeight + 8);
+  const labelX = clamp(x - labelWidth * 0.5, 16, w - labelWidth - 24);
+  const labelY = clamp(mastTop - labelHeight - 16 - rowLift, 58, canvas.height - labelHeight - 28);
   ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
   ctx.strokeRect(labelX, labelY, labelWidth, labelHeight);
 
@@ -584,6 +685,13 @@ function renderContactLabel(contact, x, y, spriteHeight) {
   ctx.font = `${Math.max(10, w * 0.012)}px Segoe UI, sans-serif`;
   ctx.fillText(`${contact.profile?.label || "Vessel"} / ${formatBearing(contact.bearing)}`, labelX + 10, labelY + 35);
   ctx.fillText(`Range ${contact.range.toFixed(1)} nm`, labelX + 10, labelY + 50);
+
+  ctx.strokeStyle = isSelected ? "rgba(138, 215, 193, 0.36)" : "rgba(226, 240, 236, 0.18)";
+  ctx.lineWidth = Math.max(1, w * 0.001);
+  ctx.beginPath();
+  ctx.moveTo(clamp(x, labelX + 12, labelX + labelWidth - 12), labelY + labelHeight);
+  ctx.lineTo(x, mastTop + spriteHeight * 0.16);
+  ctx.stroke();
 }
 
 function renderAcquisitionCue(contact, x, y, spriteWidth, spriteHeight, now) {
@@ -625,6 +733,25 @@ function renderAcquisitionCue(contact, x, y, spriteWidth, spriteHeight, now) {
   ctx.restore();
 }
 
+function renderSelectedFocus(contact, x, y, spriteWidth, spriteHeight) {
+  if (state.selectedId !== contact.id) return;
+  const w = canvas.width;
+  const lift = spriteHeight * 0.42;
+  const reticle = Math.max(spriteWidth * 0.48, w * 0.044);
+
+  ctx.save();
+  ctx.translate(x, y - lift);
+  ctx.strokeStyle = "rgba(138, 215, 193, 0.36)";
+  ctx.lineWidth = Math.max(1, w * 0.0018);
+  ctx.beginPath();
+  ctx.arc(0, 0, reticle, Math.PI * 0.08, Math.PI * 0.42);
+  ctx.arc(0, 0, reticle, Math.PI * 0.58, Math.PI * 0.92);
+  ctx.arc(0, 0, reticle, Math.PI * 1.08, Math.PI * 1.42);
+  ctx.arc(0, 0, reticle, Math.PI * 1.58, Math.PI * 1.92);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function renderContact(contact, now) {
   if (!contact.visible) return;
   const w = canvas.width;
@@ -642,6 +769,7 @@ function renderContact(contact, now) {
     : 2;
   const spriteHeight = spriteWidth / clamp(assetRatio, 1.7, 2.35);
   if (![x, y, spriteWidth, spriteHeight].every(Number.isFinite)) return;
+  const isSelected = state.selectedId === contact.id;
 
   ctx.save();
   renderWake(contact, x, y, spriteWidth);
@@ -651,7 +779,9 @@ function renderContact(contact, now) {
     const drawX = x - spriteWidth * 0.5;
     const drawY = y - spriteHeight * profile.waterline;
     ctx.save();
-    ctx.globalAlpha = clamp(0.54 + rangeRatio * 0.16, 0.54, 0.72) * profile.haze;
+    const distanceAlpha = clamp(1.03 - Math.pow(rangeRatio, 1.4) * 0.36, 0.56, 1);
+    const focusBoost = isSelected ? 0.1 : 0;
+    ctx.globalAlpha = clamp(0.48 + rangeRatio * 0.14, 0.48, 0.68) * profile.haze * distanceAlpha;
     ctx.filter = "brightness(0) blur(0.35px)";
     ctx.drawImage(
       vesselAsset.image,
@@ -662,8 +792,10 @@ function renderContact(contact, now) {
     );
     ctx.restore();
 
-    ctx.globalAlpha = clamp(1.03 - rangeRatio * 0.12, 0.82, 0.98) * profile.haze;
-    ctx.filter = `blur(${(rangeRatio * 0.32 / optics.backgroundZoom).toFixed(2)}px) contrast(${(1.04 + optics.magnification * 0.008).toFixed(2)}) saturate(0.94) brightness(${(0.92 + contact.scale * 0.14).toFixed(2)})`;
+    ctx.globalAlpha = clamp(0.98 - rangeRatio * 0.18 + focusBoost, 0.6, 1) * profile.haze * distanceAlpha;
+    const blur = isSelected ? rangeRatio * 0.14 : rangeRatio * 0.38;
+    const contrast = (profile.contrast || 1) * (1.03 + optics.magnification * 0.008 + focusBoost * 0.8);
+    ctx.filter = `blur(${(blur / optics.backgroundZoom).toFixed(2)}px) contrast(${contrast.toFixed(2)}) saturate(${(0.9 + focusBoost).toFixed(2)}) brightness(${(0.9 + contact.scale * 0.13 + focusBoost).toFixed(2)})`;
     ctx.drawImage(
       vesselAsset.image,
       drawX,
@@ -672,7 +804,7 @@ function renderContact(contact, now) {
       spriteHeight
     );
     if (rangeRatio > 0.62) {
-      ctx.globalAlpha = (rangeRatio - 0.62) * 0.45;
+      ctx.globalAlpha = (rangeRatio - 0.62) * 0.32;
       ctx.filter = "none";
       ctx.fillStyle = "rgba(214, 226, 221, 0.42)";
       ctx.fillRect(drawX, drawY, spriteWidth, spriteHeight * 0.38);
@@ -680,9 +812,11 @@ function renderContact(contact, now) {
   } else {
     renderFallbackContactGlyph(contact, x, y, spriteWidth);
   }
+  renderDistanceVeil(contact, x, y, spriteWidth, spriteHeight);
   ctx.restore();
 
   renderAcquisitionCue(contact, x, y, spriteWidth, spriteHeight, now);
+  renderSelectedFocus(contact, x, y, spriteWidth, spriteHeight);
   renderContactLabel(contact, x, y, spriteHeight);
 }
 
@@ -756,6 +890,7 @@ function updateContactStrip(contacts) {
     if (!button) return;
     const status = contact.visible ? "In field" : `${formatBearing(contact.bearing)} / ${contact.range.toFixed(1)} nm`;
     button.classList.toggle("is-visible", contact.visible);
+    button.classList.toggle("is-selected", state.selectedId === contact.id);
     button.querySelector("strong").textContent = contact.callsign;
     button.querySelector("span").textContent = status;
   });
@@ -870,7 +1005,16 @@ function render(now) {
   autoAcquireSharedContact(sourceContacts);
   const contacts = sourceContacts.map(projectContact);
   state.visibleContacts = contacts.filter((contact) => contact.visible);
+  state.visibleContacts
+    .slice()
+    .sort((first, second) => first.x - second.x)
+    .reduce((previous, contact) => {
+      const close = previous && Math.abs(contact.x - previous.x) < 0.28;
+      contact.labelRow = close ? (previous.labelRow || 0) + 1 : 0;
+      return contact;
+    }, null);
   contacts.forEach((contact) => renderContact(contact, now));
+  renderOpticsGlass(now);
 
   bearingReadout.textContent = formatBearing(state.bearing);
   updateBearingBand();
