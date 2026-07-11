@@ -80,6 +80,7 @@ const state = {
   visibleContacts: [],
   contactButtonsReady: false,
   contactSourceKey: "",
+  acquiredSourceKey: "",
 };
 
 const assets = {
@@ -144,6 +145,19 @@ function sharedContacts() {
 
 function currentContacts(elapsedSeconds) {
   return sharedContacts() || localContacts(elapsedSeconds);
+}
+
+function autoAcquireSharedContact(contacts) {
+  const shared = contacts.filter((contact) => contact.source);
+  const sourceKey = shared.map((contact) => contact.id).join("|");
+  if (!shared.length || state.acquiredSourceKey === sourceKey) return;
+  state.acquiredSourceKey = sourceKey;
+  const preferred = shared
+    .slice()
+    .sort((first, second) => first.range - second.range)[0];
+  state.bearing = normalizeDegrees(preferred.bearing);
+  state.targetBearing = state.bearing;
+  state.velocity = 0;
 }
 
 function projectContact(contact) {
@@ -485,7 +499,9 @@ function render(now) {
   renderSeaPlate(now);
   renderAtmosphere(now);
   renderBridgeOptics();
-  const contacts = currentContacts(now / 1000).map(projectContact);
+  const sourceContacts = currentContacts(now / 1000);
+  autoAcquireSharedContact(sourceContacts);
+  const contacts = sourceContacts.map(projectContact);
   state.visibleContacts = contacts.filter((contact) => contact.visible);
   contacts.forEach((contact) => renderContact(contact, now));
 
