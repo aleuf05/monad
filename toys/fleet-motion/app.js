@@ -222,8 +222,8 @@ function contactIcon(selected = false, heading = 0) {
   return L.divIcon({
     className: "fleet-dot",
     html: `<span class="contact-dot${selectedClass}" style="--heading:${heading}deg"></span>`,
-    iconSize: [22, 22],
-    iconAnchor: [11, 11]
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
   });
 }
 
@@ -336,7 +336,7 @@ const contactMarkers = NPC_CONTACTS.map((contact) =>
     icon: contactIcon(false, contact.headingDegrees),
     title: contact.name
   })
-    .bindTooltip(contact.name, { direction: "top", offset: [0, -12] })
+    .bindTooltip(contact.name, { permanent: true, direction: "bottom", offset: [0, 12], className: "contact-label" })
     .addTo(map)
 );
 

@@ -829,34 +829,45 @@ h1 {
 .contact-dot {
   position: relative;
   display: grid;
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   place-items: center;
-  border: 2px solid rgba(255, 255, 255, 0.82);
-  border-radius: 42% 58% 50% 50%;
-  background: rgba(38, 61, 74, 0.92);
-  box-shadow: 0 0 0 3px rgba(7, 26, 40, 0.38), 0 0 14px rgba(255, 255, 255, 0.22);
+  border: 2px solid #ffffff;
+  border-radius: 44% 56% 50% 50%;
+  background: rgba(230, 184, 106, 0.96);
+  box-shadow: 0 0 0 4px rgba(7, 26, 40, 0.46), 0 0 18px rgba(230, 184, 106, 0.5);
 }
 
 .contact-dot::before {
   position: absolute;
-  top: -6px;
+  top: -8px;
   left: 50%;
   width: 2px;
-  height: 9px;
+  height: 12px;
   content: "";
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.74);
+  background: #ffffff;
   transform: translateX(-50%) rotate(var(--heading, 0deg));
   transform-origin: 50% calc(100% + 6px);
 }
 
 .contact-dot::after {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   content: "";
   border-radius: 50%;
-  background: #d9ecf0;
+  background: var(--navy);
+}
+
+.contact-label {
+  border: 1px solid rgba(230, 184, 106, 0.42);
+  color: #fff7dc;
+  background: rgba(7, 26, 40, 0.88);
+  box-shadow: 0 6px 16px rgba(7, 26, 40, 0.28);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .ship-dot.selected {
