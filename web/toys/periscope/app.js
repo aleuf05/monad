@@ -34,6 +34,58 @@ const OPTICS_TIERS = {
 const ASSET_PATHS = {
   sea: "assets/backgrounds/sea-horizon-mk2.png",
   scout: "assets/sprites/scout-alpha.png",
+  vessels: {
+    scout: "assets/sprites/vessel-scout.svg",
+    tanker: "assets/sprites/vessel-tanker.svg",
+    dhow: "assets/sprites/vessel-dhow.svg",
+    pilot: "assets/sprites/vessel-pilot.svg",
+    coaster: "assets/sprites/vessel-coaster.svg",
+  },
+};
+
+const VESSEL_RENDER_PROFILES = {
+  scout: {
+    label: "Scout",
+    sprite: "scout",
+    size: 0.95,
+    waterline: 0.76,
+    haze: 0.88,
+  },
+  tanker: {
+    label: "Tanker",
+    sprite: "tanker",
+    size: 1.78,
+    waterline: 0.7,
+    haze: 0.72,
+  },
+  dhow: {
+    label: "Dhow",
+    sprite: "dhow",
+    size: 0.72,
+    waterline: 0.72,
+    haze: 1,
+  },
+  pilot: {
+    label: "Pilot Boat",
+    sprite: "pilot",
+    size: 0.66,
+    waterline: 0.74,
+    haze: 1,
+  },
+  coaster: {
+    label: "Coaster",
+    sprite: "coaster",
+    size: 1.14,
+    waterline: 0.72,
+    haze: 0.88,
+  },
+  fallback: {
+    label: "Vessel",
+    sprite: "scout",
+    size: 0.92,
+    waterline: 0.74,
+    haze: 0.92,
+  },
 };
 
 const vessels = [
@@ -124,6 +176,7 @@ const state = {
 const assets = {
   sea: loadImage(ASSET_PATHS.sea),
   scout: loadImage(ASSET_PATHS.scout),
+  vessels: Object.fromEntries(Object.entries(ASSET_PATHS.vessels).map(([key, path]) => [key, loadImage(path)])),
 };
 
 function loadImage(src) {
@@ -160,6 +213,16 @@ function formatBearing(value) {
 
 function currentOptics() {
   return OPTICS_TIERS[state.opticsMode] || OPTICS_TIERS.wide;
+}
+
+function vesselProfile(contact) {
+  const text = `${contact.class || ""} ${contact.mission || ""} ${contact.callsign || ""}`.toLowerCase();
+  if (text.includes("tanker")) return VESSEL_RENDER_PROFILES.tanker;
+  if (text.includes("dhow")) return VESSEL_RENDER_PROFILES.dhow;
+  if (text.includes("pilot")) return VESSEL_RENDER_PROFILES.pilot;
+  if (text.includes("coaster") || text.includes("freighter")) return VESSEL_RENDER_PROFILES.coaster;
+  if (text.includes("scout") || text.includes("escort")) return VESSEL_RENDER_PROFILES.scout;
+  return VESSEL_RENDER_PROFILES.fallback;
 }
 
 function vesselState(vessel, elapsedSeconds) {
@@ -207,16 +270,23 @@ function autoAcquireSharedContact(contacts) {
 
 function projectContact(contact) {
   const optics = currentOptics();
+  const profile = vesselProfile(contact);
   const relative = shortestDelta(state.bearing, contact.bearing);
   const visible = Math.abs(relative) <= optics.fov / 2;
   const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
+  const proximity = 1 - rangeRatio;
+  const horizonY = HORIZON_RATIO + 0.035;
+  const waterlineY = clamp(horizonY + proximity * 0.19, horizonY, 0.71);
+  const baseScale = 0.42 + proximity * 0.52;
   return {
     ...contact,
+    profile,
     relative,
     visible,
     x: 0.5 + relative / optics.fov,
-    y: 0.61 - (1 - rangeRatio) * 0.27,
-    scale: (1 - rangeRatio * 0.42) * optics.spriteBoost,
+    y: waterlineY,
+    rangeRatio,
+    scale: baseScale * profile.size * optics.spriteBoost,
     optics,
   };
 }
@@ -499,7 +569,7 @@ function renderContactLabel(contact, x, y, spriteHeight) {
   ctx.fillText(contact.callsign, labelX + 10, labelY + 18);
   ctx.fillStyle = "rgba(232, 240, 237, 0.9)";
   ctx.font = `${Math.max(10, w * 0.012)}px Segoe UI, sans-serif`;
-  ctx.fillText(`Bearing ${formatBearing(contact.bearing)}`, labelX + 10, labelY + 35);
+  ctx.fillText(`${contact.profile?.label || "Vessel"} / ${formatBearing(contact.bearing)}`, labelX + 10, labelY + 35);
   ctx.fillText(`Range ${contact.range.toFixed(1)} nm`, labelX + 10, labelY + 50);
 }
 
@@ -547,26 +617,31 @@ function renderContact(contact, now) {
   const w = canvas.width;
   const h = canvas.height;
   const optics = currentOptics();
+  const profile = contact.profile || vesselProfile(contact);
+  const vesselAsset = assets.vessels[profile.sprite] || assets.scout;
   const x = contact.x * w;
   const bobSeed = Number.isFinite(contact.baseBearing) ? contact.baseBearing : contact.bearing;
   const bob = Math.sin(now * 0.003 + bobSeed) * h * 0.004 * contact.scale / optics.backgroundZoom;
   const y = contact.y * h + bob;
   const spriteWidth = w * 0.24 * contact.scale;
-  const spriteHeight = spriteWidth * 0.5;
+  const assetRatio = vesselAsset?.ready && vesselAsset.image.height
+    ? vesselAsset.image.width / vesselAsset.image.height
+    : 2;
+  const spriteHeight = spriteWidth / clamp(assetRatio, 1.7, 2.35);
   if (![x, y, spriteWidth, spriteHeight].every(Number.isFinite)) return;
 
   ctx.save();
   renderWake(contact, x, y, spriteWidth);
   renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight);
-  if (assets.scout.ready) {
+  if (vesselAsset?.ready) {
     const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
     const drawX = x - spriteWidth * 0.5;
-    const drawY = y - spriteHeight * 0.78;
+    const drawY = y - spriteHeight * profile.waterline;
     ctx.save();
-    ctx.globalAlpha = clamp(0.54 + rangeRatio * 0.16, 0.54, 0.72);
+    ctx.globalAlpha = clamp(0.54 + rangeRatio * 0.16, 0.54, 0.72) * profile.haze;
     ctx.filter = "brightness(0) blur(0.35px)";
     ctx.drawImage(
-      assets.scout.image,
+      vesselAsset.image,
       drawX + Math.max(1, w * 0.002),
       drawY + Math.max(1, h * 0.002),
       spriteWidth,
@@ -574,15 +649,21 @@ function renderContact(contact, now) {
     );
     ctx.restore();
 
-    ctx.globalAlpha = clamp(1.03 - rangeRatio * 0.16, 0.78, 0.98);
+    ctx.globalAlpha = clamp(1.03 - rangeRatio * 0.12, 0.82, 0.98) * profile.haze;
     ctx.filter = `blur(${(rangeRatio * 0.32 / optics.backgroundZoom).toFixed(2)}px) contrast(${(1.04 + optics.magnification * 0.008).toFixed(2)}) saturate(0.94) brightness(${(0.92 + contact.scale * 0.14).toFixed(2)})`;
     ctx.drawImage(
-      assets.scout.image,
+      vesselAsset.image,
       drawX,
       drawY,
       spriteWidth,
       spriteHeight
     );
+    if (rangeRatio > 0.62) {
+      ctx.globalAlpha = (rangeRatio - 0.62) * 0.45;
+      ctx.filter = "none";
+      ctx.fillStyle = "rgba(214, 226, 221, 0.42)";
+      ctx.fillRect(drawX, drawY, spriteWidth, spriteHeight * 0.38);
+    }
   } else {
     renderFallbackContactGlyph(contact, x, y, spriteWidth);
   }

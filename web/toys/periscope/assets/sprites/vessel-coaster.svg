@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560">
+  <defs>
+    <linearGradient id="coasterHull" x1="0" x2="1">
+      <stop offset="0" stop-color="#263038"/>
+      <stop offset="0.48" stop-color="#465965"/>
+      <stop offset="1" stop-color="#182129"/>
+    </linearGradient>
+  </defs>
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M94 344 C188 394 914 394 1084 342 C1130 328 1162 300 1182 270 C920 292 582 282 70 292 C70 316 78 334 94 344 Z" fill="url(#coasterHull)" stroke="#10171c" stroke-width="13"/>
+    <path d="M164 290 C384 272 792 280 1162 270" fill="none" stroke="#e0ece8" stroke-opacity="0.68" stroke-width="7"/>
+    <rect x="308" y="238" width="442" height="52" rx="8" fill="#586873" stroke="#151d22" stroke-width="8"/>
+    <path d="M782 290 L850 212 L986 214 L1052 294 Z" fill="#dce4df" stroke="#151d22" stroke-width="9"/>
+    <rect x="870" y="176" width="82" height="42" rx="5" fill="#f1f2ea" stroke="#151d22" stroke-width="7"/>
+    <path d="M914 172 L914 102 M914 132 L1000 170" fill="none" stroke="#e8f0ed" stroke-width="7"/>
+    <path d="M220 270 L220 228 M306 268 L306 226 M392 268 L392 226 M478 268 L478 226 M564 268 L564 226 M650 270 L650 228" stroke="#c9d2cf" stroke-width="6"/>
+  </g>
+</svg>
