@@ -209,12 +209,17 @@ does not appear in the UI and does not affect normal operation.
 
 Implementation notes for the current motion model live in `ENGINEERING_NOTES.md`.
 
+## Optional Live Mode (FleetCore)
+
+By default Fleet Motion is exactly what it's always been: a standalone local simulation, no network calls, no backend. Appending `?live=1` (or `?fleetcoreServer=ws://host:port/ws` to point at a specific server) to the URL opts into a different mode: Fleet Motion suspends its own local physics and every interactive control (waypoint routing, escort mode, time warp, detour suggestions — none of these have a FleetCore equivalent yet), connects to a running `fleetcore-serve`, and renders live vessel positions from its broadcast snapshots instead. It's read-only — this never sends a `Command`, only consumes snapshots — and it writes what it renders into the same `MonadFleetState` contract it always has, so Periscope and Bridge inherit live data with no changes on their end.
+
+Without the query param, none of this runs — no connection attempt is made at all, specifically so the public deployment (where `fleetcore-serve` isn't reachable) never even tries and never logs a spurious connection error. See `docs/architecture/fleetcore-api.md` for the wire protocol, and `logs/captains/2026/2026-07-11_fleet-motion-live-mode.md` for why this doesn't reuse `applyCanonicalFleetState()` (it would reset trail history and the current selection on every incoming snapshot) and why the connection attempt is opt-in rather than automatic-with-fallback.
+
 ## Intentionally Out of Scope
 
-- Live AIS or vessel telemetry
 - Realistic marine navigation or great-circle routing
 - Full coastline routing, terrain models, restricted waters, or real marine safety checks
-- Persistence, networking, authentication, or backend services
+- Sending commands to FleetCore (live mode is read-only; see above)
 - Connections to the Monad site, Bridge, doctrine, Qdrant, or agents
 - Weapons, damage, targeting, combat scoring, or tactical doctrine
 

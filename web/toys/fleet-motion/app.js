@@ -368,6 +368,8 @@ const cancelRouteButton = document.querySelector("#cancelRouteButton");
 const homeButton = document.querySelector("#homeButton");
 const resetButton = document.querySelector("#resetButton");
 const warpButtons = document.querySelectorAll(".warp-button");
+const dataSourceValue = document.querySelector("#dataSourceValue");
+const dataSourceBadge = document.querySelector("#dataSourceBadge");
 const scenarioPresetSelect = document.querySelector("#scenarioPresetSelect");
 const applyPresetButton = document.querySelector("#applyPresetButton");
 const flagshipSpeedControl = document.querySelector("#flagshipSpeedControl");
@@ -448,6 +450,22 @@ let lastPersistenceAttemptMs = 0;
 let restoredFromPersistentState = false;
 let persistenceSuspended = false;
 let lastKnownSelectionId = selectedShipId;
+// Live FleetCore mode: when a real fleetcore-serve is reachable, Fleet
+// Motion stops running its own local physics (see the liveMode guard in
+// advanceFleet()) and instead renders positions straight from the server's
+// broadcast snapshots -- see connectFleetCoreLive()/applyLiveSnapshot()
+// near the bottom of this file. Deliberately read-only: this does not send
+// any Command back to FleetCore, it only consumes GET-equivalent snapshot
+// data over the WebSocket. When unreachable (e.g. the public deployment,
+// where fleetcore-serve isn't publicly exposed), this whole path times out
+// once and Fleet Motion behaves exactly as it always has.
+let liveMode = false;
+let liveSocket = null;
+let liveReconnectTimer = null;
+let liveReconnectDelayMs = 1000;
+let liveMapCentered = false;
+const LIVE_CONNECT_TIMEOUT_MS = 2500;
+const LIVE_KMH_PER_MPS = 3.6;
 
 function createEscortStates() {
   return FORMATION.map((escort) => ({
@@ -765,6 +783,157 @@ function syncExternalSelection() {
   lastKnownSelectionId = externalId;
   selectedShipId = externalId;
   flashAt(getShipPosition(selectedShipId), "feedback-pulse selected");
+  updateStatus();
+}
+
+function fleetCoreServerUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("fleetcoreServer") || `ws://${window.location.hostname || "localhost"}:4771/ws`;
+}
+
+// One connection attempt to a live FleetCore server. Fails closed and
+// silently: if nothing answers within LIVE_CONNECT_TIMEOUT_MS, Fleet
+// Motion just proceeds exactly as it always has (local simulation). This
+// matters because Fleet Motion is deployed publicly, where fleetcore-serve
+// isn't reachable -- a hung or slow-failing connection attempt must never
+// delay or degrade the normal standalone experience there.
+function connectFleetCoreLive() {
+  let settled = false;
+  const socket = new WebSocket(fleetCoreServerUrl());
+  const timeout = setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    socket.close();
+  }, LIVE_CONNECT_TIMEOUT_MS);
+
+  socket.addEventListener("open", () => {
+    liveReconnectDelayMs = 1000;
+  });
+
+  socket.addEventListener("message", (event) => {
+    let message;
+    try {
+      message = JSON.parse(event.data);
+    } catch (error) {
+      return;
+    }
+    if (message.type !== "snapshot") return;
+    if (!settled) {
+      settled = true;
+      clearTimeout(timeout);
+      enterLiveMode();
+    }
+    applyLiveSnapshot(message.snapshot);
+  });
+
+  socket.addEventListener("close", () => {
+    if (!settled) {
+      // Never got a snapshot inside the timeout window -- give up for good
+      // rather than retrying forever against a host with nothing listening.
+      settled = true;
+      clearTimeout(timeout);
+      return;
+    }
+    if (liveMode) {
+      // Was live and got disconnected mid-session: keep trying rather than
+      // silently falling back to local physics, which would read as a
+      // confusing regression to anyone watching rather than a connection
+      // hiccup.
+      liveReconnectTimer = setTimeout(() => {
+        liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
+        connectFleetCoreLive();
+      }, liveReconnectDelayMs);
+    }
+  });
+
+  liveSocket = socket;
+}
+
+function disableLiveControls() {
+  [
+    pauseButton, waypointButton, suggestDetourButton, acceptDetourButton,
+    escortModeButton, undoWaypointButton, removeWaypointButton,
+    clearWaypointsButton, cancelRouteButton, homeButton
+  ].forEach((button) => {
+    if (button) button.disabled = true;
+  });
+  warpButtons.forEach((button) => {
+    button.disabled = true;
+  });
+}
+
+function enterLiveMode() {
+  liveMode = true;
+  disableLiveControls();
+  if (dataSourceValue) dataSourceValue.textContent = "FleetCore Live";
+  if (dataSourceBadge) dataSourceBadge.textContent = "Live Data";
+  addLog("FleetCore server acquired. Rendering live world state (read-only).");
+}
+
+function capitalizeStatus(status) {
+  if (!status) return null;
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+// The one place live snapshots turn into Fleet Motion's own internal state
+// shape. Deliberately does NOT go through applyCanonicalFleetState(): that
+// function also resets trails (createInitialTrails()) and the current
+// selection (selectedShipId) on every call, which is correct for a one-time
+// restore-from-storage but would fight syncExternalSelection() and erase
+// trail history every time a new snapshot arrives (about once a second).
+// Updating position/heading/speed fields directly and calling the same
+// updateFleetMarkers()/updateStatus() the local physics loop already uses
+// keeps trails accumulating and the current selection untouched, and
+// reuses Fleet Motion's existing persistFleetState() write path unchanged
+// -- Periscope and Bridge inherit live data through the same
+// MonadFleetState contract they already read, with no changes on their end.
+function applyLiveSnapshot(snapshot) {
+  const vessels = snapshot.vessels || [];
+  const flagshipVessel = vessels.find((vessel) => vessel.kind === "flagship");
+  const scoutVessels = vessels.filter((vessel) => vessel.kind === "scout");
+  const passiveVessels = vessels.filter((vessel) => vessel.kind === "passive-traffic");
+
+  if (flagshipVessel) {
+    flagship = clonePoint(flagshipVessel.position) || flagship;
+    headingDegrees = flagshipVessel.course ?? headingDegrees;
+    currentSpeedKmh = Number(flagshipVessel.speed_mps || 0) * LIVE_KMH_PER_MPS;
+    lastStatus = capitalizeStatus(flagshipVessel.status) || lastStatus;
+  }
+
+  escortStates = escortStates.map((escort, index) => {
+    const source = scoutVessels[index];
+    if (!source) return escort;
+    return {
+      ...escort,
+      position: clonePoint(source.position) || escort.position,
+      headingDegrees: source.course ?? escort.headingDegrees,
+      speedKmh: Number(source.speed_mps || 0) * LIVE_KMH_PER_MPS
+    };
+  });
+
+  contactStates = contactStates.map((contact, index) => {
+    const source = passiveVessels[index];
+    if (!source) return contact;
+    return {
+      ...contact,
+      position: clonePoint(source.position) || contact.position,
+      headingDegrees: source.course ?? contact.headingDegrees,
+      speedKmh: Number(source.speed_mps || 0) * LIVE_KMH_PER_MPS,
+      status: capitalizeStatus(source.status) || contact.status
+    };
+  });
+
+  simulationClockSeconds = Number(snapshot.tick) || simulationClockSeconds;
+  timeWarp = Number(snapshot.time_scale) || timeWarp;
+  lastMovingWarp = timeWarp || lastMovingWarp;
+  lastNavigationMessage = "Live FleetCore feed";
+
+  if (!liveMapCentered && flagshipVessel) {
+    liveMapCentered = true;
+    map.setView([flagshipVessel.position.lat, flagshipVessel.position.lng], 7);
+  }
+
+  updateFleetMarkers();
   updateStatus();
 }
 
@@ -1966,7 +2135,7 @@ function updateStatus() {
       : waypoints.length
         ? `${waypoints.length} waypoint${waypoints.length === 1 ? "" : "s"} staged; click destination`
         : "Direct course";
-  pauseButton.disabled = !destination && timeWarp !== 0;
+  pauseButton.disabled = liveMode || (!destination && timeWarp !== 0);
   waypointButton.classList.toggle("active", waypointMode);
   suggestDetourButton.hidden = !pendingDetour && !suggestedDetour;
   acceptDetourButton.hidden = !suggestedDetour;
@@ -2221,7 +2390,7 @@ function advancePassiveContact(contact, elapsedSeconds) {
 }
 
 function advanceFleet(elapsedSeconds) {
-  if (timeWarp === 0) {
+  if (liveMode || timeWarp === 0) {
     return;
   }
 
@@ -2436,6 +2605,7 @@ function cancelActiveRoute() {
 }
 
 map.on("click", (event) => {
+  if (liveMode) return;
   if (waypointMode || event.originalEvent.shiftKey) {
     addWaypoint(event.latlng);
     return;
@@ -2557,3 +2727,14 @@ if (restoredFromPersistentState) {
   startOpeningSequence({ loadOpeningRoute: true });
 }
 window.requestAnimationFrame(animationFrame);
+// Opt-in only: attempting a connection unconditionally would fire a
+// WebSocket connection-refused error to the console on every single public
+// page load, since fleetcore-serve isn't publicly reachable there. That
+// error is native browser network logging, not something a try/catch or a
+// close-event handler can suppress -- the only clean way to keep the
+// public deployment's console silent is to never attempt the connection
+// there at all. Append ?live=1 (or ?fleetcoreServer=ws://host:port/ws,
+// which implies it) to opt in on a LAN where FleetCore actually exists.
+if (new URLSearchParams(window.location.search).has("live") || new URLSearchParams(window.location.search).has("fleetcoreServer")) {
+  connectFleetCoreLive();
+}
