@@ -447,6 +447,7 @@ let lastPersistedAt = null;
 let lastPersistenceAttemptMs = 0;
 let restoredFromPersistentState = false;
 let persistenceSuspended = false;
+let lastKnownSelectionId = selectedShipId;
 
 function createEscortStates() {
   return FORMATION.map((escort) => ({
@@ -718,6 +719,7 @@ function persistFleetState(force = false) {
       throw new Error("Shared fleet state contract rejected this state");
     }
     lastPersistedAt = state.savedAt;
+    lastKnownSelectionId = state.selection.selectedShipId;
     updateLastSavedIndicator();
     updateStateInspector();
   } catch (error) {
@@ -731,11 +733,39 @@ function persistFleetState(force = false) {
 function restoreFleetState() {
   try {
     const state = window.MonadFleetState.read();
-    return state ? applyCanonicalFleetState(state) : false;
+    const restored = state ? applyCanonicalFleetState(state) : false;
+    lastKnownSelectionId = selectedShipId;
+    return restored;
   } catch (error) {
     console.warn("Fleet state restore failed", error);
     return false;
   }
+}
+
+// Fleet Motion is the sole writer of most of MonadFleetState, but Periscope has
+// an additive write path into `selection.selectedShipId` (a contact selected
+// directly in Periscope). This must run every frame, not on its own throttle:
+// animationFrame() always calls this immediately before advanceFleet() ->
+// updateStatus() -> persistFleetState(), so checking every frame guarantees
+// selectedShipId is fresh at the moment of any write. An earlier version
+// throttled this to once/second independently of persistFleetState()'s own
+// ~1.2s write throttle, which left a window where Fleet Motion's periodic
+// write could fire on stale local state and silently clobber a Periscope-
+// originated selection back to its previous value before this ever noticed.
+function syncExternalSelection() {
+  const external = window.MonadFleetState.read();
+  if (!external) {
+    return;
+  }
+  const externalId = external.selection?.selectedShipId || "monad";
+  if (externalId === lastKnownSelectionId || externalId === selectedShipId) {
+    lastKnownSelectionId = externalId;
+    return;
+  }
+  lastKnownSelectionId = externalId;
+  selectedShipId = externalId;
+  flashAt(getShipPosition(selectedShipId), "feedback-pulse selected");
+  updateStatus();
 }
 
 function clearPersistedFleetState() {
@@ -2237,6 +2267,7 @@ function animationFrame(timestamp) {
   }
   const elapsedSeconds = Math.min((timestamp - previousFrame) / 1000, 0.25);
   previousFrame = timestamp;
+  syncExternalSelection();
   advanceFleet(elapsedSeconds);
   window.requestAnimationFrame(animationFrame);
 }
