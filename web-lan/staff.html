@@ -79,6 +79,7 @@
     border-radius: 6px;
     padding: 22px 24px;
     transition: border-color 150ms ease;
+    scroll-margin-top: 24px;
   }
 
   .officer:hover { border-color: #E8A33D44; }
@@ -87,16 +88,6 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-  }
-
-  .officer-photo {
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 5px;
-    border: 1px solid #1E2C42;
-    background: #0B1220 center/cover no-repeat;
-    margin-bottom: 8px;
-    object-fit: cover;
   }
 
   .rank {
@@ -151,7 +142,6 @@
 
   @media (max-width: 640px) {
     .officer { grid-template-columns: 1fr; }
-    .officer-photo { max-width: 160px; }
   }
 
   footer {
@@ -182,7 +172,7 @@
 
     <div class="roster">
 
-      <div class="officer">
+      <div class="officer" id="admiral-c">
         <div class="officer-meta">
           <div class="rank">★★★★ Admiral</div>
           <div class="name">Admiral C</div>
@@ -194,7 +184,7 @@
         </div>
       </div>
 
-      <div class="officer">
+      <div class="officer" id="captain-t">
         <div class="officer-meta">
           <div class="rank">★★★ Captain</div>
           <div class="name">Captain T</div>
@@ -207,7 +197,19 @@
         <div class="quote">"Every artifact leaves a wake."</div>
       </div>
 
-      <div class="officer">
+      <div class="officer" id="chief-eng-g">
+        <div class="officer-meta">
+          <div class="rank">★★★ Captain</div>
+          <div class="name">Chief Engineer G</div>
+          <div class="role">Acting Chief Engineer</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Leads engineering operations and propulsion systems. Reports directly to the bridge on infrastructure, deployment, and reactor status. Called to the wardroom whenever the senior staff needs a straight answer on what's actually running.
+        </div>
+      </div>
+
+      <div class="officer" id="commander-claude">
         <div class="officer-meta">
           <div class="rank">★★ Commander</div>
           <div class="name">Commander Claude</div>
@@ -220,7 +222,7 @@
         <div class="quote">"Narrative follows reality."</div>
       </div>
 
-      <div class="officer">
+      <div class="officer" id="commander-codex">
         <div class="officer-meta">
           <div class="rank">★★ Commander</div>
           <div class="name">Commander Codex</div>
@@ -232,9 +234,8 @@
         </div>
       </div>
 
-      <div class="officer">
+      <div class="officer" id="lt-reyes">
         <div class="officer-meta">
-          <img class="officer-photo" src="assets/staff/reyes.jpg" alt="Lt. Sofia Reyes">
           <div class="rank">★ Lieutenant</div>
           <div class="name">Lt. Sofia Reyes</div>
           <div class="role">Operations Officer / Officer of the Deck</div>
@@ -246,7 +247,7 @@
         <div class="quote">"A good plan survives first contact because the crew understands the mission — not because they memorized the checklist."</div>
       </div>
 
-      <div class="officer">
+      <div class="officer" id="lt-cgl">
         <div class="officer-meta">
           <div class="rank">Lieutenant</div>
           <div class="name">Lt. cgl</div>

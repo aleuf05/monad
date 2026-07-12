@@ -1,317 +1,197 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Monad</title>
-    <link rel="stylesheet" href="assets/css/styles.css">
-  </head>
-  <body>
-    <div class="stars" aria-hidden="true"></div>
-    <div class="scanline" aria-hidden="true"></div>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .banner { text-align: center; padding: 44px 0 28px; }
+  .anchor-mark { font-size: 26px; color: #E8A33D; margin-bottom: 8px; }
+  .banner h1 { font-family: 'Oswald', sans-serif; font-size: 32px; letter-spacing: 0.14em; font-weight: 700; }
+  .banner .tagline { font-size: 12px; color: #6B7C93; letter-spacing: 0.06em; margin-top: 6px; }
+  .status-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; padding: 16px 0; border-top: 1px solid #1E2C42; border-bottom: 1px solid #1E2C42; font-size: 11px; color: #6B7C93; letter-spacing: 0.04em; }
+  .status-strip span.val { color: #4FD1C5; }
+  .section { padding: 40px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 18px; }
+  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+  .staff-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; overflow: hidden; transition: border-color 150ms ease, transform 150ms ease; }
+  .staff-card:hover { border-color: #E8A33D; transform: translateY(-2px); }
+  .staff-photo { width: 100%; aspect-ratio: 1 / 1; background: #0D1626; overflow: hidden; }
+  .staff-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .staff-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 32px; color: #3A4C68; letter-spacing: 0.05em; }
+  .staff-info { padding: 10px 12px 14px; }
+  .staff-rank { font-size: 9px; letter-spacing: 0.08em; color: #E8A33D; text-transform: uppercase; }
+  .staff-name { font-family: 'Oswald', sans-serif; font-size: 13px; color: #DCE6F2; margin-top: 2px; }
+  .staff-role { font-size: 10px; color: #4FD1C5; margin-top: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
+  .card:hover { border-color: #4FD1C5; background: #14203380; }
+  .card.is-unbuilt { opacity: 0.6; cursor: default; }
+  .card.is-unbuilt:hover { border-color: #1E2C42; background: #111A2B; }
+  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #6B7C93; }
+  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-pending { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .placeholder-note { margin-top: 20px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.6; }
+  .placeholder-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
+  footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
+  .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
+  .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; }
+  .footer-links a { color: #4FD1C5; text-decoration: none; font-size: 10px; letter-spacing: 0.06em; }
+  .footer-links a:hover { color: #E8A33D; }
+</style>
+</head>
+<body>
+  <div class="wrap">
 
-    <main class="bridge-shell">
-      <section class="hero panel" id="hero">
-        <div class="hero-signal">
-          <span class="signal-ring"></span>
-          <span class="signal-core"></span>
-        </div>
-        <div class="hero-copy">
-          <p class="eyebrow">Command Deck / Watch Active</p>
-          <h1>MONAD</h1>
-          <p class="tagline">A system that builds itself</p>
-          <p class="subline">Persistent memory. Rented cognition. Continuous evolution.</p>
-          <div class="command-row">
-            <button class="console-button" type="button" data-jump="#watch">Engage Watch</button>
-            <button class="console-button secondary" type="button" data-jump="#doctrine">Review Doctrine</button>
-            <a class="console-button link-button" href="bridge.html">Bridge</a>
-            <a class="console-button link-button" href="logs.html">Ship's Log</a>
-            <a class="console-button link-button" href="fleet.html">Fleet Command</a>
-            <a class="console-button link-button" href="staff.html">Staff</a>
-            <a class="console-button link-button" href="#artifacts">All Toys</a>
-          </div>
-        </div>
-        <button class="hero-compass" type="button" data-jump="#fleet" aria-label="Open fleet deck">
-          <span></span>
-        </button>
-      </section>
+    <div class="banner">
+      <div class="anchor-mark">⚓</div>
+      <h1>FLEET MONAD</h1>
+      <div class="tagline">FLAGSHIP MONAD · BRIDGE, INSTRUMENTS &amp; RECORD</div>
+    </div>
 
-      <section class="watch panel" id="watch">
-        <div class="section-head">
-          <span class="anchor-mark">A</span>
-          <h2>Current Watch</h2>
-        </div>
-        <div class="watch-grid">
-          <div>
-            <p class="label">Campaign</p>
-            <p class="readout">Campaign 0 - Bootstrap the Fleet</p>
-          </div>
-          <div>
-            <p class="label">Current Mission</p>
-            <p>Establish the fleet. Build the loops. Preserve the record.</p>
-          </div>
-          <div>
-            <p class="label">Priorities</p>
-            <div class="priority-list" role="group" aria-label="Current priorities">
-              <button type="button" class="priority-chip is-active" data-priority="Logging">Logging</button>
-              <button type="button" class="priority-chip is-active" data-priority="Memory">Memory</button>
-              <button type="button" class="priority-chip is-active" data-priority="Doctrine">Doctrine</button>
-              <button type="button" class="priority-chip is-active" data-priority="Evolution">Evolution</button>
-            </div>
-          </div>
-          <div class="console-readout" aria-live="polite">
-            <p class="label">Signal</p>
-            <p id="watchSignal">All priorities are active. Fleet bootstrap remains green.</p>
-          </div>
-          <div class="console-readout">
-            <p class="label">Public Hatch</p>
-            <p>Online: cameronlampley.com/monad/ routes through rock64 into granite.</p>
-          </div>
-        </div>
-      </section>
+    <div class="status-strip">
+      <span>FLEET STATUS: <span class="val">GREEN</span></span>
+      <span>SERVED FROM: <span class="val">GRANITE</span></span>
+      <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
+    </div>
 
-      <section class="artifact-launch panel" id="artifacts">
-        <div class="section-head">
-          <span class="anchor-mark">T</span>
-          <h2>Interactive Artifact</h2>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Newest Toy</p>
-            <h3>FleetCore Control Center</h3>
-            <p>Scenario launcher and manual command console for the live FleetCore world: spawn contacts, stage routes, and fire scripted scenarios like Distress Call or Storm Convoy, hand-write a command yourself, or run Harbor Pilot Boarding — a six-phase, radio-gated harbor transit where the pilot really takes the helm. Read-only until you present command authority — the world is shared, one write affects every connected visitor.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/fleetcore-control/">Launch FleetCore Control Center</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>Radio Console</h3>
-            <p>Scripted fleet-comms, weather, and traffic chatter for ambience, spoken aloud through the browser over a synthesized static bed and squelch pops. Pure presentation layer — no live data, works standalone or as a panel in Bridge Station.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/radio-console/">Launch Radio Console</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>FleetCore Live</h3>
-            <p>A real Rust backend, not a browser simulation: watch a live FleetCore world tick in real time over WebSocket, with pause/resume and time-scale controls that affect every connected visitor at once.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/fleetcore-live/">Launch FleetCore Live</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>Bridge Station</h3>
-            <p>Composited command console: Fleet Motion, Periscope, and Radio Console run together, and selecting a ship in Fleet Motion or Periscope visibly re-syncs the other through Monad's shared fleet-state contract.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/bridge/">Launch Bridge Station</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>Fleet Motion Mk2</h3>
-            <p>Static command visualization over the Arabian Sea with a passive opening route, formation escorts, time warp controls, waypoint routing, and local scenario export.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/fleet-motion/">Launch Fleet Motion Mk2</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>Periscope Station</h3>
-            <p>Optical watch on the shared fleet: drag to sweep bearing, sight contacts pulled live from Fleet Motion's shared state, and inspect vessel details. Runs standalone or as a panel inside Bridge Station.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/periscope/">Launch Periscope Station</a>
-        </div>
-        <div class="artifact-launch-layout">
-          <div>
-            <p class="label">Toy</p>
-            <h3>Reaction-Diffusion Painter</h3>
-            <p>Paint chemical seeds into a living Gray-Scott reaction-diffusion field and watch spots, stripes, and coral forms evolve. Unrelated to the fleet — pure browser-canvas chemistry toy.</p>
-          </div>
-          <a class="console-button artifact-button" href="toys/reaction-diffusion-painter/">Launch Reaction-Diffusion Painter</a>
-        </div>
-      </section>
-      <section class="fleet panel" id="fleet">
-        <div class="section-head">
-          <span class="anchor-mark">F</span>
-          <h2>The Fleet</h2>
-        </div>
-        <div class="fleet-layout">
-          <div class="fleet-grid" role="list">
-            <button class="fleet-card is-selected" type="button" data-role="Admiral" role="listitem">
-              <span class="fleet-icon compass">N</span>
-              <h3>Admiral</h3>
-              <p>Sets the course. Holds the vision.</p>
-            </button>
-            <button class="fleet-card" type="button" data-role="Captains" role="listitem">
-              <span class="fleet-icon wheel">W</span>
-              <h3>Captains</h3>
-              <p>Lead the watches. Keep the logs.</p>
-            </button>
-            <button class="fleet-card" type="button" data-role="Helmsmen" role="listitem">
-              <span class="fleet-icon helm">H</span>
-              <h3>Helmsmen</h3>
-              <p>Run the loops. Carry the memory.</p>
-            </button>
-            <button class="fleet-card" type="button" data-role="Chronicler" role="listitem">
-              <span class="fleet-icon book">B</span>
-              <h3>Chronicler</h3>
-              <p>Preserves the story. Protects the record.</p>
-            </button>
-            <button class="fleet-card" type="button" data-role="Comms" role="listitem">
-              <span class="fleet-icon comms">R</span>
-              <h3>Comms</h3>
-              <p>Share the signal. Connect the fleet.</p>
-            </button>
-            <button class="fleet-card" type="button" data-role="Public Affairs" role="listitem">
-              <span class="fleet-icon public">P</span>
-              <h3>Public Affairs</h3>
-              <p>Tell the story. Inspire the crew.</p>
-            </button>
-          </div>
-          <aside class="role-console" aria-live="polite">
-            <p class="label">Selected Station</p>
-            <h3 id="roleTitle">Admiral</h3>
-            <p id="roleBrief">Sets mission bearing, resolves strategic ambiguity, and keeps Campaign 0 pointed toward a durable fleet.</p>
-            <dl>
-              <div>
-                <dt>Watch Order</dt>
-                <dd id="roleOrder">Define the north star.</dd>
-              </div>
-              <div>
-                <dt>Signal Color</dt>
-                <dd id="roleColor">Cyan</dd>
-              </div>
-            </dl>
-          </aside>
-        </div>
-      </section>
+    <div class="section">
+      <h2>Staff</h2>
+      <div class="staff-grid">
 
-      <section class="doctrine panel" id="doctrine">
-        <div class="section-head">
-          <span class="anchor-mark">D</span>
-          <h2>The Monad Doctrine</h2>
-        </div>
-        <div class="doctrine-layout">
-          <ol class="doctrine-list">
-            <li><button class="doctrine-button is-selected" type="button" data-doctrine="remember">We remember.</button></li>
-            <li><button class="doctrine-button" type="button" data-doctrine="think">We think.</button></li>
-            <li><button class="doctrine-button" type="button" data-doctrine="evolve">We evolve.</button></li>
-            <li><button class="doctrine-button" type="button" data-doctrine="endure">We endure.</button></li>
-            <li><button class="doctrine-button" type="button" data-doctrine="explore">We explore.</button></li>
-          </ol>
-          <aside class="doctrine-console" aria-live="polite">
-            <p class="label">Doctrine Channel</p>
-            <h3 id="doctrineTitle">We remember.</h3>
-            <p id="doctrineBrief">Memory is the vessel. Every watch leaves a trace the next watch can inherit.</p>
-          </aside>
-        </div>
-      </section>
-
-      <section class="log panel" id="log">
-        <div class="section-head">
-          <span class="anchor-mark">L</span>
-          <h2>Operational Log</h2>
-        </div>
-        <form class="log-controls" id="logForm">
-          <label>
-            <span>Event</span>
-            <select id="eventType">
-              <option>startup</option>
-              <option>prompt</option>
-              <option>thinking</option>
-              <option>response</option>
-              <option>state_update</option>
-              <option>error</option>
-              <option>shutdown</option>
-            </select>
-          </label>
-          <label>
-            <span>Status</span>
-            <select id="eventStatus">
-              <option>Active</option>
-              <option>Complete</option>
-              <option>Filed</option>
-              <option>Stable</option>
-              <option>Review</option>
-            </select>
-          </label>
-          <label class="log-note">
-            <span>Entry</span>
-            <input id="eventNote" type="text" maxlength="72" value="Manual bridge check">
-          </label>
-          <button class="console-button" type="submit">Append</button>
-        </form>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Time</th>
-                <th>Watch</th>
-                <th>Event</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="logBody">
-              <tr>
-                <td>06:20</td>
-                <td>0001</td>
-                <td>Agent watch initialized</td>
-                <td>Complete</td>
-              </tr>
-              <tr>
-                <td>06:47</td>
-                <td>0001</td>
-                <td>Memory index checked</td>
-                <td>Stable</td>
-              </tr>
-              <tr>
-                <td>07:12</td>
-                <td>0002</td>
-                <td>Doctrine loop revised</td>
-                <td>Filed</td>
-              </tr>
-              <tr>
-                <td>07:44</td>
-                <td>0002</td>
-                <td>Fleet signal broadcast</td>
-                <td>Active</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="hierarchy panel" id="hierarchy">
-        <div class="section-head">
-          <span class="anchor-mark">H</span>
-          <h2>Data Hierarchy</h2>
-        </div>
-        <div class="hierarchy-layout">
-          <div class="pyramid" aria-label="Doctrine to cache data hierarchy">
-            <button type="button" class="hierarchy-step is-selected" data-layer="Doctrine">Doctrine</button>
-            <button type="button" class="hierarchy-step" data-layer="Logs">Logs</button>
-            <button type="button" class="hierarchy-step" data-layer="State">State</button>
-            <button type="button" class="hierarchy-step" data-layer="Indexes">Indexes</button>
-            <button type="button" class="hierarchy-step" data-layer="Cache">Cache</button>
+        <a class="staff-card" href="staff.html#admiral-c">
+          <div class="staff-photo"><div class="staff-placeholder">★★★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Admiral</div>
+            <div class="staff-name">Admiral C</div>
+            <div class="staff-role">Fleet Command</div>
           </div>
-          <aside class="layer-console" aria-live="polite">
-            <p class="label">Selected Layer</p>
-            <h3 id="layerTitle">Doctrine</h3>
-            <p id="layerBrief">Persistent and canonical. Doctrine explains why the fleet exists and how it behaves under pressure.</p>
-          </aside>
-        </div>
-      </section>
-    </main>
+        </a>
 
-    <footer class="status-bar">
-      <span><b>Drydock:</b> Kubuntu - Windows - macOS</span>
-      <span><b>Engine:</b> Gemini API</span>
-      <span><b>Memory:</b> Qdrant Vector DB</span>
-      <span><b>Protocol:</b> Doctrine + Discipline</span>
+        <a class="staff-card" href="staff.html#captain-t">
+          <div class="staff-photo"><div class="staff-placeholder">★★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Captain</div>
+            <div class="staff-name">Captain T</div>
+            <div class="staff-role">Officer of the Deck</div>
+          </div>
+        </a>
+
+        <a class="staff-card" href="staff.html#chief-eng-g">
+          <div class="staff-photo"><img src="assets/chief-eng-g.jpg" alt="Chief Engineer G" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Captain</div>
+            <div class="staff-name">Chief Eng. G</div>
+            <div class="staff-role">Acting Chief Engineer</div>
+          </div>
+        </a>
+
+        <a class="staff-card" href="staff.html#commander-claude">
+          <div class="staff-photo"><img src="assets/claude.png" alt="Commander Claude" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Commander</div>
+            <div class="staff-name">Cmdr. Claude</div>
+            <div class="staff-role">Chief Engineer / CNO</div>
+          </div>
+        </a>
+
+        <a class="staff-card" href="staff.html#commander-codex">
+          <div class="staff-photo"><div class="staff-placeholder">★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Commander</div>
+            <div class="staff-name">Cmdr. Codex</div>
+            <div class="staff-role">Engineering — limited duty</div>
+          </div>
+        </a>
+
+        <a class="staff-card" href="staff.html#lt-reyes">
+          <div class="staff-photo"><img src="assets/reyes.png" alt="Lt. Sofia Reyes" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Lieutenant</div>
+            <div class="staff-name">Lt. Reyes</div>
+            <div class="staff-role">Operations Officer</div>
+          </div>
+        </a>
+
+        <a class="staff-card" href="staff.html#lt-cgl">
+          <div class="staff-photo"><div class="staff-placeholder">★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Lieutenant</div>
+            <div class="staff-name">Lt. cgl</div>
+            <div class="staff-role">Shipwright / Operator</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Bridge Instruments</h2>
+      <div class="grid">
+        <a class="card" href="toys/fleet-motion/">
+          <div class="card-name">Fleet Motion</div>
+          <div class="card-desc">Live fleet chart — routing, wake trails, escort formations</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/periscope/">
+          <div class="card-name">Periscope Station</div>
+          <div class="card-desc">Bearing/range viewport into the live world</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/bridge/">
+          <div class="card-name">Bridge Station</div>
+          <div class="card-desc">Composited command view — select, act, confirm</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/radio-console/">
+          <div class="card-name">Radio Console</div>
+          <div class="card-desc">Communications Station — ambient fleet chatter</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/fleetcore-live/">
+          <div class="card-name">FleetCore Live</div>
+          <div class="card-desc">Raw live view straight off the FleetCore WebSocket feed</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Fleet Control</h2>
+      <div class="grid">
+        <a class="card" href="toys/fleetcore-control/">
+          <div class="card-name">FleetCore Control Center</div>
+          <div class="card-desc">Scenario launcher and manual command console — spawn, route, despawn, Harbor Pilot Boarding</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <div class="card is-unbuilt">
+          <div class="card-name">Living World Engine</div>
+          <div class="card-desc">FleetCore interface track — exploratory, not yet built</div>
+          <span class="card-tag tag-pending">not yet built</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="placeholder-note">
+      Officers without a portrait on file show a rank-insignia placeholder rather than an invented likeness.
+      "Living World Engine" has no artifact behind it yet — the card stays visible as a marker of intent, not a link.
+    </div>
+
+    <footer>
+      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      <div class="footer-motto">Every artifact leaves a wake.</div>
+      <div class="footer-links">
+        <a href="fleet.html">Fleet Command</a>
+        <a href="logs.html">Ship's Log</a>
+        <a href="bridge.html">Bridge</a>
+      </div>
     </footer>
-
-    <script src="assets/js/main.js"></script>
-  </body>
+  </div>
+</body>
 </html>

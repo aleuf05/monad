@@ -1,140 +1,209 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Monad — LAN Deck</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23071118'/%3E%3Cpath d='M7 20h18l-5 5h-8zM16 5l6 12H10z' fill='%23e8b95d'/%3E%3C/svg%3E">
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg: #05080a;
-        --panel: rgba(9, 16, 19, 0.92);
-        --line: rgba(180, 216, 209, 0.2);
-        --text: #e8f0ed;
-        --muted: #9aada9;
-        --amber: #d8b46a;
-        --signal: #8ad7c1;
-      }
-      * { box-sizing: border-box; }
-      html, body { width: 100%; min-height: 100%; margin: 0; }
-      body {
-        font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at 50% 0%, rgba(74, 112, 114, 0.2), transparent 44rem),
-          linear-gradient(180deg, #111a1d 0%, var(--bg) 72%);
-      }
-      main {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: clamp(20px, 4vw, 48px) clamp(16px, 3vw, 32px) 60px;
-      }
-      .eyebrow {
-        margin: 0 0 6px;
-        color: var(--amber);
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-      }
-      h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 4vw, 2.6rem); }
-      .subtitle { margin: 0 0 32px; color: var(--muted); max-width: 640px; line-height: 1.6; }
-      .toy-grid { display: grid; gap: 14px; }
-      .toy-card {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 16px;
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        background: var(--panel);
-        padding: 16px 20px;
-      }
-      .toy-card h2 { margin: 0 0 6px; font-size: 1.05rem; }
-      .toy-card p { margin: 0; color: var(--muted); font-size: 0.85rem; line-height: 1.5; max-width: 520px; }
-      .toy-card a {
-        flex: 0 0 auto;
-        border: 1px solid var(--signal);
-        background: rgba(138, 215, 193, 0.12);
-        color: var(--signal);
-        border-radius: 6px;
-        padding: 10px 16px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 0.85rem;
-        white-space: nowrap;
-      }
-      .toy-card a:hover { background: rgba(138, 215, 193, 0.22); }
-      .note {
-        margin-top: 32px;
-        padding: 14px 16px;
-        border: 1px solid rgba(216, 180, 106, 0.35);
-        border-radius: 8px;
-        background: rgba(216, 180, 106, 0.06);
-        color: var(--muted);
-        font-size: 0.82rem;
-        line-height: 1.6;
-      }
-      .note code { background: rgba(4, 6, 7, 0.5); padding: 0.1rem 0.35rem; border-radius: 4px; color: var(--text); }
-      @media (max-width: 560px) {
-        .toy-card { flex-direction: column; align-items: flex-start; }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <p class="eyebrow">Monad / LAN Deck</p>
-      <h1>LAN-Only Deployment</h1>
-      <p class="subtitle">Reachable at <code>http://192.168.0.100:8090/</code> from any machine on Granite's LAN, served independently of the public Caddy/rock64 path (see <code>docs/deployment.md</code>). Not reachable from the public internet.</p>
-      <p class="subtitle"><a href="staff.html" style="color:var(--signal)">Staff Roster &rarr;</a></p>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleet Monad — LAN Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .banner { text-align: center; padding: 44px 0 28px; }
+  .anchor-mark { font-size: 26px; color: #E8A33D; margin-bottom: 8px; }
+  .banner h1 { font-family: 'Oswald', sans-serif; font-size: 32px; letter-spacing: 0.14em; font-weight: 700; }
+  .banner .tagline { font-size: 12px; color: #6B7C93; letter-spacing: 0.06em; margin-top: 6px; }
+  .status-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; padding: 16px 0; border-top: 1px solid #1E2C42; border-bottom: 1px solid #1E2C42; font-size: 11px; color: #6B7C93; letter-spacing: 0.04em; }
+  .status-strip span.val { color: #4FD1C5; }
+  .section { padding: 40px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 18px; }
+  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
+  .staff-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; overflow: hidden; transition: border-color 150ms ease, transform 150ms ease; }
+  .staff-card:hover { border-color: #E8A33D; transform: translateY(-2px); }
+  .staff-photo { width: 100%; aspect-ratio: 1 / 1; background: #0D1626; overflow: hidden; }
+  .staff-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .staff-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 32px; color: #3A4C68; letter-spacing: 0.05em; }
+  .staff-info { padding: 10px 12px 14px; }
+  .staff-rank { font-size: 9px; letter-spacing: 0.08em; color: #E8A33D; text-transform: uppercase; }
+  .staff-name { font-family: 'Oswald', sans-serif; font-size: 13px; color: #DCE6F2; margin-top: 2px; }
+  .staff-role { font-size: 10px; color: #4FD1C5; margin-top: 2px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
+  .card:hover { border-color: #4FD1C5; background: #14203380; }
+  .card.is-unbuilt { opacity: 0.6; cursor: default; }
+  .card.is-unbuilt:hover { border-color: #1E2C42; background: #111A2B; }
+  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #6B7C93; }
+  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-pending { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .placeholder-note { margin-top: 20px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.6; }
+  .placeholder-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
+  footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
+  .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
+  .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; }
+  .footer-links a { color: #4FD1C5; text-decoration: none; font-size: 10px; letter-spacing: 0.06em; }
+  .footer-links a:hover { color: #E8A33D; }
+</style>
+</head>
+<body>
+  <div class="wrap">
 
-      <div class="toy-grid">
-        <div class="toy-card">
-          <div>
-            <h2>Bridge Station</h2>
-            <p>Composited command console: Fleet Motion, Periscope, and Radio Console together, with a Contact Roster and Command Token field to grant live write access from the page itself.</p>
+    <div class="banner">
+      <div class="anchor-mark">⚓</div>
+      <h1>FLEET MONAD</h1>
+      <div class="tagline">FLAGSHIP MONAD · BRIDGE, INSTRUMENTS &amp; RECORD</div>
+    </div>
+
+    <div class="status-strip">
+      <span>FLEET STATUS: <span class="val">GREEN</span></span>
+      <span>SERVED FROM: <span class="val">GRANITE</span></span>
+      <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
+    </div>
+
+    <div class="section">
+      <h2>Staff</h2>
+      <div class="staff-grid">
+
+        <a class="staff-card" href="staff.html#admiral-c">
+          <div class="staff-photo"><div class="staff-placeholder">★★★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Admiral</div>
+            <div class="staff-name">Admiral C</div>
+            <div class="staff-role">Fleet Command</div>
           </div>
-          <a href="toys/bridge/">Launch</a>
-        </div>
-        <div class="toy-card">
-          <div>
-            <h2>FleetCore Control Center</h2>
-            <p>Scenario launcher and manual command console for the live FleetCore world — spawn contacts, stage routes, fire Distress Call / Storm Convoy / Collision Course, or run the six-phase Harbor Pilot Boarding scenario.</p>
+        </a>
+
+        <a class="staff-card" href="staff.html#captain-t">
+          <div class="staff-photo"><div class="staff-placeholder">★★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Captain</div>
+            <div class="staff-name">Captain T</div>
+            <div class="staff-role">Officer of the Deck</div>
           </div>
-          <a href="toys/fleetcore-control/">Launch</a>
-        </div>
-        <div class="toy-card">
-          <div>
-            <h2>Bridge Station 2.0</h2>
-            <p>One page, one live view: a single WebSocket feeds both a live fleet map and a live optics/bearing panel from one shared snapshot.</p>
+        </a>
+
+        <a class="staff-card" href="staff.html#chief-eng-g">
+          <div class="staff-photo"><img src="assets/chief-eng-g.jpg" alt="Chief Engineer G" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Captain</div>
+            <div class="staff-name">Chief Eng. G</div>
+            <div class="staff-role">Acting Chief Engineer</div>
           </div>
-          <a href="toys/bridge-2/">Launch</a>
-        </div>
-        <div class="toy-card">
-          <div>
-            <h2>Fleet Motion Mk2</h2>
-            <p>Command visualization over the Arabian Sea — escorts, waypoint routing, time warp, and live FleetCore mode.</p>
+        </a>
+
+        <a class="staff-card" href="staff.html#commander-claude">
+          <div class="staff-photo"><img src="assets/claude.png" alt="Commander Claude" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Commander</div>
+            <div class="staff-name">Cmdr. Claude</div>
+            <div class="staff-role">Chief Engineer / CNO</div>
           </div>
-          <a href="toys/fleet-motion/">Launch</a>
-        </div>
-        <div class="toy-card">
-          <div>
-            <h2>Periscope Station</h2>
-            <p>Optical watch on the shared fleet — drag to sweep bearing, sight contacts pulled live from shared state.</p>
+        </a>
+
+        <a class="staff-card" href="staff.html#commander-codex">
+          <div class="staff-photo"><div class="staff-placeholder">★★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Commander</div>
+            <div class="staff-name">Cmdr. Codex</div>
+            <div class="staff-role">Engineering — limited duty</div>
           </div>
-          <a href="toys/periscope/">Launch</a>
-        </div>
-        <div class="toy-card">
-          <div>
-            <h2>Radio Console</h2>
-            <p>Scripted fleet-comms, weather, and traffic chatter for ambience, spoken aloud through the browser.</p>
+        </a>
+
+        <a class="staff-card" href="staff.html#lt-reyes">
+          <div class="staff-photo"><img src="assets/reyes.png" alt="Lt. Sofia Reyes" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★&lt;/div&gt;'" /></div>
+          <div class="staff-info">
+            <div class="staff-rank">Lieutenant</div>
+            <div class="staff-name">Lt. Reyes</div>
+            <div class="staff-role">Operations Officer</div>
           </div>
-          <a href="toys/radio-console/">Launch</a>
+        </a>
+
+        <a class="staff-card" href="staff.html#lt-cgl">
+          <div class="staff-photo"><div class="staff-placeholder">★</div></div>
+          <div class="staff-info">
+            <div class="staff-rank">Lieutenant</div>
+            <div class="staff-name">Lt. cgl</div>
+            <div class="staff-role">Shipwright / Operator</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Bridge Instruments</h2>
+      <div class="grid">
+        <a class="card" href="toys/fleet-motion/">
+          <div class="card-name">Fleet Motion</div>
+          <div class="card-desc">Live fleet chart — routing, wake trails, escort formations</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/periscope/">
+          <div class="card-name">Periscope Station</div>
+          <div class="card-desc">Bearing/range viewport into the live world</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/bridge/">
+          <div class="card-name">Bridge Station</div>
+          <div class="card-desc">Composited command view — select, act, confirm</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/radio-console/">
+          <div class="card-name">Radio Console</div>
+          <div class="card-desc">Communications Station — ambient fleet chatter</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/fleetcore-live/">
+          <div class="card-name">FleetCore Live</div>
+          <div class="card-desc">Raw live view straight off the FleetCore WebSocket feed</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Fleet Control</h2>
+      <div class="grid">
+        <a class="card" href="toys/fleetcore-control/">
+          <div class="card-name">FleetCore Control Center</div>
+          <div class="card-desc">Scenario launcher and manual command console — spawn, route, despawn, Harbor Pilot Boarding</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <div class="card is-unbuilt">
+          <div class="card-name">Living World Engine</div>
+          <div class="card-desc">FleetCore interface track — exploratory, not yet built</div>
+          <span class="card-tag tag-pending">not yet built</span>
         </div>
       </div>
+    </div>
 
-      <p class="note"><strong>Command token:</strong> <code>bridge-3-0-lan</code> grants live write access to the shared FleetCore world (Bridge's Command Token field, or FleetCore Control Center) — affects every connected visitor, LAN or otherwise. See <code>docs/deployment.md</code> for the current exposure notes on this token.</p>
-    </main>
-  </body>
+    <div class="section">
+      <h2>LAN Only</h2>
+      <div class="grid">
+        <a class="card" href="toys/bridge-2/">
+          <div class="card-name">Bridge Station 2.0</div>
+          <div class="card-desc">One page, one live view — a single WebSocket feeds both map and optics from one shared snapshot</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="placeholder-note">
+      Officers without a portrait on file show a rank-insignia placeholder rather than an invented likeness.
+      "Living World Engine" has no artifact behind it yet — the card stays visible as a marker of intent, not a link.
+      Reachable at <code>http://192.168.0.100:8090/</code> only — not the public deployment. Command token <code>bridge-3-0-lan</code> grants live write access via Bridge's Command Token field or FleetCore Control Center, affecting every connected visitor.
+    </div>
+
+    <footer>
+      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      <div class="footer-motto">Every artifact leaves a wake.</div>
+      <div class="footer-links">
+        <a href="fleet.html">Fleet Command</a>
+        <a href="logs.html">Ship's Log</a>
+        <a href="bridge.html">Bridge</a>
+      </div>
+    </footer>
+  </div>
+</body>
 </html>
