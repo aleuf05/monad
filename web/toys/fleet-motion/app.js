@@ -962,7 +962,7 @@ function updateLiveModeNote() {
   }
   liveModeNoteEl.hidden = false;
   liveModeNoteEl.textContent = liveCommandAuthority
-    ? "Live command authority granted: Set Waypoint (staged multi-leg routes included), Cancel Route, and Pause/Time Warp send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
+    ? "Live command authority granted: click the map to send the ship there now. For a multi-leg route, click Add Waypoint to arm, click the map once per point, then click Add Waypoint again to send the whole path as one command (Shift-click also stages points, if you'd rather not use the button). Cancel Route and Pause/Time Warp also send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
     : "Live, read-only: no command token presented, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with one — FleetCore has no command for them yet.";
 }
 
@@ -2355,7 +2355,7 @@ function updateStatus() {
   motionStatus.classList.toggle("blocked", status === "Blocked");
   navigationStatus.textContent = lastNavigationMessage;
   routeStatus.textContent = waypointMode
-    ? "Click map to place one waypoint"
+    ? (liveMode ? "Click map to add waypoints; click Add Waypoint again to send" : "Click map to place one waypoint")
     : suggestedDetour
       ? `Detour suggested: ${suggestedDetour.waypoints.length} waypoint${suggestedDetour.waypoints.length === 1 ? "" : "s"}`
       : pendingDetour
@@ -2473,7 +2473,11 @@ function addWaypoint(position) {
   waypoints.push(waypoint);
   selectedWaypointIndex = waypoints.length - 1;
   clearSuggestedDetour();
-  if (oneShotMode) {
+  // Live mode keeps waypointMode armed across clicks so the button is a
+  // press-to-start/press-to-send toggle (see waypointButton's own click
+  // handler) -- one click per waypoint, no Shift needed, so this works on
+  // touch. Local-sim mode keeps its original one-shot-per-press behavior.
+  if (oneShotMode && !liveMode) {
     waypointMode = false;
   }
   redrawWaypoints();
@@ -2901,6 +2905,25 @@ function sendLiveRoute(latlng) {
   updateStatus();
 }
 
+// Finalizes waypointButton's armed multi-click staging (see addWaypoint's
+// liveMode branch): every staged point becomes the route, with no extra
+// "final click" point needed since the last click already staged one.
+function sendStagedLiveRoute() {
+  if (!liveCommandAuthority || !liveFlagshipId || !liveSocket || liveSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  if (!waypoints.length) return;
+  const route = waypoints.map((point) => ({ lat: point.lat, lng: point.lng }));
+  liveSocket.send(JSON.stringify({ type: "set-route", vessel_id: liveFlagshipId, route }));
+  waypointMode = false;
+  waypoints = [];
+  selectedWaypointIndex = null;
+  redrawWaypoints();
+  flashAt(route[route.length - 1]);
+  addLog(`Route command sent — ${route.length} leg${route.length === 1 ? "" : "s"}. Awaiting live world response.`);
+  updateStatus();
+}
+
 // Real cancel: sends an empty route, which world.rs's set-route handler
 // treats as "clear route, go to Holding" -- not a local-only reset like
 // clearRoutePlan() (which only clears the staged, not-yet-sent waypoints
@@ -2958,6 +2981,18 @@ pauseButton.addEventListener("click", () => {
 });
 
 waypointButton.addEventListener("click", () => {
+  if (liveMode) {
+    waypointMode = !waypointMode;
+    if (waypointMode) {
+      addLog("Waypoint placement armed — click the map to add points, click Add Waypoint again to send.");
+    } else if (waypoints.length) {
+      sendStagedLiveRoute();
+    } else {
+      addLog("Waypoint placement canceled — no points staged.");
+    }
+    updateStatus();
+    return;
+  }
   waypointMode = true;
   addLog("Waypoint placement armed for next map click.");
   updateStatus();
