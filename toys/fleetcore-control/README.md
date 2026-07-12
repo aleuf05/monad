@@ -41,6 +41,27 @@ FleetCore's `Command` enum (`fleetcore/src/command.rs`) has no despawn/remove-co
 
 `set-route` takes a fixed waypoint list. **Collision Course** routes the spawned contact to the flagship's position *as read from the snapshot at the moment the button was clicked* — if the flagship keeps moving afterward, the contact does not re-aim to follow it. Good enough for a one-shot scripted setup; not a real intercept simulation.
 
+## Harbor Pilot Boarding
+
+A stateful, multi-phase scenario implementing `Harbor.md` (Captain T's mission packet), built entirely on the same commands every other scenario here uses — no new FleetCore `Command` variant. Six operator clicks step through the mission packet's seven phases (phases 5 and 6, conn transfer and harbor transit, are one click since the packet itself has the pilot issue helm orders immediately after taking the conn):
+
+1. **Begin Harbor Approach** — spawns a pilot boat and two harbor traffic contacts at a synthetic harbor point (offset from the flagship's position at click time; there's no real harbor/berth data in this world), routes the pilot boat toward the flagship, records the ETA watch event.
+2. **Confirm Pilot Boat Detected** — narrative-only advance.
+3. **Acknowledge Pilot Boat** — shows the pilot's hail text first, then on click re-routes the pilot boat to the flagship's current position and records the exchange.
+4. **Confirm Boarding** — narrative-only advance.
+5. **Grant the Conn** — the real centerpiece: issues a single `set-route` on the **flagship's own vessel id**, a four-leg staged path curving from its current position to the harbor point, with each leg's `record-watch-event` named after one of the packet's helm orders ("Port five," "Dead slow ahead," "Midships," "Ease to starboard"). This is what actually moves Monad under "pilot control" — confirmed via a live snapshot fetch during verification: flagship `status` flips to `"underway"` and `route` holds the real four waypoints.
+6. **Arrive at Berth** — records completion, routes the pilot boat back out to the harbor point (departing).
+
+**Reset Scenario Tracker** only resets this toy's own client-side phase tracker so a fresh run can start (with a new id suffix, avoiding collision with the previous run) — it does not despawn anything, same limitation as the rest of this toy.
+
+### What's simplified versus the mission packet
+
+- **Phase advancement is a manual operator action**, not automatic detection/proximity/radio-driven progression. The mission packet itself says "scenario should not automatically advance... communication is the trigger" — but FleetCore has no proximity-detection or dialogue-parsing capability to fire that trigger on its own, so a human click stands in for it at every phase.
+- **No FleetCore-side phase state machine.** The mission packet's Architectural Principle asks for "every event to arise from authoritative world state and state transitions rather than isolated UI logic." The *content* of each phase (spawns, routes, watch events) is genuinely authoritative FleetCore state, visible to every connected instrument — but the phase sequencing itself (`harbor.phase` in `app.js`) lives in this one browser tab, not in FleetCore. A second visitor's Control Center wouldn't know a Harbor Pilot run is in progress elsewhere.
+- **No Radio Console integration.** The hail text ("Request permission to come alongside," "Captain, request the conn.") displays in this toy's own UI and is written to FleetCore's watch log — it is not spoken through Radio Console's synthesized voice. Wiring that in would mean changing Radio Console, which both this toy's and the separate Command Center brief's boundaries rule out.
+- **No visual boarding/transfer event or animation** — "Harbor Pilot aboard" is a watch-log line, not a rendered event in Fleet Motion or Periscope.
+- **The harbor point is synthetic**, not a real charted harbor/berth location — an offset from wherever the flagship happens to be when the scenario starts.
+
 ## Boundaries
 
 - No changes to `fleetcore/src/command.rs`, `world.rs`, or any other shared-core FleetCore file.
