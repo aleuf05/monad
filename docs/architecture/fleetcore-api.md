@@ -96,11 +96,14 @@ Internally tagged on `"type"`, kebab-case, matching `fleetcore/src/command.rs`'s
 {"type": "set-time-scale", "scale": 5}
 {"type": "set-route", "vessel_id": "vessel.monad", "route": [{"lat": 26.2, "lng": 55.9}]}
 {"type": "spawn-passive-contact", "id": "traffic.new-01", "name": "New Contact", "callsign": "NEW CONTACT", "position": {"lat": 24.0, "lng": 58.0}, "course": 90.0, "speed_mps": 8.0}
+{"type": "despawn-vessel", "id": "traffic.new-01"}
 {"type": "record-watch-event", "message": "operator note"}
 {"type": "step", "ticks": 1}
 ```
 
 `set-route` and `spawn-passive-contact` are rejected (`422`) if any position involved — every waypoint for `set-route`, the spawn point for `spawn-passive-contact` — falls inside one of `land_zones`' rectangles (see Payload Shapes above). The error message names the zone, e.g. `"spawn rejected: position (26.8, 55.9) is on land (Qeshm Island)"`.
+
+`despawn-vessel` is the symmetric inverse of `spawn-passive-contact` and only that: it's rejected (`422`) for an unknown id, and rejected for any vessel that isn't `passive-traffic` kind (`"cannot despawn '...': only passive-traffic contacts can be removed, not a Flagship/Scout vessel"`) — the flagship and scout escorts aren't removable through this command, on purpose. There is still no bulk "clear the board"/reset command; each vessel has to be despawned individually.
 
 `step` is what the server's own tick loop sends itself every `--tick-ms`; a client can send it too (e.g. to single-step a paused world), but there's normally no reason to — the tick loop already advances the clock in real time whenever it isn't paused.
 

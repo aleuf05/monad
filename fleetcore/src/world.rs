@@ -124,6 +124,28 @@ impl World {
                 self.vessels.sort_by(|a, b| a.id.cmp(&b.id));
                 "passive-contact-spawned"
             }
+            Command::DespawnVessel { id } => {
+                let vessel = self
+                    .vessels
+                    .iter()
+                    .find(|vessel| vessel.id == *id)
+                    .ok_or_else(|| format!("unknown vessel '{id}'"))?;
+                // Restricted to passive traffic on purpose: the flagship and
+                // scouts are core to the mission, not test debris. Every
+                // vessel this command exists to clean up (scenario spawns
+                // from FleetCore Control Center, manual test spawns) is
+                // spawn-passive-contact's own output, so this is genuinely
+                // the symmetric inverse of that command, not a general
+                // "remove anything" escape hatch.
+                if vessel.kind != VesselKind::PassiveTraffic {
+                    return Err(format!(
+                        "cannot despawn '{id}': only passive-traffic contacts can be removed, not a {:?} vessel",
+                        vessel.kind
+                    ));
+                }
+                self.vessels.retain(|vessel| vessel.id != *id);
+                "vessel-despawned"
+            }
             Command::RecordWatchEvent { message } => {
                 self.watch_events.push(WatchEvent {
                     tick: self.clock.tick,

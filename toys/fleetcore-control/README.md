@@ -33,9 +33,11 @@ Enter a server URL (defaults to `ws://localhost:4771/ws`) and a command token, t
 
 Every scenario- or manually-spawned contact gets a timestamp+random suffix (`distress-<suffix>`, `manual-<suffix>`, etc.) so repeated runs never collide with an earlier spawn still sitting in the world — `spawn-passive-contact` rejects a duplicate id outright (`world.rs`), and a fixed literal id would make every second click of the same scenario button fail.
 
-## No despawn, no reset
+## Despawn, but no bulk reset
 
-FleetCore's `Command` enum (`fleetcore/src/command.rs`) has no despawn/remove-contact command and no world-reset/teleport command — only `set-route`, `pause-clock`, `resume-clock`, `set-time-scale`, `spawn-passive-contact`, and `record-watch-event`. Anything spawned from this page, or from anywhere else, stays in the world until the `fleetcore-serve` process itself restarts. This toy does not attempt to fake a client-side "hide" of a contact — that would misrepresent shared world state to every other connected viewer, who would still see it. A real fix needs a new `Command` variant in FleetCore's shared core (`fleetcore/src/command.rs` + `world.rs`), which is out of scope here — see `logs/captains/2026/2026-07-11_fleet-motion-command-restoration.md`'s Follow-up note for the same gap flagged from Fleet Motion's side, including the note that this may already be Codex's independent FleetCore-interface track rather than something to pick up unilaterally.
+**Manual: Despawn Vessel** wraps `despawn-vessel`, FleetCore's real inverse of `spawn-passive-contact` (`fleetcore/src/command.rs` + `world.rs`) — a genuine removal from shared world state, not a client-side hide. Restricted to `passive-traffic` vessels only: the flagship and scout escorts can never be despawned through this command (rejected server-side, `422`, naming the vessel's real kind), since they're core to the mission, not test debris.
+
+There is still no bulk "clear the board"/world-reset command — no way to remove many contacts at once, only one at a time, and no way to reset the flagship/scouts/clock to a fresh starting state. `fleetcore/src/command.rs`'s full surface is now `set-route`, `pause-clock`, `resume-clock`, `set-time-scale`, `spawn-passive-contact`, `despawn-vessel`, and `record-watch-event`.
 
 ## Route scenarios track a point, not a moving target
 
@@ -52,7 +54,7 @@ A stateful, multi-phase scenario implementing `Harbor.md` (Captain T's mission p
 5. **Grant the Conn** — the real centerpiece: issues a single `set-route` on the **flagship's own vessel id**, a four-leg staged path curving from its current position to the harbor point, with each leg's `record-watch-event` named after one of the packet's helm orders ("Port five," "Dead slow ahead," "Midships," "Ease to starboard"). This is what actually moves Monad under "pilot control" — confirmed via a live snapshot fetch during verification: flagship `status` flips to `"underway"` and `route` holds the real four waypoints.
 6. **Arrive at Berth** — records completion, routes the pilot boat back out to the harbor point (departing).
 
-**Reset Scenario Tracker** only resets this toy's own client-side phase tracker so a fresh run can start (with a new id suffix, avoiding collision with the previous run) — it does not despawn anything, same limitation as the rest of this toy.
+**Reset Scenario Tracker** only resets this toy's own client-side phase tracker so a fresh run can start (with a new id suffix, avoiding collision with the previous run) — it does not despawn the pilot boat or harbor traffic it spawned. Use Manual: Despawn Vessel separately if you want them gone (Manual: Set Route's vessel dropdown and Manual: Despawn Vessel's both refresh from the live vessel list, so a Harbor Pilot run's contacts show up there like anything else).
 
 ### What's simplified versus the mission packet
 

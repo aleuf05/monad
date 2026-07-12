@@ -19,6 +19,9 @@ const spawnSubmitButton = spawnForm.querySelector("button[type=submit]");
 const routeForm = document.querySelector("#routeForm");
 const routeSubmitButton = routeForm.querySelector("button[type=submit]");
 const routeVesselSelect = document.querySelector("#routeVesselSelect");
+const despawnForm = document.querySelector("#despawnForm");
+const despawnSubmitButton = despawnForm.querySelector("button[type=submit]");
+const despawnVesselSelect = document.querySelector("#despawnVesselSelect");
 const harborPhaseLabelEl = document.querySelector("#harborPhaseLabel");
 const harborHailEl = document.querySelector("#harborHail");
 const harborActionButton = document.querySelector("#harborActionButton");
@@ -84,6 +87,7 @@ function updateControlsEnabled() {
   applyTimeScaleButton.disabled = !enabled;
   spawnSubmitButton.disabled = !enabled;
   routeSubmitButton.disabled = !enabled;
+  despawnSubmitButton.disabled = !enabled;
   scenarioButtons.forEach((button) => { button.disabled = !enabled; });
   harborActionButton.disabled = !enabled;
 }
@@ -188,6 +192,7 @@ function applySnapshot(snapshot) {
 
   renderVesselList(snapshot.vessels);
   renderRouteVesselOptions(snapshot.vessels);
+  renderDespawnVesselOptions(snapshot.vessels);
   renderWatchEvents(snapshot.watch_events);
 }
 
@@ -221,6 +226,28 @@ function renderRouteVesselOptions(vessels) {
   });
   if (vessels.some((vessel) => vessel.id === previousValue)) {
     routeVesselSelect.value = previousValue;
+  }
+}
+
+// Filtered to passive-traffic only, matching despawn-vessel's own
+// server-side restriction (fleetcore/src/world.rs) -- flagship and scout
+// vessels would just get rejected, so they're not offered here at all.
+function renderDespawnVesselOptions(vessels) {
+  const despawnable = vessels.filter((vessel) => vessel.kind === "passive-traffic");
+  const previousValue = despawnVesselSelect.value;
+  despawnVesselSelect.innerHTML = "";
+  if (!despawnable.length) {
+    despawnVesselSelect.innerHTML = '<option value="">No passive-traffic contacts</option>';
+    return;
+  }
+  despawnable.forEach((vessel) => {
+    const option = document.createElement("option");
+    option.value = vessel.id;
+    option.textContent = vessel.callsign;
+    despawnVesselSelect.appendChild(option);
+  });
+  if (despawnable.some((vessel) => vessel.id === previousValue)) {
+    despawnVesselSelect.value = previousValue;
   }
 }
 
@@ -305,6 +332,16 @@ routeForm.addEventListener("submit", (event) => {
     return;
   }
   sendCommand({ type: "set-route", vessel_id: vesselId, route: waypoints });
+});
+
+despawnForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const vesselId = despawnVesselSelect.value;
+  if (!vesselId) {
+    showCommandFeedback("No contact selected to despawn.");
+    return;
+  }
+  sendCommand({ type: "despawn-vessel", id: vesselId });
 });
 
 function flagshipVessel() {

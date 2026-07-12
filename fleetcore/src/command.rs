@@ -21,6 +21,9 @@ pub enum Command {
         course: f64,
         speed_mps: f64,
     },
+    DespawnVessel {
+        id: String,
+    },
     RecordWatchEvent {
         message: String,
     },
