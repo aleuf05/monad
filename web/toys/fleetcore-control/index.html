@@ -64,6 +64,21 @@
 
       <section class="console-layout">
         <div class="control-column">
+          <section class="harbor-panel">
+            <h2>Harbor Pilot Boarding</h2>
+            <p class="panel-note">Multi-phase scenario (<code>Harbor.md</code>): a pilot boat departs a synthetic harbor point, intercepts the flagship, boards, and takes temporary helm authority via a real staged route on the flagship itself &mdash; then departs. Each phase is a real FleetCore write (spawn/route/watch-event); phase advancement itself is a manual operator action here, standing in for the proximity/radio detection FleetCore doesn't have yet. See this toy's README for the full list of simplifications.</p>
+            <div class="harbor-status">
+              <span>Phase</span>
+              <strong id="harborPhaseLabel">Not started</strong>
+            </div>
+            <p id="harborHail" class="harbor-hail" hidden></p>
+            <button id="harborActionButton" class="console-button scenario-button" type="button" disabled>
+              <strong id="harborActionLabel">Begin Harbor Approach</strong>
+              <span id="harborActionNote">Spawns the pilot boat and harbor traffic, sets an intercept route.</span>
+            </button>
+            <button id="harborResetButton" class="console-button secondary" type="button" hidden>Reset Scenario Tracker</button>
+          </section>
+
           <section class="scenario-panel">
             <h2>Scenarios</h2>
             <p class="panel-note">Each button spawns a short, scripted sequence of contacts and a route, then records a watch event. IDs are timestamp-suffixed so repeated runs never collide.</p>

@@ -13,12 +13,18 @@ const timeScaleInput = document.querySelector("#timeScaleInput");
 const applyTimeScaleButton = document.querySelector("#applyTimeScaleButton");
 const vesselListEl = document.querySelector("#vesselList");
 const watchLogEl = document.querySelector("#watchLog");
-const scenarioButtons = Array.from(document.querySelectorAll(".scenario-button"));
+const scenarioButtons = Array.from(document.querySelectorAll(".scenario-buttons .scenario-button"));
 const spawnForm = document.querySelector("#spawnForm");
 const spawnSubmitButton = spawnForm.querySelector("button[type=submit]");
 const routeForm = document.querySelector("#routeForm");
 const routeSubmitButton = routeForm.querySelector("button[type=submit]");
 const routeVesselSelect = document.querySelector("#routeVesselSelect");
+const harborPhaseLabelEl = document.querySelector("#harborPhaseLabel");
+const harborHailEl = document.querySelector("#harborHail");
+const harborActionButton = document.querySelector("#harborActionButton");
+const harborActionLabelEl = document.querySelector("#harborActionLabel");
+const harborActionNoteEl = document.querySelector("#harborActionNote");
+const harborResetButton = document.querySelector("#harborResetButton");
 
 const state = {
   socket: null,
@@ -79,6 +85,7 @@ function updateControlsEnabled() {
   spawnSubmitButton.disabled = !enabled;
   routeSubmitButton.disabled = !enabled;
   scenarioButtons.forEach((button) => { button.disabled = !enabled; });
+  harborActionButton.disabled = !enabled;
 }
 
 function connect() {
@@ -300,6 +307,10 @@ routeForm.addEventListener("submit", (event) => {
   sendCommand({ type: "set-route", vessel_id: vesselId, route: waypoints });
 });
 
+function flagshipVessel() {
+  return state.lastSnapshot?.vessels.find((vessel) => vessel.kind === "flagship") || null;
+}
+
 function flagshipPosition() {
   const flagship = state.lastSnapshot?.vessels.find((vessel) => vessel.kind === "flagship");
   return flagship ? flagship.position : null;
@@ -370,6 +381,209 @@ const SCENARIOS = {
     sendCommand({ type: "record-watch-event", message: "Contact on possible collision bearing with flagship" });
   }
 };
+
+// Harbor Pilot Boarding (Harbor.md, Captain T's mission packet): a
+// stateful, multi-phase scenario built on the same real FleetCore commands
+// every other scenario in this toy uses -- spawn-passive-contact,
+// set-route (including on the flagship's own vessel id, for "the pilot
+// takes the helm"), and record-watch-event for every narrative beat.
+// Phase advancement is a manual operator action here, not automatic:
+// Harbor.md's own acceptance criteria says "scenario should not
+// automatically advance... communication is the trigger," and FleetCore
+// has no proximity/detection engine to fire that on its own. See this
+// toy's README for the full list of simplifications versus the mission
+// packet's full vision (no Radio Console voice integration, no
+// FleetCore-side phase state machine, no auto-detection).
+const harbor = {
+  phase: "idle",
+  suffix: null,
+  pilotId: null,
+  trafficIds: [],
+  harborPoint: null,
+  pilotCallsign: null
+};
+
+const HARBOR_PHASE_LABELS = {
+  idle: "Not started",
+  inbound: "Phase 1 — Inbound Transit",
+  detected: "Phase 2 — Detection",
+  hailed: "Phase 3 — Radio Contact",
+  boarding: "Phase 4 — Boarding",
+  transit: "Phase 5–6 — Conn Transferred / Harbor Transit",
+  complete: "Phase 7 — Completion"
+};
+
+const HARBOR_STEPS = {
+  idle: {
+    buttonLabel: "Begin Harbor Approach",
+    buttonNote: "Spawns the pilot boat and harbor traffic at a synthetic harbor point; pilot boat gets a real intercept route toward the flagship.",
+    run: () => {
+      const flagship = flagshipPosition();
+      if (!flagship) return showCommandFeedback("No flagship position yet -- wait for the first snapshot.");
+      const suffix = idSuffix();
+      harbor.suffix = suffix;
+      harbor.harborPoint = { lat: flagship.lat + 0.5, lng: flagship.lng - 0.35 };
+      harbor.pilotId = `harbor-pilot-${suffix}`;
+      harbor.pilotCallsign = `PILOT BOAT ${suffix.slice(-3).toUpperCase()}`;
+      harbor.trafficIds = [`harbor-traffic-${suffix}-0`, `harbor-traffic-${suffix}-1`];
+
+      sendCommand({
+        type: "spawn-passive-contact",
+        id: harbor.pilotId,
+        name: "Harbor Pilot Boat",
+        callsign: harbor.pilotCallsign,
+        position: harbor.harborPoint,
+        course: 0,
+        speed_mps: 6
+      });
+      sendCommand({ type: "set-route", vessel_id: harbor.pilotId, route: [flagship] });
+
+      harbor.trafficIds.forEach((id, index) => {
+        sendCommand({
+          type: "spawn-passive-contact",
+          id,
+          name: `Harbor Traffic ${index + 1}`,
+          callsign: `HARBOR TRAFFIC ${index + 1}`,
+          position: {
+            lat: harbor.harborPoint.lat + (index === 0 ? 0.02 : -0.03),
+            lng: harbor.harborPoint.lng + (index === 0 ? -0.02 : 0.015)
+          },
+          course: 90 + index * 40,
+          speed_mps: 3
+        });
+      });
+
+      sendCommand({
+        type: "record-watch-event",
+        message: `Harbor Pilot requested. ${harbor.pilotCallsign} departing harbor -- ETA approximately 12 minutes.`
+      });
+      harbor.phase = "inbound";
+      updateHarborUI();
+    }
+  },
+  inbound: {
+    buttonLabel: "Confirm Pilot Boat Detected",
+    buttonNote: "Fleet Motion and Periscope should already show the pilot boat closing -- this advances the watch narrative, it doesn't move anything itself.",
+    run: () => {
+      sendCommand({
+        type: "record-watch-event",
+        message: `${harbor.pilotCallsign} visually acquired, closing on intercept course.`
+      });
+      harbor.phase = "detected";
+      updateHarborUI();
+    }
+  },
+  detected: {
+    buttonLabel: "Acknowledge Pilot Boat",
+    buttonNote: "Grant permission to come alongside -- this is the radio trigger the scenario waits on.",
+    hail: () => `"Monad, this is ${harbor.pilotCallsign}. Request permission to come alongside."`,
+    run: () => {
+      sendCommand({
+        type: "record-watch-event",
+        message: `Monad to ${harbor.pilotCallsign}: Permission granted, come alongside.`
+      });
+      const flagship = flagshipPosition();
+      if (flagship) sendCommand({ type: "set-route", vessel_id: harbor.pilotId, route: [flagship] });
+      harbor.phase = "hailed";
+      updateHarborUI();
+    }
+  },
+  hailed: {
+    buttonLabel: "Confirm Boarding",
+    buttonNote: "Pilot boat should now be closing tightly on the flagship for the boarding transfer.",
+    run: () => {
+      sendCommand({ type: "record-watch-event", message: "Harbor Pilot aboard." });
+      harbor.phase = "boarding";
+      updateHarborUI();
+    }
+  },
+  boarding: {
+    buttonLabel: "Grant the Conn",
+    buttonNote: "Transfers temporary ship-handling authority and issues the pilot's staged helm orders as a real route on the flagship itself.",
+    hail: () => `"Captain, request the conn."`,
+    run: () => {
+      const flagship = flagshipVessel();
+      if (!flagship) return showCommandFeedback("No flagship position yet.");
+      sendCommand({ type: "record-watch-event", message: "Captain to Harbor Pilot: The conn is yours." });
+
+      const berth = harbor.harborPoint;
+      const start = flagship.position;
+      const legs = [
+        { lat: start.lat + (berth.lat - start.lat) * 0.33, lng: start.lng + (berth.lng - start.lng) * 0.2, order: "Port five" },
+        { lat: start.lat + (berth.lat - start.lat) * 0.6, lng: start.lng + (berth.lng - start.lng) * 0.55, order: "Dead slow ahead" },
+        { lat: start.lat + (berth.lat - start.lat) * 0.85, lng: start.lng + (berth.lng - start.lng) * 0.8, order: "Midships" },
+        { lat: berth.lat, lng: berth.lng, order: "Ease to starboard" }
+      ];
+      // One real set-route call carries the whole staged path -- FleetCore
+      // has no per-order/incremental route command -- but each named order
+      // still gets its own record-watch-event so the narrative reads as
+      // distinct helm commands, not one opaque route change.
+      sendCommand({ type: "set-route", vessel_id: flagship.id, route: legs.map(({ lat, lng }) => ({ lat, lng })) });
+      legs.forEach((leg) => sendCommand({ type: "record-watch-event", message: `Pilot orders: ${leg.order}` }));
+
+      harbor.phase = "transit";
+      updateHarborUI();
+    }
+  },
+  transit: {
+    buttonLabel: "Arrive at Berth",
+    buttonNote: "Flagship should be following the staged route toward the harbor point. Pilot boat departs once berthed.",
+    run: () => {
+      sendCommand({ type: "record-watch-event", message: "Monad arrives at berth. Harbor transit complete." });
+      if (harbor.pilotId && harbor.harborPoint) {
+        sendCommand({ type: "set-route", vessel_id: harbor.pilotId, route: [harbor.harborPoint] });
+      }
+      sendCommand({
+        type: "record-watch-event",
+        message: `${harbor.pilotCallsign} disembarks and returns to harbor. Harbor Pilot Boarding scenario complete.`
+      });
+      harbor.phase = "complete";
+      updateHarborUI();
+    }
+  }
+};
+
+function updateHarborUI() {
+  harborPhaseLabelEl.textContent = HARBOR_PHASE_LABELS[harbor.phase] || harbor.phase;
+  harborResetButton.hidden = harbor.phase === "idle";
+
+  const step = HARBOR_STEPS[harbor.phase];
+  if (!step) {
+    harborActionButton.hidden = true;
+    harborHailEl.hidden = true;
+    return;
+  }
+  harborActionButton.hidden = false;
+  harborActionLabelEl.textContent = step.buttonLabel;
+  harborActionNoteEl.textContent = step.buttonNote;
+  if (step.hail) {
+    harborHailEl.hidden = false;
+    harborHailEl.textContent = step.hail();
+  } else {
+    harborHailEl.hidden = true;
+  }
+}
+
+harborActionButton.addEventListener("click", () => {
+  const step = HARBOR_STEPS[harbor.phase];
+  if (step) step.run();
+});
+
+harborResetButton.addEventListener("click", () => {
+  harbor.phase = "idle";
+  harbor.suffix = null;
+  harbor.pilotId = null;
+  harbor.trafficIds = [];
+  harbor.harborPoint = null;
+  harbor.pilotCallsign = null;
+  updateHarborUI();
+  showCommandFeedback(
+    "Harbor scenario tracker reset. Previously spawned vessels are still in the world -- there is no despawn command.",
+    false
+  );
+});
+
+updateHarborUI();
 
 scenarioButtons.forEach((button) => {
   button.addEventListener("click", () => {
