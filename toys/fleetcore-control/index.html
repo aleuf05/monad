@@ -56,11 +56,12 @@
             <input id="timeScaleInput" type="number" min="1" max="500" value="1" disabled>
           </label>
           <button id="applyTimeScaleButton" class="console-button secondary" type="button" disabled>Apply</button>
+          <button id="resetFleetButton" class="console-button secondary" type="button" disabled>Reset Fleet</button>
         </div>
       </section>
       <p class="auth-note">This world is shared by every visitor. Without a command token every control below is disabled and this page only observes; holding a valid token grants command authority over the live world for everyone connected, not just you.</p>
       <p id="commandFeedback" class="command-feedback" role="status" hidden></p>
-      <p class="no-despawn-note"><strong>No bulk reset:</strong> individual passive-traffic contacts can now be removed (Manual: Despawn Vessel, below), but there is still no "clear the board" command &mdash; the flagship and scout escorts can never be despawned, and removing many contacts still means despawning them one at a time.</p>
+      <p class="no-despawn-note"><strong>Reset Fleet</strong> puts Monad and all three scout escorts back to their exact starting position, course, speed, and route (the same values as <code>fleetcore/data/seed-world.json</code>) &mdash; global, affects every connected visitor, and asks for confirmation first. Individual passive-traffic contacts can be removed one at a time (Manual: Despawn Vessel, below), but Reset Fleet does not touch them, and there is still no single "clear every contact" command.</p>
 
       <section class="console-layout">
         <div class="control-column">

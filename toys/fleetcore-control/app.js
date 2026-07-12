@@ -11,6 +11,7 @@ const connectButton = document.querySelector("#connectButton");
 const pauseResumeButton = document.querySelector("#pauseResumeButton");
 const timeScaleInput = document.querySelector("#timeScaleInput");
 const applyTimeScaleButton = document.querySelector("#applyTimeScaleButton");
+const resetFleetButton = document.querySelector("#resetFleetButton");
 const vesselListEl = document.querySelector("#vesselList");
 const watchLogEl = document.querySelector("#watchLog");
 const scenarioButtons = Array.from(document.querySelectorAll(".scenario-buttons .scenario-button"));
@@ -85,6 +86,7 @@ function updateControlsEnabled() {
   pauseResumeButton.disabled = !enabled;
   timeScaleInput.disabled = !enabled;
   applyTimeScaleButton.disabled = !enabled;
+  resetFleetButton.disabled = !enabled;
   spawnSubmitButton.disabled = !enabled;
   routeSubmitButton.disabled = !enabled;
   despawnSubmitButton.disabled = !enabled;
@@ -282,6 +284,17 @@ applyTimeScaleButton.addEventListener("click", () => {
   const scale = Number(timeScaleInput.value);
   if (!Number.isFinite(scale) || scale < 1) return;
   sendCommand({ type: "set-time-scale", scale: Math.round(scale) });
+});
+
+// Global and visible to everyone connected, same as Pause/Time Scale --
+// confirm() first since a misclick here silently overwrites whatever
+// position/route the flagship and every scout currently have, for every
+// visitor at once, not just this one.
+resetFleetButton.addEventListener("click", () => {
+  if (!window.confirm("Reset Monad and all three scout escorts to their starting position, course, speed, and route? This affects every connected visitor and cannot be undone.")) {
+    return;
+  }
+  sendCommand({ type: "reset-fleet" });
 });
 
 spawnForm.addEventListener("submit", (event) => {

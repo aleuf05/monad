@@ -3,7 +3,7 @@ use crate::command::Command;
 use crate::event::Event;
 use crate::geography;
 use crate::route::{bearing_degrees, distance_meters, point_at_distance};
-use crate::vessel::{normalize_degrees, quantize, Vessel, VesselKind, VesselStatus};
+use crate::vessel::{normalize_degrees, quantize, Position, Vessel, VesselKind, VesselStatus};
 use serde::{Deserialize, Serialize};
 
 const ARRIVAL_RADIUS_METERS: f64 = 80.0;
@@ -150,6 +150,26 @@ impl World {
                 self.vessels.retain(|vessel| vessel.id != *id);
                 "vessel-despawned"
             }
+            Command::ResetFleet => {
+                let sim_time = self.clock.sim_time();
+                for condition in initial_conditions() {
+                    if let Some(vessel) = self.vessel_mut(condition.id) {
+                        vessel.position = condition.position;
+                        vessel.course = normalize_degrees(condition.course);
+                        vessel.speed_mps = condition.speed_mps;
+                        vessel.route = condition.route;
+                        vessel.status = VesselStatus::Underway;
+                        vessel.last_update = sim_time.clone();
+                    }
+                    // A missing id (e.g. the flagship or a scout id was
+                    // somehow renamed) is silently skipped rather than
+                    // erroring the whole command -- resetting the other
+                    // three vessels is still better than resetting none of
+                    // them, and there's no world in which the flagship
+                    // itself is ever absent to explain to an operator.
+                }
+                "fleet-reset"
+            }
             Command::RecordWatchEvent { message } => {
                 self.watch_events.push(WatchEvent {
                     tick: self.clock.tick,
@@ -260,4 +280,55 @@ fn advance_vessel(vessel: &mut Vessel, elapsed_seconds: f64, sim_time: &str) {
         vessel.status = VesselStatus::Transiting;
         vessel.last_update = sim_time.to_string();
     }
+}
+
+struct InitialCondition {
+    id: &'static str,
+    position: Position,
+    course: f64,
+    speed_mps: f64,
+    route: Vec<Position>,
+}
+
+// The flagship's and each scout's starting position, course, speed, and
+// route -- deliberately the exact same values as fleetcore/data/seed-
+// world.json's own vessels, not new numbers invented for this command.
+// Kept as a hardcoded constant here (rather than reading seed-world.json
+// at reset time) because World::apply_command has no file I/O anywhere
+// else and stays a pure in-memory state transition; if seed-world.json's
+// starting positions are ever deliberately changed, update both together.
+// Passive-traffic contacts are untouched by reset-fleet on purpose --
+// despawn-vessel already exists for those, and initial conditions were
+// asked for "Monad and escorts" specifically.
+fn initial_conditions() -> Vec<InitialCondition> {
+    vec![
+        InitialCondition {
+            id: "vessel.monad",
+            position: Position { lat: 26.56, lng: 56.25 },
+            course: 270.0,
+            speed_mps: 20.0,
+            route: vec![Position { lat: 26.25, lng: 55.35 }],
+        },
+        InitialCondition {
+            id: "vessel.scout-alpha",
+            position: Position { lat: 26.34, lng: 55.93 },
+            course: 286.0,
+            speed_mps: 18.0,
+            route: vec![Position { lat: 26.3, lng: 55.7 }],
+        },
+        InitialCondition {
+            id: "vessel.scout-bravo",
+            position: Position { lat: 26.54, lng: 56.63 },
+            course: 238.0,
+            speed_mps: 17.0,
+            route: vec![Position { lat: 26.47, lng: 56.36 }],
+        },
+        InitialCondition {
+            id: "vessel.scout-charlie",
+            position: Position { lat: 26.74, lng: 56.31 },
+            course: 204.0,
+            speed_mps: 16.0,
+            route: vec![Position { lat: 26.58, lng: 56.15 }],
+        },
+    ]
 }

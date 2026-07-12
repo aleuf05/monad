@@ -24,6 +24,7 @@ pub enum Command {
     DespawnVessel {
         id: String,
     },
+    ResetFleet,
     RecordWatchEvent {
         message: String,
     },
