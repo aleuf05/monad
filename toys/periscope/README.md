@@ -35,11 +35,18 @@ The artifact uses only static HTML, CSS, JavaScript, Canvas 2D, and local image 
 
 - The ocean background is loaded from `assets/backgrounds/sea-horizon-mk2.png` and panned by bearing.
 - Scout contacts render with `assets/sprites/scout-alpha.png` when available.
-- Class-specific vessel sprites render scout, tanker, dhow, pilot boat, and coaster contacts.
+- Class-specific photographic PNG sprites render scout, tanker, dhow, pilot boat, and coaster contacts.
 - Range controls horizon placement, while vessel class controls apparent size and waterline behavior.
 - Optics tiers adjust horizontal FOV, reticle density, long-lens shimmer, background zoom, and sprite scale.
 - If image assets are missing, the station falls back to the Mk I procedural ocean and geometric contact glyphs.
 - Mk II requirements, rendering notes, and asset pipeline guidance live in `mk2/REQUIREMENTS.md`.
+
+## Asset Foundry Mk I
+
+- Source chroma-key generations are archived in `assets/source/foundry-mk1/`.
+- Runtime alpha sprites live in `assets/sprites/vessel-*-photo.png`.
+- Existing SVG silhouettes remain in the repo as lightweight fallback/reference assets.
+- The current sprite set is prototype-quality generated imagery; class identity and scale are improved, but final production art still needs a dedicated asset review pass for exact hull proportions, lighting consistency, and long-range readability.
 
 ## Mk III Optics Glass
 

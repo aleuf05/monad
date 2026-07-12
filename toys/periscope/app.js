@@ -35,11 +35,11 @@ const ASSET_PATHS = {
   sea: "assets/backgrounds/sea-horizon-mk2.png",
   scout: "assets/sprites/scout-alpha.png",
   vessels: {
-    scout: "assets/sprites/vessel-scout.svg",
-    tanker: "assets/sprites/vessel-tanker.svg",
-    dhow: "assets/sprites/vessel-dhow.svg",
-    pilot: "assets/sprites/vessel-pilot.svg",
-    coaster: "assets/sprites/vessel-coaster.svg",
+    scout: "assets/sprites/vessel-scout-photo.png",
+    tanker: "assets/sprites/vessel-tanker-photo.png",
+    dhow: "assets/sprites/vessel-dhow-photo.png",
+    pilot: "assets/sprites/vessel-pilot-photo.png",
+    coaster: "assets/sprites/vessel-coaster-photo.png",
   },
 };
 
@@ -58,7 +58,7 @@ const VESSEL_RENDER_PROFILES = {
     sprite: "tanker",
     size: 1.78,
     waterline: 0.7,
-    haze: 0.72,
+    haze: 0.84,
     wake: 1.42,
     contrast: 0.96,
   },
@@ -85,7 +85,7 @@ const VESSEL_RENDER_PROFILES = {
     sprite: "coaster",
     size: 1.14,
     waterline: 0.72,
-    haze: 0.88,
+    haze: 0.94,
     wake: 1.04,
     contrast: 1,
   },
@@ -206,6 +206,12 @@ function loadImage(src) {
   return asset;
 }
 
+function vesselAssetForProfile(profile) {
+  const asset = assets.vessels[profile.sprite];
+  if (asset && !asset.failed) return asset;
+  return assets.scout;
+}
+
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
@@ -303,7 +309,7 @@ function projectContact(contact) {
   const horizonY = HORIZON_RATIO + 0.028;
   const rangeCompression = Math.pow(proximity, 1.32);
   const waterlineY = clamp(horizonY + rangeCompression * 0.225, horizonY, 0.73);
-  const baseScale = 0.34 + Math.pow(proximity, 0.74) * 0.6;
+  const baseScale = 0.42 + Math.pow(proximity, 0.74) * 0.56;
   return {
     ...contact,
     profile,
@@ -585,14 +591,14 @@ function renderWake(contact, x, y, spriteWidth) {
 function renderContactContrastPocket(contact, x, y, spriteWidth, spriteHeight) {
   const w = canvas.width;
   const rangeRatio = clamp(contact.range / MAX_RANGE, 0, 1);
-  const selectedBoost = state.selectedId === contact.id ? 0.16 : 0;
-  const pocketWidth = spriteWidth * (1.2 + rangeRatio * 0.48);
-  const pocketHeight = spriteHeight * (0.64 + rangeRatio * 0.26);
+  const selectedBoost = state.selectedId === contact.id ? 0.2 : 0;
+  const pocketWidth = spriteWidth * (1.28 + rangeRatio * 0.56);
+  const pocketHeight = spriteHeight * (0.68 + rangeRatio * 0.28);
   const centerY = y - spriteHeight * 0.32;
   const gradient = ctx.createRadialGradient(x, centerY, 0, x, centerY, pocketWidth * 0.58);
 
-  gradient.addColorStop(0, `rgba(3, 8, 10, ${(0.22 + rangeRatio * 0.18 + selectedBoost).toFixed(3)})`);
-  gradient.addColorStop(0.62, `rgba(6, 18, 20, ${(0.14 + rangeRatio * 0.1 + selectedBoost * 0.5).toFixed(3)})`);
+  gradient.addColorStop(0, `rgba(3, 8, 10, ${(0.26 + rangeRatio * 0.22 + selectedBoost).toFixed(3)})`);
+  gradient.addColorStop(0.62, `rgba(6, 18, 20, ${(0.16 + rangeRatio * 0.13 + selectedBoost * 0.56).toFixed(3)})`);
   gradient.addColorStop(1, "rgba(6, 18, 20, 0)");
 
   ctx.save();
@@ -758,7 +764,7 @@ function renderContact(contact, now) {
   const h = canvas.height;
   const optics = currentOptics();
   const profile = contact.profile || vesselProfile(contact);
-  const vesselAsset = assets.vessels[profile.sprite] || assets.scout;
+  const vesselAsset = vesselAssetForProfile(profile);
   const x = contact.x * w;
   const bobSeed = Number.isFinite(contact.baseBearing) ? contact.baseBearing : contact.bearing;
   const bob = Math.sin(now * 0.003 + bobSeed) * h * 0.004 * contact.scale / optics.backgroundZoom;
@@ -779,8 +785,8 @@ function renderContact(contact, now) {
     const drawX = x - spriteWidth * 0.5;
     const drawY = y - spriteHeight * profile.waterline;
     ctx.save();
-    const distanceAlpha = clamp(1.03 - Math.pow(rangeRatio, 1.4) * 0.36, 0.56, 1);
-    const focusBoost = isSelected ? 0.1 : 0;
+    const distanceAlpha = clamp(1.05 - Math.pow(rangeRatio, 1.4) * 0.31, 0.64, 1);
+    const focusBoost = isSelected ? 0.16 : 0;
     ctx.globalAlpha = clamp(0.48 + rangeRatio * 0.14, 0.48, 0.68) * profile.haze * distanceAlpha;
     ctx.filter = "brightness(0) blur(0.35px)";
     ctx.drawImage(
@@ -792,10 +798,10 @@ function renderContact(contact, now) {
     );
     ctx.restore();
 
-    ctx.globalAlpha = clamp(0.98 - rangeRatio * 0.18 + focusBoost, 0.6, 1) * profile.haze * distanceAlpha;
+    ctx.globalAlpha = clamp(1 - rangeRatio * 0.14 + focusBoost, 0.68, 1) * profile.haze * distanceAlpha;
     const blur = isSelected ? rangeRatio * 0.14 : rangeRatio * 0.38;
     const contrast = (profile.contrast || 1) * (1.03 + optics.magnification * 0.008 + focusBoost * 0.8);
-    ctx.filter = `blur(${(blur / optics.backgroundZoom).toFixed(2)}px) contrast(${contrast.toFixed(2)}) saturate(${(0.9 + focusBoost).toFixed(2)}) brightness(${(0.9 + contact.scale * 0.13 + focusBoost).toFixed(2)})`;
+    ctx.filter = `blur(${(blur / optics.backgroundZoom).toFixed(2)}px) contrast(${contrast.toFixed(2)}) saturate(${(0.92 + focusBoost).toFixed(2)}) brightness(${(0.94 + contact.scale * 0.12 + focusBoost).toFixed(2)})`;
     ctx.drawImage(
       vesselAsset.image,
       drawX,
