@@ -2,22 +2,15 @@
 // ../world.rs, ../command.rs) in a real-time process. Two ways in:
 //
 // - WebSocket at /ws: receive a snapshot on connect plus a fresh snapshot
-//   after every tick or applied command. Pass ?token=<command-token> on the
-//   connect URL to gain command authority on that connection; without it the
-//   connection is read-only (it still receives every broadcast, it just
-//   can't send commands).
-// - Plain JSON over HTTP: GET /snapshot (always open, read-only) and
-//   POST /command (requires `Authorization: Bearer <command-token>`).
+//   after every tick or applied command.
+// - Plain JSON over HTTP: GET /snapshot and POST /command.
 //
 // Both paths accept the same tagged Command JSON shape the CLI already
 // parses positional arguments into (e.g. {"type":"pause-clock"}).
 //
-// Command authority is opt-in, not opt-out: with no --command-token
-// configured, the server accepts reads from anyone but rejects every write,
-// from either transport. This is a deliberate default -- see Sprint.md
-// ("Read-only default for toys; explicit grant required for command
-// authority") -- not an oversight. Set --command-token to grant authority to
-// whoever holds that token.
+// No auth: every connection on both transports has full command authority,
+// no token required. --command-token is still accepted on the command line
+// and silently ignored, so existing launchers don't fail to start.
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::extract::{Query, State};
 use axum::http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, AUTHORIZATION};
@@ -57,15 +50,14 @@ struct AppState {
     world: Arc<Mutex<World>>,
     paths: Arc<StorePaths>,
     tx: broadcast::Sender<String>,
-    command_token: Option<Arc<str>>,
 }
 
 impl AppState {
-    fn authorized(&self, presented: Option<&str>) -> bool {
-        match (&self.command_token, presented) {
-            (Some(expected), Some(presented)) => expected.as_ref() == presented,
-            _ => false,
-        }
+    // Command token check removed -- every connection has command authority
+    // regardless of what (if anything) is presented. See commit history for
+    // the prior token-gated behavior.
+    fn authorized(&self, _presented: Option<&str>) -> bool {
+        true
     }
 }
 
@@ -110,8 +102,9 @@ async fn run() -> Result<(), String> {
     } else {
         DEFAULT_BIND_HOST
     };
-    let command_token: Option<Arc<str>> =
-        take_option(&mut args, "--command-token").map(|token| Arc::from(token.as_str()));
+    // --command-token is still accepted (and ignored) so existing launchers
+    // that pass it don't fail to start.
+    take_option(&mut args, "--command-token");
 
     let paths = StorePaths::new(state_dir, seed_path);
     ensure_dirs(&paths)?;
@@ -131,7 +124,6 @@ async fn run() -> Result<(), String> {
         world: Arc::new(Mutex::new(world)),
         paths: Arc::new(paths),
         tx,
-        command_token,
     };
 
     spawn_tick_loop(state.clone(), tick_ms);
@@ -148,13 +140,9 @@ async fn run() -> Result<(), String> {
     println!(
         "fleetcore live server listening: ws://{bind_host}:{port}/ws  http://{bind_host}:{port}/snapshot  http://{bind_host}:{port}/command"
     );
-    if state.command_token.is_some() {
-        println!("fleetcore-serve: command authority is GRANTED to holders of --command-token");
-    } else {
-        println!(
-            "fleetcore-serve: no --command-token set -- server is read-only, every write from every transport is rejected"
-        );
-    }
+    println!(
+        "fleetcore-serve: command authority is GRANTED to every connection -- no token required"
+    );
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await

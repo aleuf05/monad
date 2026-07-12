@@ -962,7 +962,7 @@ function updateLiveModeNote() {
   }
   liveModeNoteEl.hidden = false;
   liveModeNoteEl.textContent = liveCommandAuthority
-    ? "Live command authority granted: Set Waypoint (staged multi-leg routes included), Cancel Route, and Pause/Time Warp send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
+    ? "Live command authority granted: click the map to send the ship there now. Hold Shift and click multiple points to plan a multi-leg route, then click normally to send the whole path as one command. Cancel Route and Pause/Time Warp also send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
     : "Live, read-only: no command token presented, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with one — FleetCore has no command for them yet.";
 }
 
