@@ -1,0 +1,4 @@
+gradio_client
+pillow
+rembg[cpu]
+replicate
