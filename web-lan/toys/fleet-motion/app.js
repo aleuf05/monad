@@ -447,6 +447,18 @@ let shipTrails = [];
 let simulationClockSeconds = 0;
 let escortStates = createEscortStates();
 let contactStates = createContactStates();
+// Live mode only: escortStates/contactStates hold every real scout/passive
+// vessel FleetCore reports (see applyLiveSnapshot()), not just the fixed
+// 3+4 local demo roster (FORMATION/NPC_CONTACTS) non-live mode uses. The
+// original escortMarkers/contactMarkers/formationLinks arrays are sized
+// for that fixed roster and stay untouched -- hidden once, on first live
+// snapshot -- rather than reused, since indexing into them past their
+// fixed length would silently show only the first 3/4 real vessels.
+// liveVesselMarkers is a real dynamic marker pool keyed by each vessel's
+// own FleetCore id, reconciled (created/updated/removed) on every
+// snapshot by renderLiveVessels().
+const liveVesselMarkers = new Map();
+let liveRenderingInitialized = false;
 let lastPersistedAt = null;
 let lastPersistenceAttemptMs = 0;
 let restoredFromPersistentState = false;
@@ -985,33 +997,17 @@ function capitalizeStatus(status) {
 // reuses Fleet Motion's existing persistFleetState() write path unchanged
 // -- Periscope and Bridge inherit live data through the same
 // MonadFleetState contract they already read, with no changes on their end.
-// FleetCore's vessel ids never matched Fleet Motion's own ids ("escort-alpha"
-// vs "vessel.scout-alpha"), so this has always matched by array position
-// instead of id -- fine for escorts, since both sides happen to list
-// alpha/bravo/charlie in the same order, but WRONG for passive traffic:
-// FleetCore's snapshot order is alphabetical by id (coaster, dhow, gulf-star,
-// pilot-amber), Fleet Motion's own contactStates order is not (dhow, gulf-star,
-// pilot-amber, coaster). Positional matching there silently paired each
-// contact's on-screen name with a different vessel's real position -- e.g.
-// "DHOW LANTERN" rendering wherever the real Coaster Qeshm actually was.
-// Matched by name keyword instead: every FleetCore vessel name's last word
-// (ALPHA, LANTERN, STAR, AMBER, QESHM, ...) is a distinctive substring of
-// exactly one Fleet Motion entity's own name, regardless of either side's
-// array order.
-function matchByNameKeyword(entities, sourceVessels) {
-  const used = new Set();
-  return entities.map((entity) => {
-    const source = sourceVessels.find((vessel) => {
-      if (used.has(vessel.id)) return false;
-      const name = vessel.callsign || vessel.name || "";
-      const keyword = name.trim().split(/\s+/).pop()?.toUpperCase();
-      return keyword && entity.name?.toUpperCase().includes(keyword);
-    });
-    if (source) used.add(source.id);
-    return { entity, source };
-  });
-}
-
+// FleetCore's vessel ids never matched Fleet Motion's own local demo ids
+// ("escort-alpha" vs "vessel.scout-alpha"). An earlier version of this
+// function matched incoming vessels onto a fixed local roster by name
+// keyword instead of array position (position broke for passive traffic:
+// FleetCore's snapshot order is alphabetical by id, Fleet Motion's own
+// contactStates order wasn't, so positional matching silently paired
+// "DHOW LANTERN" with whatever vessel happened to be at that index -- e.g.
+// the real Coaster Qeshm's position). Using each real vessel's own id
+// directly (see escortStates/contactStates below) sidesteps matching
+// altogether -- there's nothing to mismatch -- and also removes the fixed
+// roster's 3+4 cap on how many vessels could ever be shown at once.
 function applyLiveSnapshot(snapshot) {
   const vessels = snapshot.vessels || [];
   const flagshipVessel = vessels.find((vessel) => vessel.kind === "flagship");
@@ -1033,26 +1029,37 @@ function applyLiveSnapshot(snapshot) {
     finalDestination = routeQueue.length ? routeQueue[routeQueue.length - 1] : null;
   }
 
-  escortStates = matchByNameKeyword(escortStates, scoutVessels).map(({ entity: escort, source }) => {
-    if (!source) return escort;
-    return {
-      ...escort,
-      position: clonePoint(source.position) || escort.position,
-      headingDegrees: source.course ?? escort.headingDegrees,
-      speedKmh: Number(source.speed_mps || 0) * LIVE_KMH_PER_MPS
-    };
-  });
+  // escortStates/contactStates hold every real scout/passive vessel
+  // FleetCore reports in live mode -- not matched against, or capped by,
+  // the fixed 3+4 local demo roster (FORMATION/NPC_CONTACTS) non-live mode
+  // uses. Earlier versions of this function matched incoming vessels onto
+  // that fixed roster (by name keyword, to avoid a positional-order
+  // mismatch bug -- see git history), which meant only 7 vessels could
+  // ever be visible here regardless of how many actually existed in
+  // FleetCore, and only if their callsigns happened to end in one of the
+  // roster's own names (ALPHA, LANTERN, ...). Using each real vessel's own
+  // id/position directly sidesteps the matching problem entirely (nothing
+  // to mismatch) and removes the cap -- Periscope and Bridge inherit the
+  // full real list for free through the same MonadFleetState contract,
+  // with no changes needed on their end.
+  escortStates = scoutVessels.map((vessel) => ({
+    id: vessel.id,
+    name: vessel.callsign || vessel.name,
+    position: clonePoint(vessel.position),
+    headingDegrees: vessel.course ?? null,
+    speedKmh: Number(vessel.speed_mps || 0) * LIVE_KMH_PER_MPS,
+    blocked: false
+  }));
 
-  contactStates = matchByNameKeyword(contactStates, passiveVessels).map(({ entity: contact, source }) => {
-    if (!source) return contact;
-    return {
-      ...contact,
-      position: clonePoint(source.position) || contact.position,
-      headingDegrees: source.course ?? contact.headingDegrees,
-      speedKmh: Number(source.speed_mps || 0) * LIVE_KMH_PER_MPS,
-      status: capitalizeStatus(source.status) || contact.status
-    };
-  });
+  contactStates = passiveVessels.map((vessel) => ({
+    id: vessel.id,
+    name: vessel.callsign || vessel.name,
+    role: "passive traffic",
+    position: clonePoint(vessel.position),
+    headingDegrees: vessel.course ?? null,
+    speedKmh: Number(vessel.speed_mps || 0) * LIVE_KMH_PER_MPS,
+    status: capitalizeStatus(vessel.status) || "Transiting"
+  }));
 
   simulationClockSeconds = Number(snapshot.tick) || simulationClockSeconds;
   liveClockState = snapshot.clock_state || liveClockState;
@@ -1709,7 +1716,13 @@ function renderTrail(index) {
 
 function syncTrails() {
   const changed = [addTrailPoint(0, flagship)];
-  escortStates.forEach((escort, index) => {
+  // trailLayers/trailColors are sized for the fixed 3-escort local roster
+  // (FORMATION.length + 1). In live mode escortStates can hold many more
+  // real scout vessels, so cap here rather than index out of bounds --
+  // per-vessel trails for live mode's dynamic roster aren't attempted,
+  // only the flagship's own trail (index 0, always synced above) matters
+  // operationally there.
+  escortStates.slice(0, trailLayers.length - 1).forEach((escort, index) => {
     changed[index + 1] = addTrailPoint(index + 1, escort.position);
   });
   changed.forEach((shouldRender, index) => {
@@ -1745,26 +1758,94 @@ function updateMarkerIcons() {
     const escortHeading = Math.round(escort.headingDegrees === null ? heading : escort.headingDegrees);
     marker.setIcon(shipIcon("escort", selectedShipId === escort.id, escortHeading));
   });
-  contactMarkers.forEach((marker, index) => {
-    const contact = contactStates[index];
-    marker.setIcon(contactIcon(selectedShipId === contact.id, Math.round(contact.headingDegrees)));
-  });
+  if (liveMode) {
+    renderLiveVessels();
+  } else {
+    escortMarkers.forEach((marker, index) => {
+      const escort = escortStates[index];
+      marker.setIcon(shipIcon("escort", selectedShipId === escort.id, Math.round(escort.headingDegrees === null ? heading : escort.headingDegrees)));
+    });
+    contactMarkers.forEach((marker, index) => {
+      const contact = contactStates[index];
+      marker.setIcon(contactIcon(selectedShipId === contact.id, Math.round(contact.headingDegrees)));
+    });
+  }
+}
+
+// Live mode's dynamic counterpart to the escortMarkers/contactMarkers
+// forEach loops above -- reconciles one real Leaflet marker per vessel id
+// currently in escortStates/contactStates (which in live mode hold every
+// real scout/passive vessel FleetCore reports, not a fixed 3+4 slot
+// roster). Markers persist across calls (keyed in liveVesselMarkers by
+// vessel id) so repeated snapshots update existing markers in place
+// instead of flickering; a vessel id no longer present gets its marker
+// removed. First call hides the original fixed-roster markers/links once,
+// since indexing into those fixed-length arrays would only ever show the
+// first 3/4 real vessels.
+function renderLiveVessels() {
+  if (!liveRenderingInitialized) {
+    escortMarkers.forEach((marker) => map.removeLayer(marker));
+    contactMarkers.forEach((marker) => map.removeLayer(marker));
+    formationLinks.forEach((link) => map.removeLayer(link));
+    liveRenderingInitialized = true;
+  }
+
+  const seen = new Set();
+  const upsert = (entity, kind) => {
+    seen.add(entity.id);
+    const heading = Math.round(entity.headingDegrees === null || entity.headingDegrees === undefined ? 0 : entity.headingDegrees);
+    const selected = selectedShipId === entity.id;
+    let entry = liveVesselMarkers.get(entity.id);
+    if (!entry) {
+      const marker = L.marker([entity.position.lat, entity.position.lng], {
+        icon: kind === "escort" ? shipIcon("escort", selected, heading) : contactIcon(selected, heading),
+        title: entity.name
+      })
+        .bindTooltip(entity.name, kind === "escort"
+          ? { direction: "top", offset: [0, -14] }
+          : { permanent: true, direction: "bottom", offset: [0, 12], className: "contact-label" })
+        .addTo(map);
+      marker.on("click", (event) => {
+        L.DomEvent.stopPropagation(event);
+        selectShip(entity.id);
+      });
+      liveVesselMarkers.set(entity.id, { marker });
+    } else {
+      entry.marker.setLatLng([entity.position.lat, entity.position.lng]);
+      entry.marker.setIcon(kind === "escort" ? shipIcon("escort", selected, heading) : contactIcon(selected, heading));
+      entry.marker.setTooltipContent(entity.name);
+    }
+  };
+
+  escortStates.forEach((escort) => upsert(escort, "escort"));
+  contactStates.forEach((contact) => upsert(contact, "contact"));
+
+  for (const [id, entry] of liveVesselMarkers) {
+    if (!seen.has(id)) {
+      map.removeLayer(entry.marker);
+      liveVesselMarkers.delete(id);
+    }
+  }
 }
 
 function updateFleetMarkers() {
   flagshipMarker.setLatLng([flagship.lat, flagship.lng]);
-  escortMarkers.forEach((marker, index) => {
-    const escort = escortStates[index];
-    marker.setLatLng([escort.position.lat, escort.position.lng]);
-    formationLinks[index].setLatLngs([
-      [flagship.lat, flagship.lng],
-      [escort.position.lat, escort.position.lng]
-    ]);
-  });
-  contactMarkers.forEach((marker, index) => {
-    const contact = contactStates[index];
-    marker.setLatLng([contact.position.lat, contact.position.lng]);
-  });
+  if (liveMode) {
+    renderLiveVessels();
+  } else {
+    escortMarkers.forEach((marker, index) => {
+      const escort = escortStates[index];
+      marker.setLatLng([escort.position.lat, escort.position.lng]);
+      formationLinks[index].setLatLngs([
+        [flagship.lat, flagship.lng],
+        [escort.position.lat, escort.position.lng]
+      ]);
+    });
+    contactMarkers.forEach((marker, index) => {
+      const contact = contactStates[index];
+      marker.setLatLng([contact.position.lat, contact.position.lng]);
+    });
+  }
 
   courseLine.setLatLngs(
     buildCoursePath()
