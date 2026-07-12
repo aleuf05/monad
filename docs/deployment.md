@@ -56,20 +56,15 @@ Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge
 
 ```sh
 cargo build --release --manifest-path fleetcore/Cargo.toml --bin serve
-sudo cp scripts/fleetcore-serve.service /etc/systemd/system/fleetcore-serve.service
+sudo cp scripts/fleetcore-serve.service scripts/monad-lan-web.service /etc/systemd/system/
 sudo systemctl daemon-reload
-sudo systemctl enable --now fleetcore-serve
-sudo systemctl status fleetcore-serve
+sudo systemctl enable --now fleetcore-serve monad-lan-web
+sudo systemctl status fleetcore-serve monad-lan-web
 ```
 
-As shipped, `scripts/fleetcore-serve.service` does not set `--command-token`, so the public deployment is read-only by default — visitors can watch the world tick but not touch it. To grant command authority (to yourself, or to anyone you give the token to), edit the unit's `ExecStart` line to add `--command-token <a-real-secret-you-choose>`, then:
+As of 2026-07-13, `scripts/fleetcore-serve.service`'s `ExecStart` already ships with `--bind-all --command-token bridge-3-0-lan` — command authority and LAN reachability are both on by default when this unit is installed, matching what's actually been live on this box, not the more conservative loopback-only/read-only configuration it originally shipped with. `scripts/monad-lan-web.service` is the LAN-only static web server's own unit, serving `web-lan/` on port `8090`.
 
-```sh
-sudo systemctl daemon-reload
-sudo systemctl restart fleetcore-serve
-```
-
-Whoever holds that token can then paste it into `toys/fleetcore-live/`'s "Command Token" field to unlock the Pause/Resume/time-scale controls. Treat it like any other shared secret — it grants control of the live world for every visitor at once, not just the person holding it.
+Whoever holds `bridge-3-0-lan` can paste it into `toys/fleetcore-live/`'s, Bridge's, or FleetCore Control Center's "Command Token" field to unlock write access — treat it like any other shared secret, since it grants control of the live world for every visitor at once. **This one specifically is not a real secret**: it's committed in plaintext across this repo's own git history (watch logs, this file, past commit messages), and the public `/monad/fleetcore-ws/` reverse proxy was finished without rotating it first — see the Bridge Station 2.1/3.0 section below for the full history. If you ever want real command-authority isolation, rotate to a token that isn't committed anywhere and update this file's `ExecStart` (then `sudo systemctl daemon-reload && sudo systemctl restart fleetcore-serve`) — deliberately not done as part of installing durability, since that's a separate decision from "does the process survive a reboot."
 
 **Exposing it publicly.** Add a `handle_path` block to `/etc/caddy/Caddyfile`, matching the existing `/portainer/*` pattern, so the public path proxies to the loopback-only server:
 
@@ -100,7 +95,7 @@ sudo systemctl reload caddy
 
 **FleetCore's bind changed too, and this affects `fleetcore-serve` globally, not just this toy.** Bridge Station 2.0 needs a live WebSocket connection to `fleetcore-serve`, but that process was loopback-only (`127.0.0.1`) — reachable only from Granite itself, not from other machines on the LAN, since loopback means "this host," not "this network." Restarted it with `--bind-all` (binds `0.0.0.0`) to make LAN access possible at all. This was judged low-risk specifically because no `--command-token` is configured — the server is still fully read-only regardless of bind address (verified: `POST /command` from the LAN IP still returns `401`) — but it does mean `fleetcore-serve` is now reachable by anything on the LAN, not just Bridge Station 2.0, and not just from Granite itself. **This paragraph's risk analysis is now stale** — see the Bridge Station 2.1/3.0 section below: a `--command-token` was later added, and separately, the public `wss://` reverse-proxy path was finished without rotating that token first, so as of 2026-07-12 the same token grants write access from the LAN, from `cameronlampley.com`, and to anything else that has read this file's git history. Revisit this bind decision now, not "if a `--command-token` is ever added" — one already was.
 
-**Durability:** both the LAN web server and `fleetcore-serve --bind-all` are ad hoc `nohup` processes, same caveat as the rest of this doc's "FleetCore Live Backend" section — neither survives a Granite reboot. `scripts/fleetcore-serve.service` (still not installed — needs `sudo`, see above) would need its `ExecStart` updated to include `--bind-all` if this LAN deployment is meant to be durable; there is currently no systemd unit for the LAN web server either.
+**Durability:** see "Running the process" above — `scripts/fleetcore-serve.service` and the new `scripts/monad-lan-web.service` cover both this box's `fleetcore-serve` and the LAN web server. Until those are installed, both remain the ad hoc `nohup` processes they've been all along and do not survive a Granite reboot.
 
 ## Bridge Station 2.1 and 3.0 — LAN-Only React Deployments
 
