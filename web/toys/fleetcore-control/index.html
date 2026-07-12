@@ -60,7 +60,7 @@
       </section>
       <p class="auth-note">This world is shared by every visitor. Without a command token every control below is disabled and this page only observes; holding a valid token grants command authority over the live world for everyone connected, not just you.</p>
       <p id="commandFeedback" class="command-feedback" role="status" hidden></p>
-      <p class="no-despawn-note"><strong>No undo yet:</strong> FleetCore's command surface has no despawn/remove-contact or reset command. Anything spawned from this page (or anywhere else) stays in the world until the <code>fleetcore-serve</code> process restarts &mdash; there is no "clear the board" button here because there is nothing for it to call.</p>
+      <p class="no-despawn-note"><strong>No bulk reset:</strong> individual passive-traffic contacts can now be removed (Manual: Despawn Vessel, below), but there is still no "clear the board" command &mdash; the flagship and scout escorts can never be despawned, and removing many contacts still means despawning them one at a time.</p>
 
       <section class="console-layout">
         <div class="control-column">
@@ -145,6 +145,18 @@
                 <textarea id="routeWaypoints" rows="4" placeholder="20.4,58.2&#10;20.9,58.6" required></textarea>
               </label>
               <button class="console-button secondary" type="submit" disabled>Set Route</button>
+            </form>
+          </section>
+
+          <section class="manual-panel">
+            <h2>Manual: Despawn Vessel</h2>
+            <p class="panel-note">Only passive-traffic contacts can be removed &mdash; the flagship and scout escorts are protected. This is the real inverse of Spawn Contact, not a client-side hide: every other connected viewer stops seeing it too.</p>
+            <form id="despawnForm" class="manual-form">
+              <label>
+                <span>Contact</span>
+                <select id="despawnVesselSelect" required></select>
+              </label>
+              <button class="console-button secondary" type="submit" disabled>Despawn Vessel</button>
             </form>
           </section>
         </div>
