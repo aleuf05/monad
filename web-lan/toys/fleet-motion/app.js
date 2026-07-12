@@ -1547,8 +1547,15 @@ function getShipPosition(id) {
   if (contact) {
     return { ...contact.position };
   }
+  // escortStates[0] as a last-resort fallback assumes at least one escort
+  // exists -- true by construction in local-sim mode (FORMATION always has
+  // 3) and in practice in live mode (FleetCore's despawn-vessel refuses to
+  // remove scouts), but not guaranteed by anything that would stop a
+  // custom/edited seed file from shipping zero scouts. Fall back to the
+  // flagship's own position rather than throwing on escortStates[0] being
+  // undefined.
   const escort = escortStates.find((ship) => ship.id === id) || escortStates[0];
-  return { ...escort.position };
+  return escort ? { ...escort.position } : { ...flagship };
 }
 
 function getSelectedShip() {
@@ -1793,6 +1800,16 @@ function renderLiveVessels() {
   const seen = new Set();
   const upsert = (entity, kind) => {
     seen.add(entity.id);
+    // FleetCore's own Vessel struct makes position non-optional, so this
+    // should never actually be null -- but a single bad entry throwing
+    // here would abort the whole forEach mid-loop, silently freezing
+    // every other live marker (including the removal pass below, which
+    // never runs). Skipping just this one entity is strictly safer than
+    // trusting the wire format to stay well-formed forever.
+    if (!entity.position || !Number.isFinite(entity.position.lat) || !Number.isFinite(entity.position.lng)) {
+      console.warn("Fleet Motion: skipping live vessel with invalid position", entity.id);
+      return;
+    }
     const heading = Math.round(entity.headingDegrees === null || entity.headingDegrees === undefined ? 0 : entity.headingDegrees);
     const selected = selectedShipId === entity.id;
     let entry = liveVesselMarkers.get(entity.id);
