@@ -49,6 +49,11 @@
       ...candidate,
       schemaVersion: SCHEMA_VERSION,
       savedAt: candidate.savedAt || null,
+      dataSource: candidate.dataSource || "local-simulation",
+      // Only meaningful when dataSource is "fleetcore-live" -- Fleet Motion
+      // is the only writer today and it's always false outside live mode,
+      // but default explicitly rather than lean on that as a promise.
+      liveCommandAuthority: Boolean(candidate.liveCommandAuthority),
       activePresetId: candidate.activePresetId || "freeplay",
       flagship: {
         ...(candidate.flagship || {}),
@@ -196,6 +201,7 @@
     return normalizeFleetMotionState({
       schemaVersion: SCHEMA_VERSION,
       savedAt: snapshot.sim_time || null,
+      dataSource: "fleetcore-live",
       activePresetId: "fleetcore",
       flagship: {
         position: clonePoint(flagship?.position),

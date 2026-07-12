@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Radio Console</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23071118'/%3E%3Cpath d='M9 20a7 7 0 0 1 14 0' fill='none' stroke='%238ad7c1' stroke-width='2' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='22' r='2.2' fill='%23d8b46a'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Monad / Bridge Instrument</p>
+          <h1>Radio Console</h1>
+          <p class="subtitle">Simulated fleet, weather, and traffic chatter for ambience. Scripted transmissions, spoken aloud where the browser supports it &mdash; not a live feed.</p>
+        </div>
+        <section class="status-strip" aria-label="Console status">
+          <div>
+            <span>Power</span>
+            <strong id="powerStatus">Off</strong>
+          </div>
+          <div>
+            <span>Frequency</span>
+            <strong id="frequencyReadout">156.800 MHz</strong>
+          </div>
+          <div>
+            <span>Monitoring</span>
+            <strong id="channelCount">3 channels</strong>
+          </div>
+          <div>
+            <span>Data Source</span>
+            <strong id="dataSourceValue">Scripted</strong>
+          </div>
+        </section>
+      </header>
+
+      <section class="control-deck" aria-label="Console controls">
+        <button id="powerButton" class="console-button power-button" type="button">Power On</button>
+
+        <div class="channel-chips" role="group" aria-label="Monitored channels">
+          <button type="button" class="channel-chip is-active" data-channel="fleet-comms">Fleet Comms</button>
+          <button type="button" class="channel-chip is-active" data-channel="weather">Weather</button>
+          <button type="button" class="channel-chip is-active" data-channel="traffic">Traffic</button>
+        </div>
+
+        <div class="volume-control">
+          <label for="volumeSlider">Volume</label>
+          <input id="volumeSlider" type="range" min="0" max="100" value="60">
+          <button id="muteButton" class="console-button secondary" type="button" aria-pressed="false">Mute</button>
+        </div>
+      </section>
+
+      <section class="console-layout">
+        <article class="signal-panel">
+          <p class="label">Signal</p>
+          <canvas id="signalMeter" width="280" height="90" aria-hidden="true"></canvas>
+          <p id="speakingIndicator" class="speaking-indicator">Standing by&hellip;</p>
+        </article>
+
+        <article class="transcript-panel">
+          <p class="label">Transcript</p>
+          <ul id="transcriptLog" class="transcript-log">
+            <li class="empty-note">Power on to begin monitoring.</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,372 @@
+:root {
+  color-scheme: dark;
+  --bridge: #090d10;
+  --bridge-deep: #040607;
+  --steel: #24323a;
+  --steel-2: #314650;
+  --glass: #87c5d4;
+  --text: #e8f0ed;
+  --muted: #95aaa6;
+  --amber: #d8b46a;
+  --signal: #8ad7c1;
+  --danger: #e0876a;
+  --panel: rgba(13, 21, 24, 0.88);
+  --line: rgba(196, 229, 223, 0.22);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(58, 86, 89, 0.42), transparent 34rem),
+    linear-gradient(180deg, #11191d 0%, var(--bridge) 42%, var(--bridge-deep) 100%);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem clamp(1rem, 3vw, 2rem) 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 1.25rem 1.5rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.6rem;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.status-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+  gap: 0.75rem 1.5rem;
+}
+
+.status-strip div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.status-strip span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.status-strip strong {
+  font-size: 1rem;
+  color: var(--signal);
+}
+
+.status-strip strong.is-on {
+  color: var(--amber);
+}
+
+.control-deck {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 1rem 1.25rem;
+}
+
+.console-button {
+  border: 1px solid var(--signal);
+  background: rgba(138, 215, 193, 0.12);
+  color: var(--signal);
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.console-button:hover {
+  background: rgba(138, 215, 193, 0.22);
+}
+
+.console-button.secondary {
+  border-color: var(--steel-2);
+  background: rgba(49, 70, 80, 0.35);
+  color: var(--text);
+}
+
+.console-button.secondary:hover {
+  background: rgba(49, 70, 80, 0.55);
+}
+
+.power-button.is-on {
+  border-color: var(--amber);
+  background: rgba(216, 180, 106, 0.16);
+  color: var(--amber);
+}
+
+.channel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.channel-chip {
+  border: 1px solid var(--steel-2);
+  background: rgba(49, 70, 80, 0.25);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.channel-chip.is-active {
+  border-color: var(--signal);
+  background: rgba(138, 215, 193, 0.16);
+  color: var(--signal);
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.volume-control label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.volume-control input[type="range"] {
+  width: 8rem;
+  accent-color: var(--signal);
+}
+
+.console-layout {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) minmax(0, 2fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.signal-panel,
+.transcript-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 1rem 1.1rem;
+}
+
+.label {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+#signalMeter {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 280 / 90;
+  background: var(--bridge-deep);
+  border: 1px solid var(--steel-2);
+  border-radius: 0.4rem;
+}
+
+.speaking-indicator {
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  min-height: 1.2em;
+}
+
+.speaking-indicator.is-speaking {
+  color: var(--amber);
+}
+
+.transcript-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+/* Set by app.js when window.self !== window.top -- this toy runs both as a
+   standalone page and as one of three panels in Bridge Station's Live
+   Console, where it gets a fixed, much shorter height than a full page.
+   Trimming here (not just relying on the .shell's own responsive rules)
+   is what keeps Power/channels/volume and at least a few transcript lines
+   visible without the iframe needing internal scrolling. */
+body.is-embedded .subtitle,
+body.is-embedded .eyebrow {
+  display: none;
+}
+
+body.is-embedded .topbar {
+  padding: 0.6rem 0.85rem;
+  align-items: center;
+}
+
+body.is-embedded h1 {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+body.is-embedded .shell {
+  padding: 0.6rem 0.75rem 0.75rem;
+  gap: 0.5rem;
+}
+
+body.is-embedded .status-strip {
+  gap: 0.3rem 0.9rem;
+}
+
+body.is-embedded .status-strip span {
+  font-size: 0.6rem;
+}
+
+body.is-embedded .status-strip strong {
+  font-size: 0.82rem;
+}
+
+body.is-embedded .control-deck {
+  padding: 0.5rem 0.7rem;
+  gap: 0.5rem;
+}
+
+body.is-embedded .console-button,
+body.is-embedded .channel-chip {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+body.is-embedded .volume-control input[type="range"] {
+  width: 5rem;
+}
+
+body.is-embedded .signal-panel,
+body.is-embedded .transcript-panel {
+  padding: 0.6rem 0.75rem;
+}
+
+body.is-embedded .transcript-log {
+  max-height: 6rem;
+}
+
+body.is-embedded #signalMeter {
+  aspect-ratio: 280 / 44;
+}
+
+.transcript-log li {
+  border-left: 2px solid var(--steel-2);
+  padding: 0.2rem 0 0.2rem 0.7rem;
+  font-size: 0.86rem;
+}
+
+.transcript-log li.is-new {
+  border-left-color: var(--amber);
+}
+
+.transcript-log .speaker {
+  color: var(--signal);
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+.transcript-log .timestamp {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-left: 0.4rem;
+}
+
+.transcript-log .channel-tag {
+  display: inline-block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--steel-2);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  margin-right: 0.5rem;
+}
+
+.empty-note {
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 780px) {
+  .volume-control {
+    margin-left: 0;
+    width: 100%;
+  }
+  .volume-control input[type="range"] {
+    flex: 1;
+  }
+}
+
+/* Narrower than a real standalone mobile view (see the 780px rule above,
+   which only relaxes volume-control layout): below this, even the two-
+   column signal/transcript layout gets cramped enough to stack. Bridge's
+   embedded width (~490-510px) stays above this, a real narrow phone does
+   not. */
+@media (max-width: 420px) {
+  .console-layout {
+    grid-template-columns: 1fr;
+  }
+}
