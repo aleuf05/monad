@@ -10,19 +10,13 @@ WorkingDirectory=/home/cgl/dev/monad
 # --bind-all: LAN clients (web-lan/'s toys, e.g. Bridge Station 2.0) reach
 # this directly at 192.168.0.100:4771, not just loopback -- see the Bridge
 # Station 2.0 bind-decision note in docs/deployment.md.
-# --command-token bridge-3-0-lan: command authority is granted with this
-# token everywhere the process is reachable -- LAN, and publicly through
-# the /monad/fleetcore-ws/ Caddy reverse proxy, since the public proxy
-# path was finished without rotating this token first. This token is
-# also committed in plaintext across this repo's own git history, so
-# treat it as a public secret, not a real one -- see docs/deployment.md's
-# Bridge Station 2.1/3.0 section for the full exposure history. This
-# service file reproduces exactly the live configuration this box was
-# actually running on 2026-07-13, not a more conservative default --
-# installing it with a stripped-down ExecStart would silently make
-# Bridge/FleetCore Control Center/LAN toys read-only or unreachable
-# after every reboot, a real capability regression from what was live.
-ExecStart=/home/cgl/dev/monad/fleetcore/target/release/serve --port 4771 --bind-all --command-token bridge-3-0-lan
+# No --command-token: as of 2026-07-12 the server grants command authority
+# to every connection unconditionally, on both /command and /ws, no token
+# required (fleetcore/src/bin/serve.rs). This is a fully open write
+# endpoint everywhere the process is reachable -- LAN, and publicly
+# through the /monad/fleetcore-ws/ Caddy reverse proxy. Deliberate,
+# explicit user request; see docs/deployment.md for the decision record.
+ExecStart=/home/cgl/dev/monad/fleetcore/target/release/serve --port 4771 --bind-all
 Restart=on-failure
 RestartSec=2
 NoNewPrivileges=true

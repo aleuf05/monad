@@ -1,35 +1,26 @@
 # Monad Deployment
 
-Granite serves the Monad LAN site through Caddy.
+Granite serves the Monad public site through Caddy, directly from the repo. There is no deploy step.
 
 ## Paths
 
 - Granite repo path: `~/dev/monad`
-- Source web bundle: `web/`
-- Live web root: `/var/www/monad`
-- Deployment command: `scripts/deploy-web.sh`
+- Live web root: `~/dev/monad/web` (Caddy's `root *` directive in `/etc/caddy/Caddyfile` points here directly)
 
 ## Deployment
 
-Run the deploy script from the Monad repo on Granite:
+There isn't one. Editing any file under `web/` changes what `https://cameronlampley.com/monad/` serves immediately — Caddy reads straight off disk, no copy, no reload, no script.
 
-```sh
-scripts/deploy-web.sh
-```
-
-The script copies `web/` to `/var/www/monad/` with `rsync --delete`, validates the Caddy config, reloads Caddy only after validation succeeds, and checks `http://localhost/`.
+As of 2026-07-12, Caddy's `root` was repointed from `/var/www/monad` (an rsynced copy, kept in sync by the now-retired `scripts/deploy-web.sh`) to `~/dev/monad/web` itself. `/var/www/monad` is no longer read by anything and can be left alone or removed. Permissions were verified compatible with this before switching: the `caddy` user (`caddy:caddy`) has traversal (`x`) on every ancestor directory down to `~/dev/monad/web` and read access on everything inside it, without needing any group changes.
 
 ## Doctrine
 
-- Git carries source.
-- `/var/www/monad` is deployed output.
-- Caddy root should remain `/var/www/monad`.
+- Git carries source, and — as of this change — is also the live source. Editing `web/` on Granite is editing production directly.
 - The Portainer reverse proxy path must not be disturbed.
-- Do not edit the live web root by hand when the repo copy can be deployed instead.
 
 ## Public Artifacts
 
-Interactive artifacts that must be reachable under `https://cameronlampley.com/monad/` live inside `web/toys/`. Each is a plain copy of the matching `toys/<name>/` source directory (runtime files only — READMEs, engineering reports, and other docs stay in the repo and are not copied). Re-copy the relevant source directory into `web/toys/<name>/` before running `scripts/deploy-web.sh` whenever that toy changes; `web/toys/` does not update itself.
+Interactive artifacts that must be reachable under `https://cameronlampley.com/monad/` live inside `web/toys/`. Each is a plain copy of the matching `toys/<name>/` source directory (runtime files only — READMEs, engineering reports, and other docs stay in the repo and are not copied). Re-copy the relevant source directory into `web/toys/<name>/` whenever that toy changes; `web/toys/` does not update itself, and since there's no deploy step, the copy is live the moment it's saved.
 
 - `web/toys/fleet-motion/` — Fleet Motion Mk2, copied from `toys/fleet-motion/`. Depends on `web/toys/shared/fleet-state.js`.
 - `web/toys/periscope/` — Periscope Station, copied from `toys/periscope/` (`app.js`, `index.html`, `style.css`, and only the two asset files `ASSET_PATHS` actually loads: `assets/backgrounds/sea-horizon-mk2.png`, `assets/sprites/scout-alpha.png`). Depends on `web/toys/shared/fleet-state.js`.
@@ -83,19 +74,19 @@ sudo systemctl reload caddy
 
 **Unverified:** `cameronlampley.com` reaches Granite through a separate reverse proxy on rock64 (see the "Public Hatch" note in `web/command-deck.html`), which this deployment doc doesn't have visibility into. Whether rock64 passes WebSocket upgrade requests through to Granite's Caddy is not confirmed — if `wss://cameronlampley.com/monad/fleetcore-ws/ws` doesn't connect after the steps above, check rock64's proxy config for WebSocket support before assuming Caddy or `fleetcore-serve` is at fault. `http://localhost/monad/fleetcore-ws/snapshot` on Granite itself is the right first check to isolate Caddy/fleetcore-serve from rock64.
 
-**Known limitation, accepted for now:** the live world is shared by every visitor, and the `--command-token` gate is all-or-nothing — there's no per-visitor isolation and no way to give one person pause/resume without also giving them everything else in the `Command` surface. Anyone holding the token affects every connected visitor at once. This was an explicit, informed choice (not an oversight) when deploying this artifact; add per-token scoping before treating this as anything more than a single-operator demo.
+**Known limitation, accepted for now:** as of 2026-07-12 there is no command-token gate at all — `fleetcore-serve` grants full command authority to every connection on both `/command` and `/ws` unconditionally (`fleetcore/src/bin/serve.rs`), explicit user request. The live world is shared by every visitor with no per-visitor isolation: anyone who can reach the server (which, through the public reverse proxy, means anyone on the internet) can pause/resume, reset the fleet, despawn vessels, or set any vessel's route. This was an explicit, informed choice, not an oversight; add real auth before treating this as anything more than a single-operator demo.
 
 ## Bridge Station 2.0 — LAN-Only Deployment
 
 `toys/bridge-2/` (see `logs/captains/2026/2026-07-11_bridge-station-2-scope.md`) is deployed to the LAN only, deliberately not through the public Caddy/rock64 path. Reachable at `http://192.168.0.100:8090/toys/bridge-2/` from any machine on Granite's LAN.
 
-**Why a separate port instead of `/var/www/monad`:** Caddy's `:80` root is reachable both on the LAN directly and publicly through rock64's proxy to `cameronlampley.com/monad/`. There is no path-based way to make something in `/var/www/monad` LAN-only — anything placed there is public too, whether or not it's linked from anywhere. Genuine LAN-only isolation requires a separate process on a port rock64 doesn't forward, so a dedicated `web-lan/` directory at the repo root (distinct from `web/`, which is what actually gets rsynced to `/var/www/monad`) is served by its own `python3 -m http.server 8090 --bind 0.0.0.0 --directory web-lan`, independent of the production Caddy instance. `web-lan/` holds its own copies (`toys/bridge-2/`, `toys/shared/`, `toys/fleetcore-control/`) — same "does not update itself, re-copy runtime files by hand" rule as `web/toys/`. Verified after deploying: `https://cameronlampley.com/monad/toys/bridge-2/` returns `404` (never copied to `/var/www/monad`), and port `8090` itself is unreachable from outside the LAN.
+**Why a separate port instead of Caddy's `:80` root:** Caddy's `:80` root (`web/`, served straight from the repo — see "Deployment" above) is reachable both on the LAN directly and publicly through rock64's proxy to `cameronlampley.com/monad/`. There is no path-based way to make something under `web/` LAN-only — anything placed there is public too, whether or not it's linked from anywhere. Genuine LAN-only isolation requires a separate process on a port rock64 doesn't forward, so a dedicated `web-lan/` directory at the repo root (distinct from `web/`) is served by its own process (`monad-lan-web.service`, `python3 -m http.server 8090 --bind 0.0.0.0 --directory web-lan`), independent of the production Caddy instance. `web-lan/` holds its own copies (`toys/bridge-2/`, `toys/shared/`, `toys/fleetcore-control/`) — same "does not update itself, re-copy runtime files by hand" rule as `web/toys/`. Verified: `https://cameronlampley.com/monad/toys/bridge-2/` returns `404` (never copied into `web/`), and port `8090` itself is unreachable from outside the LAN.
 
-**`web-lan/toys/fleetcore-control/`** — LAN-only copy of `toys/fleetcore-control/`, reachable at `http://192.168.0.100:8090/toys/fleetcore-control/`. Same divergence pattern as the public copies: `index.html`'s `#serverUrl` defaults to `ws://192.168.0.100:4771/ws` (the LAN IP fleetcore-serve's `--bind-all` already listens on) rather than `localhost` or the public `wss://` reverse-proxy path. Verified live with write access using the existing `bridge-3-0-lan` command token — see the security note immediately below before assuming that token is LAN-scoped in practice.
+**`web-lan/toys/fleetcore-control/`** — LAN-only copy of `toys/fleetcore-control/`, reachable at `http://192.168.0.100:8090/toys/fleetcore-control/`. Same divergence pattern as the public copies: `index.html`'s `#serverUrl` defaults to `ws://192.168.0.100:4771/ws` (the LAN IP fleetcore-serve's `--bind-all` already listens on) rather than `localhost` or the public `wss://` reverse-proxy path. As of 2026-07-12 no token is needed at all — see the "Known limitation" note above.
 
-**FleetCore's bind changed too, and this affects `fleetcore-serve` globally, not just this toy.** Bridge Station 2.0 needs a live WebSocket connection to `fleetcore-serve`, but that process was loopback-only (`127.0.0.1`) — reachable only from Granite itself, not from other machines on the LAN, since loopback means "this host," not "this network." Restarted it with `--bind-all` (binds `0.0.0.0`) to make LAN access possible at all. This was judged low-risk specifically because no `--command-token` is configured — the server is still fully read-only regardless of bind address (verified: `POST /command` from the LAN IP still returns `401`) — but it does mean `fleetcore-serve` is now reachable by anything on the LAN, not just Bridge Station 2.0, and not just from Granite itself. **This paragraph's risk analysis is now stale** — see the Bridge Station 2.1/3.0 section below: a `--command-token` was later added, and separately, the public `wss://` reverse-proxy path was finished without rotating that token first, so as of 2026-07-12 the same token grants write access from the LAN, from `cameronlampley.com`, and to anything else that has read this file's git history. Revisit this bind decision now, not "if a `--command-token` is ever added" — one already was.
+**FleetCore's bind changed too, and this affects `fleetcore-serve` globally, not just this toy.** Bridge Station 2.0 needs a live WebSocket connection to `fleetcore-serve`, but that process was originally loopback-only (`127.0.0.1`) — reachable only from Granite itself, not from other machines on the LAN. Restarted with `--bind-all` (binds `0.0.0.0`) to make LAN access possible at all. Combined with the command-token removal above, `fleetcore-serve` is now a fully open write endpoint reachable from the LAN, from `cameronlampley.com`, and from anywhere else that can reach Granite's ports.
 
-**Durability:** see "Running the process" above — `scripts/fleetcore-serve.service` and the new `scripts/monad-lan-web.service` cover both this box's `fleetcore-serve` and the LAN web server. Until those are installed, both remain the ad hoc `nohup` processes they've been all along and do not survive a Granite reboot.
+**Durability:** both `fleetcore-serve` and the LAN web server run as installed, enabled systemd units as of 2026-07-12 — `/etc/systemd/system/fleetcore-serve.service` and `/etc/systemd/system/monad-lan-web.service` (sourced from `scripts/fleetcore-serve.service` and `scripts/monad-lan-web.service` in this repo). Both survive a Granite reboot and restart automatically on crash (`Restart=on-failure`). World state persists to `state-dir` independent of the process restarting.
 
 ## Bridge Station 2.1 and 3.0 — LAN-Only React Deployments
 
