@@ -408,6 +408,18 @@ h1 {
   background: rgba(37, 217, 232, 0.18);
 }
 
+.live-mode-note {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(46, 230, 238, 0.3);
+  border-radius: 5px;
+  background: rgba(46, 230, 238, 0.06);
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+}
+
 .controls {
   display: grid;
   grid-template-columns: 1fr 1fr;

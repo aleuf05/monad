@@ -149,6 +149,8 @@
           </div>
         </section>
 
+        <p id="liveModeNote" class="live-mode-note" hidden></p>
+
         <div class="time-warp" aria-label="Simulation speed controls">
           <button class="warp-button" type="button" data-warp="0">Pause</button>
           <button class="warp-button active" type="button" data-warp="1">1x</button>
@@ -168,6 +170,7 @@
           <button id="clearWaypointsButton" type="button" disabled>Clear Waypoints</button>
           <button id="cancelRouteButton" type="button" disabled>Cancel Route</button>
           <button id="homeButton" type="button">Return to Station</button>
+          <button id="resetToBaselineButton" class="secondary" type="button">Reset to Open Water</button>
           <button id="resetButton" class="secondary" type="button">Reload Saved State</button>
         </div>
 
@@ -218,6 +221,6 @@
       crossorigin=""
     ></script>
     <script src="../shared/fleet-state.js"></script>
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>

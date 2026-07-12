@@ -196,6 +196,29 @@ dd {
   display: none;
 }
 
+.watchbook-redirect {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 14px;
+  max-width: 560px;
+  padding: 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.watchbook-redirect a {
+  color: var(--signal);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.watchbook-redirect a:hover,
+.watchbook-redirect a:focus-visible {
+  color: var(--amber);
+  outline: none;
+}
+
 .live-console {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -294,6 +317,124 @@ dd {
   color: var(--signal);
 }
 
+.command-token-form {
+  padding: 0 14px 14px;
+}
+
+.command-token-form label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.command-token-row {
+  display: flex;
+  gap: 8px;
+}
+
+.command-token-row input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(180, 216, 209, 0.16);
+  background: rgba(2, 6, 8, 0.48);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.command-token-row input:focus-visible {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.command-token-row button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(216, 180, 106, 0.45);
+  background: rgba(20, 17, 9, 0.5);
+  color: var(--amber);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.command-token-row button:hover,
+.command-token-row button:focus-visible {
+  border-color: var(--amber);
+  background: rgba(20, 17, 9, 0.72);
+  outline: none;
+}
+
+.contact-roster {
+  padding: 0 14px 14px;
+}
+
+.contact-roster-list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.contact-roster-empty {
+  color: var(--muted);
+  font-size: 0.78rem;
+  padding: 8px 0;
+}
+
+.contact-roster-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  min-height: 42px;
+  padding: 6px 11px;
+  border: 1px solid rgba(180, 216, 209, 0.16);
+  background: rgba(2, 6, 8, 0.48);
+  color: var(--signal);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.contact-roster-item:hover,
+.contact-roster-item:focus-visible {
+  border-color: var(--amber);
+  outline: none;
+}
+
+.contact-roster-item.is-selected {
+  border-color: var(--amber);
+  background: rgba(230, 184, 106, 0.1);
+}
+
+.contact-roster-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.contact-roster-meta {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.contact-roster-item.is-selected .contact-roster-meta {
+  color: var(--amber);
+}
+
 .engineering-note {
   margin: 0 14px 14px;
   color: var(--muted);
@@ -354,6 +495,7 @@ dd {
 @media (max-width: 900px) {
   .live-console {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
     grid-auto-rows: minmax(300px, 1fr);
     overflow-y: auto;
   }

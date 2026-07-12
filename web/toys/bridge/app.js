@@ -8,10 +8,14 @@
   const conditionValue = document.querySelector("#conditionValue");
   const fleetStateValue = document.querySelector("#fleetStateValue");
   const dataSourceValue = document.querySelector("#dataSourceValue");
+  const commandAuthorityValue = document.querySelector("#commandAuthorityValue");
   const fleetPositionValue = document.querySelector("#fleetPositionValue");
   const routeValue = document.querySelector("#routeValue");
   const contactValue = document.querySelector("#contactValue");
   const selectedVesselValue = document.querySelector("#selectedVesselValue");
+  const contactRosterList = document.querySelector("#contactRosterList");
+  const commandTokenForm = document.querySelector("#commandTokenForm");
+  const commandTokenInput = document.querySelector("#commandTokenInput");
   const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
@@ -27,24 +31,73 @@
   // Periscope) and Radio Console each independently support an opt-in live
   // FleetCore feed -- see their own READMEs. Bridge composes those
   // instruments rather than reimplementing them: passing Bridge's own
-  // `?live=1` (and optional `?fleetcoreServer=`) straight through to
-  // whichever embedded iframes declare a `data-instrument-src`. Those
-  // iframes have no `src` in the HTML itself specifically so this is the
-  // only load they ever do -- setting `.src` after an unparambed default
-  // load would cause a visible reload flash. Periscope and Watchbook keep
-  // a plain static `src` and are untouched by this: Periscope takes no
-  // query params (it just reads whatever Fleet Motion writes), and
-  // Watchbook has nothing to do with FleetCore at all.
+  // `?live=1` (and optional `?fleetcoreServer=`, `?commandToken=`) straight
+  // through to whichever embedded iframes declare a `data-instrument-src`.
+  // Those iframes have no `src` in the HTML itself specifically so this is
+  // the only load they ever do -- setting `.src` after an unparambed
+  // default load would cause a visible reload flash. Periscope and
+  // Watchbook keep a plain static `src` and are untouched by this:
+  // Periscope takes no query params (it just reads whatever Fleet Motion
+  // writes), and Watchbook has nothing to do with FleetCore at all.
+  //
+  // `commandToken` is the one param here that grants write access to the
+  // shared FleetCore world (docs/architecture/fleetcore-api.md) -- Bridge
+  // never stores or defaults it, purely forwards whatever the operator put
+  // in its own URL, same as fleetcoreServer. No token is baked in anywhere
+  // in this file for the same reason toys/fleet-motion/app.js doesn't bake
+  // one into its own bundle: this page can be the public deployment too.
   const liveCapableIframes = Array.from(document.querySelectorAll("[data-instrument-src]"));
   if (liveCapableIframes.length) {
     const bridgeParams = new URLSearchParams(window.location.search);
     const passthrough = new URLSearchParams();
     if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
     if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
+    if (bridgeParams.has("commandToken")) passthrough.set("commandToken", bridgeParams.get("commandToken"));
     const query = passthrough.toString();
     liveCapableIframes.forEach((iframe) => {
       const baseSrc = iframe.dataset.instrumentSrc;
       iframe.src = query ? `${baseSrc}?${query}` : baseSrc;
+    });
+  }
+
+  // Granting command authority today means editing the URL and reloading
+  // all of Bridge, which is a bad fit for something billing itself as a
+  // command console. This reloads only the Fleet Motion iframe -- Radio
+  // Console also matches [data-instrument-src] above but ignores
+  // commandToken entirely, and reloading it for no reason would cut off
+  // whatever it's currently playing. Unlike the initial load above (which
+  // deliberately avoids ever touching .src twice to prevent a load flash),
+  // this reload is operator-triggered on submit, so it's expected.
+  const fleetMotionIframe = document.querySelector("#liveFleetMotion iframe");
+
+  function applyCommandToken(token) {
+    if (!fleetMotionIframe) return;
+    const currentSrc = fleetMotionIframe.src || fleetMotionIframe.dataset.instrumentSrc;
+    if (!currentSrc) return;
+    const nextSrc = new URL(currentSrc, window.location.href);
+    if (token) {
+      nextSrc.searchParams.set("commandToken", token);
+    } else {
+      nextSrc.searchParams.delete("commandToken");
+    }
+    fleetMotionIframe.src = nextSrc.toString();
+
+    // Mirrors the token into Bridge's own URL (same exposure the existing
+    // ?commandToken= passthrough already has) so a page refresh doesn't
+    // silently drop authority the operator just granted.
+    const pageUrl = new URL(window.location.href);
+    if (token) {
+      pageUrl.searchParams.set("commandToken", token);
+    } else {
+      pageUrl.searchParams.delete("commandToken");
+    }
+    window.history.replaceState(null, "", pageUrl);
+  }
+
+  if (commandTokenForm) {
+    commandTokenForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applyCommandToken(commandTokenInput.value.trim());
     });
   }
 
@@ -138,6 +191,78 @@
     }, 900);
   }
 
+  // Additive write path into MonadFleetState.selection, same pattern
+  // toys/periscope/app.js's own propagateSelection() already uses for a
+  // contact picked directly on the scope: read the full shared state,
+  // override only selection.selectedShipId, write the whole object back.
+  // Bridge still never touches any other field. Fleet Motion and
+  // Periscope each pick this up the normal way (Fleet Motion checks it
+  // every frame, Periscope on its own poll) via the native `storage`
+  // event, since they're separate browsing contexts (iframes) from
+  // Bridge's own top-level document. That event does NOT fire back into
+  // the document that made the write, though, so Bridge calls
+  // updateSharedState() itself right after writing rather than waiting
+  // on its own 1s tick() to notice -- that's also what lets the existing
+  // sync-pulse logic (comparing against lastSelectedShipId) fire for a
+  // roster click the same way it already does for an iframe-originated one.
+  function selectContact(id) {
+    const sharedState = window.MonadFleetState?.read?.();
+    if (!sharedState || sharedState.selection?.selectedShipId === id) return;
+    window.MonadFleetState.write({
+      ...sharedState,
+      selection: { ...sharedState.selection, selectedShipId: id }
+    });
+    updateSharedState();
+  }
+
+  function renderContactRoster(state, contacts) {
+    if (!contactRosterList) return;
+    contactRosterList.innerHTML = "";
+    if (!state) {
+      contactRosterList.innerHTML = '<li class="contact-roster-empty">No contacts observed</li>';
+      return;
+    }
+    const selectedShipId = state.selection?.selectedShipId ?? null;
+    const entries = [
+      {
+        id: "monad",
+        name: "MONAD",
+        classLabel: "Flagship",
+        detail: formatPosition(state.flagship?.position)
+      },
+      ...contacts.map((contact) => ({
+        id: contact.id,
+        name: contact.callsign || contact.name,
+        // contact.class carries the vessel's own role string (e.g. "civilian
+        // dhow"), not the literal "passive-traffic" -- toys/shared/fleet-state.js's
+        // toScoutContacts() already tags exactly this distinction onto
+        // `source` ("fleet-motion-escort" vs "fleet-motion-passive-contact"),
+        // so key off that instead of guessing from role text.
+        classLabel: contact.source === "fleet-motion-passive-contact" ? "Local Traffic" : "Fleet Screen",
+        detail: `BRG ${String(Math.round(contact.bearing)).padStart(3, "0")}° / RNG ${contact.range.toFixed(1)} nm`
+      }))
+    ];
+    entries.forEach((entry) => {
+      const li = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      const isSelected = selectedShipId === entry.id;
+      button.className = `contact-roster-item${isSelected ? " is-selected" : ""}`;
+      button.setAttribute("aria-pressed", String(isSelected));
+      const nameEl = document.createElement("span");
+      nameEl.className = "contact-roster-name";
+      nameEl.textContent = entry.name;
+      const metaEl = document.createElement("span");
+      metaEl.className = "contact-roster-meta";
+      metaEl.textContent = `${entry.classLabel} · ${entry.detail}`;
+      button.appendChild(nameEl);
+      button.appendChild(metaEl);
+      button.addEventListener("click", () => selectContact(entry.id));
+      li.appendChild(button);
+      contactRosterList.appendChild(li);
+    });
+  }
+
   function updateSharedState() {
     const state = parseFleetState();
     const selectedShipId = state?.selection?.selectedShipId ?? null;
@@ -160,6 +285,11 @@
         dataSourceValue.textContent = "Awaiting Fleet Motion";
         dataSourceValue.className = "";
       }
+      if (commandAuthorityValue) {
+        commandAuthorityValue.textContent = "Awaiting Fleet Motion";
+        commandAuthorityValue.className = "";
+      }
+      renderContactRoster(null, []);
       return;
     }
 
@@ -197,13 +327,30 @@
         selectedVesselValue.textContent = selected ? selected.name : "No selection observed";
       }
     }
+    renderContactRoster(state, contacts);
 
     alertLevel.className = routeLegs > 0 ? "is-watch" : "";
     conditionValue.className = state.navigation?.lastNavigationMessage === "Clear" ? "is-watch" : "is-caution";
+    const isLive = state.dataSource === "fleetcore-live";
     if (dataSourceValue) {
-      const isLive = state.dataSource === "fleetcore-live";
       dataSourceValue.textContent = isLive ? "FleetCore Live" : "Fleet Motion (Local Sim)";
       dataSourceValue.className = isLive ? "is-live" : "";
+    }
+    // liveCommandAuthority only means anything once actually live -- Fleet
+    // Motion's own var is false by default and never toggles true outside
+    // a live "connected" message, but be explicit here too rather than
+    // trust a local-sim state to always carry it as false.
+    if (commandAuthorityValue) {
+      if (!isLive) {
+        commandAuthorityValue.textContent = "N/A (Local Sim)";
+        commandAuthorityValue.className = "";
+      } else if (state.liveCommandAuthority) {
+        commandAuthorityValue.textContent = "Granted";
+        commandAuthorityValue.className = "is-live";
+      } else {
+        commandAuthorityValue.textContent = "Read-Only";
+        commandAuthorityValue.className = "is-caution";
+      }
     }
   }
 
