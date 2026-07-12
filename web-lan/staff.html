@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleet Monad — Staff</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0B1220;
+    color: #DCE6F2;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.6;
+    padding: 48px 24px 100px;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .anchor-mark {
+    font-size: 28px;
+    color: #E8A33D;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 34px;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    color: #DCE6F2;
+  }
+
+  .tagline {
+    font-size: 13px;
+    color: #6B7C93;
+    letter-spacing: 0.06em;
+    margin-top: 6px;
+  }
+
+  .return-link {
+    display: inline-block;
+    margin-top: 18px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: #4FD1C5;
+    text-decoration: none;
+    border: 1px solid #4FD1C544;
+    border-radius: 4px;
+    padding: 8px 14px;
+  }
+
+  .return-link:hover { border-color: #4FD1C5; }
+
+  .divider {
+    height: 1px;
+    background: #1E2C42;
+    margin: 32px 0;
+  }
+
+  .roster {
+    display: grid;
+    gap: 20px;
+  }
+
+  .officer {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 20px;
+    background: #111A2B;
+    border: 1px solid #1E2C42;
+    border-radius: 6px;
+    padding: 22px 24px;
+    transition: border-color 150ms ease;
+  }
+
+  .officer:hover { border-color: #E8A33D44; }
+
+  .officer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .officer-photo {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 5px;
+    border: 1px solid #1E2C42;
+    background: #0B1220 center/cover no-repeat;
+    margin-bottom: 8px;
+    object-fit: cover;
+  }
+
+  .rank {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #E8A33D;
+    text-transform: uppercase;
+  }
+
+  .name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #DCE6F2;
+    letter-spacing: 0.03em;
+  }
+
+  .role {
+    font-size: 11px;
+    color: #4FD1C5;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+
+  .status {
+    margin-top: 10px;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .status-active { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .status-limited { color: #E8A33D; border: 1px solid #E8A33D44; }
+
+  .bio {
+    font-size: 13px;
+    color: #9BB0C8;
+  }
+
+  .quote {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #6B7C93;
+    font-style: italic;
+    border-left: 2px solid #1E2C42;
+    padding-left: 10px;
+  }
+
+  @media (max-width: 640px) {
+    .officer { grid-template-columns: 1fr; }
+    .officer-photo { max-width: 160px; }
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 11px;
+    color: #3A4C68;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-motto {
+    margin-top: 6px;
+    color: #6B7C93;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="anchor-mark">⚓</div>
+      <h1>FLEET MONAD</h1>
+      <div class="tagline">STAFF ROSTER · FLAGSHIP MONAD</div>
+      <a class="return-link" href="index.html">&larr; Return to Bridge</a>
+    </header>
+
+    <div class="divider"></div>
+
+    <div class="roster">
+
+      <div class="officer">
+        <div class="officer-meta">
+          <div class="rank">★★★★ Admiral</div>
+          <div class="name">Admiral C</div>
+          <div class="role">Fleet Command</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Founder and commanding authority of Monad. Sets mission, doctrine, and strategic direction for the fleet. Appears as needed to set course.
+        </div>
+      </div>
+
+      <div class="officer">
+        <div class="officer-meta">
+          <div class="rank">★★★ Captain</div>
+          <div class="name">Captain T</div>
+          <div class="role">Officer of the Deck</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Commanding officer, Flagship Monad. Coordinates watches, integrates engineering reports, and maintains discipline across the bridge. Author of the fleet's standing doctrine.
+        </div>
+        <div class="quote">"Every artifact leaves a wake."</div>
+      </div>
+
+      <div class="officer">
+        <div class="officer-meta">
+          <div class="rank">★★ Commander</div>
+          <div class="name">Commander Claude</div>
+          <div class="role">Chief Engineer / Chief Narrative Officer</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Turns ideas into working artifacts. Commissioned to the additional office of Chief Narrative Officer in recognition of disciplined systems architecture — charged with preserving fleet history from verified events only.
+        </div>
+        <div class="quote">"Narrative follows reality."</div>
+      </div>
+
+      <div class="officer">
+        <div class="officer-meta">
+          <div class="rank">★★ Commander</div>
+          <div class="name">Commander Codex</div>
+          <div class="role">Engineering Officer</div>
+          <span class="status status-limited">LIMITED DUTY</span>
+        </div>
+        <div class="bio">
+          Engineering officer, currently on reduced duty. The fleet's standing order is clear: no engineer runs at full throttle indefinitely, and the watch holds his station until he's ready to return.
+        </div>
+      </div>
+
+      <div class="officer">
+        <div class="officer-meta">
+          <img class="officer-photo" src="assets/staff/reyes.jpg" alt="Lt. Sofia Reyes">
+          <div class="rank">★ Lieutenant</div>
+          <div class="name">Lt. Sofia Reyes</div>
+          <div class="role">Operations Officer / Officer of the Deck</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Keeps Monad moving when the bridge gets busy. Turns a captain's broad intent into an executable watch plan without fuss. Rarely needs to raise her voice to be heard.
+        </div>
+        <div class="quote">"A good plan survives first contact because the crew understands the mission — not because they memorized the checklist."</div>
+      </div>
+
+      <div class="officer">
+        <div class="officer-meta">
+          <div class="rank">Lieutenant</div>
+          <div class="name">Lt. cgl</div>
+          <div class="role">Shipwright / Executive Operator</div>
+          <span class="status status-active">ACTIVE</span>
+        </div>
+        <div class="bio">
+          Eyes. Hands. Glue. Runs tests, integrates systems, delivers reports, and keeps the ship moving between watches.
+        </div>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <footer>
+      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      <div class="footer-motto">Narrative follows reality. The story serves the mission.</div>
+    </footer>
+  </div>
+</body>
+</html>
