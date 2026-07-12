@@ -233,7 +233,12 @@
       ...contacts.map((contact) => ({
         id: contact.id,
         name: contact.callsign || contact.name,
-        classLabel: contact.class === "passive-traffic" ? "Local Traffic" : "Fleet Screen",
+        // contact.class carries the vessel's own role string (e.g. "civilian
+        // dhow"), not the literal "passive-traffic" -- toys/shared/fleet-state.js's
+        // toScoutContacts() already tags exactly this distinction onto
+        // `source` ("fleet-motion-escort" vs "fleet-motion-passive-contact"),
+        // so key off that instead of guessing from role text.
+        classLabel: contact.source === "fleet-motion-passive-contact" ? "Local Traffic" : "Fleet Screen",
         detail: `BRG ${String(Math.round(contact.bearing)).padStart(3, "0")}° / RNG ${contact.range.toFixed(1)} nm`
       }))
     ];
