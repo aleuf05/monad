@@ -1,6 +1,7 @@
 use crate::clock::{ClockState, WorldClock};
 use crate::command::Command;
 use crate::event::Event;
+use crate::geography;
 use crate::route::{bearing_degrees, distance_meters, point_at_distance};
 use crate::vessel::{normalize_degrees, quantize, Vessel, VesselKind, VesselStatus};
 use serde::{Deserialize, Serialize};
@@ -35,6 +36,16 @@ impl World {
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
         let event_type = match &command {
             Command::SetRoute { vessel_id, route } => {
+                if let Some(waypoint) = route
+                    .iter()
+                    .find(|point| geography::is_on_land(point))
+                {
+                    let zone = geography::zone_containing(waypoint).expect("is_on_land just confirmed a match");
+                    return Err(format!(
+                        "route rejected: waypoint ({}, {}) is on land ({})",
+                        waypoint.lat, waypoint.lng, zone.name
+                    ));
+                }
                 let sim_time = self.clock.sim_time();
                 let vessel = self
                     .vessel_mut(vessel_id)
@@ -89,6 +100,12 @@ impl World {
             } => {
                 if self.vessels.iter().any(|vessel| vessel.id == *id) {
                     return Err(format!("vessel '{id}' already exists"));
+                }
+                if let Some(zone) = geography::zone_containing(position) {
+                    return Err(format!(
+                        "spawn rejected: position ({}, {}) is on land ({})",
+                        position.lat, position.lng, zone.name
+                    ));
                 }
                 let mut vessel = Vessel {
                     id: id.clone(),

@@ -77,11 +77,14 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
   "tick_duration_seconds": 1,
   "vessels": [ /* Vessel, see fleetcore-data-contract.md */ ],
   "watch_events": [ { "tick": 12, "sim_time": "...", "message": "..." } ],
-  "event_sequence": 42
+  "event_sequence": 42,
+  "land_zones": [ { "name": "Qeshm Island", "south": 26.62, "north": 26.98, "west": 55.55, "east": 56.25 }, "..." ]
 }
 ```
 
 Identical to the CLI's `snapshot` command output (`fleetcore/src/snapshot.rs`'s `snapshot()` function) — there is exactly one snapshot shape in this codebase, not a separate live-API variant.
+
+**`land_zones`** (`fleetcore/src/geography.rs`) is static reference data, not part of the mutable `World` — the same five rough bounding-box rectangles `toys/fleet-motion/app.js`'s client-side `LAND_ZONES` already draws (same names, same coordinates, kept in sync deliberately rather than defining a second geography). Recomputed fresh on every snapshot, never persisted. Before this existed, FleetCore had no concept of land at all — every vessel was just a lat/lng point on open water, and Fleet Motion's own land-hazard boxes were a purely client-side, unenforced heuristic (explicitly not checked once talking to a real backend). `World::apply_command` now actually rejects `spawn-passive-contact` and `set-route` commands that would place a vessel inside one of these zones (`422`, message names the zone) — see Command Shapes below. This is still a rough approximation, not real coastline polygons, and only five hand-picked rectangles near the Persian Gulf/Strait of Hormuz — most of the world these vessels operate in has no land data at all and is treated as open water by default.
 
 ### `Command`
 
@@ -92,10 +95,12 @@ Internally tagged on `"type"`, kebab-case, matching `fleetcore/src/command.rs`'s
 {"type": "resume-clock"}
 {"type": "set-time-scale", "scale": 5}
 {"type": "set-route", "vessel_id": "vessel.monad", "route": [{"lat": 26.2, "lng": 55.9}]}
-{"type": "spawn-passive-contact", "id": "traffic.new-01", "name": "New Contact", "callsign": "NEW CONTACT", "position": {"lat": 26.1, "lng": 56.0}, "course": 90.0, "speed_mps": 8.0}
+{"type": "spawn-passive-contact", "id": "traffic.new-01", "name": "New Contact", "callsign": "NEW CONTACT", "position": {"lat": 24.0, "lng": 58.0}, "course": 90.0, "speed_mps": 8.0}
 {"type": "record-watch-event", "message": "operator note"}
 {"type": "step", "ticks": 1}
 ```
+
+`set-route` and `spawn-passive-contact` are rejected (`422`) if any position involved — every waypoint for `set-route`, the spawn point for `spawn-passive-contact` — falls inside one of `land_zones`' rectangles (see Payload Shapes above). The error message names the zone, e.g. `"spawn rejected: position (26.8, 55.9) is on land (Qeshm Island)"`.
 
 `step` is what the server's own tick loop sends itself every `--tick-ms`; a client can send it too (e.g. to single-step a paused world), but there's normally no reason to — the tick loop already advances the clock in real time whenever it isn't paused.
 

@@ -49,9 +49,15 @@ fn same_seed_events_and_ticks_replay_to_same_snapshot() {
             id: "traffic.test-contact".to_string(),
             name: "Test Contact".to_string(),
             callsign: "TEST CONTACT".to_string(),
+            // Moved from (26.1, 56.1) -- that point falls inside the
+            // Musandam Peninsula land zone (geography.rs), which
+            // World::apply_command now rejects. This is open water just
+            // east of that zone; the exact position isn't otherwise
+            // meaningful to what this test checks (determinism, not
+            // geography).
             position: Position {
-                lat: 26.1,
-                lng: 56.1,
+                lat: 25.5,
+                lng: 58.0,
             },
             course: 91.0,
             speed_mps: 9.5,
