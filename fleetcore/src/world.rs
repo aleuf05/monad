@@ -36,11 +36,15 @@ impl World {
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
         let event_type = match &command {
             Command::SetRoute { vessel_id, route } => {
-                if let Some(waypoint) = route
+                // find_map (not find + a second zone_containing call) so
+                // there's no separate .expect() that would panic -- and
+                // therefore poison the Mutex<World> for every future
+                // command -- if is_on_land and zone_containing ever
+                // disagreed after a future refactor of either.
+                if let Some((waypoint, zone)) = route
                     .iter()
-                    .find(|point| geography::is_on_land(point))
+                    .find_map(|point| geography::zone_containing(point).map(|zone| (point, zone)))
                 {
-                    let zone = geography::zone_containing(waypoint).expect("is_on_land just confirmed a match");
                     return Err(format!(
                         "route rejected: waypoint ({}, {}) is on land ({})",
                         waypoint.lat, waypoint.lng, zone.name
