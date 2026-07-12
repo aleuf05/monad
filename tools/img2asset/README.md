@@ -2,8 +2,11 @@
 
 Image -> 3D asset pipeline. Takes a source image, strips the background,
 runs image-to-3D inference on a remote GPU (no local GPU available on
-Granite/Rock64), and drops a `.glb` into `assets/models/` with a manifest
-entry. Contracts-only: never touches FleetCore or `World` state.
+Granite/Rock64), and drops a `.glb` into `web/assets/models/` (mirrored
+to `web-lan/assets/models/`) with a manifest entry. Both are live-served
+directly, no deploy step (see docs/deployment.md) -- a successful run is
+viewable immediately at `toys/asset-viewer/`. Contracts-only: never
+touches FleetCore or `World` state.
 
 ## Setup
 
@@ -21,8 +24,11 @@ python3 image_to_asset.py input/<source>.png --output <name>.glb
 ```
 
 Source images go in `input/` (gitignored). Output lands in
-`assets/models/<name>.glb`, and `assets/models/manifest.json` gets an
-entry recording the name, source image, backend used, and timestamp.
+`web/assets/models/<name>.glb` and is mirrored into
+`web-lan/assets/models/<name>.glb`; `manifest.json` next to it in both
+gets an entry recording the name, source image, backend used, and
+timestamp. View results at `toys/asset-viewer/` (or its `web/`/`web-lan/`
+copies) -- it reads the manifest and lists every cataloged model.
 
 ## Backends
 
@@ -45,9 +51,9 @@ entry recording the name, source image, backend used, and timestamp.
 
 ## Manifest convention
 
-`assets/models/manifest.json` is new -- there was no existing 3D asset
-manifest in this repo before this tool (checked before building: no
-`.glb` files, no 3D asset directory anywhere). Shape:
+`web/assets/models/manifest.json` is new -- there was no existing 3D
+asset manifest in this repo before this tool (checked before building:
+no `.glb` files, no 3D asset directory anywhere). Shape:
 
 ```json
 {
@@ -55,7 +61,7 @@ manifest in this repo before this tool (checked before building: no
   "models": [
     {
       "name": "scout-alpha.glb",
-      "glb_path": "assets/models/scout-alpha.glb",
+      "glb_path": "web/assets/models/scout-alpha.glb",
       "source_image": "tools/img2asset/input/scout-alpha-src.png",
       "backend": "hf_spaces",
       "created_at": "2026-07-12T16:40:00+00:00"
@@ -64,5 +70,5 @@ manifest in this repo before this tool (checked before building: no
 }
 ```
 
-No toy currently consumes these assets -- there's no 3D viewer in Monad
-yet. This tool only produces and catalogs them.
+`toys/asset-viewer/` (see its own README) consumes this manifest to
+list and render every cataloged model with `<model-viewer>`.

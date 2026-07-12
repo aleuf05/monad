@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Image -> 3D asset pipeline for Monad. Contracts-only: this tool never
 touches FleetCore or World state, it only reads a source image and
-writes a .glb file plus a manifest entry under assets/models/.
+writes a .glb file plus a manifest entry under web/assets/models/ (and
+mirrors both into web-lan/assets/models/, same manual-sync pattern
+toys/<name>/ already uses -- both dirs are live-served directly, no
+deploy step, see docs/deployment.md).
 
 Usage:
     image_to_asset.py <input.png> --output <name>.glb [--backend hf_spaces|replicate]
@@ -10,13 +13,15 @@ import argparse
 import datetime
 import json
 import os
+import shutil
 import sys
 import tempfile
 
 from PIL import Image
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-ASSETS_DIR = os.path.join(REPO_ROOT, "assets", "models")
+ASSETS_DIR = os.path.join(REPO_ROOT, "web", "assets", "models")
+LAN_ASSETS_DIR = os.path.join(REPO_ROOT, "web-lan", "assets", "models")
 MANIFEST_PATH = os.path.join(ASSETS_DIR, "manifest.json")
 
 VALID_INPUT_FORMATS = {"PNG", "JPEG", "WEBP"}
@@ -81,6 +86,12 @@ def write_manifest_entry(output_name: str, source_image: str, backend: str, glb_
         f.write("\n")
 
 
+def mirror_to_lan(glb_filename: str) -> None:
+    os.makedirs(LAN_ASSETS_DIR, exist_ok=True)
+    shutil.copy(os.path.join(ASSETS_DIR, glb_filename), os.path.join(LAN_ASSETS_DIR, glb_filename))
+    shutil.copy(MANIFEST_PATH, os.path.join(LAN_ASSETS_DIR, "manifest.json"))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", help="source image (PNG/JPEG/WEBP)")
@@ -107,8 +118,9 @@ def main() -> None:
 
     print(f"[4/4] writing manifest entry for {args.output}")
     write_manifest_entry(args.output, os.path.relpath(args.input, REPO_ROOT), args.backend, final_path)
+    mirror_to_lan(args.output)
 
-    print(f"done: {os.path.relpath(final_path, REPO_ROOT)}")
+    print(f"done: {os.path.relpath(final_path, REPO_ROOT)} (mirrored to web-lan/)")
 
 
 if __name__ == "__main__":
