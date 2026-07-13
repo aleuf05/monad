@@ -13,6 +13,7 @@
 
 import * as THREE from "three";
 import { ASSET_PATHS, HORIZON_RATIO, MAX_RANGE, clamp, formatBearing, shortestDelta } from "./state.js";
+import { createOpticsEffects } from "./effects.js";
 
 const OCEAN_RADIUS = 480;
 const OCEAN_HEIGHT = 260;
@@ -73,6 +74,8 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
   const camera = new THREE.PerspectiveCamera(54, 1, 0.5, OCEAN_RADIUS * 1.2);
   camera.rotation.order = "YXZ";
   camera.position.set(0, EYE_HEIGHT, 0);
+
+  const effects = createOpticsEffects({ renderer, scene, camera });
 
   const overlayCtx = overlayCanvas.getContext("2d");
 
@@ -209,6 +212,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
     const target = Math.max(320, size);
     renderer.setSize(target, target, true);
+    effects.setSize(target, target);
     overlayCanvas.width = Math.round(target * ratio);
     overlayCanvas.height = Math.round(target * ratio);
     camera.aspect = 1;
@@ -309,7 +313,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
       acquisitionRing.visible = false;
     }
 
-    renderer.render(scene, camera);
+    effects.render();
 
     const w = overlayCanvas.width;
     const h = overlayCanvas.height;
