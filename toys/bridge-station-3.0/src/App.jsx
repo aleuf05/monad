@@ -35,7 +35,7 @@ const { bearingDegrees, distanceKm, normalizeDegrees } = window.MonadFleetState.
 // everywhere).
 function serverUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("server") || "wss://cameronlampley.com/monad/fleetcore-ws/ws";
+  return params.get("server") || "wss://cameronlampley.com/fleetcore-ws/ws";
 }
 
 function norm360(deg) {
