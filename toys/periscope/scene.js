@@ -29,10 +29,21 @@ const CONTACT_MAX_DISTANCE = 150;
 const SUN_BEARING = 132;
 const DAY_CYCLE_MS = 150000;
 
+// `now` is time-since-navigation-start, so every fresh page load began this
+// cycle at phase 0 (midnight, the darkest point) -- meaning a first look, or
+// a reload, or Bridge Station remounting the embed, landed dark far more
+// often than the cycle's actual 50/50 day/night split would suggest. A
+// once-per-load random offset spreads page loads across the whole cycle
+// instead of always starting at its darkest instant.
+const CYCLE_OFFSET_MS = Math.random() * DAY_CYCLE_MS;
+
 function daylightState(now) {
-  const phase = ((now % DAY_CYCLE_MS) + DAY_CYCLE_MS) % DAY_CYCLE_MS / DAY_CYCLE_MS;
+  const phase = ((now + CYCLE_OFFSET_MS) % DAY_CYCLE_MS + DAY_CYCLE_MS) % DAY_CYCLE_MS / DAY_CYCLE_MS;
   const elevation = -Math.cos(phase * Math.PI * 2); // -1 midnight, 0 dawn/dusk, 1 noon
-  const t = (elevation + 1) / 2; // 0 night .. 1 day, for color/intensity blends
+  // Floor the blend at 0.34 rather than 0 -- full "midnight" darkness made
+  // the scope read as broken/underlit rather than atmospheric. Night still
+  // reads dim and blue relative to noon, just not near-black.
+  const t = 0.34 + (elevation + 1) / 2 * 0.66; // 0.34 night .. 1 day, for color/intensity blends
   let label = "Night";
   if (phase >= 0.15 && phase < 0.35) label = "Dawn";
   else if (phase >= 0.35 && phase < 0.65) label = "Midday";
