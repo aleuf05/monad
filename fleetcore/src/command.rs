@@ -1,4 +1,4 @@
-use crate::vessel::Position;
+use crate::vessel::{EscortMode, Position};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -7,6 +7,9 @@ pub enum Command {
     SetRoute {
         vessel_id: String,
         route: Vec<Position>,
+    },
+    SetEscortMode {
+        mode: EscortMode,
     },
     PauseClock,
     ResumeClock,

@@ -1,4 +1,5 @@
 use crate::geography::{self, LandZone};
+use crate::vessel::EscortMode;
 use crate::world::World;
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +15,7 @@ pub struct WorldSnapshot {
     pub vessels: Vec<crate::vessel::Vessel>,
     pub watch_events: Vec<crate::world::WatchEvent>,
     pub event_sequence: u64,
+    pub escort_mode: EscortMode,
     // Static reference geography, not part of World's persisted state --
     // recomputed fresh on every snapshot rather than stored, so it costs
     // nothing to add here and never needs a migration. See geography.rs.
@@ -32,6 +34,7 @@ pub fn snapshot(world: &World) -> WorldSnapshot {
         vessels: world.vessels.clone(),
         watch_events: world.watch_events.clone(),
         event_sequence: world.event_sequence,
+        escort_mode: world.escort_mode,
         land_zones: geography::land_zones(),
     }
 }

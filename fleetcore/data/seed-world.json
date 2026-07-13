@@ -56,54 +56,6 @@
       "status": "underway",
       "route": [{ "lat": 26.58, "lng": 56.15 }],
       "last_update": "2026-07-10T20:00:00Z"
-    },
-    {
-      "id": "traffic.dhow-lantern",
-      "name": "Dhow Lantern",
-      "callsign": "DHOW LANTERN",
-      "kind": "passive-traffic",
-      "position": { "lat": 26.42, "lng": 55.95 },
-      "course": 312.0,
-      "speed_mps": 8.9,
-      "status": "transiting",
-      "route": [],
-      "last_update": "2026-07-10T20:00:00Z"
-    },
-    {
-      "id": "traffic.gulf-star",
-      "name": "Tanker Gulf Star",
-      "callsign": "GULF STAR",
-      "kind": "passive-traffic",
-      "position": { "lat": 25.86, "lng": 55.34 },
-      "course": 72.0,
-      "speed_mps": 12.2,
-      "status": "transiting",
-      "route": [],
-      "last_update": "2026-07-10T20:00:00Z"
-    },
-    {
-      "id": "traffic.pilot-amber",
-      "name": "Pilot Boat Amber",
-      "callsign": "PILOT AMBER",
-      "kind": "passive-traffic",
-      "position": { "lat": 26.72, "lng": 56.48 },
-      "course": 246.0,
-      "speed_mps": 10.6,
-      "status": "transiting",
-      "route": [],
-      "last_update": "2026-07-10T20:00:00Z"
-    },
-    {
-      "id": "traffic.coaster-qeshm",
-      "name": "Coaster Qeshm",
-      "callsign": "COASTER QESHM",
-      "kind": "passive-traffic",
-      "position": { "lat": 26.20, "lng": 56.88 },
-      "course": 286.0,
-      "speed_mps": 10.0,
-      "status": "transiting",
-      "route": [],
-      "last_update": "2026-07-10T20:00:00Z"
     }
   ],
   "event_sequence": 0,

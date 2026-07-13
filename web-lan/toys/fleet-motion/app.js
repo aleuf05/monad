@@ -487,6 +487,18 @@ let liveCommandAuthority = false;
 let liveFlagshipId = null;
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_KMH_PER_MPS = 3.6;
+// Live escort mode is real server state (World.escort_mode in FleetCore),
+// not local cosmetic drift -- see sendLiveEscortMode()/applyLiveSnapshot().
+// Kept separate from escortModeIndex/ESCORT_MODES (which has no "off" and
+// stays exactly as before for non-live use) rather than unifying them.
+let liveEscortMode = "off";
+const LIVE_ESCORT_MODE_ORDER = ["off", "loose", "patrol", "tight"];
+const LIVE_ESCORT_LABELS = {
+  off: "Off",
+  loose: "Loose Screen",
+  patrol: "Patrol Weave",
+  tight: "Tight Screen"
+};
 
 function createEscortStates() {
   return FORMATION.map((escort) => ({
@@ -903,17 +915,18 @@ function connectFleetCoreLive() {
 
 // These have no FleetCore command behind them at all, in any mode, with
 // any authority: Suggest/Accept Detour is a client-only land-avoidance
-// heuristic FleetCore's Command enum has no terrain concept for; Escort
-// Mode is cosmetic client-side formation drift that live snapshots
-// overwrite every tick regardless; Return to Station is a fixed local-demo
-// waypoint with no shared-world meaning; Reset to Open Water instantly
-// teleports local state, and FleetCore has no reset/teleport command --
-// only set-route, which moves a vessel over real ticks, not instantly.
-// Permanently disabled while live, not authority-gated, so the visitor
-// isn't misled into thinking command authority would unlock them.
+// heuristic FleetCore's Command enum has no terrain concept for; Return to
+// Station is a fixed local-demo waypoint with no shared-world meaning;
+// Reset to Open Water instantly teleports local state, and FleetCore has
+// no reset/teleport command -- only set-route, which moves a vessel over
+// real ticks, not instantly. Permanently disabled while live, not
+// authority-gated, so the visitor isn't misled into thinking command
+// authority would unlock them. Escort Mode used to be in this list --
+// set-escort-mode is now a real command, so it moved to
+// updateLiveWriteControlsAvailability() below.
 function disableLiveOnlyControls() {
   [
-    suggestDetourButton, acceptDetourButton, escortModeButton,
+    suggestDetourButton, acceptDetourButton,
     homeButton, resetToBaselineButton
   ].forEach((button) => {
     if (button) button.disabled = true;
@@ -921,14 +934,14 @@ function disableLiveOnlyControls() {
 }
 
 // Everything here DOES have a real FleetCore command (set-route,
-// pause-clock, resume-clock, set-time-scale) -- availability tracks
-// liveCommandAuthority, not a permanent live-mode disable. undo/remove/
-// clear-waypoint stay additionally gated by their own state checks in
-// updateStatus() (nothing staged yet, etc.); this function only handles
-// the authority half of that gate.
+// pause-clock, resume-clock, set-time-scale, set-escort-mode) --
+// availability tracks liveCommandAuthority, not a permanent live-mode
+// disable. undo/remove/clear-waypoint stay additionally gated by their own
+// state checks in updateStatus() (nothing staged yet, etc.); this function
+// only handles the authority half of that gate.
 function updateLiveWriteControlsAvailability() {
   const blocked = liveMode && !liveCommandAuthority;
-  [waypointButton, pauseButton, undoWaypointButton, removeWaypointButton, clearWaypointsButton, cancelRouteButton]
+  [waypointButton, pauseButton, undoWaypointButton, removeWaypointButton, clearWaypointsButton, cancelRouteButton, escortModeButton]
     .forEach((button) => {
       if (button) button.disabled = blocked;
     });
@@ -946,8 +959,8 @@ function updateLiveModeNote() {
   }
   liveModeNoteEl.hidden = false;
   liveModeNoteEl.textContent = liveCommandAuthority
-    ? "Live command authority granted: click the map to send the ship there now. For a multi-leg route, click Add Waypoint to arm, click the map once per point, then click Add Waypoint again to send the whole path as one command (Shift-click also stages points, if you'd rather not use the button). Cancel Route and Pause/Time Warp also send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
-    : "Live, read-only: the server has not granted command authority to this connection, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with authority — FleetCore has no command for them yet.";
+    ? "Live command authority granted: click the map to send the ship there now. For a multi-leg route, click Add Waypoint to arm, click the map once per point, then click Add Waypoint again to send the whole path as one command (Shift-click also stages points, if you'd rather not use the button). Cancel Route, Pause/Time Warp, and Escort Mode also send real FleetCore commands — escort mode is real per-tick station-keeping in the sim engine, visible to every connected visitor. Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
+    : "Live, read-only: the server has not granted command authority to this connection, so every control here only observes. Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with authority — FleetCore has no command for them yet.";
 }
 
 function enterLiveMode() {
@@ -1047,6 +1060,7 @@ function applyLiveSnapshot(snapshot) {
 
   simulationClockSeconds = Number(snapshot.tick) || simulationClockSeconds;
   liveClockState = snapshot.clock_state || liveClockState;
+  liveEscortMode = snapshot.escort_mode || liveEscortMode;
   const liveScale = Number(snapshot.time_scale) || lastMovingWarp || 1;
   lastMovingWarp = liveScale;
   // timeWarp is the UI's single "effective speed" number (0 = paused) in
@@ -1098,14 +1112,14 @@ function updateStateInspector() {
   }
   const routeLegs = routeQueue.length;
   const waypointCount = waypoints.length;
-  const mode = currentEscortMode();
+  const escortModeLabel = liveMode ? LIVE_ESCORT_LABELS[liveEscortMode] : currentEscortMode().label;
   stateSchemaValue.textContent = `v${FLEET_STATE_SCHEMA_VERSION}`;
   stateSavedValue.textContent = persistenceSuspended ? "Cleared this session" : formatSavedTimestamp(lastPersistedAt);
   statePresetValue.textContent = SCENARIO_PRESETS[activePresetId]?.label || activePresetId || "Manual";
   stateFlagshipValue.textContent = `${formatPosition(flagship)} / ${headingDegrees === null ? "--" : `${Math.round(headingDegrees)} deg`}`;
   stateMotionValue.textContent = `${formatSpeed(currentSpeedKmh)} / ${timeWarp === 0 ? "paused" : `${timeWarp}x`}`;
   stateRouteValue.textContent = `${routeLegs} leg${routeLegs === 1 ? "" : "s"} / ${waypointCount} waypoint${waypointCount === 1 ? "" : "s"}`;
-  stateEscortValue.textContent = `${mode.label} / ${escortStates.length} ships`;
+  stateEscortValue.textContent = `${escortModeLabel} / ${escortStates.length} ships`;
   if (stateContactValue) {
     stateContactValue.textContent = `${contactStates.length} passive`;
   }
@@ -2314,13 +2328,13 @@ function advanceThreat(elapsedSeconds) {
 
 function updateStatus() {
   const status = currentStatus();
-  const mode = currentEscortMode();
+  const escortModeLabel = liveMode ? LIVE_ESCORT_LABELS[liveEscortMode] : currentEscortMode().label;
   currentPosition.textContent = formatPosition(flagship);
   destinationPosition.textContent = destination
     ? formatPosition(finalDestination || destination)
     : "No course set";
   speedValue.textContent = formatSpeed(currentSpeedKmh);
-  escortModeStatus.textContent = mode.label;
+  escortModeStatus.textContent = escortModeLabel;
   if (trafficStatus) {
     trafficStatus.textContent = `${contactStates.length} passive contact${contactStates.length === 1 ? "" : "s"}`;
   }
@@ -2369,7 +2383,7 @@ function updateStatus() {
   removeWaypointButton.disabled = liveWriteBlocked || selectedWaypointIndex === null || !waypoints[selectedWaypointIndex];
   clearWaypointsButton.disabled = liveWriteBlocked || (!waypoints.length && !routeQueue.length && !destination);
   cancelRouteButton.disabled = liveWriteBlocked || (!destination && !routeQueue.length);
-  escortModeButton.textContent = `Escort: ${mode.label}`;
+  escortModeButton.textContent = `Escort: ${escortModeLabel}`;
   updateWarpControls();
   updateMarkerIcons();
   updateShipInfo();
@@ -2743,9 +2757,14 @@ function selectShip(id) {
 }
 
 function cycleEscortMode() {
-  escortModeIndex = (escortModeIndex + 1) % ESCORT_MODES.length;
   escortModeButton.classList.add("attention");
   window.setTimeout(() => escortModeButton.classList.remove("attention"), 700);
+  if (liveMode) {
+    const nextIndex = (LIVE_ESCORT_MODE_ORDER.indexOf(liveEscortMode) + 1) % LIVE_ESCORT_MODE_ORDER.length;
+    sendLiveEscortMode(LIVE_ESCORT_MODE_ORDER[nextIndex]);
+    return;
+  }
+  escortModeIndex = (escortModeIndex + 1) % ESCORT_MODES.length;
   addLog(`Escort mode changed to ${currentEscortMode().label}.`);
   updateStatus();
 }
@@ -2942,6 +2961,17 @@ function sendLiveTimeWarp(nextWarp) {
   }
   liveSocket.send(JSON.stringify({ type: "set-time-scale", scale: nextWarp }));
   addLog(`Time-scale command sent — ${nextWarp}x. This affects every connected visitor's clock, not just this view.`);
+}
+
+// Real FleetCore command (set-escort-mode) -- scouts hold formation via
+// actual per-tick route-chasing in the sim engine, not client-side drift.
+// Affects every connected visitor's view, same as time-scale above.
+function sendLiveEscortMode(mode) {
+  if (!liveCommandAuthority || !liveSocket || liveSocket.readyState !== WebSocket.OPEN) {
+    return;
+  }
+  liveSocket.send(JSON.stringify({ type: "set-escort-mode", mode }));
+  addLog(`Escort mode command sent — ${LIVE_ESCORT_LABELS[mode]}.`);
 }
 flagshipMarker.on("click", (event) => {
   L.DomEvent.stopPropagation(event);

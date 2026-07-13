@@ -3,10 +3,51 @@ use crate::command::Command;
 use crate::event::Event;
 use crate::geography;
 use crate::route::{bearing_degrees, distance_meters, point_at_distance};
-use crate::vessel::{normalize_degrees, quantize, Position, Vessel, VesselKind, VesselStatus};
+use crate::vessel::{
+    normalize_degrees, quantize, EscortMode, Position, Vessel, VesselKind, VesselStatus,
+};
 use serde::{Deserialize, Serialize};
 
 const ARRIVAL_RADIUS_METERS: f64 = 80.0;
+
+// Escort formation geometry: scouts are spread evenly across this many
+// degrees, centered dead astern (180 deg relative to the flagship's
+// course), sorted by vessel id for a stable slot assignment. Radius varies
+// by mode; Patrol reuses Loose's radius and adds a slow, deterministic
+// bearing sweep on top of each slot's base offset, driven by tick count
+// (not wall-clock time) so it stays replay-deterministic like everything
+// else in this engine.
+const ESCORT_WEDGE_SPREAD_DEGREES: f64 = 70.0;
+const ESCORT_LOOSE_RADIUS_METERS: f64 = 1200.0;
+const ESCORT_TIGHT_RADIUS_METERS: f64 = 350.0;
+const ESCORT_PATROL_SWEEP_DEGREES: f64 = 40.0;
+const ESCORT_PATROL_SWEEP_RATE: f64 = 0.002;
+
+fn escort_station(
+    leader: &Vessel,
+    slot_index: usize,
+    slot_count: usize,
+    mode: EscortMode,
+    tick: u64,
+) -> Position {
+    let slot_offset = if slot_count <= 1 {
+        0.0
+    } else {
+        -ESCORT_WEDGE_SPREAD_DEGREES / 2.0
+            + ESCORT_WEDGE_SPREAD_DEGREES * (slot_index as f64) / ((slot_count - 1) as f64)
+    };
+    let sweep = if mode == EscortMode::Patrol {
+        ESCORT_PATROL_SWEEP_DEGREES * ((tick as f64) * ESCORT_PATROL_SWEEP_RATE).sin()
+    } else {
+        0.0
+    };
+    let radius = match mode {
+        EscortMode::Tight => ESCORT_TIGHT_RADIUS_METERS,
+        _ => ESCORT_LOOSE_RADIUS_METERS,
+    };
+    let bearing = normalize_degrees(leader.course + 180.0 + slot_offset + sweep);
+    point_at_distance(leader.position, bearing, radius)
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct WatchEvent {
@@ -23,6 +64,10 @@ pub struct World {
     pub vessels: Vec<Vessel>,
     pub event_sequence: u64,
     pub watch_events: Vec<WatchEvent>,
+    // Defaulted so seed/state files saved before this field existed still
+    // load fine -- absent means Off, the pre-existing behavior.
+    #[serde(default)]
+    pub escort_mode: EscortMode,
 }
 
 impl World {
@@ -170,6 +215,23 @@ impl World {
                 }
                 "fleet-reset"
             }
+            Command::SetEscortMode { mode } => {
+                self.escort_mode = *mode;
+                if *mode == EscortMode::Off {
+                    // Hold position cleanly rather than coasting toward a
+                    // stale station point -- see advance_vessel, where a
+                    // scout with an empty route just sits still.
+                    let sim_time = self.clock.sim_time();
+                    for vessel in &mut self.vessels {
+                        if vessel.kind == VesselKind::Scout {
+                            vessel.route.clear();
+                            vessel.status = VesselStatus::Holding;
+                            vessel.last_update = sim_time.clone();
+                        }
+                    }
+                }
+                "escort-mode-set"
+            }
             Command::RecordWatchEvent { message } => {
                 self.watch_events.push(WatchEvent {
                     tick: self.clock.tick,
@@ -224,6 +286,38 @@ impl World {
         self.clock.tick += 1;
         let sim_time = self.clock.sim_time();
         let tick_duration = self.clock.tick_duration_seconds as f64;
+
+        // Re-issue every scout's route to a freshly computed station point
+        // before the normal physics pass below -- reuses advance_vessel's
+        // existing route-chasing motion instead of a separate movement
+        // path, so escorts never run out of a target the way a one-shot
+        // route would.
+        if self.escort_mode != EscortMode::Off {
+            let mode = self.escort_mode;
+            let tick = self.clock.tick;
+            if let Some(leader) = self
+                .vessels
+                .iter()
+                .find(|vessel| vessel.kind == VesselKind::Flagship)
+                .cloned()
+            {
+                let scout_ids: Vec<String> = self
+                    .vessels
+                    .iter()
+                    .filter(|vessel| vessel.kind == VesselKind::Scout)
+                    .map(|vessel| vessel.id.clone())
+                    .collect();
+                let slot_count = scout_ids.len();
+                for (index, id) in scout_ids.iter().enumerate() {
+                    let station = escort_station(&leader, index, slot_count, mode, tick);
+                    if let Some(vessel) = self.vessel_mut(id) {
+                        vessel.route = vec![station];
+                        vessel.status = VesselStatus::Underway;
+                    }
+                }
+            }
+        }
+
         for vessel in &mut self.vessels {
             advance_vessel(vessel, tick_duration, &sim_time);
         }
