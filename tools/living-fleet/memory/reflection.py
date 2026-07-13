@@ -166,6 +166,7 @@ class HeuristicReflectionProvider:
                         "situation": top.get("what", "a similar situation"),
                         "guidance": f"Deliberately {direction}: {top.get('what', '')}",
                         "confidence": 0.7,
+                        "evidence": [{"episodic_id": top["episodic_id"]}],
                     }
                 )
 
