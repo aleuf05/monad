@@ -1,0 +1,42 @@
+{
+  "entries": [
+    {
+      "id": "doctrine-living-fleet",
+      "source": "doctrine_living_fleet.md",
+      "target_table": "semantic_beliefs",
+      "belief_type": "doctrine",
+      "scope": "per-captain",
+      "description": "Curated excerpt of docs/architecture/living-fleet-v0.1.md."
+    },
+    {
+      "id": "roles",
+      "source": "captains.json (generated, no static file)",
+      "target_table": "semantic_beliefs",
+      "belief_type": "fact",
+      "scope": "per-captain",
+      "description": "Each captain's own role, read live from tools/living-fleet/captains.json."
+    },
+    {
+      "id": "lieutenant-cgl-preferences",
+      "source": "lieutenant_cgl_preferences.md",
+      "target_table": "semantic_beliefs",
+      "belief_type": "belief",
+      "scope": "per-captain",
+      "description": "Distilled CLAUDE.md policies, interpreted (not verbatim), plus a relationships seed row for lieutenant.cgl."
+    },
+    {
+      "id": "operation-quacken",
+      "source": "operation_quacken.md + web/missions/quacken-transit-002/mission.json",
+      "target_table": "episodic_memories + narrative_memories",
+      "scope": "fleet + per-captain",
+      "description": "FACT parsed live from the real mission record; MYTHOLOGY hand-authored, kept explicitly separate."
+    },
+    {
+      "id": "workflow-cleanup-lessons",
+      "source": "workflow_cleanup_lessons.md",
+      "target_table": "procedural_lessons",
+      "scope": "per-captain",
+      "description": "Verify referenced prior work exists before building on it as an assumption."
+    }
+  ]
+}

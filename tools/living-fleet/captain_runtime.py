@@ -178,7 +178,7 @@ def validate_decision(decision):
 
 
 class CaptainRuntime:
-    def __init__(self, fleetcore_url, captains, state_dir, provider):
+    def __init__(self, fleetcore_url, captains, state_dir, provider, memory_service=None):
         self.fleetcore_url = fleetcore_url.rstrip("/")
         self.captains = captains
         self.state_dir = Path(state_dir)
@@ -186,6 +186,11 @@ class CaptainRuntime:
         self.provider = provider
         self.fallback = DoctrineProvider()
         self.memory = self._load_memory()
+        # Effort B's persistent memory/identity service is optional and
+        # fail-open by construction: this runtime must behave identically to
+        # today whenever it's unavailable, same as the provider/doctrine
+        # fallback above. See tools/living-fleet/memory/service.py.
+        self.memory_service = memory_service
 
     def _load_memory(self):
         try:
@@ -283,6 +288,14 @@ class CaptainRuntime:
             captain_memory = self.memory["captains"].setdefault(
                 captain["captain_id"], {"recent_decisions": []}
             )
+            if self.memory_service:
+                try:
+                    captain_memory["context"] = self.memory_service.request_context(
+                        captain["captain_id"], purpose="choose-procedure"
+                    )
+                except Exception as error:
+                    captain_memory["context"] = {}
+                    captain_memory["memory_context_error"] = str(error)[:240]
             provider = self.provider
             runtime_status = "idle"
             try:
@@ -311,6 +324,11 @@ class CaptainRuntime:
                 for item in reversed(result_snapshot.get("agent_decisions", []))
                 if item["captain_id"] == captain["captain_id"]
             )
+            if self.memory_service:
+                try:
+                    self.memory_service.record_decision(captain["captain_id"], record)
+                except Exception as error:
+                    captain_memory["memory_record_error"] = str(error)[:240]
             captain_memory.update(
                 {
                     "current_objective": decision["objective"],
@@ -349,18 +367,40 @@ def parse_args():
     parser.add_argument("--state-dir", default=str(DEFAULT_STATE_DIR))
     parser.add_argument("--interval", type=float, default=5.0)
     parser.add_argument("--once", action="store_true")
+    parser.add_argument("--memory-db", default=str(DEFAULT_STATE_DIR / "memory.db"))
     return parser.parse_args()
+
+
+def build_memory_service(memory_db_path, captains):
+    """Effort B's persistent memory/identity service. Construction is
+    wrapped by the caller in a broad except -- any failure (missing module,
+    unwritable path, corrupt db) must leave the runtime working exactly as
+    it did before this system existed, same fail-open shape as the provider
+    fallback above. MONAD_MEMORY_DISABLED=1 is an explicit ops kill switch.
+    """
+    if os.getenv("MONAD_MEMORY_DISABLED") == "1":
+        return None
+    from memory.service import MemoryService  # local import: optional subsystem, not a hard dependency
+
+    return MemoryService(memory_db_path, captains)
 
 
 def main():
     args = parse_args()
     provider_command = os.getenv("MONAD_CAPTAIN_PROVIDER_COMMAND")
     provider = CommandProvider(provider_command) if provider_command else DoctrineProvider()
+    captains = load_captains(args.config)
+    try:
+        memory_service = build_memory_service(args.memory_db, captains)
+    except Exception as error:
+        print(f"living-fleet: memory service unavailable, continuing without it: {error}", file=sys.stderr, flush=True)
+        memory_service = None
     runtime = CaptainRuntime(
         args.fleetcore_url,
-        load_captains(args.config),
+        captains,
         args.state_dir,
         provider,
+        memory_service=memory_service,
     )
     while True:
         try:
