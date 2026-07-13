@@ -2,11 +2,11 @@
 
 Image -> 3D asset pipeline. Takes a source image, strips the background,
 runs image-to-3D inference on a remote GPU (no local GPU available on
-Granite/Rock64), and drops a `.glb` into `web/assets/models/` (mirrored
-to `web-lan/assets/models/`) with a manifest entry. Both are live-served
-directly, no deploy step (see docs/deployment.md) -- a successful run is
-viewable immediately at `toys/asset-viewer/`. Contracts-only: never
-touches FleetCore or `World` state.
+Granite/Rock64), and drops a `.glb` into `web/assets/models/` with a
+manifest entry. Live-served directly, no deploy step (see
+docs/deployment.md) -- a successful run is viewable immediately at
+`toys/asset-viewer/`. Contracts-only: never touches FleetCore or `World`
+state.
 
 ## Setup
 
@@ -24,11 +24,10 @@ python3 image_to_asset.py input/<source>.png --output <name>.glb
 ```
 
 Source images go in `input/` (gitignored). Output lands in
-`web/assets/models/<name>.glb` and is mirrored into
-`web-lan/assets/models/<name>.glb`; `manifest.json` next to it in both
-gets an entry recording the name, source image, backend used, and
-timestamp. View results at `toys/asset-viewer/` (or its `web/`/`web-lan/`
-copies) -- it reads the manifest and lists every cataloged model.
+`web/assets/models/<name>.glb`; `manifest.json` next to it gets an entry
+recording the name, source image, backend used, and timestamp. View
+results at `toys/asset-viewer/` (or its `web/` copy) -- it reads the
+manifest and lists every cataloged model.
 
 ## Backends
 

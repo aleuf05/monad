@@ -24,7 +24,6 @@ logs/lan-web-server.log
 logs/bridge-station-2.1-server.log
 logs/bridge-station-3.0-server.log
 
-# Generated 3D assets -- live on disk where they're served (web/, web-lan/),
-# not tracked in git. Regenerate or re-copy onto whatever box serves them.
+# Generated 3D assets -- live on disk where they're served (web/), not
+# tracked in git. Regenerate or re-copy onto whatever box serves them.
 web/assets/models/*.glb
-web-lan/assets/models/*.glb
