@@ -18,7 +18,7 @@ Then open `http://localhost:8080/toys/radio-console/`. Click **Power On** — br
 
 - A bank of scripted transmission lines across three channels (Fleet Comms, Weather, Traffic), using the same vessel names and callsigns as the rest of Monad's world (`MONAD`, `SCOUT ALPHA/BRAVO/CHARLIE`, and the passive-traffic contacts from `fleetcore/data/seed-world.json` — `Dhow Lantern`, `Gulf Star`, `Pilot Amber`, `Coaster Qeshm`) for continuity, not because it reads that data live.
 - A scheduler picks a random transmission from the currently-monitored channels every 6–16 seconds, appends it to the transcript, and speaks it aloud (assigning each named speaker a consistent voice, if more than one is available, so "Scout Alpha" always sounds the same).
-- A continuous filtered-noise static bed plays under everything, ducking down while a transmission is "on the air" and rising again during dead air — a squelch pop brackets each transmission.
+- A filtered-noise static bed plays only while a transmission is "on the air" (ducked quiet under the voice), and stays silent — squelch closed — during dead air, like a real monitored channel. A squelch pop marks the transmission ending (PTT release).
 - Channel chips (multi-select) control which categories are monitored; Volume and Mute control the Web Audio output and speech volume together.
 
 ## Live Mode (FleetCore)

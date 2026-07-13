@@ -132,7 +132,7 @@ function initAudio() {
   masterGain.connect(audioContext.destination);
 
   staticGain = audioContext.createGain();
-  staticGain.gain.value = 0.05;
+  staticGain.gain.value = 0; // squelch closed until the first transmission opens it
   staticGain.connect(masterGain);
 
   const staticSource = audioContext.createBufferSource();
@@ -181,7 +181,10 @@ function duckStatic(down) {
   if (!staticGain) return;
   const now = audioContext.currentTime;
   staticGain.gain.cancelScheduledValues(now);
-  staticGain.gain.linearRampToValueAtTime(down ? 0.012 : 0.05, now + (down ? 0.15 : 0.4));
+  // Squelch closed (no transmission) is silent, not a constant hiss --
+  // static is only audible, ducked under the voice, while a transmission
+  // is actually on the air.
+  staticGain.gain.linearRampToValueAtTime(down ? 0.012 : 0, now + (down ? 0.15 : 0.4));
 }
 
 function setSpeaking(speaking) {
