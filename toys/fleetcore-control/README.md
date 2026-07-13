@@ -33,11 +33,11 @@ Enter a server URL (defaults to `ws://localhost:4771/ws`) and a command token, t
 
 Every scenario- or manually-spawned contact gets a timestamp+random suffix (`distress-<suffix>`, `manual-<suffix>`, etc.) so repeated runs never collide with an earlier spawn still sitting in the world — `spawn-passive-contact` rejects a duplicate id outright (`world.rs`), and a fixed literal id would make every second click of the same scenario button fail.
 
-## Despawn, but no bulk reset
+## Despawn and Reset Fleet, but no bulk contact clear
 
 **Manual: Despawn Vessel** wraps `despawn-vessel`, FleetCore's real inverse of `spawn-passive-contact` (`fleetcore/src/command.rs` + `world.rs`) — a genuine removal from shared world state, not a client-side hide. Restricted to `passive-traffic` vessels only: the flagship and scout escorts can never be despawned through this command (rejected server-side, `422`, naming the vessel's real kind), since they're core to the mission, not test debris.
 
-There is still no bulk "clear the board"/world-reset command — no way to remove many contacts at once, only one at a time, and no way to reset the flagship/scouts/clock to a fresh starting state. `fleetcore/src/command.rs`'s full surface is now `set-route`, `pause-clock`, `resume-clock`, `set-time-scale`, `spawn-passive-contact`, `despawn-vessel`, and `record-watch-event`.
+**Reset Fleet** (next to Pause/Time Scale) wraps `reset-fleet`, which puts Monad and all three scout escorts back to their exact starting position, course, speed, and route (the same values as `fleetcore/data/seed-world.json`) — global, affects every connected visitor, confirm()-gated first. It does not touch passive-traffic contacts; there is still no bulk "clear the board" command for those, only one-at-a-time despawn. `fleetcore/src/command.rs`'s full surface is now `set-route`, `pause-clock`, `resume-clock`, `set-time-scale`, `spawn-passive-contact`, `despawn-vessel`, `reset-fleet`, and `record-watch-event`.
 
 ## Route scenarios track a point, not a moving target
 
