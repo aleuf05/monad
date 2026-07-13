@@ -26,6 +26,12 @@ visitor couldn't reach by clicking through the live site. `web/` is the one
 deploy target (see `docs/deployment.md`) and there is no deploy step:
 editing a file under `web/` changes production immediately. Concretely:
 
+- Every feature must be reachable by clicking through from the site root
+  (`https://cameronlampley.com/`) -- a link on the homepage, or a link
+  reachable from a link on the homepage, and so on. Typing a specific path
+  from memory or a doc doesn't count as reachable, no matter how "clean"
+  the URL is. If you ship something new, add the nav link/card that gets a
+  visitor there by clicking, in the same pass -- not as a follow-up.
 - Before calling any work on a public-facing toy done, verify it against the
   real `https://cameronlampley.com/...` URL, not just a local dev server.
   `toys/<name>/` is source; it is not live until copied into `web/toys/<name>/`.
@@ -48,6 +54,12 @@ must be plainly, obviously visible on the live page it belongs to -- not a
 console log, not a value you have to inspect DOM/localStorage to find, not
 something reachable only via a non-obvious click sequence. Assume the Lt.
 will glance at the page for a few seconds, not read the diff.
+
+Optimize for the moment the Lt. actually sits down to test something: he
+should never have to hunt, guess a path, or ask "where is it." Every new
+or changed thing should be the obvious, easy thing to find and click on
+from the page he lands on -- that's the whole point of the click-reachable
+and on-page-marker rules below, not separate concerns from this one.
 
 - Give every new feature an obvious on-page marker when it first ships --
   a visible label/badge (e.g. "NEW"), a highlighted border/glow, or

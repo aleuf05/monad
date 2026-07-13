@@ -28,6 +28,13 @@ you know the exact path" artifacts. If a change lives only in `toys/<name>/`
 it does not count as shipped, no matter how thoroughly it was tested
 locally -- verify against the real production URL before calling it done.
 
+**Click-reachable from the root, not just resolvable.** Every feature needs
+an actual link path starting from `https://cameronlampley.com/` -- a card or
+link on the homepage, or something reachable from one. Knowing the URL
+because it's in a doc or a commit message doesn't make it discoverable.
+Shipping a toy means adding its nav entry in the same pass, not leaving it
+to be found later.
+
 **Deploy to the live app always, as part of finishing the work, not as a
 separate later step.** When a public toy under `toys/<name>/` changes,
 re-copy it into `web/toys/<name>/` (and `web/toys/shared/` if
@@ -44,6 +51,12 @@ Deployed-but-buried does not count as done. New or changed functionality
 must be plainly, obviously visible on the live page it belongs to when the
 Lt. glances at it -- not a console log, not a value only visible via
 devtools/localStorage, not gated behind a non-obvious click sequence.
+
+Optimize for the moment the Lt. actually sits down to test something: he
+should never have to hunt, guess a path, or ask where a thing is. Every new
+or changed feature should be the obvious, easy-to-find, easy-to-click thing
+on the page he lands on -- this is the same goal as the click-reachable and
+on-page-marker rules below, not a separate concern.
 
 - Every new feature should get an obvious on-page marker when it first
   ships -- a visible "NEW" label/badge, a highlighted border/glow, or
