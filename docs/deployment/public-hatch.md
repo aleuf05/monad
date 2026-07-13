@@ -31,6 +31,8 @@ HTTP is redirected to HTTPS automatically. rock64 is not otherwise involved.
 - `/monad/` is currently the only public proxy path family (`/monad/*` for static
   content, `/monad/fleetcore-ws/*` and `/monad/portainer/*` as reverse-proxied
   sub-paths — see `/etc/caddy/Caddyfile`).
+- The bare domain (`https://cameronlampley.com/`) redirects (302) to `/monad/` —
+  nothing is served at the true root.
 - Qdrant is not exposed publicly.
 
 ## Doctrine
