@@ -65,19 +65,19 @@
       <p class="eyebrow">Monad &middot; Mission Director</p>
       <h1>quacken-transit-002</h1>
     </div>
-    <span class="verdict verdict-pending">Strait Transit</span>
+    <span class="verdict verdict-good">Mission Complete</span>
   </header>
 
   <div class="stats">
-    <div class="stat"><span class="label">Phase</span><span class="value mono">STRAIT_TRANSIT</span></div>
+    <div class="stat"><span class="label">Phase</span><span class="value mono">MISSION_COMPLETE</span></div>
     <div class="stat"><span class="label">Started</span><span class="value mono">2026-07-13T14:45:29Z</span></div>
-    <div class="stat"><span class="label">Updated</span><span class="value mono">2026-07-13T15:40:56Z</span></div>
-    <div class="stat"><span class="label">Evidence</span><span class="value mono">5</span></div>
+    <div class="stat"><span class="label">Updated</span><span class="value mono">2026-07-13T19:27:51Z</span></div>
+    <div class="stat"><span class="label">Evidence</span><span class="value mono">16</span></div>
     
-        <div class="stat"><span class="label">Position</span><span class="value mono">26.3704, 55.8986</span></div>
-        <div class="stat"><span class="label">Status</span><span class="value mono">underway</span></div>
-        <div class="stat"><span class="label">Course</span><span class="value mono">352.7&deg;</span></div>
-        <div class="stat"><span class="label">Tick</span><span class="value mono">20794</span></div>
+        <div class="stat"><span class="label">Position</span><span class="value mono">24.8000, 58.5970</span></div>
+        <div class="stat"><span class="label">Status</span><span class="value mono">arrived</span></div>
+        <div class="stat"><span class="label">Course</span><span class="value mono">117.3&deg;</span></div>
+        <div class="stat"><span class="label">Tick</span><span class="value mono">40288</span></div>
         
   </div>
 
@@ -88,6 +88,17 @@
 <li class="event event-capture_requested"><span class="event-time">2026-07-13T14:45:30Z</span><span class="event-kind">capture_requested</span><span class="event-detail">mission_start: quacken-transit-002: mission start, QUACKEN on station at {&#x27;lat&#x27;: 24.8, &#x27;lng&#x27;: 58.6}.</span></li>
 <li class="event event-phase_transition"><span class="event-time">2026-07-13T15:40:56Z</span><span class="event-kind">phase_transition</span><span class="event-detail">TRANSIT_UNDERWAY -&gt; STRAIT_TRANSIT: waypoint_reached (leg 7 remaining)</span></li>
 <li class="event event-progress"><span class="event-time">2026-07-13T15:40:56Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 7 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T15:57:16Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 6 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T16:21:30Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 5 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T17:05:44Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 4 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T17:54:27Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 3 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T18:37:32Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 2 remaining)</span></li>
+<li class="event event-progress"><span class="event-time">2026-07-13T19:23:39Z</span><span class="event-kind">progress</span><span class="event-detail">waypoint_reached (leg 1 remaining)</span></li>
+<li class="event event-phase_transition"><span class="event-time">2026-07-13T19:27:19Z</span><span class="event-kind">phase_transition</span><span class="event-detail">STRAIT_TRANSIT -&gt; APPROACH_QUACKEN: route_completed (final transit waypoint reached)</span></li>
+<li class="event event-phase_transition"><span class="event-time">2026-07-13T19:27:19Z</span><span class="event-kind">phase_transition</span><span class="event-detail">APPROACH_QUACKEN -&gt; RENDEZVOUS_HOLD: RendezvousReached (Director-derived: 300m &lt;= 500m radius)</span></li>
+<li class="event event-capture_requested"><span class="event-time">2026-07-13T19:27:19Z</span><span class="event-kind">capture_requested</span><span class="event-detail">rendezvous_reached: MONAD entered rendezvous radius with QUACKEN at tick 39897.</span></li>
+<li class="event event-phase_transition"><span class="event-time">2026-07-13T19:27:50Z</span><span class="event-kind">phase_transition</span><span class="event-detail">RENDEZVOUS_HOLD -&gt; MISSION_COMPLETE: hold criteria satisfied (31s continuous dwell inside radius)</span></li>
+<li class="event event-capture_requested"><span class="event-time">2026-07-13T19:27:50Z</span><span class="event-kind">capture_requested</span><span class="event-detail">mission_complete: quacken-transit-002: rendezvous hold complete, mission success.</span></li>
   </ul>
 
   <div class="section-title"><span class="eyebrow">Screenshots</span><span class="rule"></span></div>
@@ -96,6 +107,18 @@
       <strong>#1 — mission_start</strong>
       <div class="meta">recommended view: fleetcore-live</div>
       <div>quacken-transit-002: mission start, QUACKEN on station at {&#x27;lat&#x27;: 24.8, &#x27;lng&#x27;: 58.6}.</div>
+      <p class="capture-pending">Awaiting manual attachment.</p>
+    </div>
+<div class="capture-card">
+      <strong>#2 — rendezvous_reached</strong>
+      <div class="meta">recommended view: fleetcore-live</div>
+      <div>MONAD entered rendezvous radius with QUACKEN at tick 39897.</div>
+      <p class="capture-pending">Awaiting manual attachment.</p>
+    </div>
+<div class="capture-card">
+      <strong>#3 — mission_complete</strong>
+      <div class="meta">recommended view: bridge-station-3.0</div>
+      <div>quacken-transit-002: rendezvous hold complete, mission success.</div>
       <p class="capture-pending">Awaiting manual attachment.</p>
     </div>
   </div>
