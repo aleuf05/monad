@@ -41,6 +41,7 @@
           <div class="scope-stack">
             <div class="scope-frame" id="scopeFrame">
               <canvas id="periscopeCanvas" width="960" height="960" aria-label="Circular periscope observation window"></canvas>
+              <canvas id="periscopeOverlay" width="960" height="960" aria-hidden="true"></canvas>
               <div class="glass-sheen"></div>
               <div class="bearing-band" id="bearingBand" aria-hidden="true"></div>
               <div class="field-note" id="fieldNote">Drag to rotate bearing</div>
@@ -87,6 +88,14 @@
     </main>
 
     <script src="../shared/fleet-state.js"></script>
-    <script src="app.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>

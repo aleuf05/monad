@@ -8,6 +8,8 @@ Mk II adds a photographic rendering prototype: a panoramic sea plate, atmospheri
 
 Mk III adds an optics-glass visual pass: stronger distance haze, range-stable horizon placement, class-aware wake treatment, selected-contact focus, lens edge darkening, subtle chromatic fringe, and dust/glass overlays.
 
+Mk IV replaces the Canvas 2D renderer with three.js, keeping the same documented behavior (drag-to-rotate, optics tiers, shared-state contacts, selection sync, embed trim). It is the prerequisite for a real-time shader pass and a fabricated Quacken/"Rubber Ducky" 3D contact; see `mk4/REQUIREMENTS.md` and `mk4/ENGINEERING_REPORT.md`.
+
 ## Run locally
 
 From the repository root:
