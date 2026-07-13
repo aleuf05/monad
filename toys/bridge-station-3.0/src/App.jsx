@@ -39,7 +39,7 @@ const { bearingDegrees, distanceKm, normalizeDegrees } = window.MonadFleetState.
 
 function serverUrl() {
   const params = new URLSearchParams(window.location.search);
-  const base = params.get("server") || `ws://${window.location.hostname || "localhost"}:4771/ws`;
+  const base = params.get("server") || "wss://cameronlampley.com/monad/fleetcore-ws/ws";
   return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(COMMAND_TOKEN)}`;
 }
 

@@ -28,6 +28,7 @@ Interactive artifacts that must be reachable under `https://cameronlampley.com/m
 - `web/toys/shared/fleet-state.js` — the `MonadFleetState` contract, copied from `toys/shared/fleet-state.js`. Fleet Motion, Periscope, and Bridge Station all depend on this being present and in sync with the source; a stale copy silently breaks cross-instrument selection sync (this happened once — `web/toys/fleet-motion/` sat un-refreshed since the `7003852` schema-v2 refactor until it was caught during the Bridge Station Mk III deploy).
 - `web/toys/fleetcore-live/` — copied from `toys/fleetcore-live/`, **with one intentional divergence from source**: `index.html`'s default `#serverUrl` value is `wss://cameronlampley.com/monad/fleetcore-ws/ws` (the public reverse-proxy path below) instead of `ws://localhost:4771/ws`. Unlike every other public artifact here, this one doesn't work from a plain file copy alone — see "FleetCore Live Backend" below for what else has to be running.
 - `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/monad/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) requires whatever `--command-token` the public `fleetcore-serve` instance is running with, entered into this toy's own token field — there is no `?commandToken=` URL passthrough here.
+- `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. Not linked from the homepage yet, but reachable by URL like everything else here — nothing about it is secret.
 
 ### Watchbook is intentionally not public
 
@@ -76,22 +77,36 @@ sudo systemctl reload caddy
 
 **Known limitation, accepted for now:** as of 2026-07-12 there is no command-token gate at all — `fleetcore-serve` grants full command authority to every connection on both `/command` and `/ws` unconditionally (`fleetcore/src/bin/serve.rs`), explicit user request. The live world is shared by every visitor with no per-visitor isolation: anyone who can reach the server (which, through the public reverse proxy, means anyone on the internet) can pause/resume, reset the fleet, despawn vessels, or set any vessel's route. This was an explicit, informed choice, not an oversight; add real auth before treating this as anything more than a single-operator demo.
 
-## Bridge Station 2.0 — LAN-Only Deployment
+## Bridge Station — `toys/bridge-station-3.0/`, Public
 
-`toys/bridge-2/` (see `logs/captains/2026/2026-07-11_bridge-station-2-scope.md`) is deployed to the LAN only, deliberately not through the public Caddy/rock64 path. Reachable at `http://192.168.0.100:8090/toys/bridge-2/` from any machine on Granite's LAN.
+As of 2026-07-13, Bridge Station 3.0 (real FleetCore data, Vite + React) is the only
+surviving generation of the Bridge Station lineage. `toys/bridge-2/` (2.0) and
+`toys/bridge-station-2.1/` (mock-data 2.1) have been removed from the repo and their
+ad hoc dev-server processes killed — superseded, not needed. `toys/bridge/` (the
+original, unrelated "Live Console" — iframe-composited Fleet Motion/Periscope/Radio
+Console) is a different toy entirely and is untouched.
 
-**Why a separate port instead of Caddy's `:80` root:** Caddy's `:80` root (`web/`, served straight from the repo — see "Deployment" above) is reachable both on the LAN directly and publicly through rock64's proxy to `cameronlampley.com/monad/`. There is no path-based way to make something under `web/` LAN-only — anything placed there is public too, whether or not it's linked from anywhere. Genuine LAN-only isolation requires a separate process on a port rock64 doesn't forward, so a dedicated `web-lan/` directory at the repo root (distinct from `web/`) is served by its own process (`monad-lan-web.service`, `python3 -m http.server 8090 --bind 0.0.0.0 --directory web-lan`), independent of the production Caddy instance. `web-lan/` holds its own copies (`toys/bridge-2/`, `toys/shared/`, `toys/fleetcore-control/`) — same "does not update itself, re-copy runtime files by hand" rule as `web/toys/`. Verified: `https://cameronlampley.com/monad/toys/bridge-2/` returns `404` (never copied into `web/`), and port `8090` itself is unreachable from outside the LAN.
+Bridge Station 3.0 is deployed the same way as every other public toy: `npm run
+build` in `toys/bridge-station-3.0/`, then the `dist/` output copied into
+`web/toys/bridge-station-3.0/` — no separate port, no ad hoc process, served straight
+through Caddy like the rest of `web/`. Two things this build needed that other,
+non-bundled toys don't:
 
-**`web-lan/toys/fleetcore-control/`** — LAN-only copy of `toys/fleetcore-control/`, reachable at `http://192.168.0.100:8090/toys/fleetcore-control/`. Same divergence pattern as the public copies: `index.html`'s `#serverUrl` defaults to `ws://192.168.0.100:4771/ws` (the LAN IP fleetcore-serve's `--bind-all` already listens on) rather than `localhost` or the public `wss://` reverse-proxy path. As of 2026-07-12 no token is needed at all — see the "Known limitation" note above.
+- `vite.config.js` sets `base: './'` so the built `index.html`/asset references are
+  relative, not absolute — required because this is served from a subpath
+  (`/monad/toys/bridge-station-3.0/` or `/toys/bridge-station-3.0/`, not domain root).
+- `src/App.jsx`'s `serverUrl()` now defaults to
+  `wss://cameronlampley.com/monad/fleetcore-ws/ws` instead of deriving
+  `ws://<page-hostname>:4771/ws` — the latter would have tried to reach port 4771
+  directly on `cameronlampley.com` (not open, and blocked as mixed content on an
+  `https://` page regardless).
 
-**FleetCore's bind changed too, and this affects `fleetcore-serve` globally, not just this toy.** Bridge Station 2.0 needs a live WebSocket connection to `fleetcore-serve`, but that process was originally loopback-only (`127.0.0.1`) — reachable only from Granite itself, not from other machines on the LAN. Restarted with `--bind-all` (binds `0.0.0.0`) to make LAN access possible at all. Combined with the command-token removal above, `fleetcore-serve` is now a fully open write endpoint reachable from the LAN, from `cameronlampley.com`, and from anywhere else that can reach Granite's ports.
-
-**Durability:** both `fleetcore-serve` and the LAN web server run as installed, enabled systemd units as of 2026-07-12 — `/etc/systemd/system/fleetcore-serve.service` and `/etc/systemd/system/monad-lan-web.service` (sourced from `scripts/fleetcore-serve.service` and `scripts/monad-lan-web.service` in this repo). Both survive a Granite reboot and restart automatically on crash (`Restart=on-failure`). World state persists to `state-dir` independent of the process restarting.
-
-## Bridge Station 2.1 and 3.0 — LAN-Only React Deployments
-
-`toys/bridge-station-2.1/` (mock data, `http://192.168.0.100:8080/`) and `toys/bridge-station-3.0/` (real FleetCore data, `http://192.168.0.100:8070/`) are the first build-toolchain projects in this repo (Vite + React + `lucide-react`). Each is `npm run build` then `npx serve -s dist -p <port>` as an ad hoc `nohup` process, same durability caveat as everything else on this page — no systemd unit, doesn't survive a reboot. `serve`'s `-l 0.0.0.0:8080` syntax (as might be assumed from other tools) errors; `serve` already defaults to binding `0.0.0.0`, so `-p <port>` alone is correct.
-
-**The bind-decision revisit flagged in the Bridge Station 2.0 section above has happened.** `fleetcore-serve` now runs with `--command-token bridge-3-0-lan` (previously no token at all, fully read-only) so Bridge Station 3.0's Set Waypoint can actually write. This is a real, if LAN-scoped, change in risk profile: read-only-to-the-LAN and writable-to-the-LAN are different postures, and this crossed that line deliberately, not by accident. Verified before treating it as safe: `GET /snapshot` (what `toys/bridge-2/` and `toys/fleetcore-live/` both rely on) is completely unaffected; `POST /command` still 401s with no token or the wrong one; only the correct token succeeds.
-
-The token is baked into Bridge Station 3.0's client bundle (`COMMAND_TOKEN` in `src/App.jsx`) — acceptable under the "LAN is the trust boundary, no login" scope both the 2.1 and 3.0 packets stated explicitly, not acceptable as a real secret, and shared with anything else that knows it. Notably, `toys/fleetcore-live/`'s own "Command Token" field (currently deployed publicly at `https://cameronlampley.com/monad/toys/fleetcore-live/`, but not yet reachable there since the Caddy reverse-proxy step above is still pending) would also accept `bridge-3-0-lan` and gain full write access, since it's the same `fleetcore-serve` process — if that public reverse-proxy step is ever finished while this token is still live, this token effectively becomes a public secret at that point, not a LAN one. Rotate or remove it before finishing that proxy step, not after.
+**Command token:** `fleetcore-serve` runs with `--command-token bridge-3-0-lan`
+baked into Bridge Station 3.0's client bundle (`COMMAND_TOKEN` in `src/App.jsx`).
+This token is not a real secret — see the "FleetCore Live Backend" section above;
+`fleetcore-serve` currently grants command authority to every connection
+unconditionally regardless of token, so this is presentational only unless real auth
+is added later. `web-lan/toys/fleetcore-control/` still exists as a LAN-only copy of
+a different toy (`toys/fleetcore-control/`), reachable at
+`http://192.168.0.100:8090/toys/fleetcore-control/`, defaulting to
+`ws://192.168.0.100:4771/ws` — unaffected by this change.
