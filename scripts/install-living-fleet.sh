@@ -24,6 +24,13 @@ sudo systemctl enable --now living-fleet
 sudo systemctl enable --now living-fleet-memory
 sudo systemctl enable --now living-fleet-memory-reflect.timer
 
+# Effort B's inspector API is only reachable publicly through this route
+# (same loopback+reverse-proxy pattern as /fleetcore-ws/*, see
+# docs/deployment.md); scripts/Caddyfile is this repo's checked-in mirror
+# of /etc/caddy/Caddyfile, kept in sync here rather than as a manual step.
+sudo cp "$REPO_ROOT/scripts/Caddyfile" /etc/caddy/Caddyfile
+sudo caddy validate --config /etc/caddy/Caddyfile
+sudo systemctl reload caddy
+
 echo "Living Fleet installed. Agent Operations: https://cameronlampley.com/toys/agent-ops/"
-echo "Remember to add the /captain-memory-api/* route to /etc/caddy/Caddyfile (see scripts/Caddyfile) if not already present, then: sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy"
-sudo systemctl --no-pager --full status fleetcore-serve living-fleet living-fleet-memory living-fleet-memory-reflect.timer
+sudo systemctl --no-pager --full status fleetcore-serve living-fleet living-fleet-memory living-fleet-memory-reflect.timer caddy
