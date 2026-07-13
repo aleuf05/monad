@@ -38,7 +38,16 @@ const state = {
   commandFeedbackTimer: null,
   selectedId: null,
   markers: new Map(),
-  renderedWatchEventCount: 0
+  renderedWatchEventCount: 0,
+  // Vessel-events consumption state -- see processVesselEvents()/
+  // derivedStatusText() below. routeTotals tracks, per vessel, the leg
+  // count a route started with (from the event that installed it) so "leg
+  // X of Y" can be computed as legs shrink; lastVesselEvent tracks each
+  // vessel's most recent event so a fresh route_replaced can show a brief
+  // "Route changed" callout before settling back into leg wording.
+  processedVesselEventCount: 0,
+  routeTotals: new Map(),
+  lastVesselEvent: new Map()
 };
 
 function vesselIcon(kind, selected) {
@@ -186,6 +195,7 @@ function applySnapshot(snapshot) {
     timeScaleInput.value = snapshot.time_scale;
   }
 
+  processVesselEvents(snapshot.vessel_events || []);
   renderVessels(snapshot.vessels);
   renderWatchEvents(snapshot.watch_events);
 
@@ -207,6 +217,59 @@ function actualSpeedMps(vessel) {
   return vessel.status === "underway" || vessel.status === "transiting" ? vessel.speed_mps : 0;
 }
 
+// vessel_events (docs/architecture/fleetcore-api.md's "Vessel Events") is
+// ever-growing and never truncated server-side, same as watch_events --
+// only look at what's new since the last snapshot, same idiom
+// renderWatchEvents already uses via renderedWatchEventCount.
+function processVesselEvents(vesselEvents) {
+  if (vesselEvents.length === state.processedVesselEventCount) return;
+  vesselEvents.slice(state.processedVesselEventCount).forEach((event) => {
+    state.lastVesselEvent.set(event.vessel_id, event);
+    if (event.type === "route_replaced") {
+      state.routeTotals.set(event.vessel_id, { routeId: event.new_route_id, total: event.remaining_leg_count });
+    } else if (event.type === "waypoint_reached") {
+      const existing = state.routeTotals.get(event.vessel_id);
+      // No route_replaced seen yet for this route_id (e.g. this is this
+      // session's first snapshot, or the server restarted) -- best
+      // available total is "however many legs remain, plus the one just
+      // completed."
+      if (!existing || existing.routeId !== event.route_id) {
+        state.routeTotals.set(event.vessel_id, { routeId: event.route_id, total: event.remaining_leg_count + 1 });
+      }
+    } else if (event.type === "route_completed" || event.type === "holding") {
+      state.routeTotals.delete(event.vessel_id);
+    }
+  });
+  state.processedVesselEventCount = vesselEvents.length;
+}
+
+// Status wording derives from the vessel_events stream, not from
+// re-inferring intent out of status/route the way the popup used to --
+// that inference is exactly what made a route replacement landing near an
+// old waypoint indistinguishable from a genuine arrival. See "Vessel
+// Events" in docs/architecture/fleetcore-api.md for the full event model.
+function derivedStatusText(vessel) {
+  const lastEvent = state.lastVesselEvent.get(vessel.id);
+  // Brief one-tick callout right when a replacement lands -- matching the
+  // event's own tick against the snapshot we're rendering right now is
+  // what makes this "just happened" rather than stale history.
+  if (lastEvent && lastEvent.type === "route_replaced" && lastEvent.tick === state.lastTick) {
+    return "Route changed";
+  }
+  if (vessel.status === "arrived") return "Arrived — complete";
+  if (vessel.status === "holding") return "Holding";
+  if (vessel.status === "underway") {
+    const totals = state.routeTotals.get(vessel.id);
+    if (totals && totals.routeId === vessel.route_id) {
+      const remaining = vessel.route.length;
+      const currentLeg = Math.max(1, totals.total - remaining + 1);
+      return `Underway — leg ${currentLeg} of ${totals.total}`;
+    }
+    return "Underway";
+  }
+  return vessel.status.charAt(0).toUpperCase() + vessel.status.slice(1);
+}
+
 function renderVessels(vessels) {
   const seenIds = new Set();
 
@@ -224,7 +287,7 @@ function renderVessels(vessels) {
       marker.setIcon(vesselIcon(vessel.kind, selected));
     }
     marker.bindPopup(
-      `<strong>${vessel.callsign}</strong><br>${vessel.kind} &middot; ${vessel.status}<br>` +
+      `<strong>${vessel.callsign}</strong><br>${vessel.kind} &middot; ${derivedStatusText(vessel)}<br>` +
       `${(actualSpeedMps(vessel) * 1.94384).toFixed(1)} kn &middot; ${Math.round(vessel.course)}&deg;`
     );
   });
@@ -250,7 +313,7 @@ function renderVesselList(vessels) {
     item.classList.toggle("is-selected", vessel.id === state.selectedId);
     item.innerHTML =
       `<span class="vessel-name">${vessel.callsign}</span>` +
-      `<span class="vessel-meta">${vessel.status}</span>`;
+      `<span class="vessel-meta">${derivedStatusText(vessel)}</span>`;
     item.addEventListener("click", () => selectVessel(vessel.id));
     vesselListEl.appendChild(item);
   });

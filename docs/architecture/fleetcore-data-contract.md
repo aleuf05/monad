@@ -45,9 +45,12 @@ Adapters may expose kilometers per hour or knots, but FleetCore stores meters pe
   "speed_mps": 20.0,
   "status": "underway",
   "route": [{ "lat": 26.25, "lng": 55.35 }],
-  "last_update": "2026-07-10T20:00:00Z"
+  "last_update": "2026-07-10T20:00:00Z",
+  "route_id": 3
 }
 ```
+
+**`route_id`**: identifies which route is currently installed on this vessel, bumped every time a new one is set via `set-route` or `reset-fleet` — including a fresh assignment from `holding`/`arrived`, not just a genuine replacement. Defaulted to `0` for state saved before this field existed. See the live API doc's "Vessel Events" section for how this ties into `route_replaced`/`waypoint_reached`/`route_completed`.
 
 Allowed v1 vessel kinds:
 

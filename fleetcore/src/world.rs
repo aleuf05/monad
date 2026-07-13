@@ -4,7 +4,8 @@ use crate::event::Event;
 use crate::geography;
 use crate::route::{bearing_degrees, distance_meters, point_at_distance};
 use crate::vessel::{
-    normalize_degrees, quantize, EscortMode, Position, Vessel, VesselKind, VesselStatus,
+    normalize_degrees, quantize, EscortMode, Position, Vessel, VesselEvent, VesselKind,
+    VesselStatus,
 };
 use serde::{Deserialize, Serialize};
 
@@ -68,6 +69,13 @@ pub struct World {
     // load fine -- absent means Off, the pre-existing behavior.
     #[serde(default)]
     pub escort_mode: EscortMode,
+    // Structured per-vessel route/motion events -- see VesselEvent's own
+    // doc comment. Grows forever, same as watch_events, never truncated
+    // server-side; clients diff against length/tick to find what's new
+    // (same pattern renderWatchEvents already uses client-side). Defaulted
+    // for backward compat with state files saved before this existed.
+    #[serde(default)]
+    pub vessel_events: Vec<VesselEvent>,
 }
 
 impl World {
@@ -95,17 +103,64 @@ impl World {
                         waypoint.lat, waypoint.lng, zone.name
                     ));
                 }
+                let tick = self.clock.tick;
                 let sim_time = self.clock.sim_time();
-                let vessel = self
-                    .vessel_mut(vessel_id)
-                    .ok_or_else(|| format!("unknown vessel '{vessel_id}'"))?;
-                vessel.route = route.clone();
-                vessel.status = if vessel.route.is_empty() {
-                    VesselStatus::Holding
-                } else {
-                    VesselStatus::Underway
+
+                // Route replacement as a first-class event: a vessel that
+                // was genuinely underway on a real route and gets a new one
+                // holds its current position (no snap/jump), keeps moving
+                // (status stays Underway), and gets its heading recomputed
+                // toward the new first waypoint immediately -- it never
+                // passes through Arrived/Holding on the way, which is what
+                // previously let a same-tick replacement get misread
+                // downstream as "arrived, then a new route was assigned"
+                // instead of what actually happened, one continuous order.
+                // A vessel that was NOT underway on a real route (Holding,
+                // Arrived, Paused, or a scout with no route) gets a fresh
+                // assignment instead -- there is nothing to replace.
+                let event_to_emit: Option<VesselEvent> = {
+                    let vessel = self
+                        .vessel_mut(vessel_id)
+                        .ok_or_else(|| format!("unknown vessel '{vessel_id}'"))?;
+                    if route.is_empty() {
+                        vessel.route = vec![];
+                        vessel.status = VesselStatus::Holding;
+                        vessel.last_update = sim_time.clone();
+                        Some(VesselEvent::Holding {
+                            vessel_id: vessel_id.clone(),
+                            tick,
+                            sim_time: sim_time.clone(),
+                        })
+                    } else if vessel.status == VesselStatus::Underway && !vessel.route.is_empty() {
+                        let old_route_id = vessel.route_id;
+                        let old_active_waypoint = vessel.route[0];
+                        vessel.route_id += 1;
+                        vessel.route = route.clone();
+                        vessel.course = quantize(bearing_degrees(vessel.position, route[0]));
+                        vessel.status = VesselStatus::Underway;
+                        vessel.last_update = sim_time.clone();
+                        Some(VesselEvent::RouteReplaced {
+                            vessel_id: vessel_id.clone(),
+                            old_route_id,
+                            old_active_waypoint,
+                            new_route_id: vessel.route_id,
+                            new_first_waypoint: route[0],
+                            remaining_leg_count: route.len(),
+                            issuing_authority: "operator".to_string(),
+                            tick,
+                            sim_time: sim_time.clone(),
+                        })
+                    } else {
+                        vessel.route_id += 1;
+                        vessel.route = route.clone();
+                        vessel.status = VesselStatus::Underway;
+                        vessel.last_update = sim_time.clone();
+                        None
+                    }
                 };
-                vessel.last_update = sim_time;
+                if let Some(event) = event_to_emit {
+                    self.vessel_events.push(event);
+                }
                 "route-set"
             }
             Command::PauseClock => {
@@ -167,6 +222,7 @@ impl World {
                     status: VesselStatus::Transiting,
                     route: Vec::new(),
                     last_update: self.clock.sim_time(),
+                    route_id: 0,
                 };
                 vessel.normalize();
                 self.vessels.push(vessel);
@@ -203,6 +259,7 @@ impl World {
                         vessel.course = normalize_degrees(condition.course);
                         vessel.speed_mps = condition.speed_mps;
                         vessel.route = condition.route;
+                        vessel.route_id += 1;
                         vessel.status = VesselStatus::Underway;
                         vessel.last_update = sim_time.clone();
                     }
@@ -318,8 +375,11 @@ impl World {
             }
         }
 
+        let tick = self.clock.tick;
         for vessel in &mut self.vessels {
-            advance_vessel(vessel, tick_duration, &sim_time);
+            if let Some(event) = advance_vessel(vessel, tick_duration, &sim_time, tick) {
+                self.vessel_events.push(event);
+            }
         }
     }
 
@@ -328,9 +388,19 @@ impl World {
     }
 }
 
-fn advance_vessel(vessel: &mut Vessel, elapsed_seconds: f64, sim_time: &str) {
+// Returns the VesselEvent for this vessel's transition this tick, if any --
+// at most one, per the "mutually exclusive, no blending" rule. A vessel
+// that's still en route to its current target (the final `else` branch of
+// the "still traveling" case) doesn't get an event every tick, only on an
+// actual leg/route completion.
+fn advance_vessel(
+    vessel: &mut Vessel,
+    elapsed_seconds: f64,
+    sim_time: &str,
+    tick: u64,
+) -> Option<VesselEvent> {
     if vessel.speed_mps <= 0.0 {
-        return;
+        return None;
     }
 
     if let Some(target) = vessel.route.first().copied() {
@@ -338,13 +408,8 @@ fn advance_vessel(vessel: &mut Vessel, elapsed_seconds: f64, sim_time: &str) {
         if remaining <= ARRIVAL_RADIUS_METERS {
             vessel.position = target;
             vessel.route.remove(0);
-            vessel.status = if vessel.route.is_empty() {
-                VesselStatus::Arrived
-            } else {
-                VesselStatus::Underway
-            };
             vessel.last_update = sim_time.to_string();
-            return;
+            return Some(leg_or_route_complete(vessel, target, tick, sim_time));
         }
 
         vessel.course = quantize(bearing_degrees(vessel.position, target));
@@ -352,17 +417,13 @@ fn advance_vessel(vessel: &mut Vessel, elapsed_seconds: f64, sim_time: &str) {
         if step >= remaining {
             vessel.position = target;
             vessel.route.remove(0);
-            vessel.status = if vessel.route.is_empty() {
-                VesselStatus::Arrived
-            } else {
-                VesselStatus::Underway
-            };
-        } else {
-            vessel.position = point_at_distance(vessel.position, vessel.course, step);
-            vessel.status = VesselStatus::Underway;
+            vessel.last_update = sim_time.to_string();
+            return Some(leg_or_route_complete(vessel, target, tick, sim_time));
         }
+        vessel.position = point_at_distance(vessel.position, vessel.course, step);
+        vessel.status = VesselStatus::Underway;
         vessel.last_update = sim_time.to_string();
-        return;
+        return None;
     }
 
     if vessel.kind == VesselKind::PassiveTraffic {
@@ -373,6 +434,37 @@ fn advance_vessel(vessel: &mut Vessel, elapsed_seconds: f64, sim_time: &str) {
         );
         vessel.status = VesselStatus::Transiting;
         vessel.last_update = sim_time.to_string();
+    }
+    None
+}
+
+// Shared by both arrival paths in advance_vessel (the immediate-snap case
+// and the step-overshoots-remaining case) -- same event logic either way,
+// just reached via a different distance check.
+fn leg_or_route_complete(
+    vessel: &mut Vessel,
+    reached_waypoint: Position,
+    tick: u64,
+    sim_time: &str,
+) -> VesselEvent {
+    if vessel.route.is_empty() {
+        vessel.status = VesselStatus::Arrived;
+        VesselEvent::RouteCompleted {
+            vessel_id: vessel.id.clone(),
+            route_id: vessel.route_id,
+            tick,
+            sim_time: sim_time.to_string(),
+        }
+    } else {
+        vessel.status = VesselStatus::Underway;
+        VesselEvent::WaypointReached {
+            vessel_id: vessel.id.clone(),
+            route_id: vessel.route_id,
+            waypoint: reached_waypoint,
+            remaining_leg_count: vessel.route.len(),
+            tick,
+            sim_time: sim_time.to_string(),
+        }
     }
 }
 

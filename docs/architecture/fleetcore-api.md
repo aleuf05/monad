@@ -78,6 +78,7 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
   "tick_duration_seconds": 1,
   "vessels": [ /* Vessel, see fleetcore-data-contract.md */ ],
   "watch_events": [ { "tick": 12, "sim_time": "...", "message": "..." } ],
+  "vessel_events": [ /* VesselEvent, see "Vessel Events" below */ ],
   "event_sequence": 42,
   "land_zones": [ { "name": "Qeshm Island", "south": 26.62, "north": 26.98, "west": 55.55, "east": 56.25 }, "..." ]
 }
@@ -86,6 +87,28 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
 Identical to the CLI's `snapshot` command output (`fleetcore/src/snapshot.rs`'s `snapshot()` function) — there is exactly one snapshot shape in this codebase, not a separate live-API variant.
 
 **`land_zones`** (`fleetcore/src/geography.rs`) is static reference data, not part of the mutable `World` — the same five rough bounding-box rectangles `toys/fleet-motion/app.js`'s client-side `LAND_ZONES` already draws (same names, same coordinates, kept in sync deliberately rather than defining a second geography). Recomputed fresh on every snapshot, never persisted. Before this existed, FleetCore had no concept of land at all — every vessel was just a lat/lng point on open water, and Fleet Motion's own land-hazard boxes were a purely client-side, unenforced heuristic (explicitly not checked once talking to a real backend). `World::apply_command` now actually rejects `spawn-passive-contact` and `set-route` commands that would place a vessel inside one of these zones (`422`, message names the zone) — see Command Shapes below. This is still a rough approximation, not real coastline polygons, and only five hand-picked rectangles near the Persian Gulf/Strait of Hormuz — most of the world these vessels operate in has no land data at all and is treated as open water by default.
+
+### Vessel Events
+
+`vessel_events` (`fleetcore/src/vessel.rs`'s `VesselEvent` enum) is a structured, ever-growing log of route/motion transitions per vessel — distinct from `watch_events` (free-text operator log lines) and from the internal replay `Event` (`fleetcore/src/event.rs`, records which `Command` was applied, not used over the wire). Never truncated server-side, same as `watch_events` — a client wanting only what's new since its last look should diff against array length or the highest `tick` seen, the same pattern `fleetcore-control`'s own `renderWatchEvents()` already uses for `watch_events`.
+
+Exactly one of four types can occur for a given vessel in a given tick — they're mutually exclusive, never blended:
+
+```json
+{"type": "waypoint_reached", "vessel_id": "vessel.scout-bravo", "route_id": 1, "waypoint": {"lat": 26.539, "lng": 56.628}, "remaining_leg_count": 1, "tick": 2872, "sim_time": "..."}
+{"type": "route_replaced", "vessel_id": "vessel.monad", "old_route_id": 1, "old_active_waypoint": {"lat": 26.2, "lng": 55.9}, "new_route_id": 2, "new_first_waypoint": {"lat": 24.5, "lng": 59.0}, "remaining_leg_count": 2, "issuing_authority": "operator", "tick": 57, "sim_time": "..."}
+{"type": "route_completed", "vessel_id": "vessel.scout-alpha", "route_id": 0, "tick": 1294, "sim_time": "..."}
+{"type": "holding", "vessel_id": "vessel.monad", "tick": 10, "sim_time": "..."}
+```
+
+- **`waypoint_reached`** — a vessel reached one leg of a multi-leg route and has more remaining (`remaining_leg_count >= 1`). Status stays `underway`.
+- **`route_completed`** — a vessel reached the *last* leg of its route (`remaining_leg_count` would be `0`). Status becomes `arrived`.
+- **`route_replaced`** — a `set-route` command landed on a vessel that was genuinely `underway` on a real route (not `holding`/`arrived`/`paused`, not routeless). The vessel holds its current position (no snap/jump to the old or new target), keeps moving (`status` stays `underway`), and its heading is recomputed toward `new_first_waypoint` immediately. This is the fix for the bug this event type exists to solve: previously, a new route arriving near an old route's completion was indistinguishable downstream from a genuine arrival followed by a fresh assignment — now the two are structurally different events with different payloads, and a replacement never passes through `arrived`/`holding` on the way. `issuing_authority` is always `"operator"` today — there is no per-connection identity anywhere in `fleetcore-serve` (see Command Authority above), so treat this as a placeholder, not a real actor id.
+- **`holding`** — a `set-route` command with an empty route was applied (explicit "cancel route, hold position").
+
+A `set-route` command that assigns a route to a vessel that was *not* underway on an existing one (e.g. from `holding` or `arrived`) is a fresh assignment, not a replacement — nothing was superseded, so no event fires for it. Escort Mode's own per-tick station-keeping (`world.rs`'s `advance_one_tick`, re-issuing each scout's route toward a freshly computed formation point every tick) deliberately bypasses this event system entirely — treating every tick's station update as a route replacement would fire `route_replaced` continuously the whole time escorting is active, which isn't useful signal.
+
+**Tie-break, replacement vs. genuine arrival landing "the same tick":** there isn't one to design, and no special-case code exists for it. `World` lives behind a single `Mutex`, and even the tick loop's own advancement is just another `Command` (`Step`) applied through the same `apply_command` entry point everything else uses — so a `set-route` command and a tick's arrival check are always strictly ordered by lock acquisition, never concurrent. Whichever actually ran first is definitionally correct: if the command ran first, the route was already replaced before that tick's arrival check ever evaluates against it (unambiguous `route_replaced`). If the tick ran first, arrival was already genuine before the command was even processed (unambiguous `route_completed`/`waypoint_reached`), and the command that lands a moment later is just an ordinary fresh assignment.
 
 ### `Command`
 

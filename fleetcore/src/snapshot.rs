@@ -14,6 +14,7 @@ pub struct WorldSnapshot {
     pub tick_duration_seconds: u64,
     pub vessels: Vec<crate::vessel::Vessel>,
     pub watch_events: Vec<crate::world::WatchEvent>,
+    pub vessel_events: Vec<crate::vessel::VesselEvent>,
     pub event_sequence: u64,
     pub escort_mode: EscortMode,
     // Static reference geography, not part of World's persisted state --
@@ -33,6 +34,7 @@ pub fn snapshot(world: &World) -> WorldSnapshot {
         tick_duration_seconds: world.clock.tick_duration_seconds,
         vessels: world.vessels.clone(),
         watch_events: world.watch_events.clone(),
+        vessel_events: world.vessel_events.clone(),
         event_sequence: world.event_sequence,
         escort_mode: world.escort_mode,
         land_zones: geography::land_zones(),

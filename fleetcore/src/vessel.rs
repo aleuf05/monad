@@ -53,6 +53,18 @@ pub struct Vessel {
     pub status: VesselStatus,
     pub route: Vec<Position>,
     pub last_update: String,
+    // Identifies which route is currently installed -- bumped every time a
+    // new route is set (SetRoute, ResetFleet), including on a fresh
+    // assignment from Holding/Arrived, not just on a genuine replacement.
+    // Escort Mode's own per-tick station-chasing (world.rs advance_one_tick)
+    // writes vessel.route directly and deliberately does NOT bump this or
+    // emit a VesselEvent -- that's continuous station-keeping, not an
+    // operator route order, and treating every tick's station update as a
+    // "replacement" would spam route_replaced constantly while escorting.
+    // Defaulted for backward compat with state files saved before this
+    // field existed -- 0 is a reasonable genesis value.
+    #[serde(default)]
+    pub route_id: u64,
 }
 
 impl Vessel {
@@ -64,6 +76,55 @@ impl Vessel {
         self.position.lat = quantize(self.position.lat.clamp(-90.0, 90.0));
         self.position.lng = quantize(normalize_longitude(self.position.lng));
     }
+}
+
+// Per-vessel route/motion events, distinct from event::Event (which
+// records the Command applied, for replay/persistence) and world::
+// WatchEvent (free-text operator log lines). These are structured,
+// mutually exclusive per tick per vessel -- a vessel gets at most one of
+// these in a given tick -- so frontend status wording can derive purely
+// from "what was the most recent event for this vessel" instead of
+// re-inferring intent from status/route, which is what previously made a
+// route replacement near an old waypoint indistinguishable from a real
+// arrival. See world.rs's apply_command (SetRoute) and advance_vessel for
+// where each variant is emitted.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "type", rename_all = "snake_case")]
+pub enum VesselEvent {
+    WaypointReached {
+        vessel_id: String,
+        route_id: u64,
+        waypoint: Position,
+        remaining_leg_count: usize,
+        tick: u64,
+        sim_time: String,
+    },
+    RouteReplaced {
+        vessel_id: String,
+        old_route_id: u64,
+        old_active_waypoint: Position,
+        new_route_id: u64,
+        new_first_waypoint: Position,
+        remaining_leg_count: usize,
+        // No real per-connection identity exists anywhere in fleetcore-serve
+        // (see docs/deployment.md's "Known limitation" note -- there is no
+        // auth at all, let alone identity). This is always "operator" today,
+        // a placeholder, not a real actor id -- do not treat it as one.
+        issuing_authority: String,
+        tick: u64,
+        sim_time: String,
+    },
+    RouteCompleted {
+        vessel_id: String,
+        route_id: u64,
+        tick: u64,
+        sim_time: String,
+    },
+    Holding {
+        vessel_id: String,
+        tick: u64,
+        sim_time: String,
+    },
 }
 
 pub fn quantize(value: f64) -> f64 {

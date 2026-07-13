@@ -1511,8 +1511,19 @@ function formatPosition(position) {
   return `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`;
 }
 
+// ETA is wall-clock (real) time, not sim time -- distance/speed alone
+// gives sim-seconds-until-arrival, and dividing by time_scale converts
+// that to real seconds (equivalently, multiplying effective speed by
+// timeWarp before dividing, done here). The actual bug this fixed: live
+// mode was computing that against designSettings.flagshipSpeedKmh, a
+// local-simulation-only design constant totally disconnected from the
+// live vessel's real speed, instead of currentSpeedKmh (the real speed
+// FleetCore reports, "72 km/h sim"). timeWarp itself was never the
+// problem -- it's needed in both modes for the same reason, real time
+// versus sim time.
 function formatEta(distance) {
-  const effectiveSpeed = currentFlagshipSpeedKmh() * Math.max(timeWarp, 1);
+  const baseSpeed = liveMode ? currentSpeedKmh : currentFlagshipSpeedKmh();
+  const effectiveSpeed = baseSpeed * Math.max(timeWarp, 1);
   const totalMinutes = Math.ceil((distance / effectiveSpeed) * 60);
   if (totalMinutes < 1) {
     return "<1 min";
