@@ -1,0 +1,10 @@
+[Unit]
+Description=Run scheduled Living Fleet captain reflection every 30 minutes
+
+[Timer]
+OnBootSec=10min
+OnUnitActiveSec=30min
+Unit=living-fleet-memory-reflect.service
+
+[Install]
+WantedBy=timers.target

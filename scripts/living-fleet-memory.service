@@ -1,0 +1,17 @@
+[Unit]
+Description=Monad Living Fleet captain memory inspector API (loopback only)
+After=network-online.target living-fleet.service
+Wants=network-online.target
+Requires=living-fleet.service
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/living-fleet/memory/inspector_server.py
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

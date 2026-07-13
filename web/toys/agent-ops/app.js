@@ -7,6 +7,9 @@ const fleetPauseButton = document.querySelector("#fleetPauseButton");
 const captainGrid = document.querySelector("#captainGrid");
 const historyBody = document.querySelector("#historyBody");
 const feedback = document.querySelector("#feedback");
+const memoryGrid = document.querySelector("#memoryGrid");
+const fleetNarrative = document.querySelector("#fleetNarrative");
+const fleetNarrativeList = document.querySelector("#fleetNarrativeList");
 
 const state = { socket: null, authority: false, snapshot: null, reconnectTimer: null };
 
@@ -131,6 +134,74 @@ function render() {
   renderCaptains();
   renderHistory();
 }
+
+// Captain Memory & Identity (Effort B): a separate, portless-service-backed
+// read-only API (tools/living-fleet/memory/inspector_server.py, reached
+// publicly through Caddy's /captain-memory-api/* reverse proxy -- see
+// docs/deployment.md), polled independently of the FleetCore WebSocket
+// above since it reports on a different backend.
+function memoryApiUrl(path) {
+  return `${location.origin}/captain-memory-api${path}`;
+}
+
+function renderMemory(data) {
+  memoryGrid.innerHTML = (data.captains || []).map((captain) => {
+    const traits = captain.traits || {};
+    const traitRows = Object.entries(traits)
+      .map(
+        ([trait, value]) => `<div class="trait-bar">
+      <span>${escapeHtml(title(trait))}</span>
+      <div class="trait-bar-track"><div class="trait-bar-fill" style="width:${Math.round(value * 100)}%"></div></div>
+      <span>${value.toFixed(2)}</span>
+    </div>`
+      )
+      .join("");
+    const relationship = captain.lieutenant_relationship || { trust: 0.5, friction: 0 };
+    const beliefCounts = captain.belief_counts || { active: 0, superseded: 0 };
+    return `<article class="captain-card memory-card">
+      <header>
+        <div><p class="eyebrow">${escapeHtml(captain.role || "")}</p><h3>${escapeHtml(captain.captain_id.replace("captain.", "Captain ").toUpperCase())}</h3></div>
+      </header>
+      <div class="trait-bars">${traitRows}</div>
+      <dl>
+        <div><dt>Lieutenant Trust / Friction</dt><dd>${relationship.trust.toFixed(2)} / ${relationship.friction.toFixed(2)}</dd></div>
+        <div><dt>Beliefs</dt><dd>${beliefCounts.active} active, ${beliefCounts.superseded} superseded</dd></div>
+        <div><dt>Latest Reflection</dt><dd>${captain.latest_reflection ? escapeHtml(captain.latest_reflection.summary) : "No reflection recorded yet."}</dd></div>
+        <div><dt>Most Salient Memory</dt><dd>${captain.top_episode ? escapeHtml(captain.top_episode.what) : "No memories recorded yet."}</dd></div>
+      </dl>
+    </article>`;
+  }).join("");
+
+  if (data.fleet_narrative && data.fleet_narrative.length) {
+    fleetNarrative.hidden = false;
+    fleetNarrativeList.innerHTML = data.fleet_narrative
+      .map(
+        (item) => `<div>
+      <strong>${escapeHtml(item.title)}</strong>
+      <div class="narrative-pair">
+        <div><small>Fact</small><p>${escapeHtml(item.fact_summary)}</p></div>
+        <div class="mythology"><small>Fleet Lore</small><p>${escapeHtml(item.mythology)}</p></div>
+      </div>
+    </div>`
+      )
+      .join("");
+  } else {
+    fleetNarrative.hidden = true;
+  }
+}
+
+async function refreshMemory() {
+  try {
+    const response = await fetch(memoryApiUrl("/captains/summary"), { cache: "no-store" });
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    renderMemory(await response.json());
+  } catch (error) {
+    memoryGrid.innerHTML = `<p class="memory-unavailable">Captain memory API unavailable (${escapeHtml(error.message)}).</p>`;
+  }
+}
+
+refreshMemory();
+setInterval(refreshMemory, 8000);
 
 fleetPauseButton.addEventListener("click", () => {
   send({ type: "set-agent-fleet-paused", paused: !state.snapshot.agent_fleet_paused });
