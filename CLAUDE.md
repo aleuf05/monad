@@ -32,6 +32,14 @@ editing a file under `web/` changes production immediately. Concretely:
   from memory or a doc doesn't count as reachable, no matter how "clean"
   the URL is. If you ship something new, add the nav link/card that gets a
   visitor there by clicking, in the same pass -- not as a follow-up.
+- No URL prefix other than the bare `https://cameronlampley.com/` root
+  serves the app -- not `/monad/`, not any other segment. The old `/monad/`
+  prefix is fully retired (see `docs/deployment/public-hatch.md`) and its
+  Caddy routes are gone, confirmed 404 as of 2026-07-13. The one deliberate
+  exception is `/monad/portainer/*` -- operator infrastructure, not part of
+  the app, under standing protection ("the Portainer reverse proxy path
+  must not be disturbed"). Don't recreate a second prefix/path for
+  anything new; everything else lives at the bare root.
 - Before calling any work on a public-facing toy done, verify it against the
   real `https://cameronlampley.com/...` URL, not just a local dev server.
   `toys/<name>/` is source; it is not live until copied into `web/toys/<name>/`.

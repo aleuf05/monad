@@ -35,6 +35,13 @@ because it's in a doc or a commit message doesn't make it discoverable.
 Shipping a toy means adding its nav entry in the same pass, not leaving it
 to be found later.
 
+**No prefix but the bare root.** The app is served only at
+`https://cameronlampley.com/` -- no `/monad/` segment, no other prefix. The
+old `/monad/` routes are fully retired (see `docs/deployment/public-hatch.md`)
+and confirmed 404 as of 2026-07-13; only `/monad/portainer/*` remains, as a
+deliberate, separately-protected exception for operator infrastructure, not
+the app. Don't introduce a second prefix for anything new.
+
 **Deploy to the live app always, as part of finishing the work, not as a
 separate later step.** When a public toy under `toys/<name>/` changes,
 re-copy it into `web/toys/<name>/` (and `web/toys/shared/` if
