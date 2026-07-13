@@ -104,12 +104,31 @@ No pixel-perfect visual comparison was performed or is warranted here --
 the brief calibrated verification to real scrutiny for shared-state behavior
 (done above) and a smoke check for the render swap itself (also done).
 
+## GLSL 3 optics upgrade (2026-07-13)
+
+The Phase 1 post-process originally used GLSL 1-era `varying`, `texture2D`,
+and `gl_FragColor` syntax. It now constructs an explicit
+`THREE.ShaderMaterial` with `glslVersion: THREE.GLSL3`, modern vertex/fragment
+interfaces, `texture()` sampling, and a declared location-0 fragment output.
+The single pass now combines the existing vignette, fresnel rim, and chromatic
+separation with restrained barrel distortion, a horizon atmosphere band, and
+animated physical-pixel grain. Keeping these in one pass avoids multiplying
+fullscreen render targets, while the separate 2D reticle/label overlay stays
+unfiltered and crisp.
+
+Verification followed the live-only deployment policy: source runtime files
+were mirrored into `web/toys/periscope/`, the intentional deployed duck-model
+path divergence was preserved, and the real
+`https://cameronlampley.com/toys/periscope/` page was exercised in headless
+Chromium. The page returned 200, created a WebGL2 context, compiled the GLSL 3
+pass without console/page errors, displayed the `GLSL 3 Lens` marker, and
+retained drag-to-rotate behavior.
+
 ## Known limitations / deliberate simplifications
 
-- No horizon haze/glare/grain atmosphere layer, no per-contact
-  distance-blur/contrast-pocket filter. These were cosmetic polish on top of
-  the photo backdrop, not documented behavior; the "optics glass" look they
-  approximated is Phase 1's real job now.
+- No per-contact distance-blur/contrast-pocket filter. Horizon atmosphere and
+  grain now live in the GLSL 3 optics pass, but intentionally remain global
+  lens effects rather than contact-specific material work.
 - No procedural-ocean fallback if the sea texture fails to load (a flat
   color substitutes) -- the elaborate wave-gradient fallback from Mk I
   predates the photographic assets Mk II shipped and was already arguably
@@ -132,6 +151,6 @@ the brief calibrated verification to real scrutiny for shared-state behavior
 - Draco-compress the duck GLB (Phase 2 explicitly deferred this).
 - Consider syncing this rewrite into the manually-mirrored `web/`/`web-lan/`
   copies of Periscope (out of scope here -- separate deploy decision).
-- If the atmosphere/haze look from the old renderer is missed after seeing
-  Phase 1's shader pass in practice, it's a reasonable follow-up shader
-  layer of its own -- explicitly out of scope for this packet.
+- Calibrate the new global atmosphere/grain strengths on a physical phone GPU
+  if the current restrained defaults need tuning; software-rendered headless
+  Chromium is useful for correctness, not visual-performance acceptance.

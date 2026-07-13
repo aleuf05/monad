@@ -10,21 +10,17 @@ Mk III adds an optics-glass visual pass: stronger distance haze, range-stable ho
 
 Mk IV replaces the Canvas 2D renderer with three.js, keeping the same documented behavior (drag-to-rotate, optics tiers, shared-state contacts, selection sync, embed trim). It is the prerequisite for a real-time shader pass and a fabricated Quacken/"Rubber Ducky" 3D contact; see `mk4/REQUIREMENTS.md` and `mk4/ENGINEERING_REPORT.md`.
 
-## Run locally
+The optical pass now runs on GLSL 3/WebGL2 and combines restrained barrel distortion, radial chromatic separation, horizon haze, edge glass, and animated physical-pixel grain in one post-process pass. The reticle and contact labels remain on the crisp 2D overlay above it.
 
-From the repository root:
+## Live station
 
-```sh
-python -m http.server 8080
-```
-
-Then open:
+Browse the deployed station at:
 
 ```text
-http://localhost:8080/toys/periscope/
+https://cameronlampley.com/toys/periscope/
 ```
 
-The artifact uses only static HTML, CSS, JavaScript, Canvas 2D, and local image assets.
+The artifact uses static HTML, CSS, JavaScript, three.js/WebGL2, a 2D overlay canvas, and local image/model assets.
 
 ## Controls
 

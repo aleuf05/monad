@@ -361,7 +361,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
       acquisitionRing.visible = false;
     }
 
-    effects.render();
+    effects.render(now);
 
     const w = overlayCanvas.width;
     const h = overlayCanvas.height;
