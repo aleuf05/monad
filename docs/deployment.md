@@ -21,6 +21,21 @@ duck-model-path examples below) -- a relative path that's correct from
 `toys/<name>/` is not automatically correct once nested one level deeper
 under `web/toys/<name>/`.
 
+## POLICY: If the Lt. can't see it on the live app, it doesn't exist
+
+Deployed-but-buried does not count as done. New or changed functionality
+must be plainly, obviously visible on the live page it belongs to when the
+Lt. glances at it -- not a console log, not a value only visible via
+devtools/localStorage, not gated behind a non-obvious click sequence.
+
+- Every new feature should get an obvious on-page marker when it first
+  ships -- a visible "NEW" label/badge, a highlighted border/glow, or
+  equivalent -- so it's immediately findable without a guided tour. Fine to
+  remove once it's no longer new.
+- Prefer surfacing state as visible page content (a readout, a status line,
+  a label) over anything that would need devtools to observe.
+- When reporting a feature done, say where on the live page to look for it.
+
 Granite serves the Monad public site through Caddy, directly from the repo. There is no deploy step.
 
 ## Paths

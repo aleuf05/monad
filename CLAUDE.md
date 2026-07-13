@@ -25,7 +25,22 @@ editing a file under `web/` changes production immediately. Concretely:
 - Any backend a public toy depends on (FleetCore, etc.) must be reached
   through the existing Caddy reverse-proxy path, not a raw `host:port`.
 
-## POLICY: Security hardening is not the priority here
+## POLICY: If the Lt. can't see it on the live app, it doesn't exist
+
+Deployed-but-buried does not count as done. New or changed functionality
+must be plainly, obviously visible on the live page it belongs to -- not a
+console log, not a value you have to inspect DOM/localStorage to find, not
+something reachable only via a non-obvious click sequence. Assume the Lt.
+will glance at the page for a few seconds, not read the diff.
+
+- Give every new feature an obvious on-page marker when it first ships --
+  a visible label/badge (e.g. "NEW"), a highlighted border/glow, or
+  equivalent -- so it's immediately findable without a tour. It's fine to
+  remove the marker in a later pass once it's not new anymore.
+- Prefer surfacing state as visible page content (a readout, a status
+  line, a label) over anything the Lt. would need devtools to observe.
+- When reporting a feature done, say where on the live page to look, not
+  just that it works.
 
 This is a single-operator demo project (see `docs/deployment.md`'s
 "Known limitation, accepted for now" -- no command-token gate, full write

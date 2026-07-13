@@ -37,6 +37,8 @@
   .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
   .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
   .tag-pending { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .tag-new { color: #E8A33D; border: 1px solid #E8A33D44; animation: tag-new-pulse 2s ease-in-out infinite; }
+  @keyframes tag-new-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .placeholder-note { margin-top: 20px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.6; }
   .placeholder-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
@@ -157,6 +159,12 @@
           <div class="card-name">Bridge Station</div>
           <div class="card-desc">Composited command view — select, act, confirm</div>
           <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/bridge-station-3.0/">
+          <div class="card-name">Bridge Station 3.0</div>
+          <div class="card-desc">Live command view wired to real FleetCore data — select a vessel, Set Waypoint, watch the world respond</div>
+          <span class="card-tag tag-live">live</span>
+          <span class="card-tag tag-new">fixed: speed readout</span>
         </a>
         <a class="card" href="toys/radio-console/">
           <div class="card-name">Radio Console</div>

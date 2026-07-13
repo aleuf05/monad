@@ -37,6 +37,8 @@
   .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
   .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
   .tag-pending { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .tag-new { color: #E8A33D; border: 1px solid #E8A33D44; animation: tag-new-pulse 2s ease-in-out infinite; }
+  @keyframes tag-new-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
   .placeholder-note { margin-top: 20px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.6; }
   .placeholder-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
@@ -44,6 +46,20 @@
   .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; }
   .footer-links a { color: #4FD1C5; text-decoration: none; font-size: 10px; letter-spacing: 0.06em; }
   .footer-links a:hover { color: #E8A33D; }
+  .mission-widget { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: #111A2B; border: 1px solid #1E2C42; border-left: 3px solid #4FD1C5; border-radius: 6px; padding: 10px 16px; font-size: 11px; }
+  .mission-widget.mw-ok { border-left-color: #4FD1C5; }
+  .mission-widget.mw-warn { border-left-color: #E8A33D; }
+  .mission-widget.mw-fail { border-left-color: #E05252; }
+  .mw-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .mw-label { color: #6B7C93; letter-spacing: 0.08em; }
+  .mw-id { color: #DCE6F2; }
+  .mw-phase { padding: 1px 7px; border-radius: 3px; border: 1px solid #4FD1C544; color: #4FD1C5; }
+  .mw-warn .mw-phase { border-color: #E8A33D44; color: #E8A33D; }
+  .mw-fail .mw-phase { border-color: #E0525244; color: #E05252; }
+  .mw-since { color: #6B7C93; }
+  .mw-link { color: #4FD1C5; text-decoration: none; }
+  .mw-link:hover { color: #E8A33D; }
+  .mw-new { background: #E8A33D; color: #0B1220; font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -59,6 +75,19 @@
       <span>FLEET STATUS: <span class="val">GREEN</span></span>
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
+    </div>
+
+    <div class="section" style="padding-top: 20px;">
+      <div class="mission-widget mw-active" id="mission-widget">
+        <div class="mw-left">
+          <span class="mw-new">NEW</span>
+          <span class="mw-label">ACTIVE MISSION</span>
+          <span class="mw-id mono">quacken-transit-002</span>
+          <span class="mw-phase mono" id="mw-phase">loading&hellip;</span>
+          <span class="mw-since mono" id="mw-since"></span>
+        </div>
+        <a class="mw-link" href="missions/quacken-transit-002/">full report &rarr;</a>
+      </div>
     </div>
 
     <div class="section">
@@ -158,6 +187,12 @@
           <div class="card-desc">Composited command view — select, act, confirm</div>
           <span class="card-tag tag-live">live</span>
         </a>
+        <a class="card" href="toys/bridge-station-3.0/">
+          <div class="card-name">Bridge Station 3.0</div>
+          <div class="card-desc">Live command view wired to real FleetCore data — select a vessel, Set Waypoint, watch the world respond</div>
+          <span class="card-tag tag-live">live</span>
+          <span class="card-tag tag-new">fixed: speed readout</span>
+        </a>
         <a class="card" href="toys/radio-console/">
           <div class="card-name">Radio Console</div>
           <div class="card-desc">Communications Station — ambient fleet chatter</div>
@@ -225,5 +260,50 @@
       </div>
     </footer>
   </div>
+  <script>
+  (function () {
+    var MISSION_ID = "quacken-transit-002";
+    var wrap = document.getElementById("mission-widget");
+    var phaseEl = document.getElementById("mw-phase");
+    var sinceEl = document.getElementById("mw-since");
+
+    var PHASE_CLASS = {
+      MISSION_COMPLETE: "mw-ok",
+      MISSION_STALLED: "mw-warn",
+      MISSION_ABORTED: "mw-warn",
+      MISSION_FAILED: "mw-fail",
+    };
+
+    function fmtDuration(seconds) {
+      if (seconds < 60) return Math.floor(seconds) + "s";
+      if (seconds < 3600) return Math.floor(seconds / 60) + "m";
+      return (seconds / 3600).toFixed(1) + "h";
+    }
+
+    function refresh() {
+      fetch("missions/" + MISSION_ID + "/mission.json", { cache: "no-store" })
+        .then(function (r) {
+          if (!r.ok) throw new Error("status " + r.status);
+          return r.json();
+        })
+        .then(function (d) {
+          phaseEl.textContent = d.phase;
+          wrap.className = "mission-widget " + (PHASE_CLASS[d.phase] || "mw-active");
+          // mission.json only regenerates on a phase transition (or manual
+          // `publish`), not continuously -- so this is "time in this phase
+          // as of the last published transition", not a live heartbeat.
+          sinceEl.textContent = "in phase " + fmtDuration(Date.now() / 1000 - d.phase_entered_at) + " (as of last publish)";
+        })
+        .catch(function () {
+          phaseEl.textContent = "unavailable";
+          wrap.className = "mission-widget mw-warn";
+          sinceEl.textContent = "";
+        });
+    }
+
+    refresh();
+    setInterval(refresh, 15000);
+  })();
+  </script>
 </body>
 </html>
