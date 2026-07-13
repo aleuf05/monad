@@ -5,7 +5,6 @@ const clockStateEl = document.querySelector("#clockState");
 const tickReadoutEl = document.querySelector("#tickReadout");
 const vesselCountEl = document.querySelector("#vesselCount");
 const serverUrlInput = document.querySelector("#serverUrl");
-const commandTokenInput = document.querySelector("#commandToken");
 const commandFeedbackEl = document.querySelector("#commandFeedback");
 const connectButton = document.querySelector("#connectButton");
 const pauseResumeButton = document.querySelector("#pauseResumeButton");
@@ -77,10 +76,11 @@ function setAuthorityStatus(text, authorized) {
 }
 
 // Every write control in this toy only ever enables when both connected AND
-// holding command authority -- same rule toys/fleetcore-live/ and Bridge's
-// Command Token field already follow, since the server is read-only by
-// default and a connected-but-unauthorized visitor must not see live-looking
-// controls the server will just reject.
+// the server reports command authority for this connection (there is no
+// client-supplied token anymore -- fleetcore-serve currently grants
+// authority to every connection unconditionally, see docs/deployment.md).
+// A connected-but-unauthorized visitor must not see live-looking controls
+// the server will just reject.
 function updateControlsEnabled() {
   const enabled = state.connected && state.commandAuthority;
   pauseResumeButton.disabled = !enabled;
@@ -105,17 +105,13 @@ function connect() {
 
   const url = serverUrlInput.value.trim();
   if (!url) return;
-  const token = commandTokenInput.value.trim();
-  const connectUrl = token
-    ? `${url}${url.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
-    : url;
 
   setLinkStatus("Connecting…", false);
   setAuthorityStatus("—", false);
   state.connected = false;
   updateControlsEnabled();
 
-  const socket = new WebSocket(connectUrl);
+  const socket = new WebSocket(url);
   state.socket = socket;
 
   socket.addEventListener("open", () => {

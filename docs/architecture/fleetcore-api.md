@@ -15,14 +15,15 @@ Both transports read from and write to the same in-memory `World`. A command app
 
 ## Command Authority
 
-**Read-only by default.** `GET /snapshot` requires nothing and always works. Every write path — `POST /command` and any command sent over `/ws` — requires the server to have been started with `--command-token <token>`, and the caller to present that exact token. With no `--command-token` configured, every write from every transport is rejected, unconditionally, regardless of what a caller presents.
+**As actually shipped (see the doc comment atop `fleetcore/src/bin/serve.rs`): there is no auth at all.** Every connection on both transports has full command authority, no token required. `--command-token` is still accepted on the command line but silently ignored — see `docs/deployment.md`'s "Known limitation" note. This is why every toy in this repo (`fleetcore-live`, `fleetcore-control`, `bridge`, `fleet-motion`, `bridge-station-3.0`) had its Command Token field/param removed: a client-supplied token never did anything real to check against.
 
-This is deliberate, not a placeholder for "add auth later": Sprint.md's acceptance criteria explicitly required "read-only default for toys; explicit grant required for command authority," because this world is shared — one write affects every connected instrument and every other visitor, not just the caller. Treat holding the token as equivalent to holding operational control of the fleet for everyone currently watching.
+The rest of this section describes the originally-designed contract (Sprint.md's acceptance criteria: "read-only default for toys; explicit grant required for command authority") for reference — a future real-auth pass would presumably implement something like this, not invent a new shape from scratch.
 
-- **HTTP:** send `Authorization: Bearer <token>` on `POST /command`. Missing or wrong token → `401`.
-- **WebSocket:** pass `?token=<token>` on the `/ws` connect URL. A connection without the right token still receives every broadcast (reads are always open) but any command it sends gets an `error` message back instead of being applied.
+- **Read-only by default (as designed).** `GET /snapshot` requires nothing and always works. Every write path — `POST /command` and any command sent over `/ws` — was meant to require the server to have been started with `--command-token <token>`, and the caller to present that exact token.
+- **HTTP (as designed):** send `Authorization: Bearer <token>` on `POST /command`. Missing or wrong token → `401`.
+- **WebSocket (as designed):** pass `?token=<token>` on the `/ws` connect URL. A connection without the right token still receives every broadcast (reads are always open) but any command it sends gets an `error` message back instead of being applied.
 
-There is currently no per-token scoping — a valid token grants unrestricted command authority (pause, resume, set-route, spawn-contact, everything in `Command`), not a subset. If you need finer-grained permissions, that's a real gap to design, not something to work around client-side.
+There is no per-token scoping in the design either — a valid token would grant unrestricted command authority (pause, resume, set-route, spawn-contact, everything in `Command`), not a subset.
 
 ## HTTP Endpoints
 

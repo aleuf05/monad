@@ -468,17 +468,12 @@ let lastKnownSelectionId = selectedShipId;
 // Motion stops running its own local physics (see the liveMode guard in
 // advanceFleet()) and instead renders positions straight from the server's
 // broadcast snapshots -- see connectFleetCoreLive()/applyLiveSnapshot()
-// near the bottom of this file. Read-only by default, the same as any
-// other FleetCore client (docs/architecture/fleetcore-api.md) -- command
-// authority is only granted if a `?commandToken=` is present in the URL
-// and the server accepts it (see liveCommandAuthority below). No token
-// baked into this bundle, unlike toys/bridge-station-3.0/: this file is
-// also served from the public deployment, where fleetcore-serve isn't
-// reachable, but "isn't reachable" is a network fact, not a promise --
-// a hardcoded token here would command the shared fleet for everyone the
-// moment that stops being true. When no live server answers at all, this
-// whole path times out once and Fleet Motion behaves exactly as it always
-// has.
+// near the bottom of this file. Command authority (liveCommandAuthority
+// below) is granted by the server per-connection on its own -- there is no
+// client-supplied token anymore (see fleetcore-control's app.js comment
+// for why that field was removed everywhere). When no live server answers
+// at all, this whole path times out once and Fleet Motion behaves exactly
+// as it always has.
 let liveMode = false;
 let liveSocket = null;
 let liveReconnectTimer = null;
@@ -832,18 +827,6 @@ function fleetCoreServerUrl() {
   return `ws://${window.location.hostname || "localhost"}:4771/ws`;
 }
 
-// Command authority is opt-in per docs/architecture/fleetcore-api.md: pass
-// `?token=<token>` on the /ws connect URL to request it. No default and no
-// baked-in value -- see the liveMode comment above for why. An operator
-// (or Bridge, forwarding its own `?commandToken=`) supplies this via URL.
-function liveConnectUrl() {
-  const base = fleetCoreServerUrl();
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("commandToken");
-  if (!token) return base;
-  return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`;
-}
-
 // One connection attempt to a live FleetCore server. Fails closed and
 // silently: if nothing answers within LIVE_CONNECT_TIMEOUT_MS, Fleet
 // Motion just proceeds exactly as it always has (local simulation). This
@@ -852,7 +835,7 @@ function liveConnectUrl() {
 // delay or degrade the normal standalone experience there.
 function connectFleetCoreLive() {
   let settled = false;
-  const socket = new WebSocket(liveConnectUrl());
+  const socket = new WebSocket(fleetCoreServerUrl());
   const timeout = setTimeout(() => {
     if (settled) return;
     settled = true;
@@ -903,7 +886,7 @@ function connectFleetCoreLive() {
       // confusing regression to anyone watching rather than a connection
       // hiccup. Command authority doesn't carry over an open socket, so
       // don't assume it survives the gap either -- the next "connected"
-      // message re-grants it if the token still checks out.
+      // message re-grants it.
       liveCommandAuthority = false;
       updateLiveWriteControlsAvailability();
       updateLiveModeNote();
@@ -926,7 +909,7 @@ function connectFleetCoreLive() {
 // teleports local state, and FleetCore has no reset/teleport command --
 // only set-route, which moves a vessel over real ticks, not instantly.
 // Permanently disabled while live, not authority-gated, so the visitor
-// isn't misled into thinking a token would unlock them.
+// isn't misled into thinking command authority would unlock them.
 function disableLiveOnlyControls() {
   [
     suggestDetourButton, acceptDetourButton, escortModeButton,
@@ -963,7 +946,7 @@ function updateLiveModeNote() {
   liveModeNoteEl.hidden = false;
   liveModeNoteEl.textContent = liveCommandAuthority
     ? "Live command authority granted: click the map to send the ship there now. For a multi-leg route, click Add Waypoint to arm, click the map once per point, then click Add Waypoint again to send the whole path as one command (Shift-click also stages points, if you'd rather not use the button). Cancel Route and Pause/Time Warp also send real FleetCore commands. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water have no FleetCore command yet and stay disabled."
-    : "Live, read-only: no command token presented, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with one — FleetCore has no command for them yet.";
+    : "Live, read-only: the server has not granted command authority to this connection, so every control here only observes. Escort Mode, Suggest/Accept Detour, Return to Station, and Reset to Open Water would stay disabled even with authority — FleetCore has no command for them yet.";
 }
 
 function enterLiveMode() {
@@ -2372,8 +2355,8 @@ function updateStatus() {
   // Live mode gates these on command authority (set once by
   // updateLiveWriteControlsAvailability, which calls back into this
   // function) on top of the same state checks non-live mode already used
-  // -- a live visitor without a token sees the same disabled state as
-  // before; one with a token sees exactly local mode's own logic.
+  // -- a live visitor without authority sees the same disabled state as
+  // before; one with authority sees exactly local mode's own logic.
   const liveWriteBlocked = liveMode && !liveCommandAuthority;
   pauseButton.disabled = liveMode ? liveWriteBlocked : (!destination && timeWarp !== 0);
   waypointButton.classList.toggle("active", waypointMode);

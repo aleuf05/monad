@@ -16,11 +16,11 @@ Then open:
 http://localhost:8080/toys/fleetcore-control/
 ```
 
-Enter a server URL (defaults to `ws://localhost:4771/ws`) and a command token, then Connect. See `docs/architecture/fleetcore-api.md` for the full API contract this toy is built against.
+Enter a server URL (defaults to `ws://localhost:4771/ws`) and Connect. See `docs/architecture/fleetcore-api.md` for the full API contract this toy is built against.
 
 ## What it does
 
-- **Connects** over the same WebSocket contract `toys/fleetcore-live/` uses. Read-only with no token; every write control below enables only once the server confirms command authority for this connection.
+- **Connects** over the same WebSocket contract `toys/fleetcore-live/` uses. Every write control below enables only once the server confirms command authority for this connection — there is no client-supplied token, the server grants authority per-connection on its own.
 - **Scenarios** — three buttons, each a short hardcoded sequence of `spawn-passive-contact` (+ `set-route` where relevant) and a closing `record-watch-event`, positioned relative to the flagship's position at the moment the button is clicked:
   - **Distress Call** — one stopped vessel spawned near the flagship.
   - **Storm Convoy** — three vessels spawned in a loose line, each routed a short distance toward the flagship's area.
@@ -69,4 +69,4 @@ A stateful, multi-phase scenario implementing `Harbor.md` (Captain T's mission p
 - No changes to `fleetcore/src/command.rs`, `world.rs`, or any other shared-core FleetCore file.
 - No changes to Bridge Station, Fleet Motion, Periscope, or Radio Console.
 - No backend, database, or persistence of its own — everything here is a thin client over `fleetcore-serve`'s existing HTTP/WebSocket API.
-- No baked-in command token. This page can be deployed publicly like every other toy in this repo; an operator supplies a token via the form, never the URL (unlike Bridge/Fleet Motion, there is no `?commandToken=` passthrough here — the token field is the whole mechanism).
+- No client-supplied token of any kind. This page can be deployed publicly like every other toy in this repo; command authority is whatever the connected `fleetcore-serve` grants this connection on its own.

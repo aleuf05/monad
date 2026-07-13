@@ -9,7 +9,7 @@ The merge: 2.1's operator loop (Select → Act → World changes → Instruments
 | Data source | `initialVessels` + a local `setInterval` tick simulation | Live WebSocket to `fleetcore-serve`, no local state at all |
 | Positions | Abstract 600×400 chart units | Real lat/lng, projected into chart space (see "Projection" below) |
 | Set Waypoint | Mutates local mock state directly | Sends `{"type":"set-route","vessel_id":...,"route":[...]}` over the socket; the UI just waits for the next real snapshot |
-| Auth | None (no backend to protect) | FleetCore's `--command-token` gate — this is the first write-capable deployment in the project |
+| Auth | None (no backend to protect) | Server-granted command authority per connection — this is the first write-capable deployment in the project |
 | Bearing/range math | Flat abstract-plane geometry | Real `bearingDegrees`/`distanceKm` (reused from `toys/shared/fleet-state.js`, same utilities `toys/bridge-2/` uses) |
 
 `toys/bridge-station-2.1/` is untouched — this is a new artifact, not an edit to it, same as 2.1 didn't touch `toys/bridge-2/`.
@@ -18,11 +18,9 @@ The merge: 2.1's operator loop (Select → Act → World changes → Instruments
 
 The original 2.1 component's Fleet Motion panel was built around a 600×400 abstract coordinate space, not geography. Rather than redesign the visual layout, `computeBounds()` takes the fleet's real lat/lng spread from the *first* snapshot received, pads it generously (60%), and freezes it — `toChart()`/`toGeo()` then convert between real positions and that fixed chart space for the rest of the session. Frozen rather than recomputed every tick for the same reason `toys/bridge-2/` centers its map once (`hasCenteredMap`): recomputing bounds every snapshot would make the whole view rescale and jump as vessels move, which reads as broken, not live.
 
-## Command token
+## Command authority
 
-FleetCore is read-only by default (see `docs/architecture/fleetcore-api.md`) — no `--command-token`, every write rejected regardless of what's presented. Bridge Station 3.0 is the first deployment in this project to actually need write access, so `fleetcore-serve` was restarted with `--command-token bridge-3-0-lan`, and that token is baked into this app's client bundle (`COMMAND_TOKEN` in `src/App.jsx`).
-
-This is fine for "LAN is the trust boundary" (2.1's own explicit scope, carried forward here) and not fine as a real secret — it ships in a public JS bundle. Granting this token also means `toys/fleetcore-live/`'s Command Token field would accept `bridge-3-0-lan` too, since it's the same `fleetcore-serve` process; anyone who knows this token can command the fleet from either UI. If this deployment stops being LAN-only, this needs a real per-purpose token strategy, not this one.
+Bridge Station 3.0 was the first deployment in this project to need write access. It originally carried a `COMMAND_TOKEN` baked into the client bundle (`src/App.jsx`) to satisfy FleetCore's read-only-by-default gate — since removed, once it turned out `fleetcore-serve` grants command authority to every connection unconditionally regardless of what token (if any) is presented (see `docs/deployment.md`'s "Known limitation" note). `serverUrl()` now connects with no token param at all; whatever authority the server decides to grant this connection is what you get.
 
 ## Run locally
 
@@ -32,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Needs a running `fleetcore-serve` with `--command-token bridge-3-0-lan` (or override `?server=` and edit `COMMAND_TOKEN` to match your own).
+Needs a running `fleetcore-serve` reachable at the default URL, or override `?server=`.
 
 ## Build and serve
 

@@ -6,10 +6,10 @@ This is different from every other toy in this repository: Fleet Motion, Perisco
 
 ## Run
 
-1. Start the live server from the repository root. With no `--command-token`, the world is visible to this page but every control is disabled — that's the default, not a bug (see Command Authority below):
+1. Start the live server from the repository root:
 
    ```sh
-   cargo run --manifest-path fleetcore/Cargo.toml --bin serve -- --port 4771 --command-token <choose-a-token>
+   cargo run --manifest-path fleetcore/Cargo.toml --bin serve -- --port 4771
    ```
 
 2. Serve this directory (or the repository root) over HTTP — opening `index.html` directly as a `file://` URL also works, since the page only needs a WebSocket to the server, not to itself:
@@ -18,11 +18,11 @@ This is different from every other toy in this repository: Fleet Motion, Perisco
    python3 -m http.server 8080
    ```
 
-3. Open `http://localhost:8080/toys/fleetcore-live/` (or wherever you served it). The default server field is `ws://localhost:4771/ws`; click **Connect** if it doesn't connect automatically. Paste the same token into the **Command Token** field before connecting if you want the Pause/Resume/time-scale controls enabled.
+3. Open `http://localhost:8080/toys/fleetcore-live/` (or wherever you served it). The default server field is `ws://localhost:4771/ws`; click **Connect** if it doesn't connect automatically.
 
 ## Command Authority
 
-This page works with no token at all — it just can't control anything. The "Authority" status strip entry reads "Read-only" (Pause/Resume and time-scale stay disabled) unless the token in the **Command Token** field matches the server's `--command-token` at connect time, in which case it reads "Command." The token field is a password input so it isn't shown on screen, but it isn't otherwise protected — do not treat it as a real secret if the server is reachable by anyone you don't want to have write access, since holding it grants control of the live world for every connected visitor, not just you.
+This page has no way to supply a token — there is no token field or URL param. Whatever the server decides to grant this connection is what you get: the "Authority" status strip entry reads "Command" if the server's `connected` message reports `command_authority: true`, or "Read-only" otherwise (Pause/Resume and time-scale stay disabled). See `docs/deployment.md`'s "Known limitation" note for the current state of `fleetcore-serve`'s own gating (as of this writing it grants authority to every connection unconditionally, regardless of any `--command-token` the process was started with).
 
 ## What it shows
 

@@ -26,21 +26,16 @@ import { Navigation, Crosshair, Anchor } from "lucide-react";
 const CHART_W = 600;
 const CHART_H = 400;
 const MARGIN = 40;
-// LAN is the trust boundary for this deployment (matching 2.1's explicit
-// "no auth layer" scope) -- this token just satisfies FleetCore's own
-// read-only-by-default gate (see docs/architecture/fleetcore-api.md) so
-// Set Waypoint can actually write. It is baked into the client bundle,
-// which is fine for "anyone who can load this LAN page can command the
-// ship," not fine as a real secret -- do not reuse this token for a
-// public deployment.
-const COMMAND_TOKEN = "bridge-3-0-lan";
 
 const { bearingDegrees, distanceKm, normalizeDegrees } = window.MonadFleetState.utils;
 
+// Command authority is granted by the server per-connection, the same for
+// everyone -- there is no client-supplied token anymore (see
+// fleetcore-control's app.js comment for why the token field was removed
+// everywhere).
 function serverUrl() {
   const params = new URLSearchParams(window.location.search);
-  const base = params.get("server") || "wss://cameronlampley.com/monad/fleetcore-ws/ws";
-  return `${base}${base.includes("?") ? "&" : "?"}token=${encodeURIComponent(COMMAND_TOKEN)}`;
+  return params.get("server") || "wss://cameronlampley.com/monad/fleetcore-ws/ws";
 }
 
 function norm360(deg) {

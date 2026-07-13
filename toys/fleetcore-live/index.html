@@ -45,10 +45,6 @@
           <span>Server</span>
           <input id="serverUrl" type="text" value="ws://localhost:4771/ws" spellcheck="false">
         </label>
-        <label>
-          <span>Command Token</span>
-          <input id="commandToken" type="password" placeholder="read-only without one" autocomplete="off" spellcheck="false">
-        </label>
         <button id="connectButton" class="console-button" type="button">Connect</button>
         <div class="clock-controls">
           <button id="pauseResumeButton" class="console-button secondary" type="button" disabled>Pause</button>
@@ -59,7 +55,7 @@
           <button id="applyTimeScaleButton" class="console-button secondary" type="button" disabled>Apply</button>
         </div>
       </section>
-      <p class="auth-note">This world is shared by every visitor. Without a command token the view is read-only; holding a valid token grants command authority over the live world for everyone connected, not just you.</p>
+      <p class="auth-note">This world is shared by every visitor. Command authority is granted by the server on connect, the same for everyone -- every control below acts on the live world for all connected visitors at once, not just you.</p>
       <p id="commandFeedback" class="command-feedback" role="status" hidden></p>
 
       <section class="console-layout">

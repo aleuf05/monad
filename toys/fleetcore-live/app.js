@@ -11,7 +11,6 @@ const clockStateEl = document.querySelector("#clockState");
 const tickReadoutEl = document.querySelector("#tickReadout");
 const simTimeReadoutEl = document.querySelector("#simTimeReadout");
 const serverUrlInput = document.querySelector("#serverUrl");
-const commandTokenInput = document.querySelector("#commandToken");
 const commandFeedbackEl = document.querySelector("#commandFeedback");
 const connectButton = document.querySelector("#connectButton");
 const pauseResumeButton = document.querySelector("#pauseResumeButton");
@@ -104,17 +103,13 @@ function connect() {
 
   const url = serverUrlInput.value.trim();
   if (!url) return;
-  const token = commandTokenInput.value.trim();
-  const connectUrl = token
-    ? `${url}${url.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`
-    : url;
 
   setLinkStatus("Connecting…", false);
   setAuthorityStatus("—", false);
   state.connected = false;
   updateControlsEnabled();
 
-  const socket = new WebSocket(connectUrl);
+  const socket = new WebSocket(url);
   state.socket = socket;
 
   socket.addEventListener("open", () => {

@@ -27,7 +27,7 @@ Interactive artifacts that must be reachable under `https://cameronlampley.com/m
 - `web/toys/bridge/` — Bridge Station's Live Console, copied from `toys/bridge/`, **with one intentional divergence from source**: the Watchbook tab's panel is not an iframe pointing at a Watchbook instance (Watchbook is not deployed publicly — see below) but a static message linking to `web/logs.html`. If `toys/bridge/index.html`'s Watchbook panel markup changes, re-apply that patch by hand rather than doing a raw copy.
 - `web/toys/shared/fleet-state.js` — the `MonadFleetState` contract, copied from `toys/shared/fleet-state.js`. Fleet Motion, Periscope, and Bridge Station all depend on this being present and in sync with the source; a stale copy silently breaks cross-instrument selection sync (this happened once — `web/toys/fleet-motion/` sat un-refreshed since the `7003852` schema-v2 refactor until it was caught during the Bridge Station Mk III deploy).
 - `web/toys/fleetcore-live/` — copied from `toys/fleetcore-live/`, **with one intentional divergence from source**: `index.html`'s default `#serverUrl` value is `wss://cameronlampley.com/monad/fleetcore-ws/ws` (the public reverse-proxy path below) instead of `ws://localhost:4771/ws`. Unlike every other public artifact here, this one doesn't work from a plain file copy alone — see "FleetCore Live Backend" below for what else has to be running.
-- `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/monad/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) requires whatever `--command-token` the public `fleetcore-serve` instance is running with, entered into this toy's own token field — there is no `?commandToken=` URL passthrough here.
+- `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/monad/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) is whatever the server grants this connection on its own — there is no client-supplied token field or URL passthrough here anymore.
 - `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. Linked from `web/index.html` and `web/command-deck.html`'s "Bridge Instruments" section, alongside (not replacing) the existing `toys/bridge/` "Bridge Station" card.
 
 ### Watchbook is intentionally not public
@@ -44,7 +44,7 @@ Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge
 
 `web/toys/fleetcore-live/` is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike every other public artifact in this repo, which are all fully self-contained static pages.
 
-**Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`), and its write path (`POST /command`, and any command sent over `/ws`) requires a `--command-token` to be configured at all — with none set, the server is fully read-only regardless of what any client presents (see `docs/architecture/fleetcore-api.md`, "Command Authority"). Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
+**Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`). Its write path (`POST /command`, and any command sent over `/ws`) has no auth at all: every connection on both transports has full command authority, no token required — `--command-token` is still accepted on the command line but silently ignored (see the doc comment at the top of `fleetcore/src/bin/serve.rs`, which is authoritative over `docs/architecture/fleetcore-api.md`'s "Command Authority" section describing the originally-designed gate). Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
 
 ```sh
 cargo build --release --manifest-path fleetcore/Cargo.toml --bin serve
@@ -56,7 +56,7 @@ sudo systemctl status fleetcore-serve monad-lan-web
 
 As of 2026-07-13, `scripts/fleetcore-serve.service`'s `ExecStart` already ships with `--bind-all --command-token bridge-3-0-lan` — command authority and LAN reachability are both on by default when this unit is installed, matching what's actually been live on this box, not the more conservative loopback-only/read-only configuration it originally shipped with. `scripts/monad-lan-web.service` is the LAN-only static web server's own unit, serving `web-lan/` on port `8090`.
 
-Whoever holds `bridge-3-0-lan` can paste it into `toys/fleetcore-live/`'s, Bridge's, or FleetCore Control Center's "Command Token" field to unlock write access — treat it like any other shared secret, since it grants control of the live world for every visitor at once. **This one specifically is not a real secret**: it's committed in plaintext across this repo's own git history (watch logs, this file, past commit messages), and the public `/monad/fleetcore-ws/` reverse proxy was finished without rotating it first — see the Bridge Station 2.1/3.0 section below for the full history. If you ever want real command-authority isolation, rotate to a token that isn't committed anywhere and update this file's `ExecStart` (then `sudo systemctl daemon-reload && sudo systemctl restart fleetcore-serve`) — deliberately not done as part of installing durability, since that's a separate decision from "does the process survive a reboot."
+`bridge-3-0-lan` is moot in practice: `fleetcore-serve` currently grants command authority to every connection unconditionally regardless of what token (if any) is presented (see "Known limitation" below), and none of this repo's toy UIs can even present a token anymore — the Command Token field/param that used to exist in `toys/fleetcore-live/`, `toys/fleetcore-control/`, `toys/bridge/`, `toys/fleet-motion/`, and `toys/bridge-station-3.0/` was removed everywhere once that became clear. **The token itself was never a real secret regardless**: it's committed in plaintext across this repo's own git history (watch logs, this file, past commit messages), and the public `/monad/fleetcore-ws/` reverse proxy was finished without rotating it first — see the Bridge Station 2.1/3.0 section below for the full history. If you ever want real command-authority isolation, the server needs actual per-client auth (not just a shared token), and every client above would need a way to present credentials reintroduced.
 
 **Exposing it publicly.** Add a `handle_path` block to `/etc/caddy/Caddyfile`, matching the existing `/portainer/*` pattern, so the public path proxies to the loopback-only server:
 
@@ -101,12 +101,17 @@ non-bundled toys don't:
   directly on `cameronlampley.com` (not open, and blocked as mixed content on an
   `https://` page regardless).
 
-**Command token:** `fleetcore-serve` runs with `--command-token bridge-3-0-lan`
-baked into Bridge Station 3.0's client bundle (`COMMAND_TOKEN` in `src/App.jsx`).
-This token is not a real secret — see the "FleetCore Live Backend" section above;
-`fleetcore-serve` currently grants command authority to every connection
-unconditionally regardless of token, so this is presentational only unless real auth
-is added later. `web-lan/toys/fleetcore-control/` still exists as a LAN-only copy of
-a different toy (`toys/fleetcore-control/`), reachable at
+**Command authority:** `fleetcore-serve` still runs with `--command-token bridge-3-0-lan`
+(see the "FleetCore Live Backend" section above), but as of this writing it grants
+command authority to every connection unconditionally regardless of what token (if
+any) is presented — so the client-side token that used to be baked into Bridge
+Station 3.0's bundle (`COMMAND_TOKEN` in `src/App.jsx`) was pure theater and has
+been removed, along with the equivalent Command Token field/param in every other
+toy (`fleetcore-control`, `fleetcore-live`, `bridge`, `fleet-motion`'s
+`?commandToken=` passthrough). None of these toys can present a token anymore;
+whatever the server grants a connection is what that connection gets. If real
+per-client auth is ever added server-side, these clients will need a token
+mechanism reintroduced. `web-lan/toys/fleetcore-control/` still exists as a
+LAN-only copy of a different toy (`toys/fleetcore-control/`), reachable at
 `http://192.168.0.100:8090/toys/fleetcore-control/`, defaulting to
 `ws://192.168.0.100:4771/ws` — unaffected by this change.

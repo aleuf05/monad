@@ -294,64 +294,6 @@ dd {
   color: var(--signal);
 }
 
-.command-token-form {
-  padding: 0 14px 14px;
-}
-
-.command-token-form label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.command-token-row {
-  display: flex;
-  gap: 8px;
-}
-
-.command-token-row input {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 36px;
-  padding: 0 10px;
-  border: 1px solid rgba(180, 216, 209, 0.16);
-  background: rgba(2, 6, 8, 0.48);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.82rem;
-}
-
-.command-token-row input:focus-visible {
-  border-color: var(--amber);
-  outline: none;
-}
-
-.command-token-row button {
-  flex: 0 0 auto;
-  min-height: 36px;
-  padding: 0 14px;
-  border: 1px solid rgba(216, 180, 106, 0.45);
-  background: rgba(20, 17, 9, 0.5);
-  color: var(--amber);
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.command-token-row button:hover,
-.command-token-row button:focus-visible {
-  border-color: var(--amber);
-  background: rgba(20, 17, 9, 0.72);
-  outline: none;
-}
-
 .contact-roster {
   padding: 0 14px 14px;
 }

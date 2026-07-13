@@ -14,8 +14,6 @@
   const contactValue = document.querySelector("#contactValue");
   const selectedVesselValue = document.querySelector("#selectedVesselValue");
   const contactRosterList = document.querySelector("#contactRosterList");
-  const commandTokenForm = document.querySelector("#commandTokenForm");
-  const commandTokenInput = document.querySelector("#commandTokenInput");
   const activeStationValue = document.querySelector("#activeStationValue");
   const commitValue = document.querySelector("#commitValue");
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
@@ -31,73 +29,28 @@
   // Periscope) and Radio Console each independently support an opt-in live
   // FleetCore feed -- see their own READMEs. Bridge composes those
   // instruments rather than reimplementing them: passing Bridge's own
-  // `?live=1` (and optional `?fleetcoreServer=`, `?commandToken=`) straight
-  // through to whichever embedded iframes declare a `data-instrument-src`.
-  // Those iframes have no `src` in the HTML itself specifically so this is
-  // the only load they ever do -- setting `.src` after an unparambed
-  // default load would cause a visible reload flash. Periscope and
-  // Watchbook keep a plain static `src` and are untouched by this:
-  // Periscope takes no query params (it just reads whatever Fleet Motion
-  // writes), and Watchbook has nothing to do with FleetCore at all.
+  // `?live=1` (and optional `?fleetcoreServer=`) straight through to
+  // whichever embedded iframes declare a `data-instrument-src`. Those
+  // iframes have no `src` in the HTML itself specifically so this is the
+  // only load they ever do -- setting `.src` after an unparambed default
+  // load would cause a visible reload flash. Periscope and Watchbook keep a
+  // plain static `src` and are untouched by this: Periscope takes no query
+  // params (it just reads whatever Fleet Motion writes), and Watchbook has
+  // nothing to do with FleetCore at all.
   //
-  // `commandToken` is the one param here that grants write access to the
-  // shared FleetCore world (docs/architecture/fleetcore-api.md) -- Bridge
-  // never stores or defaults it, purely forwards whatever the operator put
-  // in its own URL, same as fleetcoreServer. No token is baked in anywhere
-  // in this file for the same reason toys/fleet-motion/app.js doesn't bake
-  // one into its own bundle: this page can be the public deployment too.
+  // Command authority itself is no longer a client-supplied param -- the
+  // server grants it per-connection on its own (see fleetcore-control's
+  // app.js comment for why the token field was removed everywhere).
   const liveCapableIframes = Array.from(document.querySelectorAll("[data-instrument-src]"));
   if (liveCapableIframes.length) {
     const bridgeParams = new URLSearchParams(window.location.search);
     const passthrough = new URLSearchParams();
     if (bridgeParams.has("live")) passthrough.set("live", bridgeParams.get("live"));
     if (bridgeParams.has("fleetcoreServer")) passthrough.set("fleetcoreServer", bridgeParams.get("fleetcoreServer"));
-    if (bridgeParams.has("commandToken")) passthrough.set("commandToken", bridgeParams.get("commandToken"));
     const query = passthrough.toString();
     liveCapableIframes.forEach((iframe) => {
       const baseSrc = iframe.dataset.instrumentSrc;
       iframe.src = query ? `${baseSrc}?${query}` : baseSrc;
-    });
-  }
-
-  // Granting command authority today means editing the URL and reloading
-  // all of Bridge, which is a bad fit for something billing itself as a
-  // command console. This reloads only the Fleet Motion iframe -- Radio
-  // Console also matches [data-instrument-src] above but ignores
-  // commandToken entirely, and reloading it for no reason would cut off
-  // whatever it's currently playing. Unlike the initial load above (which
-  // deliberately avoids ever touching .src twice to prevent a load flash),
-  // this reload is operator-triggered on submit, so it's expected.
-  const fleetMotionIframe = document.querySelector("#liveFleetMotion iframe");
-
-  function applyCommandToken(token) {
-    if (!fleetMotionIframe) return;
-    const currentSrc = fleetMotionIframe.src || fleetMotionIframe.dataset.instrumentSrc;
-    if (!currentSrc) return;
-    const nextSrc = new URL(currentSrc, window.location.href);
-    if (token) {
-      nextSrc.searchParams.set("commandToken", token);
-    } else {
-      nextSrc.searchParams.delete("commandToken");
-    }
-    fleetMotionIframe.src = nextSrc.toString();
-
-    // Mirrors the token into Bridge's own URL (same exposure the existing
-    // ?commandToken= passthrough already has) so a page refresh doesn't
-    // silently drop authority the operator just granted.
-    const pageUrl = new URL(window.location.href);
-    if (token) {
-      pageUrl.searchParams.set("commandToken", token);
-    } else {
-      pageUrl.searchParams.delete("commandToken");
-    }
-    window.history.replaceState(null, "", pageUrl);
-  }
-
-  if (commandTokenForm) {
-    commandTokenForm.addEventListener("submit", (event) => {
-      event.preventDefault();
-      applyCommandToken(commandTokenInput.value.trim());
     });
   }
 
