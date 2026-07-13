@@ -65,14 +65,14 @@ handle_path /monad/fleetcore-ws/* {
 }
 ```
 
-This must live inside the same `:80 { ... }` block as the existing `root */file_server`/`/portainer/*` config, not as a separate site block. `handle_path` strips the matched prefix before proxying, so a public request to `/monad/fleetcore-ws/ws` reaches `fleetcore-serve`'s own `/ws` route, and `/monad/fleetcore-ws/snapshot` reaches `/snapshot`. After editing:
+This must live inside the same `cameronlampley.com { ... }` block as the existing `root */file_server`/`/monad/portainer/*` config, not as a separate site block. `handle_path` strips the matched prefix before proxying, so a public request to `/monad/fleetcore-ws/ws` reaches `fleetcore-serve`'s own `/ws` route, and `/monad/fleetcore-ws/snapshot` reaches `/snapshot`. After editing:
 
 ```sh
 sudo caddy validate --config /etc/caddy/Caddyfile
 sudo systemctl reload caddy
 ```
 
-**Unverified:** `cameronlampley.com` reaches Granite through a separate reverse proxy on rock64 (see the "Public Hatch" note in `web/command-deck.html`), which this deployment doc doesn't have visibility into. Whether rock64 passes WebSocket upgrade requests through to Granite's Caddy is not confirmed — if `wss://cameronlampley.com/monad/fleetcore-ws/ws` doesn't connect after the steps above, check rock64's proxy config for WebSocket support before assuming Caddy or `fleetcore-serve` is at fault. `http://localhost/monad/fleetcore-ws/snapshot` on Granite itself is the right first check to isolate Caddy/fleetcore-serve from rock64.
+**Resolved as of 2026-07-13:** rock64 has been removed from the path entirely — see `docs/deployment/public-hatch.md`. The router forwards ports 80/443 directly to Granite, and Granite's own Caddy terminates TLS (automatic HTTPS via Let's Encrypt) and serves `/monad/*` itself. WebSocket upgrades through the full `wss://cameronlampley.com/monad/fleetcore-ws/ws` path are confirmed working end to end (verified with a real HTTP/1.1 upgrade handshake, `101` response). `http://localhost/monad/fleetcore-ws/snapshot` on Granite itself is still the right first check to isolate Caddy/`fleetcore-serve` from anything upstream, but there is no longer a separate rock64 hop to account for.
 
 **Known limitation, accepted for now:** as of 2026-07-12 there is no command-token gate at all — `fleetcore-serve` grants full command authority to every connection on both `/command` and `/ws` unconditionally (`fleetcore/src/bin/serve.rs`), explicit user request. The live world is shared by every visitor with no per-visitor isolation: anyone who can reach the server (which, through the public reverse proxy, means anyone on the internet) can pause/resume, reset the fleet, despawn vessels, or set any vessel's route. This was an explicit, informed choice, not an oversight; add real auth before treating this as anything more than a single-operator demo.
 
