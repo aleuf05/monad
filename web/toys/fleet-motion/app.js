@@ -1005,6 +1005,16 @@ function capitalizeStatus(status) {
 // directly (see escortStates/contactStates below) sidesteps matching
 // altogether -- there's nothing to mismatch -- and also removes the fixed
 // roster's 3+4 cap on how many vessels could ever be shown at once.
+// fleetcore-serve's speed_mps is each vessel's rated/commanded speed, not
+// its instantaneous velocity -- it's never reset to 0 on arrival (there's
+// no set-speed Command; world.rs relies on the field staying nonzero so a
+// vessel can move again on its next set-route). A vessel only actually has
+// way on while "underway" or "transiting"; "arrived", "holding", and
+// "paused" mean it's stationary regardless of what speed_mps says.
+function liveActualSpeedMps(vessel) {
+  return vessel.status === "underway" || vessel.status === "transiting" ? Number(vessel.speed_mps || 0) : 0;
+}
+
 function applyLiveSnapshot(snapshot) {
   const vessels = snapshot.vessels || [];
   const flagshipVessel = vessels.find((vessel) => vessel.kind === "flagship");
@@ -1014,7 +1024,7 @@ function applyLiveSnapshot(snapshot) {
   if (flagshipVessel) {
     flagship = clonePoint(flagshipVessel.position) || flagship;
     headingDegrees = flagshipVessel.course ?? headingDegrees;
-    currentSpeedKmh = Number(flagshipVessel.speed_mps || 0) * LIVE_KMH_PER_MPS;
+    currentSpeedKmh = liveActualSpeedMps(flagshipVessel) * LIVE_KMH_PER_MPS;
     lastStatus = capitalizeStatus(flagshipVessel.status) || lastStatus;
     liveFlagshipId = flagshipVessel.id || liveFlagshipId;
     // Server truth for the course line and the Destination/Cancel Route
@@ -1044,7 +1054,7 @@ function applyLiveSnapshot(snapshot) {
     name: vessel.callsign || vessel.name,
     position: clonePoint(vessel.position),
     headingDegrees: vessel.course ?? null,
-    speedKmh: Number(vessel.speed_mps || 0) * LIVE_KMH_PER_MPS,
+    speedKmh: liveActualSpeedMps(vessel) * LIVE_KMH_PER_MPS,
     blocked: false
   }));
 
@@ -1054,7 +1064,7 @@ function applyLiveSnapshot(snapshot) {
     role: "passive traffic",
     position: clonePoint(vessel.position),
     headingDegrees: vessel.course ?? null,
-    speedKmh: Number(vessel.speed_mps || 0) * LIVE_KMH_PER_MPS,
+    speedKmh: liveActualSpeedMps(vessel) * LIVE_KMH_PER_MPS,
     status: capitalizeStatus(vessel.status) || "Transiting"
   }));
 

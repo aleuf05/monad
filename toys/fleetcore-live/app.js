@@ -196,6 +196,17 @@ function applySnapshot(snapshot) {
   }
 }
 
+// fleetcore-serve's speed_mps is the vessel's rated/commanded speed, not its
+// instantaneous velocity -- it's never reset to 0 on arrival (there's no
+// set-speed Command, so world.rs relies on the field staying nonzero for a
+// vessel to be able to move again on its next set-route). A vessel only
+// actually has way on while "underway" or "transiting"; "arrived",
+// "holding", and "paused" mean it's stationary regardless of what
+// speed_mps says.
+function actualSpeedMps(vessel) {
+  return vessel.status === "underway" || vessel.status === "transiting" ? vessel.speed_mps : 0;
+}
+
 function renderVessels(vessels) {
   const seenIds = new Set();
 
@@ -214,7 +225,7 @@ function renderVessels(vessels) {
     }
     marker.bindPopup(
       `<strong>${vessel.callsign}</strong><br>${vessel.kind} &middot; ${vessel.status}<br>` +
-      `${(vessel.speed_mps * 1.94384).toFixed(1)} kn &middot; ${Math.round(vessel.course)}&deg;`
+      `${(actualSpeedMps(vessel) * 1.94384).toFixed(1)} kn &middot; ${Math.round(vessel.course)}&deg;`
     );
   });
 
