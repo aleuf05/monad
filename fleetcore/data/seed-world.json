@@ -28,7 +28,7 @@
       "kind": "scout",
       "position": { "lat": 26.34, "lng": 55.93 },
       "course": 286.0,
-      "speed_mps": 18.0,
+      "speed_mps": 32.0,
       "status": "underway",
       "route": [{ "lat": 26.30, "lng": 55.70 }],
       "last_update": "2026-07-10T20:00:00Z"
@@ -40,7 +40,7 @@
       "kind": "scout",
       "position": { "lat": 26.54, "lng": 56.63 },
       "course": 238.0,
-      "speed_mps": 17.0,
+      "speed_mps": 30.0,
       "status": "underway",
       "route": [{ "lat": 26.47, "lng": 56.36 }],
       "last_update": "2026-07-10T20:00:00Z"
@@ -52,7 +52,7 @@
       "kind": "scout",
       "position": { "lat": 26.74, "lng": 56.31 },
       "course": 204.0,
-      "speed_mps": 16.0,
+      "speed_mps": 28.0,
       "status": "underway",
       "route": [{ "lat": 26.58, "lng": 56.15 }],
       "last_update": "2026-07-10T20:00:00Z"

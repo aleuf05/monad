@@ -499,21 +499,26 @@ fn initial_conditions() -> Vec<InitialCondition> {
             id: "vessel.scout-alpha",
             position: Position { lat: 26.34, lng: 55.93 },
             course: 286.0,
-            speed_mps: 18.0,
+            // Escorts must out-pace the flagship (1.4-1.6x its 20.0 m/s) to
+            // actually be able to close distance and hold station -- see
+            // escort_station()/advance_one_tick's per-tick station-chasing
+            // above. A slower escort can never catch a continuously
+            // receding target during sustained flagship transit.
+            speed_mps: 32.0,
             route: vec![Position { lat: 26.3, lng: 55.7 }],
         },
         InitialCondition {
             id: "vessel.scout-bravo",
             position: Position { lat: 26.54, lng: 56.63 },
             course: 238.0,
-            speed_mps: 17.0,
+            speed_mps: 30.0,
             route: vec![Position { lat: 26.47, lng: 56.36 }],
         },
         InitialCondition {
             id: "vessel.scout-charlie",
             position: Position { lat: 26.74, lng: 56.31 },
             course: 204.0,
-            speed_mps: 16.0,
+            speed_mps: 28.0,
             route: vec![Position { lat: 26.58, lng: 56.15 }],
         },
     ]
