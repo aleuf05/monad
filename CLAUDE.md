@@ -6,3 +6,35 @@ Make localized changes, commit early, and leave deeper hardening for a later pas
 Flag risks briefly, but do not block progress on low-risk issues.
 And maybe one sharper line:
 Do not spend more time proving the change works than implementing the change unless the change affects security, persistence, or shared state.
+
+## POLICY: No strange URLs or ports
+
+Every feature must be reachable by plainly browsing `cameronlampley.com` --
+no non-standard ports, no bare IPs, no internal-only hostnames, no path a
+visitor couldn't reach by clicking through the live site. `web/` is the one
+deploy target (see `docs/deployment.md`) and there is no deploy step:
+editing a file under `web/` changes production immediately. Concretely:
+
+- Before calling any work on a public-facing toy done, verify it against the
+  real `https://cameronlampley.com/...` URL, not just a local dev server.
+  `toys/<name>/` is source; it is not live until copied into `web/toys/<name>/`.
+- Never leave an ad hoc local server (`python3 -m http.server`, `npx serve`,
+  a bound dev process, etc.) running against this repo unattended. This has
+  already caused a real incident (see `docs/deployment.md`) -- kill it the
+  moment you're done checking something.
+- Any backend a public toy depends on (FleetCore, etc.) must be reached
+  through the existing Caddy reverse-proxy path, not a raw `host:port`.
+
+## POLICY: Security hardening is not the priority here
+
+This is a single-operator demo project (see `docs/deployment.md`'s
+"Known limitation, accepted for now" -- no command-token gate, full write
+authority open to anyone who can reach the server, an explicit informed
+choice). Don't gate shipping a feature on security review, auth, or
+hardening work, and don't spend time flagging the already-accepted tradeoffs
+in `docs/deployment.md` as if they were new findings. The priority is
+making things actually run and be reachable (see the URL/port policy
+above). If something looks like it would leak this machine's own secrets
+(credentials, tokens, private keys) rather than just being an open demo
+world, that's still worth a one-line flag -- but the general posture here
+is ship it, don't audit it.
