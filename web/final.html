@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fleet Monad — Sea Trial Acceptance Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+  .banner { text-align: center; padding: 44px 0 28px; }
+  .anchor-mark { font-size: 26px; color: #E8A33D; margin-bottom: 8px; }
+  .banner h1 { font-family: 'Oswald', sans-serif; font-size: 28px; letter-spacing: 0.1em; font-weight: 700; }
+  .banner .tagline { font-size: 12px; color: #6B7C93; letter-spacing: 0.06em; margin-top: 6px; }
+  .verdict-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; padding: 16px 0; border-top: 1px solid #1E2C42; border-bottom: 1px solid #1E2C42; font-size: 11px; color: #6B7C93; letter-spacing: 0.04em; }
+  .verdict-strip span.val { color: #4FD1C5; }
+  .verdict-strip span.val.pass { color: #4FD1C5; }
+  .section { padding: 36px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 14px; }
+  .section h2 .tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 3px; margin-left: 10px; vertical-align: middle; }
+  .tag-pass { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-note { color: #E8A33D; border: 1px solid #E8A33D44; }
+  .check-list { list-style: none; }
+  .check-list li { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #14203380; font-size: 13px; }
+  .check-list li:last-child { border-bottom: none; }
+  .check-mark { color: #4FD1C5; flex-shrink: 0; }
+  .check-mark.warn { color: #E8A33D; }
+  .check-text .desc { color: #8494A8; font-size: 11px; margin-top: 3px; }
+  .card { background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 16px 20px; margin-bottom: 12px; }
+  .card-label { font-size: 10px; letter-spacing: 0.08em; color: #6B7C93; text-transform: uppercase; margin-bottom: 6px; }
+  .card-value { font-size: 13px; color: #DCE6F2; }
+  .card-value code { background: #0D1626; padding: 1px 6px; border-radius: 2px; color: #E8A33D; font-size: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  th { text-align: left; color: #6B7C93; font-weight: 500; letter-spacing: 0.04em; padding: 6px 10px; border-bottom: 1px solid #1E2C42; font-size: 10px; text-transform: uppercase; }
+  td { padding: 6px 10px; border-bottom: 1px solid #14203380; color: #DCE6F2; }
+  td.mono { font-family: 'JetBrains Mono', monospace; color: #4FD1C5; }
+  .open-items { background: #1A1508; border: 1px solid #E8A33D44; border-radius: 6px; padding: 16px 20px; }
+  .open-items li { padding: 6px 0; font-size: 12px; }
+  footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
+  .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; }
+  .footer-links a { color: #4FD1C5; text-decoration: none; font-size: 10px; letter-spacing: 0.06em; }
+  .footer-links a:hover { color: #E8A33D; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="banner">
+      <div class="anchor-mark">⚓</div>
+      <h1>SEA TRIAL ACCEPTANCE REPORT</h1>
+      <div class="tagline">FLEETCORE / GRANITE PUBLIC DEPLOYMENT — VISUAL ACCEPTANCE ARTIFACT</div>
+    </div>
+
+    <div class="verdict-strip">
+      <span>OVERALL: <span class="val pass">PASS</span></span>
+      <span>SERVED FROM: <span class="val">GRANITE</span></span>
+      <span>AS OF COMMIT: <span class="val">3f3f2f1</span></span>
+    </div>
+
+    <div class="section">
+      <h2>Infrastructure <span class="tag tag-pass">verified</span></h2>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            rock64 fully retired from the public path.
+            <div class="desc">Router forwards 80/443 directly to Granite (192.168.0.100); no intermediate proxy hop remains.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Real HTTPS, terminated on Granite itself.
+            <div class="desc">Let's Encrypt certificate issued via Caddy automatic HTTPS for cameronlampley.com; plain HTTP redirects (308) to HTTPS.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Bare domain and /monad/ prefix both serve the app directly.
+            <div class="desc">cameronlampley.com/ and cameronlampley.com/monad/ both return 200 with no redirect chain between them.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Firewall active, scoped to required ports only.
+            <div class="desc">ufw allows SSH (22), HTTP (80), HTTPS (443) inbound; everything else denied by default.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            caddy, fleetcore-serve, and monad-lan-web all running as durable systemd units.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>FleetCore Live Backend <span class="tag tag-pass">verified</span></h2>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            WebSocket path confirmed end to end, not just the handshake.
+            <div class="desc">A real client connection to wss://cameronlampley.com/monad/fleetcore-ws/ws received a "connected" message followed by a live, continuously updating world snapshot stream.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Command path verified: spawn, despawn, set-route, set-escort-mode all round-trip correctly against the live server.
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            World reset to a clean baseline for testing: flagship + 3 scouts, escort mode off.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Escort Mode — Real Sim-Engine Motion <span class="tag tag-pass">verified</span></h2>
+      <div class="card">
+        <div class="card-label">What changed</div>
+        <div class="card-value">Escort Mode was previously client-side cosmetic drift, disabled outright in live mode. It is now genuine per-tick station-keeping in the FleetCore sim engine — scouts chase a continuously recomputed formation target relative to the flagship's live position and heading, using the same route-following physics as Set Waypoint and passive traffic.</div>
+      </div>
+      <table>
+        <tr><th>Mode</th><th>Behavior verified</th><th>Measurement</th></tr>
+        <tr><td>Loose</td><td>Scouts converge and hold at range</td><td class="mono">~1200m radius</td></tr>
+        <tr><td>Tight</td><td>Scouts hold a close screen</td><td class="mono">exactly 350m radius, all 3 scouts</td></tr>
+        <tr><td>Patrol</td><td>Continuous bearing sweep, even vs. a stationary leader</td><td class="mono">145.2° → 129.4° → 115.6° → 105.9° over 4 samples</td></tr>
+      </table>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Backend test suite green (cargo test, incl. determinism/replay test).
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Real headless-browser pass (Playwright/Chromium): page connects to FleetCore Live automatically, Escort Mode button cycles all four states correctly, zero console errors, visual render confirmed via screenshot.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Bridge Station Consolidation <span class="tag tag-pass">verified</span></h2>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Bridge Station 2.0 and 2.1 fully retired — source removed, ad hoc dev-server processes killed, no dangling links.
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Bridge Station 3.0 rebuilt with relative asset paths and the public FleetCore WebSocket URL, deployed under web/toys/ like every other public toy — no separate port.
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Linked from the homepage and Command Deck, distinctly labeled to avoid confusion with the original (unrelated) Bridge Station "Live Console."
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Human Acceptance Pass — Captain's Chrome Test <span class="tag tag-pass">confirmed</span></h2>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Homepage status strip (FLEET STATUS: GREEN / SERVED FROM: GRANITE) confirmed matching live source, byte for byte.
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Fleet Motion confirmed reading "FleetCore Live," not "Local Simulation."
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Observed flagship position west of the Strait of Hormuz, cross-checked against server state — confirmed genuine scripted transit (seed route, course 270°), not a rendering fault.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Open Items — Not Blocking</h2>
+      <div class="open-items">
+        <ul class="check-list">
+          <li>
+            <span class="check-mark warn">!</span>
+            <div class="check-text">
+              Two staff portraits missing on the roster (Commander Claude, Lt. Reyes) — files never existed on disk. Cosmetic; falls back to placeholder, not broken.
+            </div>
+          </li>
+          <li>
+            <span class="check-mark warn">!</span>
+            <div class="check-text">
+              /monad/portainer/ is publicly reachable, contradicting the original "Portainer is not exposed publicly" doctrine note. Flagged, not yet resolved.
+            </div>
+          </li>
+          <li>
+            <span class="check-mark warn">!</span>
+            <div class="check-text">
+              Generated 3D assets (.glb) are large (30–57MB each), served uncompressed over a residential upload link. Works, but not efficient at any real scale.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <footer>
+      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      <div class="footer-motto" style="margin-top:6px;color:#6B7C93;font-style:italic;">Every artifact leaves a wake.</div>
+      <div class="footer-links">
+        <a href="index.html">Fleet Monad</a>
+        <a href="logs.html">Ship's Log</a>
+        <a href="fleet.html">Fleet Command</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
