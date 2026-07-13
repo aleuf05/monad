@@ -15,6 +15,7 @@
           <p class="eyebrow">Monad / Fabrication Bay</p>
           <h1>Asset Viewer</h1>
           <p class="subtitle">Generated 3D assets from the img2asset pipeline (tools/img2asset/) &mdash; source image in, GLB out, cataloged here.</p>
+          <p class="subtitle">Upload an image to generate a new one (real, billed inference via Replicate), or upload a <code>.glb</code> you already generated elsewhere to just catalog it.</p>
         </div>
       </header>
 
@@ -33,11 +34,21 @@
         </article>
 
         <aside class="side-panel">
+          <section class="upload-panel">
+            <h2>Generate or Catalog</h2>
+            <form id="uploadForm">
+              <input id="uploadInput" type="file" accept="image/png,image/jpeg,image/webp,model/gltf-binary,.glb">
+              <input id="uploadNameInput" type="text" placeholder="Output name (optional)" autocomplete="off">
+              <button id="uploadButton" type="submit">Upload</button>
+            </form>
+            <p id="uploadStatus" class="upload-status"></p>
+          </section>
+
           <section class="model-list-panel">
             <h2>Cataloged Models</h2>
             <ul id="modelList" class="model-list"></ul>
             <p id="noModelsNote" class="empty-note" hidden>
-              None yet. Run <code>tools/img2asset/image_to_asset.py</code> to generate one &mdash; it lands here automatically.
+              None yet. Run <code>tools/img2asset/image_to_asset.py</code>, or upload above, to add one &mdash; it lands here automatically.
             </p>
           </section>
           <section class="model-detail-panel" id="modelDetail" hidden>

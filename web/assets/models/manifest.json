@@ -4,9 +4,23 @@
     {
       "name": "uss-rubber-ducky.glb",
       "glb_path": "web/assets/models/uss-rubber-ducky.glb",
-      "source_image": "tools/img2asset/input/file_00000000de3c71f5861286605d47b6bd.png",
-      "backend": "frogleo/Image-to-3D",
-      "created_at": "2026-07-12T19:41:00+00:00"
+      "source_image": "tools/img2asset/input/file_00000000de3c71f5861286605d47b6bd.png (via replicate tencent/hunyuan-3d-3.1)",
+      "backend": "manual",
+      "created_at": "2026-07-12T21:31:27.060657+00:00"
+    },
+    {
+      "name": "the-monad.glb",
+      "glb_path": "web/assets/models/the-monad.glb",
+      "source_image": "manual upload",
+      "backend": "manual",
+      "created_at": "2026-07-12T23:06:00+00:00"
+    },
+    {
+      "name": "file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "glb_path": "web/assets/models/file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "source_image": "tools/img2asset/input/upload-1783899358-file_00000000a68c722f9cd29e1996dba4cf.png",
+      "backend": "replicate",
+      "created_at": "2026-07-12T23:39:05.123852+00:00"
     }
   ]
 }

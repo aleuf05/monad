@@ -1,18 +1,26 @@
-"""Free-tier backend: stabilityai/TripoSR's public Gradio Space.
+"""Free-tier backend: stabilityai/stable-fast-3d's public Gradio Space.
 
-No API key required for anonymous use, but anonymous calls share a
-ZeroGPU queue with everyone else hitting the same public demo -- expect
-occasional AppError failures under load with no useful detail (the Space
-doesn't run with verbose error reporting). Set HF_TOKEN (a free
-huggingface.co account token) to get authenticated queue priority, which
-noticeably reduces how often this happens.
+UV-textured GLB by design. Replaces an earlier stabilityai/TripoSR
+integration: as of 2026-07-12, TripoSR's /generate endpoint AppError'd
+for every call tested -- anonymous AND authenticated with a verified-valid
+HF_TOKEN (confirmed via GET /api/whoami-v2 returning 200), so this wasn't
+the usual "anonymous ZeroGPU quota" story the old code assumed. A separate
+attempt against frogleo/Image-to-3D did return a .glb with no AppError,
+but the file itself had zero materials/textures/color data (bare POSITION
+geometry only, confirmed by parsing the glTF JSON chunk directly) -- not
+usable either.
 
-Verified 2026-07-12: /preprocess succeeded on every call tested;
-/generate returned a generic AppError on every anonymous call tested
-(both a flat-shaded and a gradient-shaded synthetic image). Consistent
-with anonymous ZeroGPU quota exhaustion, not an integration bug --
-retry, supply HF_TOKEN, or fall back to the replicate backend if this
-keeps happening.
+Gated: requires accepting this Space's terms once at
+https://huggingface.co/spaces/stabilityai/stable-fast-3d before HF_TOKEN
+can call it. If this raises a permission-shaped error, that's the first
+thing to check, not a code bug -- verified working here with a token that
+already had access; behavior for a token that hasn't accepted the terms
+yet is untested.
+
+Fallback if this Space goes down too: tencent/Hunyuan3D-2 (not 2.1 --
+skip that one) via its generation_all endpoint. Verify the exact api_name
+with Client(space_id).view_api() before wiring it in, the same way this
+file's own /run_button endpoint was discovered, rather than guessing.
 """
 import os
 import shutil
@@ -20,9 +28,11 @@ import time
 
 from gradio_client import Client, handle_file
 
-SPACE_ID = "stabilityai/TripoSR"
-PREPROCESS_FOREGROUND_RATIO = 0.85
-GENERATE_RESOLUTION = 256
+SPACE_ID = "stabilityai/stable-fast-3d"
+FOREGROUND_RATIO = 0.85
+REMESH_OPTION = "None"  # Literal['None', 'Triangle', 'Quad']
+VERTEX_COUNT = -1  # -1 = auto
+TEXTURE_SIZE = 1024
 MAX_ATTEMPTS = 3
 RETRY_DELAY_SECONDS = 5
 
@@ -34,19 +44,17 @@ def generate(processed_image_path: str, out_dir: str) -> str:
     last_error = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            processed = client.predict(
+            _preview, model_path = client.predict(
                 handle_file(processed_image_path),
-                False,  # remove_background: our own rembg step already did this
-                PREPROCESS_FOREGROUND_RATIO,
-                api_name="/preprocess",
+                FOREGROUND_RATIO,
+                REMESH_OPTION,
+                VERTEX_COUNT,
+                TEXTURE_SIZE,
+                api_name="/run_button",
             )
-            _obj_path, glb_path = client.predict(
-                processed,
-                GENERATE_RESOLUTION,
-                api_name="/generate",
-            )
-            dest = os.path.join(out_dir, "_hf_spaces_raw.glb")
-            shutil.copy(glb_path, dest)
+            ext = os.path.splitext(model_path)[1] or ".glb"
+            dest = os.path.join(out_dir, f"_hf_spaces_raw{ext}")
+            shutil.copy(model_path, dest)
             return dest
         except Exception as exc:  # gradio_client.exceptions.AppError, network errors, etc.
             last_error = exc
@@ -55,8 +63,8 @@ def generate(processed_image_path: str, out_dir: str) -> str:
 
     raise RuntimeError(
         f"hf_spaces backend failed after {MAX_ATTEMPTS} attempts against "
-        f"{SPACE_ID}. Last error: {last_error}. This public Space "
-        "occasionally rejects anonymous calls under ZeroGPU load -- set "
-        "HF_TOKEN for priority queueing, or retry, or use --backend "
-        "replicate."
+        f"{SPACE_ID}. Last error: {last_error}. If this looks permission-"
+        "shaped, confirm the HF_TOKEN's account has accepted this Space's "
+        "gated terms at https://huggingface.co/spaces/stabilityai/stable-fast-3d "
+        "-- otherwise retry, or fall back to tencent/Hunyuan3D-2 (not 2.1)."
     ) from last_error
