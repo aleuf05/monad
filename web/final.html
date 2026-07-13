@@ -56,7 +56,7 @@
     <div class="verdict-strip">
       <span>OVERALL: <span class="val pass">PASS</span></span>
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
-      <span>AS OF COMMIT: <span class="val">3f3f2f1</span></span>
+      <span>AS OF COMMIT: <span class="val">ce22ee6</span></span>
     </div>
 
     <div class="section">
@@ -177,6 +177,43 @@
     </div>
 
     <div class="section">
+      <h2>Live Course-Change Validation <span class="tag tag-pass">verified</span></h2>
+      <div class="card">
+        <div class="card-label">What this adds</div>
+        <div class="card-value">A structured VesselEvent stream (WaypointReached / RouteReplaced / RouteCompleted / Holding) now exists specifically to answer a question the client previously had to guess at: was an arrival a genuine autonomous completion, or did an operator replace the route first? Each Vessel carries a route_id, bumped on every real SetRoute, so events can be tied to the route they belong to. Escort Mode's own per-tick station-chasing deliberately does not bump route_id or emit an event — that's continuous station-keeping, not an operator order.</div>
+      </div>
+      <ul class="check-list">
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Clean natural leg transition observed and validated against full acceptance criteria: exact position snap, route 4→3 legs, course jumped 83.5°→92.4° on the same tick, status held Underway throughout, WaypointReached emitted, zero unexpected events.
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Correctly distinguished manual reroutes from natural arrivals under real conditions.
+            <div class="desc">Several rapid manual course changes during live testing correctly produced RouteReplaced events rather than being misread as arrivals — the validator flagged each one rather than false-passing on a route-length coincidence.</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Fleet Motion's ETA display bug found and fixed.
+            <div class="desc">formatEta() was computing live-mode ETA against a local-simulation-only design constant (180 km/h) instead of the vessel's real live speed (72 km/h) — a ~2.5x error. Fixed and verified exact against server ground truth at both 1x (91.9km @ 72km/h → 1h17m) and 10x (91.5km @ 720km/h → 8m).</div>
+          </div>
+        </li>
+        <li>
+          <span class="check-mark">✓</span>
+          <div class="check-text">
+            Scout speed correction: escorts were slower than the flagship (16-18 m/s vs. 20 m/s).
+            <div class="desc">Since the escort station target moves with the flagship every tick, a slower escort can never close the gap during sustained transit — discovered live, on a 12-leg flagship course. Fixed to 1.4-1.6x the flagship's speed (32.0/30.0/28.0 m/s) in the seed, the Rust initial_conditions(), and patched directly into the live world without disturbing the in-progress course or event history. Verified: all three scouts closing real distance afterward, where they previously could not.</div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
       <h2>Human Acceptance Pass — Captain's Chrome Test <span class="tag tag-pass">confirmed</span></h2>
       <ul class="check-list">
         <li>
@@ -223,6 +260,15 @@
             </div>
           </li>
         </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Wardroom Debrief</h2>
+      <div class="card">
+        <div class="card-value">
+          Sea trial concluded. Three real defects were found and fixed through live testing rather than assumption: the ETA display using the wrong speed source, escort formation targets recomputing correctly but escorts too slow to ever reach them, and — earlier in the trial — Fleet Motion silently stuck on Local Simulation instead of the live feed. All three were caught by actually exercising the running system against ground truth, not by inspection alone. The three open items below remain open by choice, not oversight — Portainer's public exposure specifically deferred at the Captain's order, not resolved this trial.
+        </div>
       </div>
     </div>
 
