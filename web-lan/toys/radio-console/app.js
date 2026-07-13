@@ -291,12 +291,14 @@ function fleetCoreServerUrl() {
   const params = new URLSearchParams(window.location.search);
   if (params.get("fleetcoreServer")) return params.get("fleetcoreServer");
   // Under the public /monad/ path, port 4771 isn't reachable directly --
-  // route through Caddy's /monad/fleetcore-ws/ reverse proxy instead (see
-  // docs/deployment.md). Anywhere else (LAN root, local dev server),
+  // Anywhere reached over https (the public domain, however the page itself
+  // was routed there -- with or without a /monad/ prefix), port 4771 isn't
+  // reachable directly and ws:// would be blocked as mixed content anyway --
+  // always route through Caddy's /monad/fleetcore-ws/ reverse proxy instead
+  // (see docs/deployment.md). Anywhere else (LAN root, local dev server),
   // fleetcore-serve is reachable directly on its own port.
-  if (window.location.pathname.startsWith("/monad/")) {
-    const scheme = window.location.protocol === "https:" ? "wss:" : "ws:";
-    return `${scheme}//${window.location.host}/monad/fleetcore-ws/ws`;
+  if (window.location.protocol === "https:") {
+    return `wss://${window.location.host}/monad/fleetcore-ws/ws`;
   }
   return `ws://${window.location.hostname || "localhost"}:4771/ws`;
 }
