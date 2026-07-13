@@ -2,33 +2,17 @@
 # MONAD RUNTIME EXCLUSIONS
 # ==============================================================================
 
-# Ignore the virtual environment completely
+# Ignore Python virtual environment and caching artifact files
 .venv/
 __pycache__/
 *.pyc
 .viminfo
 
 # Block all automated agent and captain runtime logs
-logs/agents/**/*.jsonl
-logs/agents/**/*.log
-logs/public-ready.log
-
-# Exceptions: Allow tracking of foundational documentation/blueprints
-!logs/captains/**/*.md
-# ==============================================================================
-# MONAD RUNTIME EXCLUSIONS
-# ==============================================================================
-
-# Ignore Python virtual environment and caching artifact files
-.venv/
-__pycache__/
-*.pyc
-
-# Block all automated high-frequency machine heartbeat logs
 logs/agents/
 logs/public-ready.log
 
-# Exceptions: Allow explicit tracking of manual structural blueprints
+# Exceptions: Allow tracking of foundational documentation/blueprints
 !logs/captains/**/*.md
 
 # Rust build output and local FleetCore runtime state
