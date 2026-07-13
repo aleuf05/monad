@@ -17,6 +17,10 @@ pub struct WorldSnapshot {
     pub vessel_events: Vec<crate::vessel::VesselEvent>,
     pub event_sequence: u64,
     pub escort_mode: EscortMode,
+    pub agent_fleet_paused: bool,
+    pub captain_controls: Vec<crate::agent::CaptainControl>,
+    pub escort_intents: Vec<crate::agent::EscortIntent>,
+    pub agent_decisions: Vec<crate::agent::AgentDecisionRecord>,
     // Static reference geography, not part of World's persisted state --
     // recomputed fresh on every snapshot rather than stored, so it costs
     // nothing to add here and never needs a migration. See geography.rs.
@@ -37,6 +41,10 @@ pub fn snapshot(world: &World) -> WorldSnapshot {
         vessel_events: world.vessel_events.clone(),
         event_sequence: world.event_sequence,
         escort_mode: world.escort_mode,
+        agent_fleet_paused: world.agent_fleet_paused,
+        captain_controls: world.captain_controls.clone(),
+        escort_intents: world.escort_intents.clone(),
+        agent_decisions: world.agent_decisions.clone(),
         land_zones: geography::land_zones(),
     }
 }

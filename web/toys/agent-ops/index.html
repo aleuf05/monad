@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Agent Operations</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23090d10'/%3E%3Cpath d='M7 23V9l9-5 9 5v14l-9 5z' fill='none' stroke='%238ad7c1' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d8b46a'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Monad / Living Fleet <span class="new-badge">New</span></p>
+          <h1>Agent Operations</h1>
+          <p class="subtitle">Persistent escort captains choose bounded intent. FleetCore validates, executes, and records the consequence.</p>
+        </div>
+        <div class="link-state">
+          <span id="liveDot" class="live-dot"></span>
+          <div><small>FleetCore Link</small><strong id="linkStatus">Connecting…</strong></div>
+        </div>
+      </header>
+
+      <section class="control-bar" aria-label="Agent fleet controls">
+        <div><small>World Tick</small><strong id="tickReadout">—</strong></div>
+        <div><small>Fleet State</small><strong id="fleetState">—</strong></div>
+        <div><small>Decision Record</small><strong id="decisionCount">0</strong></div>
+        <button id="fleetPauseButton" type="button" disabled>Pause Agent Fleet</button>
+      </section>
+      <p id="feedback" class="feedback" role="status" hidden></p>
+
+      <section>
+        <div class="section-heading">
+          <div><p class="eyebrow">Assigned Commands</p><h2>Escort Captains</h2></div>
+          <p>Short operational state, not hidden chain-of-thought.</p>
+        </div>
+        <div id="captainGrid" class="captain-grid"></div>
+      </section>
+
+      <section class="history-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">Durable Record</p><h2>Recent Decisions</h2></div>
+          <p>Accepted and rejected intent from the authoritative world snapshot.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Tick</th><th>Captain</th><th>Posture</th><th>Result</th><th>Consequence</th></tr></thead>
+            <tbody id="historyBody"><tr><td colspan="5">Awaiting FleetCore snapshot…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

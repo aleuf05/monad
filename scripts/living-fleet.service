@@ -1,0 +1,16 @@
+[Unit]
+Description=Monad Living Fleet captain runtime
+After=network-online.target fleetcore-serve.service
+Wants=network-online.target fleetcore-serve.service
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/living-fleet/captain_runtime.py --interval 5
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

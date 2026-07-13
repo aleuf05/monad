@@ -28,7 +28,11 @@ Adapters may expose kilometers per hour or knots, but FleetCore stores meters pe
   },
   "vessels": [],
   "event_sequence": 0,
-  "watch_events": []
+  "watch_events": [],
+  "agent_fleet_paused": false,
+  "captain_controls": [],
+  "escort_intents": [],
+  "agent_decisions": []
 }
 ```
 
@@ -102,11 +106,20 @@ Events are replayed in file order.
   "tick_duration_seconds": 1,
   "vessels": [],
   "watch_events": [],
+  "captain_controls": [],
+  "escort_intents": [],
+  "agent_decisions": [],
   "event_sequence": 3
 }
 ```
 
 This snapshot is display-neutral. It does not include Leaflet marker state, Periscope projection fields, CSS, or UI selection state.
+
+Living Fleet state is operational world data, not presentation data.
+`captain_controls` holds assignment, enablement, and runtime summaries;
+`escort_intents` holds current accepted posture; `agent_decisions` retains
+accepted or rejected decisions and their deterministic consequences. The same
+append-only command replay covers all three.
 
 ## Browser Adapter Boundary
 
