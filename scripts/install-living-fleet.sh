@@ -6,7 +6,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-cargo build --release --manifest-path "$REPO_ROOT/fleetcore/Cargo.toml" --bin serve
+cargo build --release --manifest-path "$REPO_ROOT/fleetcore/Cargo.toml" --bins
 python3 -m unittest discover -s "$REPO_ROOT/tools/living-fleet" -p 'test_*.py'
 
 sudo cp "$REPO_ROOT/scripts/living-fleet.service" /etc/systemd/system/living-fleet.service

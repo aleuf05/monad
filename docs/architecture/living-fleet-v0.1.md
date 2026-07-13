@@ -1,4 +1,14 @@
-# Living Fleet V0.1
+# Living Fleet V0.1 — Completion Packet
+
+**Program:** Monad
+
+**Status:** Live and sea-trial validated
+
+**Completed:** 2026-07-13
+
+FleetCore remains authoritative. Captains observe, assess, and submit bounded
+posture intent; deterministic systems validate and execute movement. There is
+no model-to-world mutation path.
 
 ## Authoritative seam
 
@@ -58,7 +68,60 @@ world clock or deterministic movement.
 
 ## Deployment
 
-Run `scripts/install-living-fleet.sh`. It builds the release FleetCore server,
-runs runtime tests, restarts the existing `fleetcore-serve` unit, and installs
-the portless `living-fleet.service`. The public operations surface is
+Run `scripts/install-living-fleet.sh`. It builds both release FleetCore
+binaries, runs runtime tests, restarts the existing `fleetcore-serve` unit, and
+installs the portless `living-fleet.service`. The public operations surface is
 `https://cameronlampley.com/toys/agent-ops/`.
+
+Checkpoints are recovery anchors, not the durable decision log. FleetCore keeps
+the newest 120 checkpoints plus the genesis checkpoint; the append-only event
+log remains authoritative. `fleetcore replay` first verifies seed-plus-events,
+then uses the newest compatible checkpoint plus a non-empty event tail when
+historical code evolution makes genesis replay incompatible.
+
+## Sea-trial record
+
+The live trial used the established production services, official FleetCore
+commands, normal 1x time, and no substitute server.
+
+- Authority boundary: Bravo attempted to command Alpha at tick 41901. FleetCore
+  rejected and durably recorded the decision without a target or consequence.
+- Independent fallback: Bravo was disabled at tick 41903. Its intent was
+  removed while deterministic escort movement continued. Re-enable produced a
+  fresh `widen-flank` decision, accepted at tick 41936 and executed at 41937.
+- Fleet pause: inference was paused while all scouts stayed underway under
+  deterministic formation logic. Resume produced fresh executed decisions for
+  Alpha, Bravo, and Charlie by tick 42001.
+- Contact adaptation: `TRIAL CONTACT` was introduced in open water. Alpha
+  replaced QUACKEN screening with `investigate-contact`, accepted at tick 52598
+  and executed at 52599 with a 650 m stand-off.
+- Changing geometry: Monad completed a reversible three-leg dogleg. At tick
+  52624 Bravo and Charlie were underway toward newly derived flank and rear
+  stations while Alpha maintained contact screening.
+- Emergency response: transient close geometry caused Alpha to select
+  `emergency-separation`, executed at tick 52633 with a deterministic separation
+  target.
+- Recovery: Monad returned exactly to its starting position at tick 52642. The
+  trial contact was removed, and Alpha resumed QUACKEN screening at tick 52683.
+- Replay: a production copy at tick 52699 replayed exactly from checkpoint
+  52693 plus seven subsequent events. Living Fleet agent state and all decision
+  records also matched genesis replay during the earlier audit.
+- Operations: the public Agent Operations page rendered three captain cards,
+  accepted results, consequences, pause/disable controls, and no page errors.
+
+The trial contact was removed and the dogleg ended at its exact starting point.
+Final state was clock running, time scale 1, agent fleet unpaused, and all three
+captains enabled.
+
+## Definition of done
+
+- [x] Alpha, Bravo, and Charlie are persistent independent captains.
+- [x] All captains observe the same authoritative FleetCore world.
+- [x] Each captain controls only bounded posture intent for its assigned vessel.
+- [x] Deterministic systems translate intent into validated movement.
+- [x] Accepted decisions, rejections, execution, and consequences are durable,
+  visible, and replayable.
+- [x] Independent disable and fleet pause preserve safe deterministic behavior.
+- [x] Agent Operations exposes state, result, history, and runtime controls.
+- [x] A live sea trial demonstrated contact adaptation, turns, emergency
+  response, recovery, and formation consequences.

@@ -2,6 +2,12 @@
 
 FleetCore v1 uses JSON files for seed state, current world state, events, checkpoints, and browser-facing snapshots.
 
+Checkpoint files are bounded recovery anchors: the newest 120 plus the genesis
+checkpoint are retained. The append-only event log, not the checkpoint set, is
+the durable history. Replay verifies seed-plus-events when compatible and falls
+back to the newest compatible checkpoint plus its event tail across historical
+simulation-code changes.
+
 ## Canonical Units
 
 - Position: decimal latitude and longitude.

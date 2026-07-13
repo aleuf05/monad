@@ -133,10 +133,15 @@ rollout:
 scripts/install-living-fleet.sh
 ```
 
+The installer builds both the `serve` process and the `fleetcore` operations
+CLI so replay tooling stays on the same command schema as production. FleetCore
+retains the newest 120 recovery checkpoints plus genesis; the append-only event
+log remains the durable history.
+
 **Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`). Its write path (`POST /command`, and any command sent over `/ws`) has no auth at all: every connection on both transports has full command authority, no token required — `--command-token` is still accepted on the command line but silently ignored (see the doc comment at the top of `fleetcore/src/bin/serve.rs`, which is authoritative over `docs/architecture/fleetcore-api.md`'s "Command Authority" section describing the originally-designed gate). Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
 
 ```sh
-cargo build --release --manifest-path fleetcore/Cargo.toml --bin serve
+cargo build --release --manifest-path fleetcore/Cargo.toml --bins
 sudo cp scripts/fleetcore-serve.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now fleetcore-serve
