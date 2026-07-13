@@ -11,6 +11,7 @@ import {
   OPTICS_TIERS,
 } from "./state.js";
 import { createPeriscopeScene } from "./scene.js";
+import { resolveDuckContactVisual } from "./duck.js";
 
 const canvas = document.querySelector("#periscopeCanvas");
 const overlayCanvas = document.querySelector("#periscopeOverlay");
@@ -35,6 +36,7 @@ const panelRange = document.querySelector("#panelRange");
 
 const periscope = createPeriscopeState();
 const scene = createPeriscopeScene({ canvas, overlayCanvas });
+scene.setContactVisualResolver(resolveDuckContactVisual);
 
 let latestContacts = [];
 let contactButtonsReady = false;

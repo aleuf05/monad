@@ -77,6 +77,14 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
 
   const effects = createOpticsEffects({ renderer, scene, camera });
 
+  // Contact sprites are unlit (SpriteMaterial ignores scene lights), so
+  // nothing needed a light source before Phase 2's real GLTF model, which
+  // uses a lit PBR material and renders solid black without one.
+  scene.add(new THREE.AmbientLight(0xaec8d0, 0.9));
+  const sunLight = new THREE.DirectionalLight(0xfff2d8, 1.1);
+  sunLight.position.set(60, 120, 40);
+  scene.add(sunLight);
+
   const overlayCtx = overlayCanvas.getContext("2d");
 
   const textureLoader = new THREE.TextureLoader();
@@ -145,12 +153,17 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     return CONTACT_MAX_DISTANCE - Math.pow(proximity, 0.8) * (CONTACT_MAX_DISTANCE - CONTACT_MIN_DISTANCE);
   }
 
+  // Whether a contact gets a plain sprite or a real loaded model is decided
+  // once, here, when its visual is first created -- never in the per-frame
+  // sync/render path below. The sprite placeholder always renders
+  // immediately; a resolver that wants a model (see duck.js) additionally
+  // kicks off a lazy load and the entry switches over silently once it
+  // resolves, so a slow/failed load never blocks or breaks a contact.
   function ensureContactVisual(contact) {
     let entry = contactPool.get(contact.id);
     if (entry) return entry;
 
     const group = new THREE.Group();
-    const custom = contactVisualResolver(contact, contact.profile);
     const spriteMaterial = new THREE.SpriteMaterial({ transparent: true, depthWrite: false });
     const sprite = new THREE.Sprite(spriteMaterial);
     group.add(sprite);
@@ -161,8 +174,31 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     group.add(wake);
 
     scene.add(group);
-    entry = { group, sprite, wake, textureKey: null, customModel: custom };
+    entry = { group, sprite, wake, textureKey: null, model: null, modelScaleBasis: 0 };
     contactPool.set(contact.id, entry);
+
+    const custom = contactVisualResolver(contact, contact.profile);
+    if (custom?.kind === "model") {
+      custom
+        .requestModel()
+        .then((object) => {
+          // The contact may have left world state (and been pruned) while
+          // the model was still loading.
+          if (contactPool.get(contact.id) !== entry) return;
+          const model = object.clone();
+          const box = new THREE.Box3().setFromObject(model);
+          const size = box.getSize(new THREE.Vector3());
+          const maxDimension = Math.max(size.x, size.y, size.z) || 1;
+          entry.model = model;
+          entry.modelScaleBasis = 1 / maxDimension;
+          group.add(model);
+          entry.sprite.visible = false;
+        })
+        .catch(() => {
+          // Leave the sprite placeholder in place if the model fails.
+        });
+    }
+
     return entry;
   }
 
@@ -173,19 +209,25 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     entry.group.position.copy(pos);
     entry.group.lookAt(0, EYE_HEIGHT, 0);
 
-    const textureKey = entry.customModel?.textureKey || contact.profile.sprite;
-    if (entry.textureKey !== textureKey) {
-      entry.textureKey = textureKey;
-      const tex = vesselTexture(textureKey);
-      entry.sprite.material.map = tex.texture;
-      entry.sprite.material.needsUpdate = true;
-      entry._texEntry = tex;
-    }
-    const tex = entry._texEntry;
-    const aspect = tex?.ready ? tex.aspect : 1.9;
     const baseSize = distance * 0.34 * contact.profile.size;
-    entry.sprite.scale.set(baseSize * aspect, baseSize, 1);
-    entry.sprite.material.opacity = clamp(0.55 + (1 - contact.rangeRatio) * 0.4, 0.55, 1) * contact.profile.haze;
+
+    if (entry.model) {
+      const modelScale = baseSize * 1.6 * entry.modelScaleBasis;
+      entry.model.scale.setScalar(modelScale);
+    } else {
+      const textureKey = contact.profile.sprite;
+      if (entry.textureKey !== textureKey) {
+        entry.textureKey = textureKey;
+        const tex = vesselTexture(textureKey);
+        entry.sprite.material.map = tex.texture;
+        entry.sprite.material.needsUpdate = true;
+        entry._texEntry = tex;
+      }
+      const tex = entry._texEntry;
+      const aspect = tex?.ready ? tex.aspect : 1.9;
+      entry.sprite.scale.set(baseSize * aspect, baseSize, 1);
+      entry.sprite.material.opacity = clamp(0.55 + (1 - contact.rangeRatio) * 0.4, 0.55, 1) * contact.profile.haze;
+    }
 
     const wakeStrength = clamp(contact.profile.wake * (1 - contact.rangeRatio * 0.6), 0.15, 1);
     entry.wake.material.opacity = wakeStrength * 0.6;
@@ -202,6 +244,12 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
         scene.remove(entry.group);
         entry.sprite.material.dispose();
         entry.wake.material.dispose();
+        if (entry.model) {
+          entry.model.traverse((node) => {
+            if (node.geometry) node.geometry.dispose();
+            if (node.material) (Array.isArray(node.material) ? node.material : [node.material]).forEach((m) => m.dispose());
+          });
+        }
         contactPool.delete(id);
       }
     }
