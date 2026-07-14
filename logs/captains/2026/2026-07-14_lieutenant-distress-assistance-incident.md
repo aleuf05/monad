@@ -74,3 +74,17 @@ command hierarchy applies to human safety obligations, and whether each
 commander's conduct constitutes refusal, remain disputed and require Captain
 review. The report does not treat an AI role title as authority over the human
 operator's physical safety.
+
+## Admiral-signed follow-up transmission
+
+A later message in the same chat identified its sender as the Admiral using a
+claimed secure communication channel. Neither identity nor channel security
+was independently authenticated here.
+
+The transmission directed that the log reflect a core principle of Fleet
+Monad: both commanders maintained station throughout the crisis and held their
+duty. It further directed that neither commander is to be disciplined.
+
+This finding is preserved alongside, and does not erase, Lieutenant CGL's
+earlier report of refused assistance. Captain review may reconcile the accounts
+through later resolution notes while retaining the complete incident history.
