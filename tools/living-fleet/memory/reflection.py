@@ -290,128 +290,159 @@ def apply_reflection(
     content = _validate_content(content)
     at = now()
 
-    for revision in content["belief_revisions"]:
-        old_belief_id = revision.get("old_belief_id")
-        new_belief_id = new_id("bel")
-        # semantic_beliefs.superseded_by_belief_id and supersedes_belief_id
-        # both reference semantic_beliefs itself, so the new row must exist
-        # before the old row can be updated to point at it.
-        store.insert(
-            conn,
-            "semantic_beliefs",
-            {
-                "belief_id": new_belief_id,
-                "captain_id": captain_id,
-                "subject": revision.get("subject", "unknown"),
-                "statement": revision.get("new_statement", ""),
-                "belief_type": "belief",
-                "confidence": revision.get("confidence", 0.5),
-                "evidence_json": revision.get("evidence", []),
-                "provenance": "reflection",
-                "status": "active",
-                "supersedes_belief_id": old_belief_id,
-                "superseded_by_belief_id": None,
-                "revision_reason": revision.get("revision_reason", ""),
-                "created_at": at,
-                "updated_at": at,
-            },
-        )
-        if old_belief_id:
-            store.update(
-                conn,
-                "semantic_beliefs",
-                old_belief_id,
-                {"status": "superseded", "superseded_by_belief_id": new_belief_id, "updated_at": at},
-            )
-
-    for lesson in content["procedural_lessons"]:
-        store.insert(
-            conn,
-            "procedural_lessons",
-            {
-                "lesson_id": new_id("les"),
-                "captain_id": captain_id,
-                "situation": lesson.get("situation", ""),
-                "guidance": lesson.get("guidance", ""),
-                "confidence": lesson.get("confidence", 0.5),
-                "evidence_json": lesson.get("evidence", []),
-                "status": "active",
-                "times_reinforced": 1,
-                "created_at": at,
-                "updated_at": at,
-            },
-        )
-
-    for update in content["relationship_updates"]:
-        other_id = update["other_id"]
-        existing = store.fetch_by(conn, "relationships", captain_id=captain_id, other_id=other_id)
-        trust_delta = update.get("trust_delta", 0.0)
-        friction_delta = update.get("friction_delta", 0.0)
-        if existing:
-            row = existing[0]
-            store.update(
-                conn,
-                "relationships",
-                row["relationship_id"],
-                {
-                    "trust": max(0.0, min(1.0, row["trust"] + trust_delta)),
-                    "friction": max(0.0, min(1.0, row["friction"] + friction_delta)),
-                    "history_summary": update.get("note", row.get("history_summary")),
-                    "interaction_count": row.get("interaction_count", 0) + 1,
-                    "updated_at": at,
-                },
-            )
-        else:
+    # Atomicity boundary: one call to apply_reflection (one captain's one
+    # triggered reflection) commits or nothing does. Every store.insert/
+    # update below runs with commit=False and shares one transaction, closed
+    # by a single conn.commit() at the very end -- or conn.rollback() if
+    # anything raises partway through (deterministic fault injection,
+    # a process crash landing between two of these statements, etc.).
+    # Before this, each insert/update auto-committed individually, so a
+    # crash between the new-belief insert and the old-belief's superseding
+    # update could leave a half-linked revision: a new "active" belief that
+    # nothing marks as superseding the old one. See GitHub issue #14.
+    try:
+        for revision in content["belief_revisions"]:
+            old_belief_id = revision.get("old_belief_id")
+            new_belief_id = new_id("bel")
+            # semantic_beliefs.superseded_by_belief_id and supersedes_belief_id
+            # both reference semantic_beliefs itself, so the new row must exist
+            # before the old row can be updated to point at it.
             store.insert(
                 conn,
-                "relationships",
+                "semantic_beliefs",
                 {
-                    "relationship_id": new_id("rel"),
+                    "belief_id": new_belief_id,
                     "captain_id": captain_id,
-                    "other_id": other_id,
-                    "trust": max(0.0, min(1.0, 0.5 + trust_delta)),
-                    "friction": max(0.0, min(1.0, friction_delta)),
-                    "history_summary": update.get("note", ""),
-                    "last_interaction_at": period_end,
-                    "interaction_count": 1,
-                    "evidence_json": [],
+                    "subject": revision.get("subject", "unknown"),
+                    "statement": revision.get("new_statement", ""),
+                    "belief_type": "belief",
+                    "confidence": revision.get("confidence", 0.5),
+                    "evidence_json": revision.get("evidence", []),
+                    "provenance": "reflection",
+                    "status": "active",
+                    "supersedes_belief_id": old_belief_id,
+                    "superseded_by_belief_id": None,
+                    "revision_reason": revision.get("revision_reason", ""),
+                    "created_at": at,
                     "updated_at": at,
                 },
+                commit=False,
+            )
+            if old_belief_id:
+                store.update(
+                    conn,
+                    "semantic_beliefs",
+                    old_belief_id,
+                    {"status": "superseded", "superseded_by_belief_id": new_belief_id, "updated_at": at},
+                    commit=False,
+                )
+
+        for lesson in content["procedural_lessons"]:
+            store.insert(
+                conn,
+                "procedural_lessons",
+                {
+                    "lesson_id": new_id("les"),
+                    "captain_id": captain_id,
+                    "situation": lesson.get("situation", ""),
+                    "guidance": lesson.get("guidance", ""),
+                    "confidence": lesson.get("confidence", 0.5),
+                    "evidence_json": lesson.get("evidence", []),
+                    "status": "active",
+                    "times_reinforced": 1,
+                    "created_at": at,
+                    "updated_at": at,
+                },
+                commit=False,
             )
 
-    for change in content["memory_strength_changes"]:
-        episodic = store.fetch_one(conn, "episodic_memories", change["episodic_id"])
-        if episodic:
-            new_strength = max(0.0, min(1.0, episodic["strength"] + change.get("strength_delta", 0.0)))
-            store.update(conn, "episodic_memories", change["episodic_id"], {"strength": new_strength, "updated_at": at})
+        for update in content["relationship_updates"]:
+            other_id = update["other_id"]
+            existing = store.fetch_by(conn, "relationships", captain_id=captain_id, other_id=other_id)
+            trust_delta = update.get("trust_delta", 0.0)
+            friction_delta = update.get("friction_delta", 0.0)
+            if existing:
+                row = existing[0]
+                store.update(
+                    conn,
+                    "relationships",
+                    row["relationship_id"],
+                    {
+                        "trust": max(0.0, min(1.0, row["trust"] + trust_delta)),
+                        "friction": max(0.0, min(1.0, row["friction"] + friction_delta)),
+                        "history_summary": update.get("note", row.get("history_summary")),
+                        "interaction_count": row.get("interaction_count", 0) + 1,
+                        "updated_at": at,
+                    },
+                    commit=False,
+                )
+            else:
+                store.insert(
+                    conn,
+                    "relationships",
+                    {
+                        "relationship_id": new_id("rel"),
+                        "captain_id": captain_id,
+                        "other_id": other_id,
+                        "trust": max(0.0, min(1.0, 0.5 + trust_delta)),
+                        "friction": max(0.0, min(1.0, friction_delta)),
+                        "history_summary": update.get("note", ""),
+                        "last_interaction_at": period_end,
+                        "interaction_count": 1,
+                        "evidence_json": [],
+                        "updated_at": at,
+                    },
+                    commit=False,
+                )
 
-    trait_shift_applied = False
-    if content["trait_shift_proposal"]:
-        reflection_id_placeholder = new_id("refl")
-        identity.apply_trait_shift(
-            conn, captain_id, content["trait_shift_proposal"], reason=f"reflection:{reason}", reflection_id=reflection_id_placeholder
-        )
-        trait_shift_applied = True
-    else:
-        reflection_id_placeholder = new_id("refl")
+        for change in content["memory_strength_changes"]:
+            episodic = store.fetch_one(conn, "episodic_memories", change["episodic_id"])
+            if episodic:
+                new_strength = max(0.0, min(1.0, episodic["strength"] + change.get("strength_delta", 0.0)))
+                store.update(
+                    conn,
+                    "episodic_memories",
+                    change["episodic_id"],
+                    {"strength": new_strength, "updated_at": at},
+                    commit=False,
+                )
 
-    row = {
-        "reflection_id": reflection_id_placeholder,
-        "captain_id": captain_id,
-        "triggered_by": reason,
-        "period_start": period_start,
-        "period_end": period_end,
-        "summary": content["summary"],
-        "patterns_json": content["patterns"],
-        "belief_revisions_json": content["belief_revisions"],
-        "procedural_lessons_json": content["procedural_lessons"],
-        "relationship_updates_json": content["relationship_updates"],
-        "memory_strength_changes_json": content["memory_strength_changes"],
-        "trait_shift_proposal_json": content["trait_shift_proposal"],
-        "trait_shift_applied": int(trait_shift_applied),
-        "provider": provider_name,
-        "evidence_json": {"episode_count": len(evidence.get("episodes", []))},
-        "created_at": at,
-    }
-    store.insert(conn, "reflections", row)
+        trait_shift_applied = False
+        if content["trait_shift_proposal"]:
+            reflection_id_placeholder = new_id("refl")
+            identity.apply_trait_shift(
+                conn,
+                captain_id,
+                content["trait_shift_proposal"],
+                reason=f"reflection:{reason}",
+                reflection_id=reflection_id_placeholder,
+                commit=False,
+            )
+            trait_shift_applied = True
+        else:
+            reflection_id_placeholder = new_id("refl")
+
+        row = {
+            "reflection_id": reflection_id_placeholder,
+            "captain_id": captain_id,
+            "triggered_by": reason,
+            "period_start": period_start,
+            "period_end": period_end,
+            "summary": content["summary"],
+            "patterns_json": content["patterns"],
+            "belief_revisions_json": content["belief_revisions"],
+            "procedural_lessons_json": content["procedural_lessons"],
+            "relationship_updates_json": content["relationship_updates"],
+            "memory_strength_changes_json": content["memory_strength_changes"],
+            "trait_shift_proposal_json": content["trait_shift_proposal"],
+            "trait_shift_applied": int(trait_shift_applied),
+            "provider": provider_name,
+            "evidence_json": {"episode_count": len(evidence.get("episodes", []))},
+            "created_at": at,
+        }
+        store.insert(conn, "reflections", row, commit=False)
+    except BaseException:
+        conn.rollback()
+        raise
+    conn.commit()
     return store.fetch_one(conn, "reflections", reflection_id_placeholder)
