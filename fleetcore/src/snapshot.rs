@@ -15,6 +15,15 @@ pub struct WorldSnapshot {
     pub vessels: Vec<crate::vessel::Vessel>,
     pub watch_events: Vec<crate::world::WatchEvent>,
     pub vessel_events: Vec<crate::vessel::VesselEvent>,
+    // Telemetry for GitHub issue #6's bounded vessel_events: the configured
+    // retention (so clients/operators can see what's actually in effect,
+    // not just assume a default) and the total count ever emitted (so a
+    // gap between this and vessel_events.len() is visible at a glance). A
+    // consumer detects it has fallen behind the retained window by
+    // comparing its own last-seen event_seq against
+    // vessel_events.first().event_seq, not from a separate field.
+    pub vessel_event_retention: usize,
+    pub vessel_events_emitted_total: u64,
     pub event_sequence: u64,
     pub escort_mode: EscortMode,
     pub agent_fleet_paused: bool,
@@ -46,6 +55,8 @@ pub fn snapshot(world: &World) -> WorldSnapshot {
         vessels: world.vessels.clone(),
         watch_events: world.watch_events.clone(),
         vessel_events: world.vessel_events.clone(),
+        vessel_event_retention: world.vessel_event_retention,
+        vessel_events_emitted_total: world.next_vessel_event_seq,
         event_sequence: world.event_sequence,
         escort_mode: world.escort_mode,
         agent_fleet_paused: world.agent_fleet_paused,

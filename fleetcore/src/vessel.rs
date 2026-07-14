@@ -88,6 +88,16 @@ impl Vessel {
 // route replacement near an old waypoint indistinguishable from a real
 // arrival. See world.rs's apply_command (SetRoute) and advance_vessel for
 // where each variant is emitted.
+// event_seq is a per-VesselEvent monotonic counter (World::next_vessel_event_seq),
+// distinct from `tick`: multiple vessels can each push a VesselEvent within
+// the same tick (the per-tick advance loop in world.rs iterates every
+// vessel), so `tick` alone is not a unique or strictly-ordered cursor.
+// event_seq is. Clients must cursor on event_seq, not array length or tick
+// -- see docs/architecture/vessel-events-retention-investigation.md and
+// GitHub issue #6. #[serde(default)] so state files saved before this field
+// existed still load (defaulting to 0); World::normalize() detects that
+// case and assigns fresh sequential values on load rather than leaving
+// every old event at the same default.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum VesselEvent {
@@ -98,6 +108,8 @@ pub enum VesselEvent {
         remaining_leg_count: usize,
         tick: u64,
         sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
     },
     RouteReplaced {
         vessel_id: String,
@@ -113,18 +125,44 @@ pub enum VesselEvent {
         issuing_authority: String,
         tick: u64,
         sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
     },
     RouteCompleted {
         vessel_id: String,
         route_id: u64,
         tick: u64,
         sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
     },
     Holding {
         vessel_id: String,
         tick: u64,
         sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
     },
+}
+
+impl VesselEvent {
+    pub fn event_seq(&self) -> u64 {
+        match self {
+            VesselEvent::WaypointReached { event_seq, .. }
+            | VesselEvent::RouteReplaced { event_seq, .. }
+            | VesselEvent::RouteCompleted { event_seq, .. }
+            | VesselEvent::Holding { event_seq, .. } => *event_seq,
+        }
+    }
+
+    pub fn set_event_seq(&mut self, value: u64) {
+        match self {
+            VesselEvent::WaypointReached { event_seq, .. }
+            | VesselEvent::RouteReplaced { event_seq, .. }
+            | VesselEvent::RouteCompleted { event_seq, .. }
+            | VesselEvent::Holding { event_seq, .. } => *event_seq = value,
+        }
+    }
 }
 
 pub fn quantize(value: f64) -> f64 {

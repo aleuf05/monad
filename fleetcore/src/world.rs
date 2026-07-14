@@ -186,12 +186,33 @@ pub struct World {
     #[serde(default)]
     pub escort_mode: EscortMode,
     // Structured per-vessel route/motion events -- see VesselEvent's own
-    // doc comment. Grows forever, same as watch_events, never truncated
-    // server-side; clients diff against length/tick to find what's new
-    // (same pattern renderWatchEvents already uses client-side). Defaulted
-    // for backward compat with state files saved before this existed.
+    // doc comment. Bounded to the newest `vessel_event_retention` entries
+    // (GitHub issue #6) -- full history remains durable forever in the
+    // separate, never-truncated events.jsonl command log; this field is a
+    // derived, replay-reconstructible convenience view for live consumers,
+    // not an independent source of history. Clients must cursor on each
+    // event's own event_seq, not array length or tick (see
+    // docs/architecture/vessel-events-retention-investigation.md).
+    // Defaulted for backward compat with state files saved before this
+    // existed.
     #[serde(default)]
     pub vessel_events: Vec<VesselEvent>,
+    // Monotonic counter for VesselEvent::event_seq -- distinct from `tick`,
+    // since multiple vessels can each push an event within one tick.
+    // Persisted so it survives restart/replay without ever repeating a
+    // value. Defaulted to 0 for old state files; World::normalize()
+    // detects that case (0 counter, non-empty vessel_events) and assigns
+    // fresh sequential values on load rather than leaving old events
+    // uniformly at the same default.
+    #[serde(default)]
+    pub next_vessel_event_seq: u64,
+    // How many of the newest vessel_events to retain in this field (and
+    // therefore in world.json/checkpoints/live snapshots). Configurable via
+    // fleetcore-serve's --vessel-event-retention flag, not hard-coded into
+    // the protocol -- deliberately per Command ruling on GitHub issue #6.
+    // Full history is unaffected either way; see the field comment above.
+    #[serde(default = "default_vessel_event_retention")]
+    pub vessel_event_retention: usize,
     #[serde(default)]
     pub agent_fleet_paused: bool,
     #[serde(default)]
@@ -216,7 +237,30 @@ pub struct World {
     pub canon_events: Vec<CanonEvent>,
 }
 
+// GitHub issue #6's approved default: generous relative to observed
+// production rate (~2.8-3 events/tick) while removing nearly all growth.
+// Configurable per-process via --vessel-event-retention; this is only the
+// fallback for state files that predate the field or omit the flag.
+pub fn default_vessel_event_retention() -> usize {
+    2000
+}
+
 impl World {
+    // Assigns the next monotonic event_seq, pushes, and trims to
+    // vessel_event_retention -- the one place vessel_events is ever
+    // mutated, so live ticking and replay (which both funnel through
+    // apply_command) can never diverge on numbering or bounding.
+    fn record_vessel_event(&mut self, mut event: VesselEvent) {
+        event.set_event_seq(self.next_vessel_event_seq);
+        self.next_vessel_event_seq += 1;
+        self.vessel_events.push(event);
+        if self.vessel_events.len() > self.vessel_event_retention {
+            let excess = self.vessel_events.len() - self.vessel_event_retention;
+            self.vessel_events.drain(0..excess);
+        }
+    }
+
+
     fn apply_canon_change(
         &mut self,
         command_id: &str,
@@ -495,6 +539,27 @@ impl World {
         }
         self.captain_controls
             .sort_by(|a, b| a.vessel_id.cmp(&b.vessel_id));
+
+        // Migration for state files saved before event_seq/retention existed:
+        // next_vessel_event_seq defaults to 0 on load; a genuinely fresh
+        // world also has an empty vessel_events, so "0 counter, non-empty
+        // vessel_events" unambiguously means an old file. Assign fresh
+        // sequential values in existing (already chronological) order
+        // rather than leaving every old event at the same defaulted 0.
+        if self.next_vessel_event_seq == 0 && !self.vessel_events.is_empty() {
+            for (index, event) in self.vessel_events.iter_mut().enumerate() {
+                event.set_event_seq(index as u64 + 1);
+            }
+            self.next_vessel_event_seq = self.vessel_events.len() as u64 + 1;
+        }
+        // Enforce the current retention bound on load too, so an
+        // already-oversized world.json/checkpoint from before this change
+        // shrinks on next load rather than staying oversized until the next
+        // natural push-and-trim.
+        if self.vessel_events.len() > self.vessel_event_retention {
+            let excess = self.vessel_events.len() - self.vessel_event_retention;
+            self.vessel_events.drain(0..excess);
+        }
     }
 
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
@@ -544,6 +609,7 @@ impl World {
                             vessel_id: vessel_id.clone(),
                             tick,
                             sim_time: sim_time.clone(),
+                            event_seq: 0,
                         })
                     } else if vessel.status == VesselStatus::Underway && !vessel.route.is_empty() {
                         let old_route_id = vessel.route_id;
@@ -563,6 +629,7 @@ impl World {
                             issuing_authority: "operator".to_string(),
                             tick,
                             sim_time: sim_time.clone(),
+                            event_seq: 0,
                         })
                     } else {
                         vessel.route_id += 1;
@@ -573,7 +640,7 @@ impl World {
                     }
                 };
                 if let Some(event) = event_to_emit {
-                    self.vessel_events.push(event);
+                    self.record_vessel_event(event);
                 }
                 "route-set"
             }
@@ -1054,10 +1121,14 @@ impl World {
             }
         }
 
+        let mut emitted = Vec::new();
         for vessel in &mut self.vessels {
             if let Some(event) = advance_vessel(vessel, tick_duration, &sim_time, tick) {
-                self.vessel_events.push(event);
+                emitted.push(event);
             }
+        }
+        for event in emitted {
+            self.record_vessel_event(event);
         }
     }
 
@@ -1132,6 +1203,7 @@ fn leg_or_route_complete(
             route_id: vessel.route_id,
             tick,
             sim_time: sim_time.to_string(),
+            event_seq: 0,
         }
     } else {
         vessel.status = VesselStatus::Underway;
@@ -1142,6 +1214,7 @@ fn leg_or_route_complete(
             remaining_leg_count: vessel.route.len(),
             tick,
             sim_time: sim_time.to_string(),
+            event_seq: 0,
         }
     }
 }

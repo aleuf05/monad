@@ -105,10 +105,20 @@ async fn run() -> Result<(), String> {
     // --command-token is still accepted (and ignored) so existing launchers
     // that pass it don't fail to start.
     take_option(&mut args, "--command-token");
+    // Configurable per Command ruling on GitHub issue #6: not hard-coded
+    // into the protocol. Overrides whatever retention value a loaded
+    // world/checkpoint happens to carry, so an operator can change it
+    // across a restart without editing state files by hand.
+    let vessel_event_retention: usize = match take_option(&mut args, "--vessel-event-retention") {
+        Some(value) => value
+            .parse()
+            .map_err(|_| "invalid --vessel-event-retention".to_string())?,
+        None => fleetcore::world::default_vessel_event_retention(),
+    };
 
     let paths = StorePaths::new(state_dir, seed_path);
     ensure_dirs(&paths)?;
-    let world = match load_world(&paths) {
+    let mut world = match load_world(&paths) {
         Ok(world) => world,
         Err(_) => {
             let seed = load_seed(&paths)?;
@@ -117,6 +127,8 @@ async fn run() -> Result<(), String> {
             seed
         }
     };
+    world.vessel_event_retention = vessel_event_retention;
+    world.normalize();
     write_snapshot(&paths, &world, None)?;
 
     let (tx, _rx) = broadcast::channel::<String>(64);

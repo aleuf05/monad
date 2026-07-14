@@ -147,7 +147,14 @@ def new_state(mission_id):
         "last_progress_at": now,
         "last_vessel_position": None,
         "stalled_from_phase": None,
-        "processed_vessel_event_count": 0,
+        # Cursors on each event's own event_seq (GitHub issue #6), not array
+        # length -- fleetcore-serve now bounds vessel_events to a recent
+        # tail, and this state persists across process restarts (save_state
+        # below), so a length-based cursor left stale from before a
+        # server-side rotation would have no restart-equivalent reset path
+        # and silently freeze mission tracking forever. -1 so event_seq 0
+        # still counts as new.
+        "last_vessel_event_seq": -1,
         "rendezvous_dwell_started_at": None,
         "evidence": [],
         "captures": [],
@@ -223,7 +230,8 @@ def cmd_start(args):
         "message": f"Mission Director: {args.mission_id} underway. Tracking {TRACKED_VESSEL_ID} toward {DUCKY_CALLSIGN}.",
     })
     snapshot = get_snapshot()
-    state["processed_vessel_event_count"] = len(snapshot.get("vessel_events", []))
+    vessel_events = snapshot.get("vessel_events", [])
+    state["last_vessel_event_seq"] = vessel_events[-1]["event_seq"] if vessel_events else -1
     transition(state, "TRANSIT_UNDERWAY", "mission start (operator action)", snapshot)
     request_capture(
         state, "mission_start", "fleetcore-live",
@@ -270,8 +278,9 @@ def advance(state, snapshot):
         return state["phase"] != phase_before
 
     vessel_events = snapshot.get("vessel_events", [])
-    new_events = vessel_events[state["processed_vessel_event_count"]:]
-    state["processed_vessel_event_count"] = len(vessel_events)
+    new_events = [e for e in vessel_events if e.get("event_seq", -1) > state["last_vessel_event_seq"]]
+    if new_events:
+        state["last_vessel_event_seq"] = new_events[-1]["event_seq"]
     tracked_new = [e for e in new_events if e.get("vessel_id") == TRACKED_VESSEL_ID]
 
     # A single poll can contain more than one relevant event for the same
@@ -280,9 +289,9 @@ def advance(state, snapshot):
     # transition instead of only reacting to the first hit. Without this,
     # a route_completed landing in the same batch as the waypoint_reached
     # that triggered TRANSIT_UNDERWAY -> STRAIT_TRANSIT would get marked
-    # "already processed" (processed_vessel_event_count already advanced
-    # past it) without ever being evaluated against STRAIT_TRANSIT's own
-    # check, silently losing a real transition.
+    # "already processed" (last_vessel_event_seq already advanced past it)
+    # without ever being evaluated against STRAIT_TRANSIT's own check,
+    # silently losing a real transition.
     advanced = True
     while advanced:
         advanced = False

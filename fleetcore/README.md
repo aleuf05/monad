@@ -60,7 +60,7 @@ Use `--state-dir <path>` and `--seed <path>` to override defaults.
 cargo run --manifest-path fleetcore/Cargo.toml --bin serve -- --port 4771
 ```
 
-Flags (all optional): `--port` (default `4771`), `--state-dir`, `--seed`, `--tick-ms` (real milliseconds per simulation tick, default `1000`), `--command-token <token>` (grants command authority to whoever presents this token; omit it and the server is fully read-only — see Command Authority below), `--bind-all` (bind `0.0.0.0` instead of the loopback-only default; only do this once a reverse proxy/TLS/auth story is actually in place).
+Flags (all optional): `--port` (default `4771`), `--state-dir`, `--seed`, `--tick-ms` (real milliseconds per simulation tick, default `1000`), `--command-token <token>` (grants command authority to whoever presents this token; omit it and the server is fully read-only — see Command Authority below), `--bind-all` (bind `0.0.0.0` instead of the loopback-only default; only do this once a reverse proxy/TLS/auth story is actually in place), `--vessel-event-retention <N>` (how many of the newest `vessel_events` to keep in `World`/`world.json`/checkpoints/live snapshots, default `2000` — GitHub issue #6; full history stays durable in `events.jsonl` regardless, see `docs/architecture/vessel-events-retention-investigation.md`).
 
 On startup the server loads `--state-dir`'s persisted world, or falls back to the seed if none exists yet, then:
 

@@ -79,6 +79,8 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
   "vessels": [ /* Vessel, see fleetcore-data-contract.md */ ],
   "watch_events": [ { "tick": 12, "sim_time": "...", "message": "..." } ],
   "vessel_events": [ /* VesselEvent, see "Vessel Events" below */ ],
+  "vessel_event_retention": 2000,
+  "vessel_events_emitted_total": 167379,
   "event_sequence": 42,
   "escort_mode": "patrol",
   "agent_fleet_paused": false,
@@ -95,7 +97,13 @@ Identical to the CLI's `snapshot` command output (`fleetcore/src/snapshot.rs`'s 
 
 ### Vessel Events
 
-`vessel_events` (`fleetcore/src/vessel.rs`'s `VesselEvent` enum) is a structured, ever-growing log of route/motion transitions per vessel — distinct from `watch_events` (free-text operator log lines) and from the internal replay `Event` (`fleetcore/src/event.rs`, records which `Command` was applied, not used over the wire). Never truncated server-side, same as `watch_events` — a client wanting only what's new since its last look should diff against array length or the highest `tick` seen, the same pattern `fleetcore-control`'s own `renderWatchEvents()` already uses for `watch_events`.
+`vessel_events` (`fleetcore/src/vessel.rs`'s `VesselEvent` enum) is a structured log of route/motion transitions per vessel — distinct from `watch_events` (free-text operator log lines) and from the internal replay `Event` (`fleetcore/src/event.rs`, records which `Command` was applied, not used over the wire).
+
+**Bounded as of GitHub issue #6** — `vessel_events` is a live tail of the newest `vessel_event_retention` entries (default 2000, configurable via `fleetcore-serve --vessel-event-retention <N>`, not hard-coded into the protocol), *not* the complete history. Full history remains durable forever in the separate, never-truncated `events.jsonl` command log — `vessel_events` is a derived, replay-reconstructible convenience view, not an independent source of truth (see `docs/architecture/vessel-events-retention-investigation.md`).
+
+Every `VesselEvent` carries `event_seq: u64` — a monotonic counter, distinct from `tick`. **Clients must cursor on `event_seq`, not array length/index and not `tick`**: multiple vessels can each push an event within the same tick (so `tick` alone doesn't disambiguate order), and since the array is now a bounded, rotating tail, a length-based cursor (`array.slice(lastCount)`) silently stops seeing new events forever the first time the array's length ever decreases relative to what a client last recorded — this was a real, latent bug in both of this repo's own consumers before the fix (`toys/fleetcore-live/app.js`, `tools/mission-director/mission_director.py`), not a hypothetical one. The correct idiom: track the highest `event_seq` seen, and take only entries where `event_seq > lastSeenSeq`.
+
+`vessel_event_retention` (the configured bound) and `vessel_events_emitted_total` (the running count of every event ever emitted, i.e. what the next `event_seq` will be) are both exposed on the snapshot as telemetry. A client can detect it has fallen behind the retained window — e.g. after being disconnected/backgrounded through more than `vessel_event_retention` worth of activity — by comparing its own last-seen `event_seq` against `vessel_events[0].event_seq` (the oldest currently-retained entry): if the gap is more than one, some events were never seen and are no longer in this view (still recoverable from `events.jsonl` via replay if ever needed, just not through this live API).
 
 Exactly one of four types can occur for a given vessel in a given tick — they're mutually exclusive, never blended:
 
