@@ -27,9 +27,10 @@ Security gate: [GitHub Issue #16](https://github.com/aleuf05/monad/issues/16)
 
 ### Durable history and bounded read API
 
-The first integrated A+B build exists only in the isolated clone
-`/home/cgl/dev/monad-history-integration` at commit
-`196137a5e07c302f7c8dc6adf9627013dbdbb310`.
+The hardened A+B integration is committed at
+`2ee94ab36dd0eb8141e7fb1806b71152c3265e4c` on remote branch
+`codex/history-v2-integration`. Its isolated clone is
+`/home/cgl/dev/monad-history-integration`.
 
 Implemented and tested:
 
@@ -43,17 +44,18 @@ Implemented and tested:
 - reserved configurable tail default of 2,000, with compaction disabled;
 - full V1 `vessel_events` retained and `watch_events` untouched.
 
-Adversarial review correctly rejected this first build. Corrective code now
-passes locally for corrupt/missing World handling, full-log validation,
+Adversarial review correctly rejected the first build. The committed correction
+passes for corrupt/missing World handling, full-log validation,
 migration-marker write gating, committed append semantics, serialized history
 reads, bounded scan work, future-cursor rejection, log-derived health, and
-fault/replay/DoS tests. That amendment is intentionally uncommitted pending the
-idempotency decision below.
+fault/replay/DoS tests.
 
 ### Command authentication hardening
 
-The amended Slice G exists only in `/home/cgl/dev/monad-slice-g` at commit
-`41e93cdac0da85796cbbf7fc88c78ecfb7390994`.
+The amended Slice G is published on remote branch
+`codex/issue-16-slice-g-auth` at commit
+`41e93cdac0da85796cbbf7fc88c78ecfb7390994`; its isolated clone is
+`/home/cgl/dev/monad-slice-g`.
 
 It provides:
 
@@ -70,20 +72,16 @@ It provides:
 All 16 FleetCore tests, formatting, serve-target Clippy, and diff checks pass in
 that clone. It has not been deployed and contains no production credentials.
 
-## Current decision required
+## Retry idempotency decision
 
-True retry idempotency after a lost response is not defined for generic
-FleetCore commands. After append and `sync_data` succeed, the command is
-authoritative even if saving derived `world.json` fails. The server can return
-`committed: true`, the durable event sequence, and `degraded: true`, but a
-caller that loses that response cannot distinguish retry from an intentional
-repeat such as another `Step` command.
-
-Recommended platform decision: add a caller-supplied idempotency key to both
-HTTP and WebSocket command envelopes, persist it in the authoritative Event,
-and return the original committed result for duplicate keys. Keys are scoped to
-the authenticated principal; reusing one with different command bytes fails
-closed. This is required before claiming retry idempotency.
+The platform now requires a caller-supplied idempotency key for authoritative
+HTTP and WebSocket commands. The authoritative Event persists versioned
+submission metadata, authenticated principal identity, and a canonical command
+digest. The same principal/key/command returns the original committed result;
+key reuse with different command bytes or another principal fails closed.
+Internal ticks use unique internal keys, so intentional repeated `Step`
+commands remain distinct. Lost-response and committed-but-degraded retries are
+covered by tests.
 
 ## Residual security and operational work
 
