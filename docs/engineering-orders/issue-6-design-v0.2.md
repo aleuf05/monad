@@ -1,6 +1,6 @@
 # MONAD ENGINEERING PACKET — Issue #6 Design V0.2
 
-Status: **APPROVED FOR REVIEWABLE IMPLEMENTATION SLICES**
+Status: **APPROVED AS ONE INTEGRATED CHANGE WITH REVIEWABLE SLICES**
 
 Issue: [#6 — Bound unbounded FleetCore vessel event history](https://github.com/aleuf05/monad/issues/6)
 
@@ -16,7 +16,7 @@ Commissioned runtime baseline:
 V0.1 is accepted in principle. This revision incorporates all Command rulings,
 closes its five architectural decisions, and makes direct FleetCore command
 authentication a release blocker. Implementation may proceed only through the
-slices below. Destructive truncation remains forbidden until migrated consumers
+slices below, integrated behind one release gate. Destructive truncation remains forbidden until migrated consumers
 pass replay, restart, lag, and rollback tests against durable history.
 
 Doctrine: array position is not identity, and truncation is not retention.
@@ -77,7 +77,7 @@ access.
 
 ### 3. Configurable tail
 
-The initial default is 1,024 vessel events. Tail size is configuration, not a
+The initial default is 2,000 vessel events. Tail size is configuration, not a
 wire or persistence contract. Invalid, zero, or unreasonably large values fail
 configuration validation rather than silently changing behavior.
 
@@ -138,7 +138,8 @@ operational evidence for Issue #16 pass.
 
 Every `VesselEvent` receives a strictly increasing sequence. Tick and FleetCore
 command sequence are insufficient alone because a command can emit multiple
-vessel events. World stores:
+vessel events. Production verification found 58,511 tick values shared by
+multiple vessel events, with as many as four events at one tick. World stores:
 
 - `vessel_event_next_sequence`;
 - `vessel_event_tail_start_sequence`;
@@ -182,8 +183,9 @@ recovery. Equal-length tail rollover cannot suppress new events.
 
 ## Implementation slices
 
-Each slice is independently reviewable and must leave the prior commissioned
-baseline recoverable.
+Each slice is independently reviewable, but the slices form one integrated
+change and are commissioned together. Every slice must leave the prior
+commissioned baseline recoverable.
 
 | Slice | Tracking issue |
 |---|---|
@@ -220,7 +222,7 @@ Migrate Mission Director, FleetCore Live source, and its deployed copy. Add
 baseline bootstrap, catch-up, persistent cursor, duplicate protection, and lag
 telemetry. Still do not compact.
 
-Gate: replay, restart, disconnect beyond 1,024 events, equal-length rollover,
+Gate: replay, restart, disconnect beyond 2,000 events, equal-length rollover,
 multi-event batch, browser bootstrap, and source/deployed parity pass.
 
 ### Slice D — Explicit legacy backfill
@@ -242,7 +244,7 @@ consumer uses array length before removal approval.
 
 ### Slice F — Safe tail compaction
 
-Enable configurable bounded World/checkpoint/snapshot tails with default 1,024.
+Enable configurable bounded World/checkpoint/snapshot tails with default 2,000.
 Full durable history and query results remain unchanged. Canon/provenance are
 explicitly excluded.
 
@@ -332,7 +334,7 @@ requires all of the following:
 
 - Issue #16 closed with negative-test evidence;
 - explicit backfill dry run accepted;
-- consumers migrated and observed within the 1,024-event lag window and beyond;
+- consumers migrated and observed within the 2,000-event lag window and beyond;
 - replay, restart, rollback, and canon-isolation evidence green;
 - bounded API and deprecation telemetry green;
 - privileged package and recovery plan approved by Command.
