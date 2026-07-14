@@ -59,3 +59,12 @@ hypothesis, not a Command finding.
 ## Commander acknowledgment
 
 **COPY CONFIRMED. ENGINEERING SEALED. EXECUTION HOLD.**
+
+## Standing order
+
+Engineering is to remain sealed until the research effort is complete.
+
+Only listening, reasoning, hypothesis formation, evidence review, and durable
+records-only transcription are authorized during the seal. Building,
+integration, deployment, migration, compaction, and production changes remain
+on hold.
