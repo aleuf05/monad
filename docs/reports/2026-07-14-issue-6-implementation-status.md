@@ -96,14 +96,44 @@ covered by tests.
 - Assemble scratch-only migration, replay, restart, rollback, authorization,
   benchmark, and commissioning evidence.
 
+## Concurrent Codex accounting
+
+All discovered concurrent work is committed and present on a remote branch:
+
+- `fa8b06d` makes captain-memory reflection transactions atomic and adds
+  scratch fault-injection coverage for Issue #14.
+- `acc5b21` adds stable `event_seq`, consumer cursor migration, and immediate
+  bounded-tail behavior for Issue #6.
+- `12555ff` wires World Intake's missing FleetCore submission path for Issue
+  #13.
+- `cf4b200` adds seven tests against the shipped FleetCore Live cursor code.
+- `3363f01`, `28de9e5`, and `41e93cd` preserve the isolated durable-history,
+  bounded-API, and authentication slices on `codex/issue-17-slice-a`,
+  `codex/issue-18-slice-b`, and `codex/issue-16-slice-g-auth`.
+- `2ee94ab` preserves the hardened A+B integration, persistence authority,
+  migration write gate, bounded history scan, and cross-transport idempotency
+  on `codex/history-v2-integration`.
+
+The primary-branch `acc5b21` implementation and isolated `2ee94ab` integration
+overlap in FleetCore World, event, persistence, snapshot, and server contracts.
+They are alternate implementation lines and must not be stacked mechanically.
+In particular, `acc5b21` enables tail trimming before the approved durable
+history, explicit backfill marker, authentication gate, and commissioning
+evidence are integrated. It is accounted for and tested, but not authorized for
+deployment or destructive migration in its present form.
+
+Current primary-branch validation passes: all FleetCore tests, 32 captain-memory
+and runtime tests, 12 World Intake tests, and 7 real FleetCore Live cursor tests.
+
 ## Workspace and production posture
 
-All Issue #6 implementation work described above is isolated and uncommissioned.
-No production services, data, credentials, migration markers, or configuration
-were changed. No event tail was compacted.
+All Issue #6 implementation work remains uncommissioned. Some concurrent code
+is committed on the shared feature branch, but no production services, data,
+credentials, migration markers, or configuration were changed. No production
+event tail was compacted.
 
 The earlier shared-checkout collision has cleared and the primary repository is
-clean. Integration remains in isolated clones until review gates pass; no
-isolated implementation commit has been merged into the commissioned branch.
+clean and synchronized. The hardened integration remains isolated until its
+review gates and reconciliation with the concurrent cursor work pass.
 
 The commissioned V1 baseline remains authoritative.
