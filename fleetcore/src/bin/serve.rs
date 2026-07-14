@@ -19,6 +19,7 @@ use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use fleetcore::command::Command;
+use fleetcore::history_api::{history_v2_router, JsonlVesselEventHistoryStore};
 use fleetcore::persistence::{
     apply_authoritative, ensure_dirs, load_seed, load_world, restore_authoritative_world,
     save_checkpoint, save_world, write_snapshot, StorePaths,
@@ -176,6 +177,10 @@ async fn run() -> Result<(), String> {
     write_snapshot(&paths, &world, None)?;
 
     let (tx, _rx) = broadcast::channel::<String>(64);
+    let history_store = Arc::new(JsonlVesselEventHistoryStore::new(
+        paths.clone(),
+        world.world_id.clone(),
+    ));
     let state = AppState {
         world: Arc::new(Mutex::new(world)),
         paths: Arc::new(paths),
@@ -190,7 +195,8 @@ async fn run() -> Result<(), String> {
         .route("/health", get(get_health))
         .route("/command", post(post_command))
         .route("/ws", get(ws_handler))
-        .with_state(state.clone());
+        .with_state(state.clone())
+        .merge(history_v2_router(history_store));
 
     let listener = tokio::net::TcpListener::bind((bind_host, port))
         .await

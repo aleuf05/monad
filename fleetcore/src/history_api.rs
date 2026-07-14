@@ -4,6 +4,7 @@
 //! implement `VesselEventHistoryStore` without this API depending on its file
 //! layout, compaction strategy, or in-memory representation.
 
+use crate::persistence::{read_events, StorePaths};
 use crate::vessel::VesselEvent;
 use axum::extract::rejection::QueryRejection;
 use axum::extract::{Query, State};
@@ -16,6 +17,31 @@ use std::sync::Arc;
 
 pub const DEFAULT_PAGE_LIMIT: usize = 50;
 pub const MAX_PAGE_LIMIT: usize = 200;
+pub const DEFAULT_OPERATIONAL_TAIL_LIMIT: usize = 2_000;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct OperationalTailConfig {
+    pub limit: usize,
+}
+
+impl Default for OperationalTailConfig {
+    fn default() -> Self {
+        Self {
+            limit: DEFAULT_OPERATIONAL_TAIL_LIMIT,
+        }
+    }
+}
+
+impl OperationalTailConfig {
+    pub fn new(limit: usize) -> Result<Self, HistoryStoreError> {
+        if limit == 0 {
+            return Err(HistoryStoreError::InvalidRequest(
+                "operational vessel-event tail limit must be greater than zero".to_string(),
+            ));
+        }
+        Ok(Self { limit })
+    }
+}
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -116,6 +142,89 @@ pub trait VesselEventHistoryStore: Send + Sync + 'static {
     /// Return events in strictly increasing sequence order, after the exclusive
     /// cursor, with all supplied scopes applied and no more than `query.limit`.
     fn query(&self, query: &HistoryQuery) -> Result<HistoryPage, HistoryStoreError>;
+}
+
+/// Read-only view over Slice A's authoritative V2 command envelopes.
+pub struct JsonlVesselEventHistoryStore {
+    paths: StorePaths,
+    world_id: String,
+}
+
+impl JsonlVesselEventHistoryStore {
+    pub fn new(paths: StorePaths, world_id: String) -> Self {
+        Self { paths, world_id }
+    }
+}
+
+impl VesselEventHistoryStore for JsonlVesselEventHistoryStore {
+    fn query(&self, query: &HistoryQuery) -> Result<HistoryPage, HistoryStoreError> {
+        if query.mission_scope.is_some() {
+            return Err(HistoryStoreError::InvalidRequest(
+                "mission_scope attribution is unavailable in authoritative vessel-event history"
+                    .to_string(),
+            ));
+        }
+        if query
+            .world_id
+            .as_ref()
+            .is_some_and(|requested| requested != &self.world_id)
+        {
+            return Err(HistoryStoreError::InvalidRequest(format!(
+                "unknown world_id '{}'",
+                query.world_id.as_deref().unwrap_or_default()
+            )));
+        }
+        let records = read_events(&self.paths).map_err(HistoryStoreError::Unavailable)?;
+        let all = records
+            .into_iter()
+            .flat_map(|envelope| envelope.vessel_events)
+            .map(|record| SequencedVesselEvent {
+                sequence: record.sequence,
+                world_id: self.world_id.clone(),
+                mission_scope: None,
+                event: record.event,
+            })
+            .collect::<Vec<_>>();
+        if all
+            .windows(2)
+            .any(|pair| pair[0].sequence >= pair[1].sequence)
+        {
+            return Err(HistoryStoreError::Unavailable(
+                "authoritative vessel-event sequence is duplicate or unordered".to_string(),
+            ));
+        }
+        let oldest = all.first().map(|event| event.sequence);
+        let newest = all.last().map(|event| event.sequence);
+        if let (Some(cursor), Some(oldest), Some(newest)) = (query.after_sequence, oldest, newest) {
+            if cursor.saturating_add(1) < oldest {
+                return Err(HistoryStoreError::Gap {
+                    requested_after: cursor,
+                    oldest_available: oldest,
+                    newest_available: newest,
+                });
+            }
+        }
+        let matching = all
+            .into_iter()
+            .filter(|event| {
+                query
+                    .after_sequence
+                    .is_none_or(|cursor| event.sequence > cursor)
+                    && query
+                        .event_type
+                        .is_none_or(|kind| event.event_type() == kind)
+            })
+            .collect::<Vec<_>>();
+        let has_more = matching.len() > query.limit;
+        let events = matching.into_iter().take(query.limit).collect::<Vec<_>>();
+        let next_cursor = has_more.then(|| events.last().expect("non-empty limited page").sequence);
+        Ok(HistoryPage {
+            oldest_available_sequence: oldest,
+            newest_available_sequence: newest,
+            events,
+            next_cursor,
+        })
+    }
 }
 
 #[derive(Clone)]

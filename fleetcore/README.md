@@ -71,6 +71,9 @@ On startup the server loads `--state-dir`'s persisted world, or falls back to th
 Endpoints — full contract, payload shapes, and error responses are in `docs/architecture/fleetcore-api.md`:
 
 - `GET /snapshot` — current `WorldSnapshot` as JSON. No auth, CORS-open.
+- `GET /v2/vessel-events` — bounded, stable-sequence history read from the
+  authoritative V2 command envelopes. `mission_scope` is rejected explicitly
+  because FleetCore does not currently record that attribution.
 - `POST /command` — apply a `Command` (JSON body, same tagged shape the CLI commands map to). Requires `Authorization: Bearer <token>`.
 - `GET /ws` — WebSocket. Optional `?token=<token>` on the connect URL grants command authority for that connection. On connect the server sends `{"type":"connected","command_authority":true|false}` then the current `{"type":"snapshot","snapshot":{...}}`, then another `snapshot` message after every subsequent tick or applied command from any client. An authorized connection can send a raw `Command` JSON object to mutate the world; an unauthorized one gets `{"type":"error","message":"..."}` back instead.
 

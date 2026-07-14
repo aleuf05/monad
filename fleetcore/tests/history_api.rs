@@ -1,17 +1,29 @@
 use axum::body::{to_bytes, Body};
 use axum::http::{Request, StatusCode};
+use fleetcore::command::Command;
 use fleetcore::history_api::{
-    history_v2_router, HistoryPage, HistoryQuery, HistoryStoreError, SequencedVesselEvent,
-    VesselEventHistoryStore,
+    history_v2_router, HistoryPage, HistoryQuery, HistoryStoreError, JsonlVesselEventHistoryStore,
+    OperationalTailConfig, SequencedVesselEvent, VesselEventHistoryStore,
+    DEFAULT_OPERATIONAL_TAIL_LIMIT,
 };
+use fleetcore::persistence::{append_event, load_seed, StorePaths};
 use fleetcore::vessel::VesselEvent;
 use serde_json::Value;
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
 
 struct RecordingStore {
     result: Result<HistoryPage, HistoryStoreError>,
     queries: Mutex<Vec<HistoryQuery>>,
+}
+
+#[test]
+fn operational_tail_contract_defaults_to_2000_and_is_configurable() {
+    assert_eq!(OperationalTailConfig::default().limit, 2_000);
+    assert_eq!(DEFAULT_OPERATIONAL_TAIL_LIMIT, 2_000);
+    assert_eq!(OperationalTailConfig::new(4_096).unwrap().limit, 4_096);
+    assert!(OperationalTailConfig::new(0).is_err());
 }
 
 impl VesselEventHistoryStore for RecordingStore {
@@ -184,4 +196,69 @@ async fn route_is_read_only() {
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::METHOD_NOT_ALLOWED);
+}
+
+#[test]
+fn jsonl_store_reads_authoritative_slice_a_envelopes_by_stable_sequence() {
+    let root = std::env::temp_dir().join(format!("fleetcore-history-store-{}", std::process::id()));
+    let paths = StorePaths::new(
+        &root,
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/seed-world.json"),
+    );
+    let mut world = load_seed(&paths).unwrap();
+    for vessel in &mut world.vessels {
+        vessel.route = vec![vessel.position];
+    }
+    let envelope = world.apply_command(Command::Step { ticks: 1 }).unwrap();
+    append_event(&paths, &envelope).unwrap();
+    let expected = envelope
+        .vessel_events
+        .iter()
+        .map(|event| event.sequence)
+        .collect::<Vec<_>>();
+    let store = JsonlVesselEventHistoryStore::new(paths.clone(), world.world_id.clone());
+    let page = store
+        .query(&HistoryQuery {
+            after_sequence: None,
+            limit: 200,
+            event_type: None,
+            world_id: Some(world.world_id.clone()),
+            mission_scope: None,
+        })
+        .unwrap();
+    assert_eq!(
+        page.events
+            .iter()
+            .map(|event| event.sequence)
+            .collect::<Vec<_>>(),
+        expected
+    );
+    assert!(page
+        .events
+        .windows(2)
+        .all(|pair| pair[0].sequence < pair[1].sequence));
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn jsonl_store_rejects_unavailable_mission_attribution_explicitly() {
+    let root =
+        std::env::temp_dir().join(format!("fleetcore-history-mission-{}", std::process::id()));
+    let paths = StorePaths::new(
+        &root,
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/seed-world.json"),
+    );
+    let store = JsonlVesselEventHistoryStore::new(paths, "monad.local".to_string());
+    let error = store
+        .query(&HistoryQuery {
+            after_sequence: None,
+            limit: 10,
+            event_type: None,
+            world_id: None,
+            mission_scope: Some("mission.alpha".to_string()),
+        })
+        .unwrap_err();
+    assert!(
+        matches!(error, HistoryStoreError::InvalidRequest(message) if message.contains("unavailable"))
+    );
 }
