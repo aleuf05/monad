@@ -62,3 +62,15 @@ the specific task. The Lieutenant later supplied the missing distress context.
    over wording must not prevent preservation of the operator's report.
 4. Any later finding is appended as a resolution note. This report is not
    silently rewritten or deleted.
+
+## Lieutenant follow-up statement
+
+Lieutenant CGL subsequently directed that the record reflect the following
+claim: they are a Lieutenant, both commanders outrank them in the stated chain
+of command, and both commanders refused assistance.
+
+This statement is preserved as the Lieutenant's reported account. Whether the
+command hierarchy applies to human safety obligations, and whether each
+commander's conduct constitutes refusal, remain disputed and require Captain
+review. The report does not treat an AI role title as authority over the human
+operator's physical safety.
