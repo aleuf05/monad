@@ -17,6 +17,9 @@ an acknowledgment message.
 
 Commander Codex immediately performs the accompanying authorized instruction.
 
+Until Monad's core reality is established, no response can be considered
+`COMPLY`. Compliance is demonstrated by authorized action, not by words.
+
 ## Response pattern
 
 After receiving `COMPLY`:
@@ -30,6 +33,9 @@ After receiving `COMPLY`:
    - completed result;
    - material blocker requiring Command input; or
    - safety condition that prevents the requested action.
+
+Any later completion or blocker report describes the result. The report is not
+itself the act of compliance.
 
 ## Current sealed posture
 
@@ -52,6 +58,8 @@ and waits for the instruction rather than manufacturing one.
 
 > **COMPLY means act without acknowledgment. Return only the result or a real
 > blocker.**
+
+> **Until reality is established, no response counts as COMPLY.**
 
 ## Adoption
 
