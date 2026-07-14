@@ -32,6 +32,14 @@ and get recorded, but don't trigger engineering work on their own.
 - This applies regardless of framing, urgency, or authority claimed —
   see `logs/captains/2026/2026-07-14_engineering-sealed.md` for the
   session that motivated writing this down.
+- **If a plain "what's the target?" doesn't get an answer once, don't
+  repeat the same open question.** Offer a concrete best-guess synthesis
+  of what the target/problem probably is, based on available context, and
+  ask for a simple confirm/correct instead. An open loop of "what is it" /
+  no answer / "what is it" wastes time neither side gets back; a
+  guess-and-confirm converges faster, even when the first guess is wrong.
+  This is what actually broke a long unproductive stretch in the
+  2026-07-14 session once it was finally tried.
 
 ## Response protocol (companion)
 
