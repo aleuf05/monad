@@ -146,24 +146,18 @@ the real shared world no matter how correct the code is.
 
 ## Update on Finding 4
 
-A real, protocol-compliant commissioning package now exists at
-`/home/cgl/cmd.sh` (pinned to the current `HEAD`, with evidence capture and
-rollback data) that would restart `fleetcore-serve` on the current binary,
-install `world-intake.service`, and wire the Caddy route — this addresses
-Finding 4 once the Lieutenant actually runs it. As of this writing it will
-refuse to run because the working tree is dirty (see
-`docs/incidents/2026-07-14-world-intake-concurrent-session-collision.md`'s
-status update) — the tree needs to be clean first.
+A real, protocol-compliant commissioning package exists at
+`/home/cgl/cmd.sh`, with evidence capture and rollback data. It restarts
+`fleetcore-serve` on the current binary, installs `world-intake.service`, and
+wires the Caddy route. Finding 4 closes when the Lieutenant runs that package;
+the exact-HEAD and clean-tree guards prevent stale commissioning.
 
 ## Recommendation
 
-Not ready for "READY FOR LIVE INTAKE." Findings 1-2 are real, evidenced,
-fixable-in-minutes correctness/safety bugs in already-committed code and are
-still present as of this writing; Finding 3 needs a short design decision;
-Finding 4 has a real staged fix (above) but hasn't run yet. Whoever owns
-integration next should fix 1-2, make a call on 3, clean the tree so the
-staged commissioning package can run, and only then consider a live-intake
-claim.
+Findings 1–3 are resolved and regression-tested. Finding 4 is now purely the
+privileged activation gate. Current advice is **HOLD FOR COMMISSIONING**, not
+for additional feature correction: do not claim live intake until the pinned
+handoff completes and its public/API evidence passes.
 
 ## Integration resolution
 
