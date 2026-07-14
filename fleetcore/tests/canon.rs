@@ -1,6 +1,6 @@
 use fleetcore::canon::{
-    CanonAssignment, CanonChange, CanonClaim, CanonEntity, CanonEntityKind, CanonPermission,
-    CanonProvenance,
+    AuthorizationRecord, CanonAssignment, CanonChange, CanonClaim, CanonEntity, CanonEntityKind,
+    CanonPermission, CanonProvenance,
 };
 use fleetcore::command::Command;
 use fleetcore::persistence::{load_seed, load_world, save_world, StorePaths};
@@ -174,6 +174,26 @@ fn old_world_json_defaults_canon_state() {
     let (_, world) = world();
     assert!(world.canon_entities.is_empty());
     assert!(world.canon_events.is_empty());
+}
+
+#[test]
+fn pending_reactor_authorization_can_reference_the_existing_monad_vessel() {
+    let (_, mut world) = world();
+    apply(
+        &mut world,
+        "cmd.reactor-request",
+        CanonChange::RecordAuthorization {
+            authorization: AuthorizationRecord {
+                id: "authorization.reactor-start".into(),
+                subject_id: "vessel.monad".into(),
+                request: "reactor_start".into(),
+                status: "pending".into(),
+            },
+        },
+    );
+    assert_eq!(world.canon_authorizations.len(), 1);
+    assert_eq!(world.canon_authorizations[0].status, "pending");
+    assert!(world.watch_events.is_empty());
 }
 
 #[test]

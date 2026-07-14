@@ -20,10 +20,13 @@ class Acceptance(unittest.TestCase):
  def test_04_alias_possible_not_created(self):
   e=self.w.add_entity("agent","Claude",["Recruit Claude","Commander Claude"]); a=self.find("alias_reference")
   outcome,candidates=self.w.resolve(a["id"]); self.assertEqual((outcome,candidates),("matched",[e])); self.assertEqual(self.w.db.execute("select count(*) from entities").fetchone()[0],1)
+  with self.assertRaises(ValueError): self.w.compile(self.w.review(a["id"],"approve"))
+  _,payload=self.w.compile(self.w.review(a["id"],"link",edit={"entity_id":e})); self.assertEqual(payload["change"],{"change":"add-alias","entity_id":e,"alias":"Commander Claude"})
  def test_05_radiation_unverified(self): self.assertEqual(self.find("attach_capability","Ada")["value"]["verification"],"unverified")
  def test_06_scram_explicit(self): self.assertEqual(self.w.validate(self.find("request_permission","Vance")["id"])[0]["code"],"explicit_authority_required")
  def test_07_startup_is_request(self):
   a=self.find("authorization_request"); self.assertEqual(a["class"],"request"); self.assertEqual(a["value"]["status"],"pending"); self.assertFalse(any(x["class"]=="event" for x in self.ast))
+  _,payload=self.w.compile(self.w.review(a["id"],"approve")); self.assertEqual(payload["change"]["authorization"]["subject_id"],"vessel.monad"); self.assertEqual(payload["change"]["authorization"]["status"],"pending")
  def test_08_exclusive_conflict(self): self.assertEqual(self.w.validate(self.find("assign_role","Cyra")["id"])[0]["code"],"duplicate_exclusive_assignment")
  def test_09_approved_uses_submit_path(self):
   a=self.find("assign_role","Ada"); adj=self.w.review(a["id"],"approve"); cid,payload=self.w.compile(adj); calls=[]
