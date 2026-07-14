@@ -18,6 +18,10 @@ cameronlampley.com {
 		reverse_proxy 127.0.0.1:4772
 	}
 
+	handle_path /world-intake-api/* {
+		reverse_proxy 127.0.0.1:4773
+	}
+
 	handle {
 		root * /home/cgl/dev/monad/web
 		file_server

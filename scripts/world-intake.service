@@ -1,0 +1,18 @@
+[Unit]
+Description=Monad Living World Intake Captain review API
+After=network-online.target fleetcore-serve.service
+Wants=network-online.target
+Requires=fleetcore-serve.service
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+EnvironmentFile=/home/cgl/.config/monad/world-intake.env
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/world-intake/world_intake.py --db /home/cgl/dev/monad/data/world-intake.sqlite3 serve
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
