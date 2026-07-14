@@ -104,9 +104,8 @@ All Issue #6 implementation work described above is isolated and uncommissioned.
 No production services, data, credentials, migration markers, or configuration
 were changed. No event tail was compacted.
 
-The primary checkout currently contains uncommitted files owned by another
-engineering session. They are preserved and excluded from this work. Integration
-will not enter the primary checkout until ownership is reconciled or that
-session completes.
+The earlier shared-checkout collision has cleared and the primary repository is
+clean. Integration remains in isolated clones until review gates pass; no
+isolated implementation commit has been merged into the commissioned branch.
 
 The commissioned V1 baseline remains authoritative.
