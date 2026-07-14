@@ -35,9 +35,9 @@ GitHub: [Issue #6](https://github.com/aleuf05/monad/issues/6)
 
 Observed evidence:
 
-- More than 155,000 vessel events in the persisted world during the audit.
-- `world.json` approximately 28 MB and rewritten every simulation tick.
-- `data/fleetcore` approximately 3 GB across current state and retained
+- More than 160,000 vessel events in the persisted world during the latest audit.
+- `world.json` approximately 29 MB and rewritten every simulation tick.
+- `data/fleetcore` approximately 3.1 GB across current state and retained
   checkpoints.
 - The complete event array is also included in live snapshots and WebSocket
   broadcasts.
@@ -49,6 +49,15 @@ Recommended design: preserve complete append-only event history separately,
 while bounding the recent event tail embedded in current state, checkpoints,
 and live snapshots. Confirm consumer requirements before changing the wire
 contract. Do not fold this into the commissioning rollout.
+
+## Codex follow-up queue
+
+- [Issue #13: Verify Living World Intake after privileged commissioning](https://github.com/aleuf05/monad/issues/13)
+  is explicitly blocked on the Lieutenant-run handoff. It defines service,
+  authentication, idempotency, provenance, and safe live-command checks.
+- [Issue #14: Prove captain-memory reflection crash atomicity](https://github.com/aleuf05/monad/issues/14)
+  tracks the remaining scratch-only fault-injection evidence gap. It must never
+  run destructive tests against the production memory database.
 
 ## Commissioning gate
 
