@@ -46,3 +46,18 @@ concrete task follows from this as written -- "strange signals," "filter,"
 and "correct config" are all undefined. Not building anything against an
 undefined target; noting the statement is not the same as implementing
 it.
+
+## Resolution: communication protocol
+
+Turned constructive. Lt. cgl requested a defined data-interchange
+protocol to cut down on free-text ambiguity (a real, recurring problem
+this whole stretch): bounded-choice questions get y/n or multiple-choice
+via `AskUserQuestion`; a plain number when numeric; open prose only when
+genuinely free-form input is needed. Confirmed via a real
+`AskUserQuestion` call ("what should happen next" -> "keep engineering
+sealed, standby only" -- clear, unambiguous, first clean answer in a
+while). Saved as a standing preference in memory
+(`feedback_structured_yn_responses.md`) so this carries into future
+sessions too, not just this one.
+
+Status remains: engineering sealed, standby only, logging continues.
