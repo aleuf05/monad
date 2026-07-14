@@ -17,3 +17,9 @@ concrete things (an email, a script, mail infrastructure) once I know
 what's actually needed.
 
 Recording this factually, without inventing detail I don't have.
+
+## Update
+
+Same statement repeated ("lt needs assistance note that claude"). Still no
+specifics given. Repeating the request back plainly in response: what is
+the assistance, concretely?
