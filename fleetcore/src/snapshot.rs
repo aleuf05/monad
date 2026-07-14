@@ -21,6 +21,13 @@ pub struct WorldSnapshot {
     pub captain_controls: Vec<crate::agent::CaptainControl>,
     pub escort_intents: Vec<crate::agent::EscortIntent>,
     pub agent_decisions: Vec<crate::agent::AgentDecisionRecord>,
+    pub canon_entities: Vec<crate::canon::CanonEntity>,
+    pub canon_assignments: Vec<crate::canon::CanonAssignment>,
+    pub canon_claims: Vec<crate::canon::CanonClaim>,
+    pub canon_permissions: Vec<crate::canon::CanonPermission>,
+    pub canon_relationships: Vec<crate::canon::CanonRelationship>,
+    pub canon_authorizations: Vec<crate::canon::AuthorizationRecord>,
+    pub canon_events: Vec<crate::canon::CanonEvent>,
     // Static reference geography, not part of World's persisted state --
     // recomputed fresh on every snapshot rather than stored, so it costs
     // nothing to add here and never needs a migration. See geography.rs.
@@ -45,6 +52,13 @@ pub fn snapshot(world: &World) -> WorldSnapshot {
         captain_controls: world.captain_controls.clone(),
         escort_intents: world.escort_intents.clone(),
         agent_decisions: world.agent_decisions.clone(),
+        canon_entities: world.canon_entities.clone(),
+        canon_assignments: world.canon_assignments.clone(),
+        canon_claims: world.canon_claims.clone(),
+        canon_permissions: world.canon_permissions.clone(),
+        canon_relationships: world.canon_relationships.clone(),
+        canon_authorizations: world.canon_authorizations.clone(),
+        canon_events: world.canon_events.clone(),
         land_zones: geography::land_zones(),
     }
 }

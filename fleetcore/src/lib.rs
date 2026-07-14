@@ -1,4 +1,5 @@
 pub mod agent;
+pub mod canon;
 pub mod clock;
 pub mod command;
 pub mod event;

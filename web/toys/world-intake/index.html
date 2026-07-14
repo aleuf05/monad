@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monad World Intake Review</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <div><p class="eyebrow">Monad / Captain's Desk</p><h1>World Intake Review</h1></div>
+      <div class="status"><span id="linkDot"></span><strong id="linkStatus">Connecting</strong><small id="queueCount">0 pending</small></div>
+    </header>
+
+    <section class="doctrine" aria-label="Authority boundary">
+      <strong>Narrative proposes. FleetCore decides.</strong>
+      <span>Review decisions compile commands; this desk cannot write canon.</span>
+    </section>
+
+    <section class="toolbar">
+      <label>Status <select id="statusFilter"><option value="pending">Pending</option><option value="deferred">Deferred</option><option value="all">All</option></select></label>
+      <label>Captain review token <input id="reviewToken" type="password" autocomplete="off" placeholder="required to record decisions"></label>
+      <button id="refreshButton" type="button">Refresh queue</button>
+    </section>
+    <p id="feedback" class="feedback" role="status" hidden></p>
+    <section id="proposalList" class="proposal-list" aria-live="polite"><p class="empty">Loading proposals…</p></section>
+  </main>
+  <template id="proposalTemplate">
+    <article class="proposal">
+      <header><div><p class="proposal-id"></p><h2 class="subject"></h2></div><span class="class-tag"></span></header>
+      <div class="change"></div>
+      <blockquote class="excerpt"></blockquote>
+      <div class="metrics"><span>Confidence <strong class="confidence"></strong></span><span class="risk"></span></div>
+      <div class="columns">
+        <section><h3>Existing canon</h3><pre class="canon"></pre></section>
+        <section><h3>Conflicts</h3><ul class="conflicts"></ul></section>
+      </div>
+      <details><summary>Command &amp; provenance</summary><label>Proposed FleetCore command<textarea class="command" readonly></textarea></label><dl class="provenance"></dl></details>
+      <div class="edit-panel" hidden>
+        <label>Amended proposed value (JSON)<textarea class="amended-command"></textarea></label>
+        <label class="link-field" hidden>Existing entity ID<input class="entity-link" placeholder="crew.claude"></label>
+      </div>
+      <footer class="actions">
+        <button data-action="approve">Approve</button><button data-action="approve_with_edit">Approve with edit</button>
+        <button data-action="reject">Reject</button><button data-action="defer">Defer</button>
+        <button data-action="flavor_only">Flavor only</button><button data-action="mark_unverified">Mark unverified</button>
+        <button data-action="link_existing">Link to existing entity</button>
+      </footer>
+    </article>
+  </template>
+  <script src="app.js"></script>
+</body>
+</html>

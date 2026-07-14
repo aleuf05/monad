@@ -1,10 +1,16 @@
 use crate::agent::{CaptainRuntimeStatus, EscortPosture};
+use crate::canon::{CanonChange, CanonProvenance};
 use crate::vessel::{EscortMode, Position};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum Command {
+    ApplyCanonChange {
+        command_id: String,
+        change: CanonChange,
+        provenance: CanonProvenance,
+    },
     SetRoute {
         vessel_id: String,
         route: Vec<Position>,

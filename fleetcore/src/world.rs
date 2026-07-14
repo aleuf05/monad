@@ -2,6 +2,10 @@ use crate::agent::{
     default_captain, AgentDecisionRecord, CaptainControl, DecisionOutcome, EscortIntent,
     EscortPosture,
 };
+use crate::canon::{
+    AuthorizationRecord, CanonAssignment, CanonChange, CanonClaim, CanonEntity, CanonEvent,
+    CanonPermission, CanonProvenance, CanonRelationship,
+};
 use crate::clock::{ClockState, WorldClock};
 use crate::command::Command;
 use crate::event::Event;
@@ -27,6 +31,7 @@ const ESCORT_LOOSE_RADIUS_METERS: f64 = 1200.0;
 const ESCORT_TIGHT_RADIUS_METERS: f64 = 350.0;
 const ESCORT_PATROL_SWEEP_DEGREES: f64 = 40.0;
 const ESCORT_PATROL_SWEEP_RATE: f64 = 0.002;
+type AgentMovementPlan = (String, Position, Option<(String, String)>);
 
 fn escort_station(
     leader: &Vessel,
@@ -195,9 +200,273 @@ pub struct World {
     pub escort_intents: Vec<EscortIntent>,
     #[serde(default)]
     pub agent_decisions: Vec<AgentDecisionRecord>,
+    #[serde(default)]
+    pub canon_entities: Vec<CanonEntity>,
+    #[serde(default)]
+    pub canon_assignments: Vec<CanonAssignment>,
+    #[serde(default)]
+    pub canon_claims: Vec<CanonClaim>,
+    #[serde(default)]
+    pub canon_permissions: Vec<CanonPermission>,
+    #[serde(default)]
+    pub canon_relationships: Vec<CanonRelationship>,
+    #[serde(default)]
+    pub canon_authorizations: Vec<AuthorizationRecord>,
+    #[serde(default)]
+    pub canon_events: Vec<CanonEvent>,
 }
 
 impl World {
+    fn apply_canon_change(
+        &mut self,
+        command_id: &str,
+        change: &CanonChange,
+        provenance: &CanonProvenance,
+    ) -> Result<&'static str, String> {
+        fn required(label: &str, value: &str) -> Result<(), String> {
+            if value.trim().is_empty() || value.len() > 500 {
+                Err(format!("{label} must be non-empty and at most 500 bytes"))
+            } else {
+                Ok(())
+            }
+        }
+        required("command_id", command_id)?;
+        required("source_id", &provenance.source_id)?;
+        required("source_hash", &provenance.source_hash)?;
+        required("assertion_id", &provenance.assertion_id)?;
+        required("adjudication_id", &provenance.adjudication_id)?;
+        required("adjudicator", &provenance.adjudicator)?;
+        required("adjudicated_at", &provenance.adjudicated_at)?;
+        if self
+            .canon_events
+            .iter()
+            .any(|event| event.command_id == command_id)
+        {
+            return Ok("canon-command-duplicate");
+        }
+        let entity_exists = |id: &str| {
+            self.canon_entities
+                .iter()
+                .any(|entity| entity.id == id && entity.merged_into.is_none())
+        };
+        match change {
+            CanonChange::CreateEntity { entity } => {
+                required("entity id", &entity.id)?;
+                required("entity name", &entity.name)?;
+                if self
+                    .canon_entities
+                    .iter()
+                    .any(|current| current.id == entity.id)
+                {
+                    return Err(format!("canon entity '{}' already exists", entity.id));
+                }
+                let mut entity = entity.clone();
+                entity.aliases.sort();
+                entity.aliases.dedup();
+                self.canon_entities.push(entity);
+            }
+            CanonChange::AddAlias { entity_id, alias } => {
+                required("alias", alias)?;
+                let entity = self
+                    .canon_entities
+                    .iter_mut()
+                    .find(|e| e.id == *entity_id && e.merged_into.is_none())
+                    .ok_or_else(|| format!("unknown canon entity '{entity_id}'"))?;
+                if !entity
+                    .aliases
+                    .iter()
+                    .any(|current| current.eq_ignore_ascii_case(alias))
+                {
+                    entity.aliases.push(alias.trim().to_string());
+                    entity.aliases.sort();
+                }
+            }
+            CanonChange::Assign { assignment } => {
+                if !entity_exists(&assignment.subject_id) {
+                    return Err(format!(
+                        "unknown assignment subject '{}'",
+                        assignment.subject_id
+                    ));
+                }
+                required("assignment id", &assignment.id)?;
+                required("assignment type", &assignment.assignment_type)?;
+                required("assignment value", &assignment.value)?;
+                if self.canon_assignments.iter().any(|a| a.id == assignment.id) {
+                    return Err(format!("assignment '{}' already exists", assignment.id));
+                }
+                let mut assignment = assignment.clone();
+                assignment.active = true;
+                self.canon_assignments.push(assignment);
+            }
+            CanonChange::SetOnboardingStatus { entity_id, status } => {
+                required("onboarding status", status)?;
+                self.canon_entities
+                    .iter_mut()
+                    .find(|e| e.id == *entity_id && e.merged_into.is_none())
+                    .ok_or_else(|| format!("unknown canon entity '{entity_id}'"))?
+                    .onboarding_status = Some(status.clone());
+            }
+            CanonChange::AttachCapability { claim } => {
+                if !entity_exists(&claim.subject_id) {
+                    return Err(format!("unknown capability subject '{}'", claim.subject_id));
+                }
+                if claim.verified {
+                    return Err("capabilities must enter canon unverified; verification requires a later adjudicated change".to_string());
+                }
+                required("claim id", &claim.id)?;
+                required("capability", &claim.capability)?;
+                if self.canon_claims.iter().any(|c| c.id == claim.id) {
+                    return Err(format!("claim '{}' already exists", claim.id));
+                }
+                let mut claim = claim.clone();
+                claim.active = true;
+                self.canon_claims.push(claim);
+            }
+            CanonChange::CreateRelationship { relationship } => {
+                if !entity_exists(&relationship.subject_id)
+                    || !entity_exists(&relationship.object_id)
+                {
+                    return Err(
+                        "relationship endpoints must be existing canon entities".to_string()
+                    );
+                }
+                required("relationship id", &relationship.id)?;
+                required("relationship", &relationship.relationship)?;
+                if self
+                    .canon_relationships
+                    .iter()
+                    .any(|r| r.id == relationship.id)
+                {
+                    return Err(format!("relationship '{}' already exists", relationship.id));
+                }
+                let mut relationship = relationship.clone();
+                relationship.active = true;
+                self.canon_relationships.push(relationship);
+            }
+            CanonChange::RecordAuthorization { authorization } => {
+                if !entity_exists(&authorization.subject_id) {
+                    return Err(format!(
+                        "unknown authorization subject '{}'",
+                        authorization.subject_id
+                    ));
+                }
+                required("authorization id", &authorization.id)?;
+                required("authorization request", &authorization.request)?;
+                if !matches!(
+                    authorization.status.as_str(),
+                    "pending" | "approved" | "denied"
+                ) {
+                    return Err(
+                        "authorization status must be pending, approved, or denied".to_string()
+                    );
+                }
+                if self
+                    .canon_authorizations
+                    .iter()
+                    .any(|a| a.id == authorization.id)
+                {
+                    return Err(format!(
+                        "authorization '{}' already exists",
+                        authorization.id
+                    ));
+                }
+                self.canon_authorizations.push(authorization.clone());
+            }
+            CanonChange::GrantPermission { permission } => {
+                if !entity_exists(&permission.subject_id) {
+                    return Err(format!(
+                        "unknown permission subject '{}'",
+                        permission.subject_id
+                    ));
+                }
+                required("permission id", &permission.id)?;
+                required("permission", &permission.permission)?;
+                required("permission approver", &permission.approved_by)?;
+                if permission.approved_by != provenance.adjudicator {
+                    return Err(
+                        "permission approver must match the recorded adjudicator".to_string()
+                    );
+                }
+                if self.canon_permissions.iter().any(|p| p.id == permission.id) {
+                    return Err(format!("permission '{}' already exists", permission.id));
+                }
+                let mut permission = permission.clone();
+                permission.active = true;
+                self.canon_permissions.push(permission);
+            }
+            CanonChange::RevokeAssignment { assignment_id } => {
+                self.canon_assignments
+                    .iter_mut()
+                    .find(|a| a.id == *assignment_id && a.active)
+                    .ok_or_else(|| format!("unknown active assignment '{assignment_id}'"))?
+                    .active = false
+            }
+            CanonChange::RemovePermission { permission_id } => {
+                self.canon_permissions
+                    .iter_mut()
+                    .find(|p| p.id == *permission_id && p.active)
+                    .ok_or_else(|| format!("unknown active permission '{permission_id}'"))?
+                    .active = false
+            }
+            CanonChange::MergeEntity {
+                entity_id,
+                into_entity_id,
+            } => {
+                if entity_id == into_entity_id || !entity_exists(into_entity_id) {
+                    return Err("entity merge requires two distinct existing entities".to_string());
+                }
+                self.canon_entities
+                    .iter_mut()
+                    .find(|e| e.id == *entity_id && e.merged_into.is_none())
+                    .ok_or_else(|| format!("unknown canon entity '{entity_id}'"))?
+                    .merged_into = Some(into_entity_id.clone());
+            }
+            CanonChange::CorrectLocation {
+                assignment_id,
+                location,
+            } => {
+                required("corrected location", location)?;
+                let prior = self
+                    .canon_assignments
+                    .iter_mut()
+                    .find(|a| a.id == *assignment_id && a.active && a.assignment_type == "station")
+                    .ok_or_else(|| {
+                        format!("unknown active station assignment '{assignment_id}'")
+                    })?;
+                prior.active = false;
+                let mut corrected = prior.clone();
+                corrected.id = format!("{assignment_id}.correction.{}", self.event_sequence + 1);
+                corrected.value = location.clone();
+                corrected.active = true;
+                self.canon_assignments.push(corrected);
+            }
+            CanonChange::DowngradeClaim { claim_id } => {
+                self.canon_claims
+                    .iter_mut()
+                    .find(|c| c.id == *claim_id && c.active)
+                    .ok_or_else(|| format!("unknown active claim '{claim_id}'"))?
+                    .verified = false
+            }
+            CanonChange::SupersedeEvent { event_id } => {
+                self.canon_events
+                    .iter_mut()
+                    .find(|e| e.id == *event_id && !e.superseded)
+                    .ok_or_else(|| format!("unknown active canon event '{event_id}'"))?
+                    .superseded = true
+            }
+        }
+        self.canon_entities.sort_by(|a, b| a.id.cmp(&b.id));
+        self.canon_events.push(CanonEvent {
+            id: format!("canon-event-{:08}", self.event_sequence + 1),
+            command_id: command_id.to_string(),
+            fleet_event_sequence: self.event_sequence + 1,
+            change: change.clone(),
+            provenance: provenance.clone(),
+            superseded: false,
+        });
+        Ok("canon-change-applied")
+    }
+
     pub fn normalize(&mut self) {
         for vessel in &mut self.vessels {
             vessel.normalize();
@@ -226,6 +495,9 @@ impl World {
 
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
         let event_type = match &command {
+            Command::ApplyCanonChange { command_id, change, provenance } => {
+                self.apply_canon_change(command_id, change, provenance)?
+            }
             Command::SetRoute { vessel_id, route } => {
                 // find_map (not find + a second zone_containing call) so
                 // there's no separate .expect() that would panic -- and
@@ -701,7 +973,7 @@ impl World {
                 .map(|vessel| vessel.id.clone())
                 .collect();
             let slot_count = scout_ids.len();
-            let mut plans: Vec<(String, Position, Option<(String, String)>)> = Vec::new();
+            let mut plans: Vec<AgentMovementPlan> = Vec::new();
             for (index, id) in scout_ids.iter().enumerate() {
                 let scout = match self.vessels.iter().find(|vessel| vessel.id == *id) {
                     Some(scout) => scout,

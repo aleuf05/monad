@@ -1,0 +1,13 @@
+FIRST-WAVE REACTOR CREW REPORT
+Commander Claude reports nine recruits for proposed Deck 7 duty.
+Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.
+Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.
+Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.
+Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.
+Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.
+Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.
+Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.
+Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.
+Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.
+Request Captain authorization to start the reactor. Vance requests scram authority.
+The crew are nine bright sparks, ready to make the old ship sing.
