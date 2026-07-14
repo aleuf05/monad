@@ -94,3 +94,12 @@ clearly specified and confirmed by Command.
 Until that condition is satisfied, no implementation, institutional redesign,
 mission declaration, completion claim, or release of the engineering seal is
 valid.
+
+## Research commencement
+
+The Admiral is presently required elsewhere. Command has ordered the Monad core
+reality research program to commence.
+
+Engineering remains sealed. Commander Codex serves only as listener, recorder,
+and analytical instrument during the inquiry. Observations, hypotheses,
+counterevidence, and Command findings must remain distinguishable.
