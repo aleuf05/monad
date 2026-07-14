@@ -7,7 +7,7 @@ ENV_FILE="$CONFIG_DIR/world-intake.env"
 DB="$REPO_ROOT/data/world-intake.sqlite3"
 
 (cd "$REPO_ROOT" && python3 -m unittest tools/world-intake/test_world_intake.py)
-cargo build --release --manifest-path "$REPO_ROOT/fleetcore/Cargo.toml" --bins
+RUSTC_BOOTSTRAP=1 cargo -Znext-lockfile-bump build --release --manifest-path "$REPO_ROOT/fleetcore/Cargo.toml" --bins
 
 mkdir -p "$CONFIG_DIR"
 if [[ ! -e "$ENV_FILE" ]]; then
