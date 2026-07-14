@@ -1,0 +1,68 @@
+{
+  "mission_id": "quacken-transit-002",
+  "phase": "STRAIT_TRANSIT",
+  "phase_entered_at": 1783957256.9738579,
+  "stalled_from_phase": null,
+  "processed_vessel_event_count": 17907,
+  "rendezvous_dwell_started_at": null,
+  "evidence": [
+    {
+      "kind": "command",
+      "detail": "spawned QUACKEN at {'lat': 24.8, 'lng': 58.6}",
+      "phase": "MISSION_INITIALIZED",
+      "at": 1783953930.0472531,
+      "tick": 17467,
+      "sim_time": "2026-07-11T00:51:07Z"
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "MISSION_INITIALIZED -> TRANSIT_UNDERWAY: mission start (operator action)",
+      "phase": "MISSION_INITIALIZED",
+      "at": 1783953930.1191137,
+      "tick": 17467,
+      "sim_time": "2026-07-11T00:51:07Z"
+    },
+    {
+      "kind": "capture_requested",
+      "detail": "mission_start: quacken-transit-002: mission start, QUACKEN on station at {'lat': 24.8, 'lng': 58.6}.",
+      "phase": "TRANSIT_UNDERWAY",
+      "at": 1783953930.119142
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "TRANSIT_UNDERWAY -> STRAIT_TRANSIT: waypoint_reached (leg 7 remaining)",
+      "phase": "TRANSIT_UNDERWAY",
+      "at": 1783957256.973851,
+      "tick": 20794,
+      "sim_time": "2026-07-11T01:46:34Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 7 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783957256.9738693,
+      "tick": 20794,
+      "sim_time": "2026-07-11T01:46:34Z"
+    }
+  ],
+  "captures": [
+    {
+      "id": 1,
+      "event": "mission_start",
+      "recommended_view": "fleetcore-live",
+      "caption": "quacken-transit-002: mission start, QUACKEN on station at {'lat': 24.8, 'lng': 58.6}.",
+      "requested_at": 1783953930.1191382,
+      "phase": "TRANSIT_UNDERWAY",
+      "attachment": null
+    }
+  ],
+  "next_capture_id": 2,
+  "outcome": null,
+  "created_at": 1783953929.9224713,
+  "updated_at": 1783957256.9738827,
+  "last_vessel_position": {
+    "lat": 26.370390041338663,
+    "lng": 55.898611279870984
+  },
+  "last_progress_at": 1783957256.9738789
+}

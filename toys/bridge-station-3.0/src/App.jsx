@@ -35,11 +35,20 @@ const { bearingDegrees, distanceKm, normalizeDegrees } = window.MonadFleetState.
 // everywhere).
 function serverUrl() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("server") || "wss://cameronlampley.com/monad/fleetcore-ws/ws";
+  return params.get("server") || "wss://cameronlampley.com/fleetcore-ws/ws";
 }
 
 function norm360(deg) {
   return ((deg % 360) + 360) % 360;
+}
+
+// fleetcore-serve's speed_mps is the vessel's rated/commanded speed, not its
+// instantaneous velocity -- it's never reset to 0 on arrival (there's no
+// set-speed Command). A vessel only actually has way on while "underway" or
+// "transiting"; "arrived", "holding", and "paused" mean it's stationary
+// regardless of what speed_mps says.
+function actualSpeedMps(vessel) {
+  return vessel.status === "underway" || vessel.status === "transiting" ? vessel.speed_mps : 0;
 }
 
 function shortestDelta(from, to) {
@@ -414,7 +423,7 @@ export default function BridgeStation() {
               <div className="bs-display" style={styles.actionName}>{selected.callsign}</div>
               <div className="bs-mono" style={styles.actionStats}>
                 {flagship && selected.id === flagship.id ? (
-                  <>COURSE {String(Math.round(selected.course)).padStart(3, "0")}° · SPEED {(selected.speed_mps * 1.94384).toFixed(1)} KT</>
+                  <>COURSE {String(Math.round(selected.course)).padStart(3, "0")}° · SPEED {(actualSpeedMps(selected) * 1.94384).toFixed(1)} KT</>
                 ) : (
                   <>RANGE {targetRange.toFixed(1)} NM · BEARING {String(Math.round(targetBearing)).padStart(3, "0")}°</>
                 )}

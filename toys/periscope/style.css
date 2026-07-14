@@ -142,6 +142,30 @@ h2 {
   color: var(--amber);
 }
 
+.optics-upgrade {
+  padding: 6px 10px;
+  border: 1px solid rgba(216, 180, 106, 0.5);
+  background: linear-gradient(135deg, rgba(216, 180, 106, 0.13), rgba(138, 215, 193, 0.08));
+  box-shadow: 0 0 18px rgba(216, 180, 106, 0.1);
+}
+
+.optics-upgrade em {
+  display: inline-block;
+  margin-left: 5px;
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: var(--amber);
+  color: #151108;
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  vertical-align: 1px;
+}
+
+.optics-upgrade strong {
+  color: var(--amber);
+}
+
 .magnification-control {
   display: grid;
   grid-template-columns: repeat(3, minmax(48px, 1fr));
@@ -210,6 +234,15 @@ h2 {
   height: 100%;
   display: block;
   border-radius: 50%;
+}
+
+#periscopeOverlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
 .glass-sheen {

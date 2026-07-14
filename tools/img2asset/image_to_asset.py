@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """Image -> 3D asset pipeline for Monad. Contracts-only: this tool never
 touches FleetCore or World state, it only reads a source image and
-writes a .glb file plus a manifest entry under web/assets/models/ (and
-mirrors both into web-lan/assets/models/, same manual-sync pattern
-toys/<name>/ already uses -- both dirs are live-served directly, no
-deploy step, see docs/deployment.md).
+writes a .glb file plus a manifest entry under web/assets/models/ --
+live-served directly, no deploy step, see docs/deployment.md.
 
 Usage:
     image_to_asset.py <input.png> --output <name>.glb [--backend hf_spaces|replicate]
@@ -30,7 +28,6 @@ from PIL import Image
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ASSETS_DIR = os.path.join(REPO_ROOT, "web", "assets", "models")
-LAN_ASSETS_DIR = os.path.join(REPO_ROOT, "web-lan", "assets", "models")
 MANIFEST_PATH = os.path.join(ASSETS_DIR, "manifest.json")
 
 VALID_INPUT_FORMATS = {"PNG", "JPEG", "WEBP"}
@@ -133,12 +130,6 @@ def write_manifest_entry(output_name: str, source_image: str, backend: str, glb_
         f.write("\n")
 
 
-def mirror_to_lan(glb_filename: str) -> None:
-    os.makedirs(LAN_ASSETS_DIR, exist_ok=True)
-    shutil.copy(os.path.join(ASSETS_DIR, glb_filename), os.path.join(LAN_ASSETS_DIR, glb_filename))
-    shutil.copy(MANIFEST_PATH, os.path.join(LAN_ASSETS_DIR, "manifest.json"))
-
-
 def run_pipeline(input_path: str, output_name: str, backend: str = "hf_spaces", source_image: str = None, log=print) -> dict:
     """Shared core of the CLI and serve.py's HTTP trigger -- both just
     wrap this and handle args/response differently. Runs validate ->
@@ -162,8 +153,7 @@ def run_pipeline(input_path: str, output_name: str, backend: str = "hf_spaces", 
         shutil.copy(input_path, final_path)
         log(f"[2/2] writing manifest entry for {output_name}")
         write_manifest_entry(output_name, source_image or os.path.relpath(input_path, REPO_ROOT), backend, final_path)
-        mirror_to_lan(output_name)
-        log(f"done: {os.path.relpath(final_path, REPO_ROOT)} (mirrored to web-lan/)")
+        log(f"done: {os.path.relpath(final_path, REPO_ROOT)}")
         with open(MANIFEST_PATH) as f:
             manifest = json.load(f)
         return next(m for m in manifest["models"] if m["name"] == output_name)
@@ -184,9 +174,8 @@ def run_pipeline(input_path: str, output_name: str, backend: str = "hf_spaces", 
 
     log(f"[4/4] writing manifest entry for {output_name}")
     write_manifest_entry(output_name, os.path.relpath(input_path, REPO_ROOT), backend, final_path)
-    mirror_to_lan(output_name)
 
-    log(f"done: {os.path.relpath(final_path, REPO_ROOT)} (mirrored to web-lan/)")
+    log(f"done: {os.path.relpath(final_path, REPO_ROOT)}")
     with open(MANIFEST_PATH) as f:
         manifest = json.load(f)
     return next(m for m in manifest["models"] if m["name"] == output_name)

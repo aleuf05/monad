@@ -7,14 +7,19 @@ Type=simple
 User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
-# --bind-all: LAN clients (web-lan/'s toys, e.g. Bridge Station 2.0) reach
-# this directly at 192.168.0.100:4771, not just loopback -- see the Bridge
-# Station 2.0 bind-decision note in docs/deployment.md.
+# --bind-all: originally so LAN clients (web-lan/'s toys, e.g. Bridge
+# Station 2.0) could reach this directly at 192.168.0.100:4771, not just
+# loopback. web-lan/ was retired 2026-07-13 (see docs/deployment.md) and
+# Bridge Station 2.0 no longer exists, so that original justification is
+# gone -- the public path only needs loopback (Caddy's reverse_proxy runs
+# on this same box). Left as --bind-all for now since nothing has asked
+# to tighten it; revisit if reducing the raw LAN-reachable attack surface
+# ever matters more than convenience.
 # No --command-token: as of 2026-07-12 the server grants command authority
 # to every connection unconditionally, on both /command and /ws, no token
 # required (fleetcore/src/bin/serve.rs). This is a fully open write
 # endpoint everywhere the process is reachable -- LAN, and publicly
-# through the /monad/fleetcore-ws/ Caddy reverse proxy. Deliberate,
+# through the /fleetcore-ws/ Caddy reverse proxy. Deliberate,
 # explicit user request; see docs/deployment.md for the decision record.
 ExecStart=/home/cgl/dev/monad/fleetcore/target/release/serve --port 4771 --bind-all
 Restart=on-failure

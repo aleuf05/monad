@@ -1,0 +1,21 @@
+cameronlampley.com {
+	encode zstd gzip
+
+	handle_path /monad/portainer/* {
+		reverse_proxy https://localhost:9443 {
+			transport http {
+				tls_insecure_skip_verify
+			}
+			header_up Host {upstream_hostport}
+		}
+	}
+
+	handle_path /fleetcore-ws/* {
+		reverse_proxy 127.0.0.1:4771
+	}
+
+	handle {
+		root * /home/cgl/dev/monad/web
+		file_server
+	}
+}

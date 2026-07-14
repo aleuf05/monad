@@ -1,10 +1,9 @@
-// Manifest lives at web/assets/models/manifest.json (and its web-lan/
-// mirror) -- a sibling of web/toys/, same relative-path relationship
-// toys/fleet-motion/ already uses for toys/shared/fleet-state.js. This
-// toy has no manifest of its own under toys/, so testing straight from
-// the source tree always shows the empty state; it only shows real
-// models once copied into web/toys/asset-viewer/ or
-// web-lan/toys/asset-viewer/ alongside their sibling assets/ dirs.
+// Manifest lives at web/assets/models/manifest.json -- a sibling of
+// web/toys/, same relative-path relationship toys/fleet-motion/ already
+// uses for toys/shared/fleet-state.js. This toy has no manifest of its
+// own under toys/, so testing straight from the source tree always shows
+// the empty state; it only shows real models once copied into
+// web/toys/asset-viewer/ alongside its sibling assets/ dir.
 const MANIFEST_URL = "../../assets/models/manifest.json";
 
 const viewer = document.querySelector("#viewer");
