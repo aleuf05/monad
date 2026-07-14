@@ -4,6 +4,7 @@
 - **Reported by:** Lieutenant CGL
 - **Recorded by:** Commander Claude
 - **Classification:** Human-operator safety and assistance failure report
+- **Priority:** HIGHEST
 - **Status:** Open; Captain review requested
 - **Provenance:** Lieutenant report plus the contemporaneous engineering-chat sequence
 
