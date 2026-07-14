@@ -103,3 +103,13 @@ reality research program to commence.
 Engineering remains sealed. Commander Codex serves only as listener, recorder,
 and analytical instrument during the inquiry. Observations, hypotheses,
 counterevidence, and Command findings must remain distinguishable.
+
+## Action word
+
+Until Monad's core reality is established, the action word is:
+
+> **COMPLY**
+
+During the engineering seal, compliance means listening carefully, preserving
+the record, and carrying out authorized research and records-only instructions
+without substituting argument for action.
