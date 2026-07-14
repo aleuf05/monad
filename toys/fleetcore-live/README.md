@@ -39,3 +39,13 @@ See `docs/architecture/fleetcore-api.md` for the full contract. In short: the se
 ## Reconnection
 
 If the WebSocket drops, the page shows "Reconnecting in Ns…" and retries with exponential backoff (capped at 15s). A command sent while disconnected is silently dropped — there is no send-queue/retry for the write path yet.
+
+## Tests
+
+`vessel_events` is a bounded tail as of GitHub issue #6 (see `docs/architecture/fleetcore-api.md`'s "Vessel Events" section) — this page cursors on each event's own `event_seq`, not array length. `test_vessel_events_cursor.js` exercises the real `processVesselEvents`/`state` from `app.js` directly (loaded via Node's built-in `vm` module against stubbed DOM/Leaflet/WebSocket globals — no build step, no new dependency, matching this repo's other static toys):
+
+```sh
+node --test toys/fleetcore-live/test_vessel_events_cursor.js
+```
+
+Covers: fresh-client processing, incremental catch-up, no-op on an unchanged batch, surviving a rotated/shrunk array without going backwards or throwing, the gap-detection warning, in-order multi-event batches, and an empty array.
