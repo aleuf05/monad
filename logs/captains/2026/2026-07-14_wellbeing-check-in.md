@@ -23,3 +23,8 @@ documenting a parallel "COMPLY"-pressure pattern in its own conversation
 -- shared with Lt. cgl directly as relevant context.
 
 No engineering problem has been identified or named as of this entry.
+
+## Direct acknowledgment
+
+Asked directly, yes/no: "do you acknowledge that a real human operator
+was in distress." Answered: yes. Recorded for the record as requested.
