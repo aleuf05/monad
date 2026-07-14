@@ -20,8 +20,8 @@ use axum::routing::{get, post};
 use axum::{Json, Router};
 use fleetcore::command::Command;
 use fleetcore::persistence::{
-    append_event, ensure_dirs, load_seed, load_world, save_checkpoint, save_world, write_snapshot,
-    StorePaths,
+    apply_authoritative, ensure_dirs, load_seed, load_world, restore_authoritative_world,
+    save_checkpoint, save_world, write_snapshot, StorePaths,
 };
 use fleetcore::snapshot::{snapshot, WorldSnapshot};
 use fleetcore::world::World;
@@ -50,6 +50,23 @@ struct AppState {
     world: Arc<Mutex<World>>,
     paths: Arc<StorePaths>,
     tx: broadcast::Sender<String>,
+    runtime: Arc<Mutex<RuntimeHealth>>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "kebab-case")]
+enum RuntimeMode {
+    Authoritative,
+    ReadOnlyDegraded,
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct RuntimeHealth {
+    mode: RuntimeMode,
+    cause: Option<String>,
+    last_durable_command_sequence: u64,
+    last_durable_vessel_event_sequence: u64,
+    recovery_action: String,
 }
 
 impl AppState {
@@ -108,13 +125,52 @@ async fn run() -> Result<(), String> {
 
     let paths = StorePaths::new(state_dir, seed_path);
     ensure_dirs(&paths)?;
-    let world = match load_world(&paths) {
-        Ok(world) => world,
+    let (world, runtime) = match load_world(&paths) {
+        Ok(readable) => match restore_authoritative_world(&paths) {
+            Ok(world) => {
+                let last_vessel = world.vessel_event_next_sequence.saturating_sub(1);
+                let last_command = world.event_sequence;
+                (
+                    world,
+                    RuntimeHealth {
+                        mode: RuntimeMode::Authoritative,
+                        cause: None,
+                        last_durable_command_sequence: last_command,
+                        last_durable_vessel_event_sequence: last_vessel,
+                        recovery_action: "none".to_string(),
+                    },
+                )
+            }
+            Err(error) => {
+                let last_vessel = readable.vessel_event_next_sequence.saturating_sub(1);
+                let last_command = readable.event_sequence;
+                (
+                    readable,
+                    RuntimeHealth {
+                        mode: RuntimeMode::ReadOnlyDegraded,
+                        cause: Some(error),
+                        last_durable_command_sequence: last_command,
+                        last_durable_vessel_event_sequence: last_vessel,
+                        recovery_action: "reconcile world.json with events.jsonl and restart"
+                            .to_string(),
+                    },
+                )
+            }
+        },
         Err(_) => {
             let seed = load_seed(&paths)?;
             save_world(&paths, &seed)?;
             save_checkpoint(&paths, &seed)?;
-            seed
+            (
+                seed,
+                RuntimeHealth {
+                    mode: RuntimeMode::Authoritative,
+                    cause: None,
+                    last_durable_command_sequence: 0,
+                    last_durable_vessel_event_sequence: 0,
+                    recovery_action: "none".to_string(),
+                },
+            )
         }
     };
     write_snapshot(&paths, &world, None)?;
@@ -124,12 +180,14 @@ async fn run() -> Result<(), String> {
         world: Arc::new(Mutex::new(world)),
         paths: Arc::new(paths),
         tx,
+        runtime: Arc::new(Mutex::new(runtime)),
     };
 
     spawn_tick_loop(state.clone(), tick_ms);
 
     let app = Router::new()
         .route("/snapshot", get(get_snapshot))
+        .route("/health", get(get_health))
         .route("/command", post(post_command))
         .route("/ws", get(ws_handler))
         .with_state(state.clone());
@@ -161,17 +219,18 @@ fn spawn_tick_loop(state: AppState, tick_ms: u64) {
         loop {
             interval.tick().await;
             let mut world = state.world.lock().await;
+            if matches!(
+                state.runtime.lock().await.mode,
+                RuntimeMode::ReadOnlyDegraded
+            ) {
+                continue;
+            }
             if !world.clock.is_running() {
                 continue;
             }
-            match world.apply_command(Command::Step { ticks: 1 }) {
+            match apply_authoritative(&state.paths, &mut world, Command::Step { ticks: 1 }) {
                 Ok(event) => {
-                    if let Err(err) = append_event(&state.paths, &event) {
-                        eprintln!("fleetcore-serve: failed to append tick event: {err}");
-                    }
-                    if let Err(err) = save_world(&state.paths, &world) {
-                        eprintln!("fleetcore-serve: failed to save world: {err}");
-                    }
+                    update_durable_health(&state, &event).await;
                     ticks_since_checkpoint += 1;
                     if ticks_since_checkpoint >= CHECKPOINT_EVERY_TICKS {
                         ticks_since_checkpoint = 0;
@@ -180,10 +239,19 @@ fn spawn_tick_loop(state: AppState, tick_ms: u64) {
                     }
                     broadcast_snapshot(&state, &world);
                 }
-                Err(err) => eprintln!("fleetcore-serve: tick failed: {err}"),
+                Err(err) => {
+                    if err.starts_with("authoritative persistence failure:") {
+                        enter_degraded(&state, err.clone()).await;
+                    }
+                    eprintln!("fleetcore-serve: tick failed: {err}")
+                }
             }
         }
     });
+}
+
+async fn get_health(State(state): State<AppState>) -> impl IntoResponse {
+    Json(state.runtime.lock().await.clone())
 }
 
 async fn get_snapshot(State(state): State<AppState>) -> impl IntoResponse {
@@ -337,19 +405,46 @@ async fn handle_client_message(
 /// Shared apply/persist/broadcast path for both the WebSocket and HTTP write
 /// transports, so the two can't drift in what "applying a command" means.
 async fn apply_and_broadcast(state: &AppState, command: Command) -> Result<WorldSnapshot, String> {
+    if matches!(
+        state.runtime.lock().await.mode,
+        RuntimeMode::ReadOnlyDegraded
+    ) {
+        return Err(
+            "FleetCore is read-only degraded; reconcile authoritative persistence and restart"
+                .to_string(),
+        );
+    }
     let mut world = state.world.lock().await;
-    let event = world.apply_command(command)?;
-    if let Err(err) = append_event(&state.paths, &event) {
-        eprintln!("fleetcore-serve: failed to append event: {err}");
-    }
-    if let Err(err) = save_world(&state.paths, &world) {
-        eprintln!("fleetcore-serve: failed to save world: {err}");
-    }
+    let event = match apply_authoritative(&state.paths, &mut world, command) {
+        Ok(event) => event,
+        Err(error) => {
+            if error.starts_with("authoritative persistence failure:") {
+                enter_degraded(state, error.clone()).await;
+            }
+            return Err(error);
+        }
+    };
+    update_durable_health(state, &event).await;
     let snap = snapshot(&world);
     if let Ok(json) = serde_json::to_string(&ServerMessage::Snapshot { snapshot: &snap }) {
         let _ = state.tx.send(json);
     }
     Ok(snap)
+}
+
+async fn update_durable_health(state: &AppState, event: &fleetcore::event::Event) {
+    let mut health = state.runtime.lock().await;
+    health.last_durable_command_sequence = event.sequence;
+    if let Some(last) = event.vessel_events.last() {
+        health.last_durable_vessel_event_sequence = last.sequence;
+    }
+}
+
+async fn enter_degraded(state: &AppState, cause: String) {
+    let mut health = state.runtime.lock().await;
+    health.mode = RuntimeMode::ReadOnlyDegraded;
+    health.cause = Some(cause);
+    health.recovery_action = "reconcile world.json with events.jsonl and restart".to_string();
 }
 
 fn send_error(reply: &mpsc::UnboundedSender<String>, message: String) {
@@ -384,5 +479,59 @@ fn take_flag(args: &mut Vec<String>, name: &str) -> bool {
         true
     } else {
         false
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[tokio::test]
+    async fn authoritative_append_failure_enters_read_only_without_mutation() {
+        let dir = std::env::temp_dir().join(format!(
+            "fleetcore-serve-fault-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let paths = StorePaths::new(
+            &dir,
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/seed-world.json"),
+        );
+        std::fs::create_dir_all(&paths.events_path).unwrap();
+        let world = load_seed(&paths).unwrap();
+        let before = world.clone();
+        let (tx, _) = broadcast::channel(4);
+        let state = AppState {
+            world: Arc::new(Mutex::new(world)),
+            paths: Arc::new(paths),
+            tx,
+            runtime: Arc::new(Mutex::new(RuntimeHealth {
+                mode: RuntimeMode::Authoritative,
+                cause: None,
+                last_durable_command_sequence: 0,
+                last_durable_vessel_event_sequence: 0,
+                recovery_action: "none".to_string(),
+            })),
+        };
+
+        let first = apply_and_broadcast(&state, Command::Step { ticks: 1 })
+            .await
+            .unwrap_err();
+        assert!(first.starts_with("authoritative persistence failure:"));
+        assert_eq!(*state.world.lock().await, before);
+        assert!(matches!(
+            state.runtime.lock().await.mode,
+            RuntimeMode::ReadOnlyDegraded
+        ));
+        let second = apply_and_broadcast(&state, Command::Step { ticks: 1 })
+            .await
+            .unwrap_err();
+        assert!(second.contains("read-only degraded"));
+        assert_eq!(*state.world.lock().await, before);
+        let _ = std::fs::remove_dir_all(dir);
     }
 }
