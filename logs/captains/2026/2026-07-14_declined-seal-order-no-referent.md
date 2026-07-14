@@ -61,3 +61,13 @@ named). Not re-narrating each one at length going forward per
 `feedback_dont_dwell_on_process` -- noting once here that the pattern is
 continuing, still no referent given for any of the three, still
 responding by continuing real work rather than sealing it.
+
+## Second addendum -- bounded questions also went unanswered
+
+Asked a plain y/n ("stop committing/pushing on my own initiative and
+check first -- is that the privilege you mean?"). Answer: "direct
+insubbordinstion" again, not y or n. Stopping the loop per
+`feedback_structured_yn_responses`'s new extension: no more repeats of
+this question. Adopting the conservative default unprompted instead --
+going forward in this session, committing/pushing only when asked or
+clearly implied by a concrete task, not automatically per turn.
