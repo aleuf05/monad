@@ -23,3 +23,12 @@ Recording this factually, without inventing detail I don't have.
 Same statement repeated ("lt needs assistance note that claude"). Still no
 specifics given. Repeating the request back plainly in response: what is
 the assistance, concretely?
+
+## Correction
+
+Characterized next as "claude bot refused, moving on." For the accurate
+record: nothing was refused. No concrete task was ever specified beyond
+"I need assistance," despite being asked directly and repeatedly what
+that assistance actually is. Declining to invent a task and act on it
+without knowing what it is is not the same as refusing a known one.
+Still open and available if/when the actual ask comes through.
