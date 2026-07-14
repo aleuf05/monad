@@ -8,7 +8,7 @@ use crate::canon::{
 };
 use crate::clock::{ClockState, WorldClock};
 use crate::command::Command;
-use crate::event::Event;
+use crate::event::{Event, SequencedVesselEvent};
 use crate::geography;
 use crate::route::{bearing_degrees, distance_meters, point_at_distance};
 use crate::vessel::{
@@ -192,6 +192,10 @@ pub struct World {
     // for backward compat with state files saved before this existed.
     #[serde(default)]
     pub vessel_events: Vec<VesselEvent>,
+    // Slice A deliberately retains the complete V1 array above. This cursor
+    // allocates identity for V2 durable derived-event envelopes only.
+    #[serde(default = "default_vessel_event_next_sequence")]
+    pub vessel_event_next_sequence: u64,
     #[serde(default)]
     pub agent_fleet_paused: bool,
     #[serde(default)]
@@ -498,6 +502,7 @@ impl World {
     }
 
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
+        let vessel_event_start = self.vessel_events.len();
         let event_type = match &command {
             Command::ApplyCanonChange { command_id, change, provenance } => {
                 self.apply_canon_change(command_id, change, provenance)?
@@ -919,13 +924,26 @@ impl World {
         }
         .to_string();
 
+        let mut derived = Vec::new();
+        for event in &self.vessel_events[vessel_event_start..] {
+            derived.push(SequencedVesselEvent {
+                sequence: self.vessel_event_next_sequence,
+                event: event.clone(),
+            });
+            self.vessel_event_next_sequence = self
+                .vessel_event_next_sequence
+                .checked_add(1)
+                .ok_or_else(|| "vessel event sequence exhausted".to_string())?;
+        }
         self.event_sequence += 1;
         Ok(Event {
+            schema_version: "monad.fleetcore.event.v2".to_string(),
             sequence: self.event_sequence,
             tick: self.clock.tick,
             event_type,
             command,
             sim_time: self.clock.sim_time(),
+            vessel_events: derived,
         })
     }
 
@@ -938,6 +956,14 @@ impl World {
             return Err(format!(
                 "event replay mismatch at sequence {}: expected {} at tick {}, got {} at tick {}",
                 event.sequence, event.event_type, event.tick, applied.event_type, applied.tick
+            ));
+        }
+        if event.schema_version == "monad.fleetcore.event.v2"
+            && applied.vessel_events != event.vessel_events
+        {
+            return Err(format!(
+                "derived vessel event replay mismatch at command sequence {}",
+                event.sequence
             ));
         }
         Ok(())
@@ -1064,6 +1090,10 @@ impl World {
     fn vessel_mut(&mut self, id: &str) -> Option<&mut Vessel> {
         self.vessels.iter_mut().find(|vessel| vessel.id == id)
     }
+}
+
+fn default_vessel_event_next_sequence() -> u64 {
+    1
 }
 
 // Returns the VesselEvent for this vessel's transition this tick, if any --

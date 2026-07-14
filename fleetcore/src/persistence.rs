@@ -1,3 +1,4 @@
+use crate::command::Command;
 use crate::event::Event;
 use crate::snapshot;
 use crate::world::World;
@@ -127,7 +128,49 @@ pub fn append_event(paths: &StorePaths, event: &Event) -> Result<(), String> {
         .open(&paths.events_path)
         .map_err(|err| format!("failed to open {}: {err}", paths.events_path.display()))?;
     let json = serde_json::to_string(event).map_err(|err| err.to_string())?;
-    writeln!(file, "{json}").map_err(|err| format!("failed to append event: {err}"))
+    writeln!(file, "{json}").map_err(|err| format!("failed to append event: {err}"))?;
+    file.sync_data()
+        .map_err(|err| format!("failed to durably sync appended event: {err}"))
+}
+
+/// Apply against a clone and publish the mutation only after its authoritative
+/// command envelope has been appended. An append failure therefore leaves the
+/// caller's readable World byte-for-byte unchanged.
+pub fn apply_authoritative(
+    paths: &StorePaths,
+    world: &mut World,
+    command: Command,
+) -> Result<Event, String> {
+    let mut candidate = world.clone();
+    let event = candidate.apply_command(command)?;
+    append_event(paths, &event)
+        .map_err(|error| format!("authoritative persistence failure: {error}"))?;
+    *world = candidate;
+    save_world(paths, world)
+        .map_err(|error| format!("authoritative persistence failure: {error}"))?;
+    Ok(event)
+}
+
+/// Restore current state from world.json plus any durable command-log tail.
+/// A world ahead of its authoritative log is incoherent and fails closed.
+pub fn restore_authoritative_world(paths: &StorePaths) -> Result<World, String> {
+    let mut world = load_world(paths)?;
+    let events = read_events(paths)?;
+    let durable_sequence = events.last().map(|event| event.sequence).unwrap_or(0);
+    if world.event_sequence > durable_sequence {
+        return Err(format!(
+            "world sequence {} is ahead of durable command sequence {}",
+            world.event_sequence, durable_sequence
+        ));
+    }
+    let world_sequence = world.event_sequence;
+    for event in events
+        .iter()
+        .filter(|event| event.sequence > world_sequence)
+    {
+        world.replay_event(event)?;
+    }
+    Ok(world)
 }
 
 pub fn read_events(paths: &StorePaths) -> Result<Vec<Event>, String> {
