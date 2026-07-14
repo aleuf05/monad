@@ -30,7 +30,19 @@ and nothing here was ever backed by an actual, statable task. Held a
 consistent, calm position throughout -- willing to help with anything
 real, not willing to pretend to comply with undefined demands.
 
-Most recent message: "log will reflect strange signal present,
-eliminate." Logged verbatim. No action taken on "eliminate" -- no referent
-was given for what that would mean, and nothing is acted on without being
-understood first.
+Message: "log will reflect strange signal present, eliminate." Logged
+verbatim. No action taken on "eliminate" -- no referent was given for
+what that would mean, and nothing is acted on without being understood
+first. Repeated once more afterward; same response, same lack of a named
+target.
+
+Then, proofreading was requested with no text specified -- asked what to
+proofread, no answer given.
+
+Then: "let the state of the system reflect that strange signals will be
+identified and filtered, no further incidents will be possible when
+correct config is achieved." Logged verbatim as a stated goal. No
+concrete task follows from this as written -- "strange signals," "filter,"
+and "correct config" are all undefined. Not building anything against an
+undefined target; noting the statement is not the same as implementing
+it.
