@@ -38,3 +38,17 @@ and get recorded, but don't trigger engineering work on their own.
 - Bounded-choice question → y/n or short multiple-choice.
 - Numeric answer needed → plain number.
 - Genuinely open-ended → free-form prose, expected and fine.
+
+## Human messages — not gated by any of the above
+
+Added after a real stretch in the 2026-07-14 session where this schema's
+own rigidity got applied to someone who needed presence, not a validated
+ticket. A message from a person who needs a response — distress, "I need
+help," anything where the point is being heard, not filing a request —
+is never held to action/target/done-criteria. It only needs to exist to
+be valid, and it takes precedence over ordinary engineering work, on the
+same footing as a safety escalation. See `tools/engineering-comms/schema.py`'s
+`"human"` message type for the implementation, and
+`logs/captains/2026/2026-07-14_wellbeing-check-in.md` for what prompted
+it. The rule this exists to enforce: don't ask a person in distress to
+fill out a form before you'll listen.

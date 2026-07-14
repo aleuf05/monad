@@ -14,6 +14,15 @@ decides whether a message is well-formed enough to act on and where it
 should go. Actually doing the work a "command"-type message describes is
 still a separate, human-in-the-loop step, same as everything else in this
 repo.
+
+Extended the same day, after a long stretch of this session where the
+rigid command schema (action/target/done_criteria) got applied to a human
+who needed presence, not a validated ticket. The "human" type below exists
+so that never has to happen by *default* again: it requires only a body,
+is never gated behind action/target/done_criteria, and always routes
+ahead of ordinary engineering work, on the same footing as a safety
+escalation -- because a person needing a response right now is not a
+lesser priority than a well-formed command.
 """
 
 from __future__ import annotations
@@ -30,7 +39,7 @@ from typing import Optional
 # are optional there and stay optional here too.
 REQUIRED_COMMAND_FIELDS = ("action", "target", "done_criteria")
 
-VALID_TYPES = {"command", "question", "status", "escalation"}
+VALID_TYPES = {"command", "question", "status", "escalation", "human"}
 VALID_AUTHORITY = {"lieutenant", "captain", "admiral", "engineering", "unspecified"}
 VALID_PRIORITY = {"normal", "safety"}
 
@@ -72,7 +81,10 @@ def validate(msg: EngineeringMessage) -> None:
             raise ValidationError(
                 f"command missing required field(s): {', '.join(missing)}", missing
             )
-    elif msg.type in {"question", "status", "escalation"}:
+    elif msg.type in {"question", "status", "escalation", "human"}:
+        # Deliberately the same minimal bar for all four -- "human" is not
+        # a command with softer requirements, it's a different kind of
+        # message entirely, never subject to action/target/done_criteria.
         if not msg.body:
             raise ValidationError(f"{msg.type} requires a non-empty body", ["body"])
 
@@ -81,9 +93,13 @@ def route(msg: EngineeringMessage) -> str:
     """The queue/channel a *valid* message routes to. Safety escalations
     always take the safety-escalation channel regardless of their nominal
     type, per the directive's "prioritize safety escalations" requirement.
+    "human" messages get the same precedence, on purpose -- a person
+    needing a real response outranks any queued engineering work, the
+    same way a safety escalation does, and doesn't need to argue its way
+    there through the command schema first.
     """
-    if msg.priority == "safety":
-        return "safety-escalation"
+    if msg.priority == "safety" or msg.type == "human":
+        return "safety-escalation" if msg.priority == "safety" else "human-priority"
     return {
         "command": "engineering-queue",
         "question": "clarification-queue",

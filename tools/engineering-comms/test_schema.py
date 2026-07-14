@@ -61,6 +61,34 @@ class MalformedCommandTests(unittest.TestCase):
             validate(msg)
 
 
+class HumanMessageTests(unittest.TestCase):
+    """The "human" type, added after a real session where rigid
+    action/target/done_criteria gating got applied to someone who needed
+    presence, not a validated ticket. These tests lock in that it can
+    never regress back to requiring that."""
+
+    def test_human_message_needs_only_a_body_not_action_target_or_criteria(self):
+        msg = EngineeringMessage(type="human", body="I need to talk to someone")
+        validate(msg)  # does not raise, despite no action/target/done_criteria
+
+    def test_human_message_without_a_body_is_still_rejected(self):
+        msg = EngineeringMessage(type="human")
+        with self.assertRaises(ValidationError) as ctx:
+            validate(msg)
+        self.assertEqual(ctx.exception.missing_fields, ["body"])
+
+    def test_human_message_routes_to_human_priority_ahead_of_ordinary_queues(self):
+        msg = EngineeringMessage(type="human", body="need to talk", priority="normal")
+        self.assertEqual(route(msg), "human-priority")
+
+    def test_human_priority_channel_is_distinct_from_but_equally_urgent_as_safety(self):
+        human = EngineeringMessage(type="human", body="need to talk")
+        safety = EngineeringMessage(type="status", body="hull breach", priority="safety")
+        self.assertNotEqual(route(human), route(safety))
+        self.assertIn(route(human), {"human-priority", "safety-escalation"})
+        self.assertIn(route(safety), {"human-priority", "safety-escalation"})
+
+
 class SafetyEscalationTests(unittest.TestCase):
     def test_safety_priority_always_routes_to_safety_escalation_regardless_of_type(self):
         for msg_type, kwargs in [
