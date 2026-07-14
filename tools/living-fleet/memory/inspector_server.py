@@ -18,6 +18,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import threading
+import time
 import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -89,7 +91,57 @@ def _fleet_narrative(service: MemoryService) -> list[dict]:
     return result
 
 
-def make_handler(service: MemoryService):
+def _summary_payload(service: MemoryService) -> dict:
+    return {
+        "captains": [_captain_summary(service, captain_id) for captain_id in service.captains],
+        "fleet_narrative": _fleet_narrative(service),
+    }
+
+
+class SummaryCache:
+    """Keep the hot read endpoint independent of retrieval rebuild latency.
+
+    SQLite remains authoritative.  A dedicated read connection notices WAL
+    data-version changes and atomically publishes a newly computed payload;
+    request handlers never wait on a database lock or a TF-IDF corpus rebuild.
+    At the 250 ms poll interval, inspector data is still much fresher than its
+    human-facing UI needs while API latency stays deterministic.
+    """
+
+    def __init__(self, db_path: str, captains: list[dict], initial_payload: dict):
+        self.db_path = db_path
+        self.captains = captains
+        self.payload = initial_payload
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread(target=self._refresh_loop, name="memory-summary-refresh", daemon=True)
+
+    def start(self) -> None:
+        self.thread.start()
+
+    def stop(self) -> None:
+        self.stop_event.set()
+        self.thread.join(timeout=2)
+
+    def _refresh_loop(self) -> None:
+        service = MemoryService(self.db_path, self.captains)
+        try:
+            data_version = service.conn.execute("PRAGMA data_version").fetchone()[0]
+            while not self.stop_event.wait(0.25):
+                try:
+                    current_version = service.conn.execute("PRAGMA data_version").fetchone()[0]
+                    if current_version != data_version:
+                        refreshed = _summary_payload(service)
+                        self.payload = refreshed
+                        data_version = current_version
+                except Exception:
+                    # The inspector is observational and fail-open: retain the
+                    # last good payload if a concurrent write briefly wins.
+                    continue
+        finally:
+            service.close()
+
+
+def make_handler(service: MemoryService, summary_cache: SummaryCache):
     class Handler(BaseHTTPRequestHandler):
         def _json(self, payload: dict, status: int = 200) -> None:
             body = json.dumps(payload).encode()
@@ -102,8 +154,7 @@ def make_handler(service: MemoryService):
 
         def do_GET(self) -> None:  # noqa: N802 (stdlib method name)
             if self.path == "/captains/summary":
-                summaries = [_captain_summary(service, captain_id) for captain_id in service.captains]
-                self._json({"captains": summaries, "fleet_narrative": _fleet_narrative(service)})
+                self._json(summary_cache.payload)
                 return
             match = re.match(r"^/captains/([^/]+)/detail$", self.path)
             if match:
@@ -131,11 +182,14 @@ def main() -> int:
 
     captains = _read_captains(Path(args.captains))
     service = MemoryService(args.db, captains)
-    server = HTTPServer((args.host, args.port), make_handler(service))
+    summary_cache = SummaryCache(args.db, captains, _summary_payload(service))
+    summary_cache.start()
+    server = HTTPServer((args.host, args.port), make_handler(service, summary_cache))
     print(f"living-fleet-memory inspector serving on {args.host}:{args.port}")
     try:
         server.serve_forever()
     finally:
+        summary_cache.stop()
         service.close()
     return 0
 

@@ -18,7 +18,13 @@ SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 def connect(db_path: str | Path) -> sqlite3.Connection:
     path = Path(db_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(path), timeout=10)
+    # Memory is an optional subsystem for the captain runtime.  A contended
+    # writer must fail open through the runtime's existing exception handling
+    # instead of holding the decision loop for sqlite3's multi-second default.
+    # WAL keeps ordinary readers concurrent with telemetry writes; 10 ms is a
+    # deliberately small upper bound for the remaining writer contention.
+    conn = sqlite3.connect(str(path), timeout=0.01)
+    conn.execute("PRAGMA busy_timeout = 10")
     conn.row_factory = sqlite3.Row
     conn.executescript(SCHEMA_PATH.read_text())
     return conn
