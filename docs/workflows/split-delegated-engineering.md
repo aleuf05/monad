@@ -153,6 +153,10 @@ Before publication, the commander:
 6. reports the commit, PR, validation, live state, and exactly one readiness
    recommendation when the order requires one.
 
+7. creates or updates the standing Captain issue report described in
+   `docs/workflows/captain-issue-reporting.md`, publishes it, and provides a
+   clickable link in the final handoff.
+
 Stacked pull requests are acceptable when prerequisite work is already under
 review, but dependencies must be explicit.
 

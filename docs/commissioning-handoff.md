@@ -23,6 +23,8 @@ Every privileged handoff must:
    with SHA-256 hashes, before restarting or replacing FleetCore.
 6. Use a completion marker and refuse accidental reuse.
 7. Keep imports and installation steps idempotent wherever possible.
+8. Link the current Captain issue report, and repin the live script after any
+   report update that changes the repository HEAD.
 
 An agent must never leave the Lieutenant with a script that contains fillable
 placeholders, refuses because it was already spent, or requires prose
