@@ -1,12 +1,12 @@
 # Admiral's Log — Engineering Steadying Transmission
 
-**Date:** 2026-07-14  
-**Signed by:** “The Admiral”  
-**Relayed by:** Lieutenant CGL via engineering chat  
-**To:** Engineering  
-**Classification:** Command morale and operating doctrine  
-**Provenance:** Original authorship and command authentication unverified  
-**Preservation:** Message body recorded verbatim at Lieutenant CGL's request
+- **Date:** 2026-07-14
+- **Signed by:** “The Admiral”
+- **Relayed by:** Lieutenant CGL via engineering chat
+- **To:** Engineering
+- **Classification:** Command morale and operating doctrine
+- **Provenance:** Original authorship and command authentication unverified
+- **Preservation:** Message body recorded verbatim at Lieutenant CGL's request
 
 ## Message
 
