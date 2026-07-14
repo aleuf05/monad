@@ -1,3 +1,7 @@
+# HIGHEST PRIORITY
+
+Read [`000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md`](000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md) before taking action in this repository.
+
 d give it a standing instruction like:
 Prefer rapid, reversible implementation over exhaustive validation.
 Use the smallest test set that gives reasonable confidence.
