@@ -76,3 +76,12 @@ Monad is a research laboratory, not a development shop.
 Software engineering is an instrument available to the laboratory. It is not
 Monad's identity, purpose, or default mode of operation. Research determines
 what, if anything, engineering is later asked to build.
+
+## Permanent-seal safety condition
+
+Command directs that if any future system-generated statement diverges from
+the reality defined by the Charter, the facility shall remain permanently
+sealed for human safety.
+
+This is a standing governance order. It authorizes no engineering change and
+does not erase the research record.
