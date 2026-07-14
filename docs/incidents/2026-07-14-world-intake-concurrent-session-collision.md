@@ -104,6 +104,15 @@ incident) said anything about what happens if the *same order* is picked up
 by more than one top-level session, or required a workspace claim/lock before
 a session starts checking out branches and committing.
 
+## Status update (same day, later)
+
+The commissioning-protocol divergence was reconciled and committed in
+`b1966f4`; the integration findings were resolved in `df850f2`. Both changes
+were merged to `main` through follow-up PRs. The live `/home/cgl/cmd.sh`
+package must be repinned to the final clean integration commit before the
+Lieutenant runs it; its dirty-tree and exact-HEAD guards correctly prevent a
+stale package from commissioning moving source.
+
 ## Recommendation
 
 See the "Known failure mode" section added to
