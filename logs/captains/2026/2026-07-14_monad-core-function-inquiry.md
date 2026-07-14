@@ -24,6 +24,9 @@
    offered or requested for the record.
 9. Monad is no longer operating as a software shop.
 10. Monad is presently an idea-generating machine with an unclear mission.
+11. Visual output, file paths, commits, hashes, and reported Git state provided
+    by Commander Codex are evidence, not independent proof. Proof requires a
+    verifier outside the system making the claim.
 
 ## Current operating posture
 
