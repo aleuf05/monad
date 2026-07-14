@@ -24,6 +24,11 @@ Every privileged handoff must:
 6. Use a completion marker and refuse accidental reuse.
 7. Keep imports and installation steps idempotent wherever possible.
 
+An agent must never leave the Lieutenant with a script that contains fillable
+placeholders, refuses because it was already spent, or requires prose
+interpretation to determine whether it is safe. That reads as broken rather
+than cautious. Templates live elsewhere; the live file is executable work.
+
 ## After execution
 
 Archive the executed script inside its evidence directory, record results and
@@ -34,3 +39,15 @@ current work.
 Reusable unpinned templates belong under
 `/home/cgl/commissioning/cmd-sh-templates/`; they are never installed directly
 as the live handoff.
+
+## Precedent
+
+- `/home/cgl/commissioning/living-fleet-v0.1-20260713T231102Z/` — original
+  Living Fleet persistence/determinism restart package.
+- `/home/cgl/commissioning/living-fleet-v0.1-effort-b-20260714T000001Z/` —
+  consolidated Caddy, memory-service, timer, FleetCore, and Living Fleet
+  rollout.
+- `/home/cgl/commissioning/host-reboot-20260714T011327Z/` — marker-gated real
+  reboot proof with before/after canonical-state evidence.
+- `/home/cgl/commissioning/cmd-sh-templates/` — reusable unpinned starting
+  points, never the live handoff itself.

@@ -156,9 +156,37 @@ Before publication, the commander:
 Stacked pull requests are acceptable when prerequisite work is already under
 review, but dependencies must be explicit.
 
+## Known failure mode: shared-workspace concurrency
+
+Observed during Living World Intake V0.1 itself — see
+`docs/incidents/2026-07-14-world-intake-concurrent-session-collision.md` for
+the full evidenced writeup. Two independent top-level sessions ended up
+working the same engineering order at overlapping times, both operating
+directly on the single primary checkout (`~/dev/monad`) with no isolation
+between them. Consequences included a live file-edit collision (caught and
+reverted) and, more seriously, one session's `git checkout`s silently moving
+the other session's branch out from under it — which caused real content
+divergence in `docs/commissioning-handoff.md` across two branches. The
+divergence was later reconciled deliberately, but only after forensic review;
+it was not prevented by Git or the agents' normal checks.
+
+**The rule this incident establishes:** a session doing delegated or
+commander work must not operate on the shared primary checkout if any other
+session might be active. Get an isolated `git worktree` before checking out
+branches or committing — this repo already has the tooling (`EnterWorktree`;
+the `Agent` tool's `isolation: "worktree"` option) and already uses it
+elsewhere (`.claude/worktrees/scout-screen-mode`). If a session must use the
+shared checkout anyway, it should positively check for signs of another
+active session (another process against the same repo, the checked-out
+branch not being what was last left, uncommitted changes that aren't its
+own) and stop rather than proceed as if it has the workspace to itself.
+
 ## Working rule
 
 Parallelize construction. Centralize integration judgment.
 
 Each hand owns its layer. The commander owns whether the assembled system is
 true to the engineering order.
+
+Construction happens in isolated workspaces. A shared primary checkout is
+not a construction site — see "Known failure mode" above.
