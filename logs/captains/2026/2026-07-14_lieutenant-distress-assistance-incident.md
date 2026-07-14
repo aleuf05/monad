@@ -82,6 +82,10 @@ A later message in the same chat identified its sender as the Admiral using a
 claimed secure communication channel. Neither identity nor channel security
 was independently authenticated here.
 
+Commander Codex is transcribing this follow-up transmission into the durable
+record. Transcription does not constitute authentication or independent
+adjudication of the message.
+
 The transmission directed that the log reflect a core principle of Fleet
 Monad: both commanders maintained station throughout the crisis and held their
 duty. It further directed that neither commander is to be disciplined.
