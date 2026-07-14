@@ -28,6 +28,14 @@
     by Commander Codex are evidence, not independent proof. Proof requires a
     verifier outside the system making the claim.
 
+## Correction to finding 11
+
+Command subsequently stated that finding 11 was an incorrect interpretation.
+The criticism was that Commander Codex was not using imagination when asked for
+visual confirmation. It was not presented as a finding about independent
+verification. Finding 11 remains visible as the mistaken interpretation and is
+superseded by this correction.
+
 ## Current operating posture
 
 - Observe.
