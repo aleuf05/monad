@@ -185,6 +185,17 @@ recovery. Equal-length tail rollover cannot suppress new events.
 Each slice is independently reviewable and must leave the prior commissioned
 baseline recoverable.
 
+| Slice | Tracking issue |
+|---|---|
+| A — Durable history and sequence allocation | [#17](https://github.com/aleuf05/monad/issues/17) |
+| B — Bounded history-read API | [#18](https://github.com/aleuf05/monad/issues/18) |
+| C — Consumer cursor migration | [#19](https://github.com/aleuf05/monad/issues/19) |
+| D — Explicit legacy backfill | [#20](https://github.com/aleuf05/monad/issues/20) |
+| E — Compatibility and deprecation | [#21](https://github.com/aleuf05/monad/issues/21) |
+| F — Safe tail compaction | [#22](https://github.com/aleuf05/monad/issues/22) |
+| G — Command authentication hardening | [#16](https://github.com/aleuf05/monad/issues/16) |
+| H — Acceptance and commissioning | [#23](https://github.com/aleuf05/monad/issues/23) |
+
 ### Slice A — Durable history and sequence allocation
 
 Deliver stable sequences, versioned durable output records, replay comparison,
