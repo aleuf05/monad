@@ -15,15 +15,19 @@ Both transports read from and write to the same in-memory `World`. A command app
 
 ## Command Authority
 
-**As actually shipped (see the doc comment atop `fleetcore/src/bin/serve.rs`): there is no auth at all.** Every connection on both transports has full command authority, no token required. `--command-token` is still accepted on the command line but silently ignored — see `docs/deployment.md`'s "Known limitation" note. This is why every toy in this repo (`fleetcore-live`, `fleetcore-control`, `bridge`, `fleet-motion`, `bridge-station-3.0`) had its Command Token field/param removed: a client-supplied token never did anything real to check against.
+Mutation is read-only by default. `GET /snapshot` requires nothing and every
+WebSocket connection may observe snapshots. Every external command path first
+authenticates a Bearer principal or hardened same-origin browser session, then
+separately checks command authority. Missing or invalid credentials receive HTTP `401`;
+the optional authenticated observer principal receives `403`. WebSocket
+attempts receive an equivalent targeted error without disconnecting observers.
 
-The rest of this section describes the originally-designed contract (Sprint.md's acceptance criteria: "read-only default for toys; explicit grant required for command authority") for reference — a future real-auth pass would presumably implement something like this, not invent a new shape from scratch.
-
-- **Read-only by default (as designed).** `GET /snapshot` requires nothing and always works. Every write path — `POST /command` and any command sent over `/ws` — was meant to require the server to have been started with `--command-token <token>`, and the caller to present that exact token.
-- **HTTP (as designed):** send `Authorization: Bearer <token>` on `POST /command`. Missing or wrong token → `401`.
-- **WebSocket (as designed):** pass `?token=<token>` on the `/ws` connect URL. A connection without the right token still receives every broadcast (reads are always open) but any command it sends gets an `error` message back instead of being applied.
-
-There is no per-token scoping in the design either — a valid token would grant unrestricted command authority (pause, resume, set-route, spawn-contact, everything in `Command`), not a subset.
+`--command-token <token>` configures the command principal. With no command
+token configured, no external caller can mutate the world. The optional
+`--observer-token <token>` proves identity without granting mutation. The
+command principal currently covers the existing `Command` surface rather than
+per-command scopes. See `fleetcore-command-auth.md` for operating and threat
+notes.
 
 ## HTTP Endpoints
 
@@ -53,7 +57,10 @@ Responses:
 
 ## WebSocket: `GET /ws`
 
-Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for command authority.
+Connect to `ws://<host>:<port>/ws`. Header-capable clients supply
+`Authorization: Bearer <token>` in an Origin-less upgrade. Browsers first use
+`POST /auth/session` from an allowlisted Origin, then upgrade with the issued
+HttpOnly cookie. URL query credentials are not supported.
 
 **On connect**, the server sends, in order:
 1. `{"type":"connected","command_authority":true|false}` — whether this connection can issue commands.
