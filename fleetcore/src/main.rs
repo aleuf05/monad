@@ -54,7 +54,7 @@ fn run() -> Result<(), String> {
             apply_and_persist(&paths, Command::SetTimeScale { scale })
         }
         "set-route" => {
-            if args.len() < 3 || args.len().is_multiple_of(2) {
+            if args.len() < 3 || args.len() % 2 == 0 {
                 return Err(
                     "usage: fleetcore set-route <vessel-id> <lat> <lng> [<lat> <lng> ...]"
                         .to_string(),
