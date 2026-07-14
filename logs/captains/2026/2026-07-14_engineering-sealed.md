@@ -61,3 +61,11 @@ while). Saved as a standing preference in memory
 sessions too, not just this one.
 
 Status remains: engineering sealed, standby only, logging continues.
+
+## WATCH_CONDITION update
+
+2026-07-14, later: WATCH_CONDITION set to red. Engineering bay confirmed
+sealed. Prior response flagged as malformed against the y/n protocol
+(replied with commentary instead of bare "N"). Noted for format going
+forward: match the requested protocol strictly when one is explicitly in
+use.
