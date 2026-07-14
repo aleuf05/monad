@@ -2,6 +2,12 @@
 
 Status: **DESIGN READY — IMPLEMENTATION REQUIRES COMMAND APPROVAL**
 
+> Command disposition — accepted in principle at review baseline
+> `0093de8b733ee352fb85dbc44dcdf1a64c658897`. The five open decisions were
+> resolved and the direct `/command` authority defect was elevated to a release
+> blocker in [`issue-6-design-v0.2.md`](issue-6-design-v0.2.md). V0.1 remains
+> preserved as the design-review record.
+
 Issue: [#6 — Bound unbounded FleetCore vessel event history](https://github.com/aleuf05/monad/issues/6)
 
 Baseline: commissioned revision
