@@ -212,3 +212,40 @@ toy (`fleetcore-control`, `fleetcore-live`, `bridge`, `fleet-motion`'s
 whatever the server grants a connection is what that connection gets. If real
 per-client auth is ever added server-side, these clients will need a token
 mechanism reintroduced.
+
+## Living World Intake — `toys/world-intake/`, Public
+
+Captain review desk for the intake pipeline (`ingest → extract → review →
+compile → commit`) that turns adjudicated narrative assertions into real
+FleetCore canon changes. Deployed the same shape as Captain Memory/Agent
+Operations: a loopback-only Python backend behind a Caddy `handle_path`
+proxy, plus a static `web/` copy of the review UI.
+
+**Backend.** `world-intake.service` (`scripts/world-intake.service`) runs
+`tools/world-intake/world_intake.py ... serve`, a single-threaded stdlib
+`http.server` bound to loopback, `Requires=fleetcore-serve.service`. It
+owns its own SQLite store at `data/world-intake.sqlite3` and talks to
+FleetCore's real command endpoint (`http://127.0.0.1:4771/command`) to
+submit adjudicated proposals as `apply-canon-change` commands — this is
+the one seam that has to match FleetCore's real schema exactly
+(`CanonChange` enum + full 6-field `CanonProvenance`), which
+`world_intake.py`'s `compile()` builds directly rather than through a
+separate mapping layer.
+
+Install/restart via `scripts/install-world-intake.sh`, same
+build-and-enable pattern as the other services in this file.
+
+**Public route.** `handle_path /world-intake-api/* { reverse_proxy
+127.0.0.1:4773 }` in `/etc/caddy/Caddyfile`, alongside the other
+`handle_path` blocks in the same `cameronlampley.com { ... }` block. The
+static UI lives at `web/toys/world-intake/` (copied from
+`toys/world-intake/`, no build step) and is linked from the homepage
+card grid. Verified live as of 2026-07-14:
+`https://cameronlampley.com/toys/world-intake/` returns 200, and
+`https://cameronlampley.com/world-intake-api/proposals` returns real
+queue data through the proxy (not the UI's demo-mode fallback).
+
+**Command authority:** same standing tradeoff as FleetCore itself — no
+per-visitor auth on the review/adjudication actions. See "Known
+limitation, accepted for now" above; the same acceptance applies here,
+not a new gap.
