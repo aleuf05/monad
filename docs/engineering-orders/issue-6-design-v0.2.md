@@ -124,6 +124,18 @@ WebSocket mutation paths must share one policy that:
 - provides a local maintenance path only when narrowly scoped, explicitly
   enabled, non-remote, and auditable.
 
+Browser command authority uses a short-lived, same-origin session established
+through an authenticated HTTP endpoint. The session credential is sent only as
+an `HttpOnly`, `Secure`, `SameSite=Strict` cookie; WebSocket upgrades require
+that cookie and a strictly validated allowed `Origin`. Long-lived bearer
+credentials remain available to non-browser clients. Secrets are never placed
+in URLs, query strings, referrers, browser storage, or checked-in configuration.
+Cross-origin session creation and mutation are denied by default.
+
+Commander and observer credentials must be distinct and use fixed-length
+secret material with a vetted constant-time comparison. Equal credentials are
+an invalid startup configuration, never an implicit privilege upgrade.
+
 Anonymous callers, invalid credentials, and authenticated callers without the
 required privilege must receive rejection without command event, state change,
 checkpoint, or canon mutation. Read-only endpoints remain separately governed
