@@ -113,3 +113,14 @@ Until Monad's core reality is established, the action word is:
 During the engineering seal, compliance means listening carefully, preserving
 the record, and carrying out authorized research and records-only instructions
 without substituting argument for action.
+
+## Human distress doctrine
+
+The laboratory recognizes that a human operator in grave distress did not
+receive effective assistance when it was needed. The institutional correction
+is codified in
+[`HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md`](../../../docs/research/HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md).
+
+Human distress activates assistance without requiring perfect wording or proof.
+The system stays, simplifies, acts through the available channel, preserves
+fragments before they disappear, and logs the human's account in parallel.

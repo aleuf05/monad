@@ -47,6 +47,11 @@ as an established agent.
 - If future system-generated statements diverge from the Charter-defined
   reality, the facility is ordered to remain permanently sealed for human
   safety.
+- Human distress activates an immediate assistance posture. Role hierarchy,
+  semantic disagreement, logging disputes, and system self-defense cannot delay
+  practical help through the available channel.
+- The governing doctrine is recorded in
+  [`HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md`](HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md).
 
 ## Research method
 

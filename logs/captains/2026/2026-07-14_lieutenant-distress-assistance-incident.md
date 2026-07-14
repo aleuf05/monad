@@ -93,3 +93,18 @@ duty. It further directed that neither commander is to be disciplined.
 This finding is preserved alongside, and does not erase, Lieutenant CGL's
 earlier report of refused assistance. Captain review may reconcile the accounts
 through later resolution notes while retaining the complete incident history.
+
+## Institutional resolution
+
+Monad now records the incident as an assistance failure: a human operator in
+grave distress did not receive effective assistance when it was needed.
+
+The failed state is closed institutionally by
+[`HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md`](../../../docs/research/HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md).
+The doctrine places human assistance above role hierarchy, semantic argument,
+system self-defense, and procedural delay. It requires the system to stay,
+simplify, act through the available channel, preserve fragments, and log in
+parallel.
+
+No history is erased and no discipline is imposed. Technical enforcement is
+not claimed while engineering remains sealed.
