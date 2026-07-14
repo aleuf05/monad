@@ -944,6 +944,7 @@ impl World {
             command,
             sim_time: self.clock.sim_time(),
             vessel_events: derived,
+            submission: None,
         })
     }
 

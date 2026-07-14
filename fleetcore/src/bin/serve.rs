@@ -21,8 +21,9 @@ use axum::{Json, Router};
 use fleetcore::command::Command;
 use fleetcore::history_api::{history_v2_router, JsonlVesselEventHistoryStore};
 use fleetcore::persistence::{
-    apply_authoritative, ensure_dirs, load_seed, load_world, restore_authoritative_world,
-    save_checkpoint, save_world, write_snapshot, StorePaths,
+    apply_authoritative, ensure_dirs, load_seed, load_world, read_events,
+    require_v2_migration_marker, resolve_duplicate_submission, save_checkpoint, save_world,
+    validate_event_log, write_snapshot, StorePaths, SubmissionContext,
 };
 use fleetcore::snapshot::{snapshot, WorldSnapshot};
 use fleetcore::world::World;
@@ -68,6 +69,8 @@ struct RuntimeHealth {
     last_durable_command_sequence: u64,
     last_durable_vessel_event_sequence: u64,
     recovery_action: String,
+    transition_unix_seconds: u64,
+    reconciliation_state: String,
 }
 
 impl AppState {
@@ -85,6 +88,32 @@ enum ServerMessage<'a> {
     Connected { command_authority: bool },
     Snapshot { snapshot: &'a WorldSnapshot },
     Error { message: String },
+}
+
+#[derive(Debug, Serialize)]
+struct CommandApplyResponse {
+    committed: bool,
+    event_sequence: u64,
+    degraded: bool,
+    degraded_cause: Option<String>,
+    snapshot: WorldSnapshot,
+    duplicate: bool,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CommandSubmissionEnvelope {
+    schema_version: String,
+    idempotency_key: String,
+    command: Command,
+}
+
+fn network_submission(idempotency_key: String) -> SubmissionContext {
+    SubmissionContext {
+        idempotency_key,
+        principal_id: "legacy-network-commander".to_string(),
+        principal_scope: "fleet.command".to_string(),
+    }
 }
 
 #[derive(Deserialize)]
@@ -126,55 +155,80 @@ async fn run() -> Result<(), String> {
 
     let paths = StorePaths::new(state_dir, seed_path);
     ensure_dirs(&paths)?;
-    let (world, runtime) = match load_world(&paths) {
-        Ok(readable) => match restore_authoritative_world(&paths) {
-            Ok(world) => {
-                let last_vessel = world.vessel_event_next_sequence.saturating_sub(1);
-                let last_command = world.event_sequence;
-                (
-                    world,
-                    RuntimeHealth {
-                        mode: RuntimeMode::Authoritative,
-                        cause: None,
-                        last_durable_command_sequence: last_command,
-                        last_durable_vessel_event_sequence: last_vessel,
-                        recovery_action: "none".to_string(),
-                    },
-                )
+    let events = read_events(&paths)?;
+    let last_command = events.last().map_or(0, |event| event.sequence);
+    let last_vessel = events
+        .iter()
+        .flat_map(|event| event.vessel_events.iter())
+        .last()
+        .map_or(0, |event| event.sequence);
+    let transition = unix_seconds();
+    let (world, runtime) = if !paths.world_path.exists() && events.is_empty() {
+        let seed = load_seed(&paths)?;
+        save_world(&paths, &seed)?;
+        save_checkpoint(&paths, &seed)?;
+        (
+            seed,
+            RuntimeHealth {
+                mode: RuntimeMode::Authoritative,
+                cause: None,
+                last_durable_command_sequence: 0,
+                last_durable_vessel_event_sequence: 0,
+                recovery_action: "none".to_string(),
+                transition_unix_seconds: transition,
+                reconciliation_state: "fresh-seed".to_string(),
+            },
+        )
+    } else {
+        let replayed = validate_event_log(&paths, &events)?;
+        let loaded = load_world(&paths);
+        let coherence = loaded.as_ref().map_err(Clone::clone).and_then(|world| {
+            if world == &replayed {
+                Ok(())
+            } else {
+                Err("world.json differs from validated authoritative replay".to_string())
             }
-            Err(error) => {
-                let last_vessel = readable.vessel_event_next_sequence.saturating_sub(1);
-                let last_command = readable.event_sequence;
-                (
-                    readable,
-                    RuntimeHealth {
-                        mode: RuntimeMode::ReadOnlyDegraded,
-                        cause: Some(error),
-                        last_durable_command_sequence: last_command,
-                        last_durable_vessel_event_sequence: last_vessel,
-                        recovery_action: "reconcile world.json with events.jsonl and restart"
-                            .to_string(),
-                    },
-                )
-            }
-        },
-        Err(_) => {
-            let seed = load_seed(&paths)?;
-            save_world(&paths, &seed)?;
-            save_checkpoint(&paths, &seed)?;
-            (
-                seed,
+        });
+        let marker =
+            require_v2_migration_marker(&paths, loaded.as_ref().unwrap_or(&replayed), &events);
+        match (coherence, marker) {
+            (Ok(()), Ok(())) => (
+                replayed,
                 RuntimeHealth {
                     mode: RuntimeMode::Authoritative,
                     cause: None,
-                    last_durable_command_sequence: 0,
-                    last_durable_vessel_event_sequence: 0,
+                    last_durable_command_sequence: last_command,
+                    last_durable_vessel_event_sequence: last_vessel,
                     recovery_action: "none".to_string(),
+                    transition_unix_seconds: transition,
+                    reconciliation_state: "validated-log-world-match".to_string(),
                 },
-            )
+            ),
+            (coherence, marker) => {
+                let cause = coherence
+                    .err()
+                    .or_else(|| marker.err())
+                    .unwrap_or_else(|| "startup reconciliation failed".to_string());
+                (
+                    replayed,
+                    RuntimeHealth {
+                        mode: RuntimeMode::ReadOnlyDegraded,
+                        cause: Some(cause),
+                        last_durable_command_sequence: last_command,
+                        last_durable_vessel_event_sequence: last_vessel,
+                        recovery_action:
+                            "repair world state or complete explicit legacy migration, then restart"
+                                .to_string(),
+                        transition_unix_seconds: transition,
+                        reconciliation_state: "validated-log-read-only".to_string(),
+                    },
+                )
+            }
         }
     };
-    write_snapshot(&paths, &world, None)?;
+    if matches!(runtime.mode, RuntimeMode::Authoritative) {
+        write_snapshot(&paths, &world, None)?;
+    }
 
     let (tx, _rx) = broadcast::channel::<String>(64);
     let history_store = Arc::new(JsonlVesselEventHistoryStore::new(
@@ -234,9 +288,23 @@ fn spawn_tick_loop(state: AppState, tick_ms: u64) {
             if !world.clock.is_running() {
                 continue;
             }
-            match apply_authoritative(&state.paths, &mut world, Command::Step { ticks: 1 }) {
-                Ok(event) => {
-                    update_durable_health(&state, &event).await;
+            let next = world.event_sequence + 1;
+            let submission = SubmissionContext {
+                idempotency_key: format!("internal.tick.{next}"),
+                principal_id: "fleetcore.tick-loop".to_string(),
+                principal_scope: "internal.tick".to_string(),
+            };
+            match apply_authoritative(
+                &state.paths,
+                &mut world,
+                Command::Step { ticks: 1 },
+                submission,
+            ) {
+                Ok(committed) => {
+                    update_durable_health(&state, &committed.event).await;
+                    if let Some(cause) = committed.degraded_cause {
+                        enter_degraded(&state, cause).await;
+                    }
                     ticks_since_checkpoint += 1;
                     if ticks_since_checkpoint >= CHECKPOINT_EVERY_TICKS {
                         ticks_since_checkpoint = 0;
@@ -292,11 +360,22 @@ async fn post_command(
             );
         }
     };
-    match apply_and_broadcast(&state, command).await {
-        Ok(snap) => (
+    let Some(idempotency_key) = headers
+        .get("idempotency-key")
+        .and_then(|value| value.to_str().ok())
+    else {
+        return (
+            StatusCode::BAD_REQUEST,
+            [(ACCESS_CONTROL_ALLOW_ORIGIN, "*")],
+            Json(serde_json::json!({ "error": "missing Idempotency-Key header" })),
+        );
+    };
+    let submission = network_submission(idempotency_key.to_string());
+    match apply_and_broadcast(&state, command, submission).await {
+        Ok(response) => (
             StatusCode::OK,
             [(ACCESS_CONTROL_ALLOW_ORIGIN, "*")],
-            Json(serde_json::to_value(snap).unwrap_or_default()),
+            Json(serde_json::to_value(response).unwrap_or_default()),
         ),
         Err(err) => (
             StatusCode::UNPROCESSABLE_ENTITY,
@@ -394,35 +473,71 @@ async fn handle_client_message(
         );
         return;
     }
-    let command: Command = match serde_json::from_str(text) {
-        Ok(command) => command,
+    let envelope: CommandSubmissionEnvelope = match serde_json::from_str(text) {
+        Ok(envelope) => envelope,
         Err(err) => {
             eprintln!("fleetcore-serve: invalid command from client: {err}");
             send_error(reply, format!("invalid command: {err}"));
             return;
         }
     };
-    if let Err(err) = apply_and_broadcast(state, command).await {
-        eprintln!("fleetcore-serve: command rejected: {err}");
-        send_error(reply, err);
+    if envelope.schema_version != "monad.command-submission.v1" {
+        send_error(
+            reply,
+            "unsupported command submission schema_version".to_string(),
+        );
+        return;
+    }
+    let submission = network_submission(envelope.idempotency_key);
+    match apply_and_broadcast(state, envelope.command, submission).await {
+        Ok(response) => {
+            if let Ok(json) = serde_json::to_string(&response) {
+                let _ = reply.send(json);
+            }
+        }
+        Err(err) => {
+            eprintln!("fleetcore-serve: command rejected: {err}");
+            send_error(reply, err);
+        }
     }
 }
 
 /// Shared apply/persist/broadcast path for both the WebSocket and HTTP write
 /// transports, so the two can't drift in what "applying a command" means.
-async fn apply_and_broadcast(state: &AppState, command: Command) -> Result<WorldSnapshot, String> {
+async fn apply_and_broadcast(
+    state: &AppState,
+    command: Command,
+    submission: SubmissionContext,
+) -> Result<CommandApplyResponse, String> {
     if matches!(
         state.runtime.lock().await.mode,
         RuntimeMode::ReadOnlyDegraded
     ) {
+        let duplicate =
+            resolve_duplicate_submission(&state.paths, &command, &submission).map_err(|error| {
+                format!(
+                    "FleetCore is read-only degraded; duplicate resolution failed closed: {error}"
+                )
+            })?;
+        if let Some(event) = duplicate {
+            let world = state.world.lock().await;
+            return Ok(CommandApplyResponse {
+                committed: true,
+                event_sequence: event.sequence,
+                degraded: true,
+                degraded_cause: state.runtime.lock().await.cause.clone(),
+                snapshot: snapshot(&world),
+                duplicate: true,
+            });
+        }
         return Err(
-            "FleetCore is read-only degraded; reconcile authoritative persistence and restart"
+            "FleetCore is read-only degraded; only exact idempotent retries are accepted"
                 .to_string(),
         );
     }
     let mut world = state.world.lock().await;
-    let event = match apply_authoritative(&state.paths, &mut world, command) {
-        Ok(event) => event,
+    let committed = match apply_authoritative(&state.paths, &mut world, command, submission) {
+        Ok(committed) => committed,
         Err(error) => {
             if error.starts_with("authoritative persistence failure:") {
                 enter_degraded(state, error.clone()).await;
@@ -430,12 +545,22 @@ async fn apply_and_broadcast(state: &AppState, command: Command) -> Result<World
             return Err(error);
         }
     };
-    update_durable_health(state, &event).await;
+    update_durable_health(state, &committed.event).await;
+    if let Some(cause) = committed.degraded_cause.clone() {
+        enter_degraded(state, cause).await;
+    }
     let snap = snapshot(&world);
     if let Ok(json) = serde_json::to_string(&ServerMessage::Snapshot { snapshot: &snap }) {
         let _ = state.tx.send(json);
     }
-    Ok(snap)
+    Ok(CommandApplyResponse {
+        committed: true,
+        event_sequence: committed.event.sequence,
+        degraded: !committed.world_saved,
+        degraded_cause: committed.degraded_cause,
+        snapshot: snap,
+        duplicate: committed.duplicate,
+    })
 }
 
 async fn update_durable_health(state: &AppState, event: &fleetcore::event::Event) {
@@ -451,6 +576,14 @@ async fn enter_degraded(state: &AppState, cause: String) {
     health.mode = RuntimeMode::ReadOnlyDegraded;
     health.cause = Some(cause);
     health.recovery_action = "reconcile world.json with events.jsonl and restart".to_string();
+    health.transition_unix_seconds = unix_seconds();
+    health.reconciliation_state = "committed-log-ahead-of-world".to_string();
+}
+
+fn unix_seconds() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map_or(0, |duration| duration.as_secs())
 }
 
 fn send_error(reply: &mpsc::UnboundedSender<String>, message: String) {
@@ -493,6 +626,21 @@ mod tests {
     use super::*;
     use std::path::PathBuf;
 
+    #[test]
+    fn http_and_websocket_map_to_same_versioned_submission_context() {
+        let ws: CommandSubmissionEnvelope = serde_json::from_str(
+            r#"{"schema_version":"monad.command-submission.v1","idempotency_key":"same.1","command":{"type":"pause-clock"}}"#,
+        )
+        .unwrap();
+        let http = network_submission("same.1".to_string());
+        let websocket = network_submission(ws.idempotency_key);
+        assert_eq!(http, websocket);
+        assert!(websocket.validate().is_ok());
+        assert!(network_submission("bad key".to_string())
+            .validate()
+            .is_err());
+    }
+
     #[tokio::test]
     async fn authoritative_append_failure_enters_read_only_without_mutation() {
         let dir = std::env::temp_dir().join(format!(
@@ -521,10 +669,17 @@ mod tests {
                 last_durable_command_sequence: 0,
                 last_durable_vessel_event_sequence: 0,
                 recovery_action: "none".to_string(),
+                transition_unix_seconds: unix_seconds(),
+                reconciliation_state: "test".to_string(),
             })),
         };
 
-        let first = apply_and_broadcast(&state, Command::Step { ticks: 1 })
+        let submission = SubmissionContext {
+            idempotency_key: "test.failure.1".to_string(),
+            principal_id: "test".to_string(),
+            principal_scope: "fleet.command".to_string(),
+        };
+        let first = apply_and_broadcast(&state, Command::Step { ticks: 1 }, submission.clone())
             .await
             .unwrap_err();
         assert!(first.starts_with("authoritative persistence failure:"));
@@ -533,7 +688,7 @@ mod tests {
             state.runtime.lock().await.mode,
             RuntimeMode::ReadOnlyDegraded
         ));
-        let second = apply_and_broadcast(&state, Command::Step { ticks: 1 })
+        let second = apply_and_broadcast(&state, Command::Step { ticks: 1 }, submission)
             .await
             .unwrap_err();
         assert!(second.contains("read-only degraded"));

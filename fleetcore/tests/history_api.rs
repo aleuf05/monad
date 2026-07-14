@@ -262,3 +262,64 @@ fn jsonl_store_rejects_unavailable_mission_attribution_explicitly() {
         matches!(error, HistoryStoreError::InvalidRequest(message) if message.contains("unavailable"))
     );
 }
+
+#[test]
+fn jsonl_store_rejects_future_cursor() {
+    let root =
+        std::env::temp_dir().join(format!("fleetcore-history-future-{}", std::process::id()));
+    let paths = StorePaths::new(
+        &root,
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/seed-world.json"),
+    );
+    let mut world = load_seed(&paths).unwrap();
+    for vessel in &mut world.vessels {
+        vessel.route = vec![vessel.position];
+    }
+    append_event(
+        &paths,
+        &world.apply_command(Command::Step { ticks: 1 }).unwrap(),
+    )
+    .unwrap();
+    let store = JsonlVesselEventHistoryStore::new(paths, world.world_id);
+    let error = store
+        .query(&HistoryQuery {
+            after_sequence: Some(9_999),
+            limit: 10,
+            event_type: None,
+            world_id: None,
+            mission_scope: None,
+        })
+        .unwrap_err();
+    assert!(
+        matches!(error, HistoryStoreError::InvalidRequest(message) if message.contains("beyond newest"))
+    );
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
+fn jsonl_store_enforces_scan_budget_before_deserialization() {
+    let root =
+        std::env::temp_dir().join(format!("fleetcore-history-budget-{}", std::process::id()));
+    let paths = StorePaths::new(
+        &root,
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/seed-world.json"),
+    );
+    std::fs::create_dir_all(&root).unwrap();
+    let file = std::fs::File::create(&paths.events_path).unwrap();
+    file.set_len(fleetcore::history_api::MAX_HISTORY_SCAN_BYTES + 1)
+        .unwrap();
+    let store = JsonlVesselEventHistoryStore::new(paths, "monad.local".into());
+    let error = store
+        .query(&HistoryQuery {
+            after_sequence: None,
+            limit: 10,
+            event_type: None,
+            world_id: None,
+            mission_scope: None,
+        })
+        .unwrap_err();
+    assert!(
+        matches!(error, HistoryStoreError::Unavailable(message) if message.contains("scan budget"))
+    );
+    let _ = std::fs::remove_dir_all(root);
+}

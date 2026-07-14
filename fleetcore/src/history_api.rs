@@ -18,6 +18,7 @@ use std::sync::Arc;
 pub const DEFAULT_PAGE_LIMIT: usize = 50;
 pub const MAX_PAGE_LIMIT: usize = 200;
 pub const DEFAULT_OPERATIONAL_TAIL_LIMIT: usize = 2_000;
+pub const MAX_HISTORY_SCAN_BYTES: u64 = 8 * 1024 * 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OperationalTailConfig {
@@ -174,6 +175,14 @@ impl VesselEventHistoryStore for JsonlVesselEventHistoryStore {
                 query.world_id.as_deref().unwrap_or_default()
             )));
         }
+        let bytes = std::fs::metadata(&self.paths.events_path)
+            .map(|metadata| metadata.len())
+            .unwrap_or(0);
+        if bytes > MAX_HISTORY_SCAN_BYTES {
+            return Err(HistoryStoreError::Unavailable(format!(
+                "history scan budget exceeded: {bytes} bytes exceeds {MAX_HISTORY_SCAN_BYTES}"
+            )));
+        }
         let records = read_events(&self.paths).map_err(HistoryStoreError::Unavailable)?;
         let all = records
             .into_iter()
@@ -195,6 +204,18 @@ impl VesselEventHistoryStore for JsonlVesselEventHistoryStore {
         }
         let oldest = all.first().map(|event| event.sequence);
         let newest = all.last().map(|event| event.sequence);
+        if newest.is_none() && query.after_sequence.is_some_and(|cursor| cursor > 0) {
+            return Err(HistoryStoreError::InvalidRequest(
+                "after_sequence is beyond empty committed history".to_string(),
+            ));
+        }
+        if let (Some(cursor), Some(newest)) = (query.after_sequence, newest) {
+            if cursor > newest {
+                return Err(HistoryStoreError::InvalidRequest(format!(
+                    "after_sequence {cursor} is beyond newest committed sequence {newest}"
+                )));
+            }
+        }
         if let (Some(cursor), Some(oldest), Some(newest)) = (query.after_sequence, oldest, newest) {
             if cursor.saturating_add(1) < oldest {
                 return Err(HistoryStoreError::Gap {
@@ -245,7 +266,16 @@ async fn get_vessel_events(
     let Query(params) = params
         .map_err(|error| HistoryApiError(HistoryStoreError::InvalidRequest(error.body_text())))?;
     let query = HistoryQuery::try_from(params).map_err(HistoryApiError)?;
-    let page = state.store.query(&query).map_err(HistoryApiError)?;
+    let query_for_store = query.clone();
+    let store = state.store.clone();
+    let page = tokio::task::spawn_blocking(move || store.query(&query_for_store))
+        .await
+        .map_err(|error| {
+            HistoryApiError(HistoryStoreError::Unavailable(format!(
+                "history worker failed: {error}"
+            )))
+        })?
+        .map_err(HistoryApiError)?;
     validate_page(&query, &page).map_err(HistoryApiError)?;
     Ok(Json(page))
 }

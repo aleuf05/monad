@@ -74,6 +74,17 @@ Endpoints — full contract, payload shapes, and error responses are in `docs/ar
 - `GET /v2/vessel-events` — bounded, stable-sequence history read from the
   authoritative V2 command envelopes. `mission_scope` is rejected explicitly
   because FleetCore does not currently record that attribution.
+
+The reserved operational-tail configuration defaults to 2,000 records. Slice
+A+B does not apply that limit or compact any history; it only fixes the future
+configuration contract.
+
+The durable JSONL append and sync is the command authority boundary. If that
+commit succeeds but rewriting `world.json` fails, the command response remains
+successful with `committed: true`, its `event_sequence`, `degraded: true`, and
+the degraded cause. FleetCore then becomes read-only until reconciliation;
+clients must not interpret this response as a rejection or resubmit it as a
+new command.
 - `POST /command` — apply a `Command` (JSON body, same tagged shape the CLI commands map to). Requires `Authorization: Bearer <token>`.
 - `GET /ws` — WebSocket. Optional `?token=<token>` on the connect URL grants command authority for that connection. On connect the server sends `{"type":"connected","command_authority":true|false}` then the current `{"type":"snapshot","snapshot":{...}}`, then another `snapshot` message after every subsequent tick or applied command from any client. An authorized connection can send a raw `Command` JSON object to mutate the world; an unauthorized one gets `{"type":"error","message":"..."}` back instead.
 
