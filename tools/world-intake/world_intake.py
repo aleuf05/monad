@@ -131,7 +131,8 @@ class Intake:
             subject_id=value["kind"]+"."+slug(value["name"])
             change={"change":"create-entity","entity":{"id":subject_id,"kind":value["kind"],"name":value["name"],"aliases":[],"onboarding_status":"proposed","merged_into":None}}
         elif pred == "alias_reference":
-            change={"change":"add-alias","entity_id":value.get("entity_id") or "crew."+slug(value["possible_canonical"]),"alias":row["subject"]}
+            if row["decision"] != "link" or not value.get("entity_id"): raise ValueError("ambiguous aliases require an explicit link decision and existing entity id")
+            change={"change":"add-alias","entity_id":value["entity_id"],"alias":json.loads(row["value_json"])["alias"]}
         elif pred in {"assign_role","assign_station"}:
             assignment_type="role" if pred == "assign_role" else "station"
             change={"change":"assign","assignment":{"id":sid("assignment",row["assertion_id"]),"subject_id":subject_id,"assignment_type":assignment_type,"value":value,"active":True}}
@@ -139,6 +140,7 @@ class Intake:
             change={"change":"attach-capability","claim":{"id":sid("claim",row["assertion_id"]),"subject_id":subject_id,"capability":value["capability"],"verified":False,"active":True}}
         elif pred in {"authorization_request","request_permission"}:
             request=value.get("action") or value.get("permission")
+            if pred == "authorization_request" and value.get("action") == "reactor_start": subject_id="vessel.monad"
             change={"change":"record-authorization","authorization":{"id":sid("authorization",row["assertion_id"]),"subject_id":subject_id,"request":request,"status":"pending"}}
         elif pred == "add_alias": change={"change":"add-alias","entity_id":subject_id,"alias":value}
         elif pred == "set_onboarding_status": change={"change":"set-onboarding-status","entity_id":subject_id,"status":value}

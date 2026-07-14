@@ -344,7 +344,11 @@ impl World {
                 self.canon_relationships.push(relationship);
             }
             CanonChange::RecordAuthorization { authorization } => {
-                if !entity_exists(&authorization.subject_id) {
+                let vessel_exists = self
+                    .vessels
+                    .iter()
+                    .any(|vessel| vessel.id == authorization.subject_id);
+                if !entity_exists(&authorization.subject_id) && !vessel_exists {
                     return Err(format!(
                         "unknown authorization subject '{}'",
                         authorization.subject_id
