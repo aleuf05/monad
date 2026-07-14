@@ -107,6 +107,7 @@ Interactive artifacts that must be reachable under `https://cameronlampley.com/`
 - `web/toys/shared/fleet-state.js` — the `MonadFleetState` contract, copied from `toys/shared/fleet-state.js`. Fleet Motion, Periscope, and Bridge Station all depend on this being present and in sync with the source; a stale copy silently breaks cross-instrument selection sync (this happened once — `web/toys/fleet-motion/` sat un-refreshed since the `7003852` schema-v2 refactor until it was caught during the Bridge Station Mk III deploy).
 - `web/toys/fleetcore-live/` — copied from `toys/fleetcore-live/`, **with one intentional divergence from source**: `index.html`'s default `#serverUrl` value is `wss://cameronlampley.com/fleetcore-ws/ws` (the public reverse-proxy path below) instead of `ws://localhost:4771/ws`. Unlike every other public artifact here, this one doesn't work from a plain file copy alone — see "FleetCore Live Backend" below for what else has to be running.
 - `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) is whatever the server grants this connection on its own — there is no client-supplied token field or URL passthrough here anymore.
+- `web/toys/agent-ops/` — Agent Operations, copied from `toys/agent-ops/` (`index.html`, `app.js`, `style.css`). Reads Living Fleet state from the public FleetCore WebSocket and sends only captain enable/pause controls. Depends on both FleetCore and the portless captain runtime below.
 - `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. Linked from `web/index.html` and `web/command-deck.html`'s "Bridge Instruments" section, alongside (not replacing) the existing `toys/bridge/` "Bridge Station" card.
 
 ### Watchbook is intentionally not public
@@ -123,10 +124,24 @@ Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge
 
 `web/toys/fleetcore-live/` is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike every other public artifact in this repo, which are all fully self-contained static pages.
 
+Living Fleet adds `living-fleet.service`, one shared Python captain runtime with
+no listening port. It talks only to FleetCore on `127.0.0.1:4771`; do not add a
+proxy route for it. Install or restart both real services with the scripted
+rollout:
+
+```sh
+scripts/install-living-fleet.sh
+```
+
+The installer builds both the `serve` process and the `fleetcore` operations
+CLI so replay tooling stays on the same command schema as production. FleetCore
+retains the newest 120 recovery checkpoints plus genesis; the append-only event
+log remains the durable history.
+
 **Running the process.** `fleetcore-serve` binds `127.0.0.1` only by default (see the comment on `DEFAULT_BIND_HOST` in `fleetcore/src/bin/serve.rs`). Its write path (`POST /command`, and any command sent over `/ws`) has no auth at all: every connection on both transports has full command authority, no token required — `--command-token` is still accepted on the command line but silently ignored (see the doc comment at the top of `fleetcore/src/bin/serve.rs`, which is authoritative over `docs/architecture/fleetcore-api.md`'s "Command Authority" section describing the originally-designed gate). Run it via the systemd unit at `scripts/fleetcore-serve.service` rather than an ad hoc background process, so it survives reboots and restarts on crash:
 
 ```sh
-cargo build --release --manifest-path fleetcore/Cargo.toml --bin serve
+cargo build --release --manifest-path fleetcore/Cargo.toml --bins
 sudo cp scripts/fleetcore-serve.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now fleetcore-serve

@@ -1,0 +1,23 @@
+[
+  {
+    "captain_id": "captain.alpha",
+    "vessel_id": "vessel.scout-alpha",
+    "name": "Captain Alpha",
+    "role": "Forward screen and reconnaissance",
+    "default_posture": "advance-screen"
+  },
+  {
+    "captain_id": "captain.bravo",
+    "vessel_id": "vessel.scout-bravo",
+    "name": "Captain Bravo",
+    "role": "Flank security and maneuvering room",
+    "default_posture": "widen-flank"
+  },
+  {
+    "captain_id": "captain.charlie",
+    "vessel_id": "vessel.scout-charlie",
+    "name": "Captain Charlie",
+    "role": "Rear guard and formation integrity",
+    "default_posture": "cover-rear"
+  }
+]

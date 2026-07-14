@@ -14,6 +14,10 @@ cameronlampley.com {
 		reverse_proxy 127.0.0.1:4771
 	}
 
+	handle_path /captain-memory-api/* {
+		reverse_proxy 127.0.0.1:4772
+	}
+
 	handle {
 		root * /home/cgl/dev/monad/web
 		file_server

@@ -19,6 +19,7 @@ logs/public-ready.log
 target/
 fleetcore/target/
 data/fleetcore/
+data/living-fleet/
 logs/fleetcore-serve.log
 logs/lan-web-server.log
 logs/bridge-station-2.1-server.log

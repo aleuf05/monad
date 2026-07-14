@@ -5,6 +5,14 @@ use std::fs::{self, File, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::{Path, PathBuf};
 
+pub const MAX_RETAINED_CHECKPOINTS: usize = 120;
+
+pub struct CheckpointReplay {
+    pub world: World,
+    pub checkpoint_path: PathBuf,
+    pub replayed_events: usize,
+}
+
 #[derive(Debug, Clone)]
 pub struct StorePaths {
     pub state_dir: PathBuf,
@@ -64,7 +72,34 @@ pub fn save_checkpoint(paths: &StorePaths, world: &World) -> Result<PathBuf, Str
         .checkpoints_dir
         .join(format!("checkpoint-tick-{:010}.json", world.clock.tick));
     write_json(&path, world)?;
+    prune_checkpoints(paths, MAX_RETAINED_CHECKPOINTS)?;
     Ok(path)
+}
+
+pub fn prune_checkpoints(paths: &StorePaths, retain: usize) -> Result<(), String> {
+    let mut checkpoints = fs::read_dir(&paths.checkpoints_dir)
+        .map_err(|err| err.to_string())?
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension == "json")
+        })
+        .collect::<Vec<_>>();
+    checkpoints.sort_by(|left, right| right.file_name().cmp(&left.file_name()));
+
+    for path in checkpoints.into_iter().skip(retain) {
+        // Keep the genesis checkpoint as a human-auditable recovery anchor.
+        if path
+            .file_name()
+            .is_some_and(|name| name == "checkpoint-tick-0000000000.json")
+        {
+            continue;
+        }
+        fs::remove_file(&path)
+            .map_err(|err| format!("failed to remove {}: {err}", path.display()))?;
+    }
+    Ok(())
 }
 
 pub fn write_snapshot(
@@ -121,6 +156,56 @@ pub fn replay_from_seed(paths: &StorePaths) -> Result<World, String> {
         world.replay_event(&event)?;
     }
     Ok(world)
+}
+
+pub fn replay_from_latest_checkpoint(
+    paths: &StorePaths,
+    target_sequence: u64,
+) -> Result<Option<CheckpointReplay>, String> {
+    if !paths.checkpoints_dir.exists() {
+        return Ok(None);
+    }
+
+    let mut checkpoints = fs::read_dir(&paths.checkpoints_dir)
+        .map_err(|err| err.to_string())?
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension == "json")
+        })
+        .collect::<Vec<_>>();
+    checkpoints.sort_by(|left, right| right.file_name().cmp(&left.file_name()));
+
+    let events = read_events(paths)?;
+    for checkpoint_path in checkpoints {
+        let mut world = load_world_from(&checkpoint_path)?;
+        if world.event_sequence >= target_sequence {
+            continue;
+        }
+        let checkpoint_sequence = world.event_sequence;
+        let tail = events
+            .iter()
+            .filter(|event| {
+                event.sequence > checkpoint_sequence && event.sequence <= target_sequence
+            })
+            .collect::<Vec<_>>();
+        for event in &tail {
+            world.replay_event(event)?;
+        }
+        if world.event_sequence != target_sequence {
+            return Err(format!(
+                "checkpoint replay ended at sequence {}, expected {}",
+                world.event_sequence, target_sequence
+            ));
+        }
+        return Ok(Some(CheckpointReplay {
+            world,
+            checkpoint_path,
+            replayed_events: tail.len(),
+        }));
+    }
+    Ok(None)
 }
 
 fn write_json<T: serde::Serialize>(path: &Path, value: &T) -> Result<(), String> {

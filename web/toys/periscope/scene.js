@@ -22,6 +22,35 @@ const CAMERA_PITCH = -0.1;
 const CONTACT_MIN_DISTANCE = 26;
 const CONTACT_MAX_DISTANCE = 150;
 
+// Mk V: a fixed world-space compass heading for the "sun" (drives the GLSL3
+// horizon glitter in effects.js) and a fast, self-contained day/night cycle
+// (real wall-clock day/night would take hours to notice; this drifts fully
+// round in a couple of minutes so it's visibly alive during a normal look).
+const SUN_BEARING = 132;
+const DAY_CYCLE_MS = 150000;
+
+// `now` is time-since-navigation-start, so every fresh page load began this
+// cycle at phase 0 (midnight, the darkest point) -- meaning a first look, or
+// a reload, or Bridge Station remounting the embed, landed dark far more
+// often than the cycle's actual 50/50 day/night split would suggest. A
+// once-per-load random offset spreads page loads across the whole cycle
+// instead of always starting at its darkest instant.
+const CYCLE_OFFSET_MS = Math.random() * DAY_CYCLE_MS;
+
+function daylightState(now) {
+  const phase = ((now + CYCLE_OFFSET_MS) % DAY_CYCLE_MS + DAY_CYCLE_MS) % DAY_CYCLE_MS / DAY_CYCLE_MS;
+  const elevation = -Math.cos(phase * Math.PI * 2); // -1 midnight, 0 dawn/dusk, 1 noon
+  // Floor the blend at 0.34 rather than 0 -- full "midnight" darkness made
+  // the scope read as broken/underlit rather than atmospheric. Night still
+  // reads dim and blue relative to noon, just not near-black.
+  const t = 0.34 + (elevation + 1) / 2 * 0.66; // 0.34 night .. 1 day, for color/intensity blends
+  let label = "Night";
+  if (phase >= 0.15 && phase < 0.35) label = "Dawn";
+  else if (phase >= 0.35 && phase < 0.65) label = "Midday";
+  else if (phase >= 0.65 && phase < 0.85) label = "Dusk";
+  return { phase, elevation, t, label };
+}
+
 function degToRad(deg) {
   return (deg * Math.PI) / 180;
 }
@@ -80,10 +109,23 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
   // Contact sprites are unlit (SpriteMaterial ignores scene lights), so
   // nothing needed a light source before Phase 2's real GLTF model, which
   // uses a lit PBR material and renders solid black without one.
-  scene.add(new THREE.AmbientLight(0xaec8d0, 0.9));
+  const ambientLight = new THREE.AmbientLight(0xaec8d0, 0.9);
+  scene.add(ambientLight);
   const sunLight = new THREE.DirectionalLight(0xfff2d8, 1.1);
   sunLight.position.set(60, 120, 40);
   scene.add(sunLight);
+
+  // Day/night drift targets. Ocean tint rides on the existing
+  // MeshBasicMaterial.color (a plain multiply over the sea texture, so no
+  // extra shader/material needed); ambient/sun light drift is what the duck
+  // GLB and any future lit model actually respond to.
+  const AMBIENT_NIGHT = new THREE.Color(0x17232a);
+  const AMBIENT_DAY = new THREE.Color(0xaec8d0);
+  const SUN_HORIZON_COLOR = new THREE.Color(0xffb066);
+  const SUN_ZENITH_COLOR = new THREE.Color(0xfff2d8);
+  const OCEAN_NIGHT_TINT = new THREE.Color(0x35505c);
+  const OCEAN_DAY_TINT = new THREE.Color(0xffffff);
+  const tintScratch = new THREE.Color();
 
   const overlayCtx = overlayCanvas.getContext("2d");
 
@@ -147,6 +189,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
   }
 
   const contactPool = new Map();
+  let latestDaylight = daylightState(0);
 
   function distanceForRange(range) {
     const proximity = 1 - clamp(range / MAX_RANGE, 0, 1);
@@ -333,6 +376,14 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     camera.fov = periscope.optics.fov;
     camera.updateProjectionMatrix();
 
+    const daylight = daylightState(now);
+    ambientLight.color.copy(AMBIENT_NIGHT).lerp(AMBIENT_DAY, daylight.t);
+    ambientLight.intensity = 0.22 + daylight.t * 0.7;
+    sunLight.intensity = Math.max(0, daylight.elevation) * 1.3;
+    sunLight.color.copy(SUN_HORIZON_COLOR).lerp(SUN_ZENITH_COLOR, clamp(daylight.elevation, 0, 1));
+    oceanMaterial.color.copy(tintScratch.copy(OCEAN_NIGHT_TINT).lerp(OCEAN_DAY_TINT, daylight.t));
+    latestDaylight = daylight;
+
     const seenIds = new Set(contacts.map((contact) => contact.id));
     contacts.forEach((contact) => syncContact(contact, now));
     pruneContacts(seenIds, now);
@@ -361,7 +412,9 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
       acquisitionRing.visible = false;
     }
 
-    effects.render(now);
+    const sunDelta = shortestDelta(periscope.bearing, SUN_BEARING);
+    const sunScreenX = 0.5 + sunDelta / periscope.optics.fov;
+    effects.render(now, { screenX: sunScreenX, elevation: clamp(daylight.elevation, 0, 1) });
 
     const w = overlayCanvas.width;
     const h = overlayCanvas.height;
@@ -403,6 +456,9 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     resize: resizeToContainer,
     setContactVisualResolver(fn) {
       contactVisualResolver = fn;
+    },
+    getDaylightLabel() {
+      return latestDaylight.label;
     },
   };
 }

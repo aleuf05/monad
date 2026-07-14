@@ -80,6 +80,11 @@ Connect to `ws://<host>:<port>/ws`, or `ws://<host>:<port>/ws?token=<token>` for
   "watch_events": [ { "tick": 12, "sim_time": "...", "message": "..." } ],
   "vessel_events": [ /* VesselEvent, see "Vessel Events" below */ ],
   "event_sequence": 42,
+  "escort_mode": "patrol",
+  "agent_fleet_paused": false,
+  "captain_controls": [ /* enablement and runtime status */ ],
+  "escort_intents": [ /* current accepted intent per captain */ ],
+  "agent_decisions": [ /* accepted/rejected history and consequences */ ],
   "land_zones": [ { "name": "Qeshm Island", "south": 26.62, "north": 26.98, "west": 55.55, "east": 56.25 }, "..." ]
 }
 ```
@@ -121,6 +126,10 @@ Internally tagged on `"type"`, kebab-case, matching `fleetcore/src/command.rs`'s
 {"type": "set-route", "vessel_id": "vessel.monad", "route": [{"lat": 26.2, "lng": 55.9}]}
 {"type": "spawn-passive-contact", "id": "traffic.new-01", "name": "New Contact", "callsign": "NEW CONTACT", "position": {"lat": 24.0, "lng": 58.0}, "course": 90.0, "speed_mps": 8.0}
 {"type": "despawn-vessel", "id": "traffic.new-01"}
+{"type": "submit-escort-intent", "captain_id": "captain.alpha", "vessel_id": "vessel.scout-alpha", "posture": "advance-screen", "target_contact_id": null, "objective": "Establish the forward screen.", "assessment": "Forward sector clear.", "observed_tick": 1234, "observed_event_sequence": 42, "reconsider_at_tick": 1294}
+{"type": "set-captain-enabled", "vessel_id": "vessel.scout-alpha", "enabled": false}
+{"type": "set-agent-fleet-paused", "paused": true}
+{"type": "report-captain-runtime", "captain_id": "captain.alpha", "vessel_id": "vessel.scout-alpha", "status": "idle", "provider": "doctrine-fallback-v1", "message": "Decision accepted.", "observed_tick": 1234}
 {"type": "record-watch-event", "message": "operator note"}
 {"type": "step", "ticks": 1}
 ```
@@ -130,6 +139,14 @@ Internally tagged on `"type"`, kebab-case, matching `fleetcore/src/command.rs`'s
 `despawn-vessel` is the symmetric inverse of `spawn-passive-contact` and only that: it's rejected (`422`) for an unknown id, and rejected for any vessel that isn't `passive-traffic` kind (`"cannot despawn '...': only passive-traffic contacts can be removed, not a Flagship/Scout vessel"`) — the flagship and scout escorts aren't removable through this command, on purpose. There is still no bulk "clear the board"/reset command; each vessel has to be despawned individually.
 
 `step` is what the server's own tick loop sends itself every `--tick-ms`; a client can send it too (e.g. to single-step a paused world), but there's normally no reason to — the tick loop already advances the clock in real time whenever it isn't paused.
+
+`submit-escort-intent` is the only captain decision command. It accepts no
+route or coordinates. FleetCore checks captain assignment, enablement,
+observation freshness, bounded text/reconsideration fields, and a current
+passive contact for investigations. A domain rejection returns a normal updated
+snapshot with an `escort-intent-rejected` command event and `agent_decisions`
+record, keeping rejection visible and replayable. Malformed JSON remains HTTP
+400; non-agent command validation remains HTTP 422.
 
 ## What This API Does Not Do
 

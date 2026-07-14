@@ -1,7 +1,7 @@
 use fleetcore::command::Command;
 use fleetcore::persistence::{
-    append_event, ensure_dirs, load_seed, load_world, read_events, replay_from_seed,
-    save_checkpoint, save_world, write_snapshot, StorePaths,
+    append_event, ensure_dirs, load_seed, load_world, read_events, replay_from_latest_checkpoint,
+    replay_from_seed, save_checkpoint, save_world, write_snapshot, StorePaths,
 };
 use fleetcore::snapshot::snapshot_json;
 use fleetcore::vessel::Position;
@@ -125,20 +125,40 @@ fn cmd_inspect(paths: &StorePaths) -> Result<(), String> {
 
 fn cmd_replay(paths: &StorePaths) -> Result<(), String> {
     let current = load_world(paths)?;
-    let replayed = replay_from_seed(paths)?;
     let current_json = snapshot_json(&current).map_err(|err| err.to_string())?;
-    let replayed_json = snapshot_json(&replayed).map_err(|err| err.to_string())?;
-    if current_json != replayed_json {
-        return Err(
-            "replay mismatch: current world snapshot differs from seed plus events".to_string(),
-        );
+    let seed_result = replay_from_seed(paths);
+    if let Ok(replayed) = &seed_result {
+        let replayed_json = snapshot_json(replayed).map_err(|err| err.to_string())?;
+        if current_json == replayed_json {
+            println!(
+                "replay matched from seed: {} events, tick {}",
+                read_events(paths)?.len(),
+                replayed.clock.tick
+            );
+            return Ok(());
+        }
     }
-    println!(
-        "replay matched: {} events, tick {}",
-        read_events(paths)?.len(),
-        replayed.clock.tick
-    );
-    Ok(())
+
+    if let Some(replayed) = replay_from_latest_checkpoint(paths, current.event_sequence)? {
+        let replayed_json = snapshot_json(&replayed.world).map_err(|err| err.to_string())?;
+        if current_json == replayed_json {
+            println!(
+                "replay matched from checkpoint {} plus {} events, tick {}",
+                replayed.checkpoint_path.display(),
+                replayed.replayed_events,
+                replayed.world.clock.tick
+            );
+            return Ok(());
+        }
+    }
+
+    let seed_detail = seed_result
+        .err()
+        .map(|error| format!(" ({error})"))
+        .unwrap_or_default();
+    Err(format!(
+        "replay mismatch: current world differs from seed plus events{seed_detail} and from the latest compatible checkpoint plus event tail"
+    ))
 }
 
 fn apply_and_persist(paths: &StorePaths, command: Command) -> Result<(), String> {

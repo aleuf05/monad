@@ -114,9 +114,10 @@ h2 {
 
 .optics-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px 12px;
   border: 1px solid rgba(196, 229, 223, 0.16);
   background: rgba(4, 9, 11, 0.46);
   padding: 10px;

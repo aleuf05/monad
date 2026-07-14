@@ -1,0 +1,11 @@
+[Unit]
+Description=Monad Living Fleet scheduled captain reflection (oneshot)
+After=network-online.target living-fleet.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/living-fleet/memory/run_scheduled_reflection.py

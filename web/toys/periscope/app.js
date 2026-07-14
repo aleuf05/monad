@@ -23,6 +23,7 @@ const contactStrip = document.querySelector("#contactStrip");
 const detailsButton = document.querySelector("#detailsButton");
 const fieldNote = document.querySelector("#fieldNote");
 const magnificationReadout = document.querySelector("#magnificationReadout");
+const lightReadout = document.querySelector("#lightReadout");
 const magnificationButtons = Array.from(document.querySelectorAll("[data-magnification]"));
 const panelEmpty = document.querySelector("#panelEmpty");
 const panelContent = document.querySelector("#panelContent");
@@ -173,6 +174,7 @@ function render(now) {
   periscope.visibleContacts = contacts.filter((contact) => contact.visible);
 
   scene.render(periscope, contacts, now);
+  if (lightReadout) lightReadout.textContent = scene.getDaylightLabel();
 
   bearingReadout.textContent = formatBearing(periscope.bearing);
   updateBearingBand();
