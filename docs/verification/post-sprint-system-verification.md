@@ -95,10 +95,10 @@ Verified durable and independently re-readable three ways after the command retu
 2. **Severity: Low — `monad-watchman`, the project's designed heartbeat/health service, isn't installed.**
    - **Evidence:** `docs/watchman.md` describes it as "a permanent, non-LLM heartbeat process" meant to run continuously; `systemctl is-enabled monad-watchman` → `not-found`.
    - **Failure scenario:** no functional impact observed (this verification pass covered the same ground manually), but if Granite has an issue outside of what the app-level snapshot exposes (disk, Qdrant health, uptime discontinuities), nothing is currently logging it automatically.
-   - **Recommendation:** install it (`sudo cp systemd/monad-watchman.service /etc/systemd/system/ && sudo systemctl enable --now monad-watchman`) — this needs privileged access this session doesn't have; left for the operator, not staged as a `cmd.sh` package since it's low-risk/non-blocking and better bundled with other privileged work if any is already queued.
+   - **Resolution status:** installation is now consolidated into the current marker-gated `/home/cgl/cmd.sh` commissioning batch. It remains pending until that privileged handoff runs.
 
-3. **Severity: Informational — `web/status/fleet.json` is a stale, orphaned artifact.**
-   - Last touched 2026-07-09, predates Living Fleet, not linked from any page. Not a defect in the running system, just dead content. Left alone — out of scope for this pass.
+3. **Correction to the original audit — `web/status/fleet.json` is not orphaned.**
+   - `web/fleet.html` loads `web/assets/js/fleet.js`, which fetches this file as its static physical-fleet roster. It is separate from FleetCore's simulated world by design. No deletion or migration is warranted from this report.
 
 ## Files Changed
 
@@ -117,8 +117,11 @@ No source, config, or data files were changed. All destructive/crash testing ran
 - `vessel_events` unbounded growth (Defect 1) — not urgent, but will keep getting more expensive every day it's left as-is; worth scheduling before it becomes a visible performance problem rather than after.
 - Crash-mid-write safety for the memory DB is inferred from WAL semantics, not directly observed under load (residual test gap noted above).
 - No privileged-restart test was performed against the actual production `fleetcore-serve`/`living-fleet` systemd units in this session (no sudo available) — confidence in restart behavior rests on the real reboot that already occurred plus the isolated CLI-level restart proof, which together are strong but not identical to an operator-triggered `systemctl restart` under this session's control.
-- `monad-watchman` gap (Defect 2) — low risk, easy fix, just needs a privileged install.
+- `monad-watchman` gap (Defect 2) — staged in the current privileged commissioning package.
 
 ## Recommended Next Engineering Action
 
-Scope and implement a bound on `vessel_events` (Defect 1) — most likely: exclude it from checkpoint bodies (checkpoints are recovery anchors; the event log is already the durable history) and cap what's embedded in `world.json`/live snapshots to a recent window, with a follow-up on whether any current toy actually needs full-history `vessel_events` or only the tail it already diffs against by sequence/tick.
+Issue [#6](https://github.com/aleuf05/monad/issues/6) tracks the required
+`vessel_events` retention/wire design. Keep it separate from commissioning;
+the likely direction is durable append-only history plus a bounded recent tail
+in current state and live snapshots, after confirming consumer requirements.
