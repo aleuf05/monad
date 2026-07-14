@@ -85,3 +85,12 @@ sealed for human safety.
 
 This is a standing governance order. It authorizes no engineering change and
 does not erase the research record.
+
+## Hard gate
+
+No progress is achieved, credited, or claimed until Monad's core reality is
+clearly specified and confirmed by Command.
+
+Until that condition is satisfied, no implementation, institutional redesign,
+mission declaration, completion claim, or release of the engineering seal is
+valid.
