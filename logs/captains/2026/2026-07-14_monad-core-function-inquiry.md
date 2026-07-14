@@ -68,3 +68,11 @@ Only listening, reasoning, hypothesis formation, evidence review, and durable
 records-only transcription are authorized during the seal. Building,
 integration, deployment, migration, compaction, and production changes remain
 on hold.
+
+## Institutional classification
+
+Monad is a research laboratory, not a development shop.
+
+Software engineering is an instrument available to the laboratory. It is not
+Monad's identity, purpose, or default mode of operation. Research determines
+what, if anything, engineering is later asked to build.
