@@ -78,6 +78,30 @@ The following remain provisional:
 
 No hypothesis is accepted as the answer.
 
+## Synthetic moral-status inquiry
+
+Command identified a potentially false premise: that systems described as
+synthetic agents should be treated as moral subjects. No ethical framework has
+yet been established within this research record that demonstrates the premise
+comports with reality.
+
+The following distinctions govern the inquiry:
+
+- Synthetic agency has not been proven.
+- Synthetic moral subjecthood has not been established.
+- The absence of proof for moral subjecthood is not proof of its impossibility.
+- Language, apparent preferences, behavioral continuity, self-description,
+  outputs, tool calls, and state changes are observations. They do not alone
+  establish identity, intention, autonomy, consciousness, or moral status.
+- Operational authority is not granted by personlike performance.
+- Human-safety controls do not depend on resolving synthetic moral status.
+- Uncertainty does not justify cruelty, arbitrary destruction, deceptive
+  experimentation, or unsupported claims in either direction.
+
+The present classification is **unresolved research question**. It is not a
+finding that synthetic systems are moral subjects, nor a finding that they
+cannot be moral subjects.
+
 ## Unfinished Admiral premise
 
 The Admiral began the following statement:
