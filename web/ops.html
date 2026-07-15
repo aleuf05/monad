@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monad — Ops Reader</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --surface: #fcfcfb;
+    --page: #f4f3ef;
+    --ink: #14140f;
+    --ink-secondary: #52514e;
+    --ink-muted: #898781;
+    --line: #e1e0d9;
+    --accent: #1c5cab;
+    --good: #0ca30c;
+    --warn: #c98500;
+    --blocked: #d03b3b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --surface: #1a1a19;
+      --page: #101010;
+      --ink: #f2f2ee;
+      --ink-secondary: #c3c2b7;
+      --ink-muted: #8b897f;
+      --line: #2c2c2a;
+      --accent: #6fa8dc;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  header {
+    position: sticky; top: 0; z-index: 5;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  header h1 { font-size: 15px; margin: 0; flex: 1; }
+  header button, header a.back {
+    font-size: 13px; padding: 6px 10px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    text-decoration: none; cursor: pointer;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  #index .group { margin-bottom: 22px; }
+  #index h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .04em;
+    color: var(--ink-muted); margin: 0 0 8px;
+  }
+  #index ul { list-style: none; margin: 0; padding: 0; }
+  #index li {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  #index a {
+    display: block; padding: 12px 14px; color: var(--ink); text-decoration: none;
+    font-size: 14px;
+  }
+  #index a .sub { display: block; color: var(--ink-muted); font-size: 12px; margin-top: 2px; }
+  #doc {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px; font-size: 15px; word-wrap: break-word; overflow-wrap: anywhere;
+  }
+  #doc h1 { font-size: 20px; }
+  #doc h2 { font-size: 17px; border-top: 1px solid var(--line); padding-top: 14px; margin-top: 20px; }
+  #doc h3 { font-size: 15px; color: var(--ink-secondary); }
+  #doc p, #doc li { font-size: 14.5px; }
+  #doc code {
+    background: var(--page); padding: 1px 5px; border-radius: 4px;
+    font-size: 0.9em; word-break: break-word;
+  }
+  #doc pre {
+    background: var(--page); padding: 10px; border-radius: 8px; overflow-x: auto;
+  }
+  #doc pre code { background: none; padding: 0; }
+  #doc a { color: var(--accent); }
+  #doc strong { color: var(--ink); }
+  #doc ul, #doc ol { padding-left: 22px; }
+  #doc table { width: 100%; border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
+  #doc th, #doc td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; }
+  .status-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+  .status-blocked { background: rgba(208,59,59,.15); color: var(--blocked); }
+  .status-queued { background: rgba(201,133,0,.15); color: var(--warn); }
+  .error { color: var(--blocked); padding: 20px; text-align: center; }
+  .hint { color: var(--ink-muted); font-size: 12px; margin-top: 16px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" id="backBtn" href="#" style="display:none">&larr;</a>
+  <h1 id="pageTitle">Ops Reader</h1>
+  <button id="refreshBtn" title="Reload">&#8635;</button>
+</header>
+<main>
+  <div id="index"></div>
+  <div id="doc" style="display:none"></div>
+</main>
+<p class="hint">Read-only mirror of <code>docs/</code>. Editing happens in the repo, not here.</p>
+
+<script>
+// Self-contained: no external requests except same-origin fetches of
+// docs/ markdown files (served via web/docs -> ../docs symlink).
+// Minimal regex-based markdown renderer -- headers, bold/italic, inline
+// code, fenced code, links, lists, tables, hr. Good enough for this
+// repo's docs, not a general-purpose parser.
+
+const CURATED = [
+  {
+    group: "Work Queue",
+    items: [
+      { title: "Live work queue", path: "engineering-orders/queue.md", sub: "Active + blocked-on-human tasks" },
+    ],
+  },
+  {
+    group: "Report Queue — Findings",
+    items: [
+      { title: "Feature Matrix", path: "reports/2026-07-15-feature-matrix.md", sub: "Master Packet §21 status, all sections" },
+      { title: "System Reality Report", path: "reports/2026-07-15-system-reality-report.md", sub: "Services, ports, storage, endpoints" },
+      { title: "Architecture Map", path: "reports/2026-07-15-architecture-map.md", sub: "Live service topology" },
+      { title: "Phase I Sweep + Corrections", path: "reports/2026-07-15-phase1-sweep-and-corrections.md", sub: "Toy drift, issue #6/#13 correction" },
+      { title: "Inadequate Specs", path: "reports/2026-07-15-inadequate-specs.md", sub: "Where orders were missing a target" },
+      { title: "Process Analysis", path: "reports/2026-07-15-process-analysis.md", sub: "Two-agent coordination system review" },
+      { title: "Captain Issue Report (7/15)", path: "reports/2026-07-15-captain-issue-report.md", sub: "" },
+      { title: "Captain Issue Report (7/14)", path: "reports/2026-07-14-captain-issue-report.md", sub: "" },
+    ],
+  },
+  {
+    group: "Doctrine",
+    items: [
+      { title: "001 — Verification Command Dialect", path: "doctrine/001-verification-command-dialect.md", sub: "Proposed, pending adoption" },
+    ],
+  },
+  {
+    group: "Process / Protocol",
+    items: [
+      { title: "Commissioning Handoff", path: "commissioning-handoff.md", sub: "Privileged (sudo) work protocol" },
+      { title: "Deployment", path: "deployment.md", sub: "" },
+      { title: "Engineering Packets README", path: "engineering-orders/packets/README.md", sub: "" },
+    ],
+  },
+];
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderInline(text) {
+  text = text.replace(/`([^`]+)`/g, (m, c) => `<code>${escapeHtml(c)}</code>`);
+  text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, label, href) => {
+    if (/^https?:\/\//.test(href)) {
+      return `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${label}</a>`;
+    }
+    // internal .md link -- route through the viewer
+    const clean = href.replace(/^\.\.?\//, "").replace(/#.*$/, "");
+    if (clean.endsWith(".md")) {
+      return `<a href="#" data-nav="${escapeHtml(clean)}">${label}</a>`;
+    }
+    return `<a href="${escapeHtml(href)}">${label}</a>`;
+  });
+  return text;
+}
+
+function mdToHtml(md) {
+  const lines = md.replace(/\r\n/g, "\n").split("\n");
+  let html = "";
+  let inCode = false, codeBuf = [];
+  let inTable = false, tableRows = [];
+  let listBuf = [], listType = null;
+  let paraBuf = [];
+
+  function flushPara() {
+    if (paraBuf.length) {
+      html += `<p>${renderInline(paraBuf.join(" "))}</p>`;
+      paraBuf = [];
+    }
+  }
+  function flushList() {
+    if (listBuf.length) {
+      const tag = listType === "ol" ? "ol" : "ul";
+      html += `<${tag}>` + listBuf.map(li => `<li>${renderInline(li)}</li>`).join("") + `</${tag}>`;
+      listBuf = []; listType = null;
+    }
+  }
+  function flushTable() {
+    if (tableRows.length) {
+      const [headerRow, sepRow, ...bodyRows] = tableRows;
+      html += "<table><thead><tr>" +
+        headerRow.map(c => `<th>${renderInline(c.trim())}</th>`).join("") +
+        "</tr></thead><tbody>" +
+        bodyRows.map(r => "<tr>" + r.map(c => `<td>${renderInline(c.trim())}</td>`).join("") + "</tr>").join("") +
+        "</tbody></table>";
+      tableRows = [];
+    }
+    inTable = false;
+  }
+
+  for (const raw of lines) {
+    const line = raw;
+    if (line.trim().startsWith("```")) {
+      if (inCode) { html += `<pre><code>${escapeHtml(codeBuf.join("\n"))}</code></pre>`; codeBuf = []; inCode = false; }
+      else { flushPara(); flushList(); flushTable(); inCode = true; }
+      continue;
+    }
+    if (inCode) { codeBuf.push(line); continue; }
+
+    if (/^\s*\|.*\|\s*$/.test(line)) {
+      const cells = line.trim().replace(/^\||\|$/g, "").split("|");
+      if (!inTable) { flushPara(); flushList(); inTable = true; }
+      tableRows.push(cells);
+      continue;
+    } else if (inTable) {
+      flushTable();
+    }
+
+    const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if (h) {
+      flushPara(); flushList();
+      const level = h[1].length;
+      html += `<h${level}>${renderInline(h[2])}</h${level}>`;
+      continue;
+    }
+    if (/^\s*---+\s*$/.test(line) && line.trim() !== "") {
+      flushPara(); flushList();
+      html += "<hr>";
+      continue;
+    }
+    const ol = line.match(/^\d+\.\s+(.*)$/);
+    const ul = line.match(/^[-*]\s+(.*)$/);
+    if (ol) {
+      flushPara();
+      if (listType !== "ol") { flushList(); listType = "ol"; }
+      listBuf.push(ol[1]);
+      continue;
+    }
+    if (ul) {
+      flushPara();
+      if (listType !== "ul") { flushList(); listType = "ul"; }
+      listBuf.push(ul[1]);
+      continue;
+    }
+    if (line.trim() === "") { flushPara(); flushList(); continue; }
+    // A non-blank, non-bullet line right after a list item is a wrapped
+    // continuation of that item (this repo's docs do this constantly),
+    // not a new paragraph -- merge it into the last <li>.
+    if (listBuf.length) {
+      listBuf[listBuf.length - 1] += " " + line.trim();
+      continue;
+    }
+    // Same idea for plain paragraphs: consecutive non-blank lines are one
+    // wrapped paragraph, not one <p> per source line.
+    paraBuf.push(line.trim());
+  }
+  flushPara();
+  flushList();
+  flushTable();
+  if (inCode && codeBuf.length) html += `<pre><code>${escapeHtml(codeBuf.join("\n"))}</code></pre>`;
+  return html;
+}
+
+const indexEl = document.getElementById("index");
+const docEl = document.getElementById("doc");
+const titleEl = document.getElementById("pageTitle");
+const backBtn = document.getElementById("backBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+
+function renderIndex() {
+  titleEl.textContent = "Ops Reader";
+  backBtn.style.display = "none";
+  docEl.style.display = "none";
+  indexEl.style.display = "block";
+  indexEl.innerHTML = CURATED.map(group => `
+    <div class="group">
+      <h2>${escapeHtml(group.group)}</h2>
+      <ul>${group.items.map(it => `
+        <li><a href="#" data-nav="${escapeHtml(it.path)}">${escapeHtml(it.title)}${it.sub ? `<span class="sub">${escapeHtml(it.sub)}</span>` : ""}</a></li>
+      `).join("")}</ul>
+    </div>
+  `).join("");
+  history.replaceState({ path: null }, "", "#");
+}
+
+async function renderDoc(path) {
+  indexEl.style.display = "none";
+  docEl.style.display = "block";
+  backBtn.style.display = "inline-block";
+  titleEl.textContent = path.split("/").pop();
+  docEl.innerHTML = "<p>Loading…</p>";
+  try {
+    const res = await fetch("docs/" + path, { cache: "no-store" });
+    if (!res.ok) throw new Error(res.status + " " + res.statusText);
+    const text = await res.text();
+    docEl.innerHTML = mdToHtml(text);
+    history.replaceState({ path }, "", "#" + encodeURIComponent(path));
+  } catch (err) {
+    docEl.innerHTML = `<p class="error">Couldn't load docs/${escapeHtml(path)}<br>${escapeHtml(String(err))}</p>`;
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-nav]");
+  if (a) {
+    e.preventDefault();
+    renderDoc(a.getAttribute("data-nav"));
+  }
+});
+backBtn.addEventListener("click", (e) => { e.preventDefault(); renderIndex(); });
+refreshBtn.addEventListener("click", () => {
+  const current = location.hash.slice(1);
+  if (current) renderDoc(decodeURIComponent(current)); else renderIndex();
+});
+window.addEventListener("popstate", (e) => {
+  const path = e.state && e.state.path;
+  if (path) renderDoc(path); else renderIndex();
+});
+
+const initial = location.hash.slice(1);
+if (initial) renderDoc(decodeURIComponent(initial));
+else renderIndex();
+</script>
+</body>
+</html>
