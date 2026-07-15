@@ -175,7 +175,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## BR-01 — Bridge full-scope verification (§7)
 
-- Status: claimed:claude@2026-07-15T15:05:00Z
+- Status: done@2026-07-15T15:12:00Z
 - Source: Master Packet §7 (Command Center + Bridge: scenario creation,
   world selection, vessel placement, routes, formations, save/load,
   validation, launch; mission control showing intent/objective/actors/
@@ -189,8 +189,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   present/absent/partial. Don't infer from the UI shell alone -- confirm
   whether scenario creation, save/load, and validation are real or
   placeholder.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: commit `dd6769e`, `docs/reports/2026-07-15-feature-matrix.md` row `BR-01` — Command Center scenario/save-load/launch confirmed absent; mission-control-unification half confirmed present
 
 ## PS-01 — Periscope full-scope verification (§8)
 
