@@ -771,7 +771,20 @@ impl World {
                 "fleet-reset"
             }
             Command::SetEscortMode { mode } => {
+                let old_mode = self.escort_mode;
                 self.escort_mode = *mode;
+                if old_mode != *mode {
+                    let sim_time = self.clock.sim_time();
+                    let tick = self.clock.tick;
+                    self.record_vessel_event(VesselEvent::EscortStationChanged {
+                        vessel_id: "fleet".to_string(),
+                        old_mode,
+                        new_mode: *mode,
+                        tick,
+                        sim_time,
+                        event_seq: 0,
+                    });
+                }
                 if *mode == EscortMode::Off {
                     // Hold position cleanly rather than coasting toward a
                     // stale station point -- see advance_vessel, where a
@@ -1140,8 +1153,21 @@ impl World {
 
         let mut emitted = Vec::new();
         for vessel in &mut self.vessels {
+            let severity_before = crate::vessel::fuel_severity(vessel.fuel_fraction);
             if let Some(event) = advance_vessel(vessel, tick_duration, &sim_time, tick) {
                 emitted.push(event);
+            }
+            let severity_after = crate::vessel::fuel_severity(vessel.fuel_fraction);
+            if severity_after != severity_before {
+                emitted.push(VesselEvent::FuelStatusChanged {
+                    vessel_id: vessel.id.clone(),
+                    old_severity: severity_before.to_string(),
+                    new_severity: severity_after.to_string(),
+                    fuel_fraction: vessel.fuel_fraction,
+                    tick,
+                    sim_time: sim_time.clone(),
+                    event_seq: 0,
+                });
             }
         }
         for event in emitted {

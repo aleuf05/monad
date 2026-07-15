@@ -211,7 +211,9 @@ fn tick_of(event: &VesselEvent) -> u64 {
         VesselEvent::WaypointReached { tick, .. }
         | VesselEvent::RouteReplaced { tick, .. }
         | VesselEvent::RouteCompleted { tick, .. }
-        | VesselEvent::Holding { tick, .. } => *tick,
+        | VesselEvent::Holding { tick, .. }
+        | VesselEvent::EscortStationChanged { tick, .. }
+        | VesselEvent::FuelStatusChanged { tick, .. } => *tick,
     }
 }
 
@@ -220,6 +222,8 @@ fn vessel_id_of(event: &VesselEvent) -> String {
         VesselEvent::WaypointReached { vessel_id, .. }
         | VesselEvent::RouteReplaced { vessel_id, .. }
         | VesselEvent::RouteCompleted { vessel_id, .. }
-        | VesselEvent::Holding { vessel_id, .. } => vessel_id.clone(),
+        | VesselEvent::Holding { vessel_id, .. }
+        | VesselEvent::EscortStationChanged { vessel_id, .. }
+        | VesselEvent::FuelStatusChanged { vessel_id, .. } => vessel_id.clone(),
     }
 }

@@ -190,6 +190,36 @@ pub enum VesselEvent {
         #[serde(default)]
         event_seq: u64,
     },
+    // escort_mode is fleet-wide (see World::escort_mode), not per-vessel --
+    // this fires once per SetEscortMode command that actually changes the
+    // mode, not per scout. vessel_id is always "fleet" for this variant;
+    // there is no single vessel it's "about."
+    EscortStationChanged {
+        vessel_id: String,
+        old_mode: EscortMode,
+        new_mode: EscortMode,
+        tick: u64,
+        sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
+    },
+    // Fires when a vessel's fuel_fraction crosses a severity boundary
+    // (see fuel_severity() below) during a tick's depletion -- mirrors the
+    // thresholds toys/radio-console/app.js's FUEL_SEVERITY_THRESHOLDS
+    // already uses client-side for continuous display; this is the
+    // server becoming authoritative about the moment of crossing, not a
+    // second, independently-invented definition. Keep both in sync if
+    // either changes.
+    FuelStatusChanged {
+        vessel_id: String,
+        old_severity: String,
+        new_severity: String,
+        fuel_fraction: f64,
+        tick: u64,
+        sim_time: String,
+        #[serde(default)]
+        event_seq: u64,
+    },
 }
 
 impl VesselEvent {
@@ -198,7 +228,9 @@ impl VesselEvent {
             VesselEvent::WaypointReached { event_seq, .. }
             | VesselEvent::RouteReplaced { event_seq, .. }
             | VesselEvent::RouteCompleted { event_seq, .. }
-            | VesselEvent::Holding { event_seq, .. } => *event_seq,
+            | VesselEvent::Holding { event_seq, .. }
+            | VesselEvent::EscortStationChanged { event_seq, .. }
+            | VesselEvent::FuelStatusChanged { event_seq, .. } => *event_seq,
         }
     }
 
@@ -207,8 +239,23 @@ impl VesselEvent {
             VesselEvent::WaypointReached { event_seq, .. }
             | VesselEvent::RouteReplaced { event_seq, .. }
             | VesselEvent::RouteCompleted { event_seq, .. }
-            | VesselEvent::Holding { event_seq, .. } => *event_seq = value,
+            | VesselEvent::Holding { event_seq, .. }
+            | VesselEvent::EscortStationChanged { event_seq, .. }
+            | VesselEvent::FuelStatusChanged { event_seq, .. } => *event_seq = value,
         }
+    }
+}
+
+// Mirrors toys/radio-console/app.js's FUEL_SEVERITY_THRESHOLDS
+// (critical <= 0.15, elevated <= 0.3) -- this is the one other place
+// those numbers are allowed to live; keep both in sync if either changes.
+pub fn fuel_severity(fraction: f64) -> &'static str {
+    if fraction <= 0.15 {
+        "critical"
+    } else if fraction <= 0.3 {
+        "elevated"
+    } else {
+        "routine"
     }
 }
 

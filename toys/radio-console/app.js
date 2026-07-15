@@ -231,8 +231,9 @@ let livePumpTimer = null;
 let speechTimeoutTimer = null;
 let lastVesselStatus = null; // Map<vesselId, status>, null until the first live snapshot seeds it
 let lastSnapshotVessels = []; // most recent snapshot's vessels, for on-demand severity derivation
-let lastWatchEventCount = 0;
+let lastWatchEventCount = null; // null until the first live snapshot seeds it
 let lastFuelSeverity = null; // Map<vesselId, "routine"|"elevated"|"critical">, null until seeded
+let lastEscortMode = null; // null until the first live snapshot seeds it
 const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
@@ -715,12 +716,50 @@ function diffFuelLevels(vessels) {
   });
 }
 
+const ESCORT_MODE_LABELS = {
+  off: "escort stood down",
+  loose: "loose escort",
+  patrol: "patrol escort",
+  tight: "tight escort",
+  screen: "screening formation"
+};
+
+// Fleet-wide (World::escort_mode is one value for the whole fleet, not
+// per-vessel -- see fleetcore/src/vessel.rs's EscortStationChanged doc
+// comment), so this is a single scalar diff, not a per-vessel map like
+// diffVesselStates/diffFuelLevels above.
+function diffEscortMode(escortMode) {
+  if (typeof escortMode !== "string") return;
+  const seeding = lastEscortMode === null;
+  const previous = lastEscortMode;
+  lastEscortMode = escortMode;
+  if (seeding || previous === escortMode) return;
+  const label = ESCORT_MODE_LABELS[escortMode] || escortMode;
+  queueLiveEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Bridge, escorts shifting to ${label}.`,
+    station: "bridge"
+  });
+}
+
 function diffWatchEvents(watchEvents) {
   const events = watchEvents || [];
-  if (events.length <= lastWatchEventCount) {
+  const seeding = lastWatchEventCount === null;
+  if (seeding || events.length <= lastWatchEventCount) {
     lastWatchEventCount = events.length;
     return;
   }
+  // Fixes a real starvation bug: before this, every power-on/reconnect
+  // replayed the *entire* watch-event history at once (lastWatchEventCount
+  // started at 0, so a multi-day-old backlog looked "new"). Those replayed
+  // entries are watch-kind (authority 1.0, 30s expiry) and always outscore
+  // status-kind entries (authority 0.86, 12s expiry) in scoreTransmission,
+  // so anything else -- including a fresh EscortStationChanged/fuel report
+  // -- got queued behind them and silently expired before ever airing.
+  // Seeding on the first snapshot (matching diffVesselStates/diffFuelLevels'
+  // existing pattern) means only genuinely new watch events queue at all.
   events.slice(lastWatchEventCount).forEach((event) => {
     queueLiveEntry({
       kind: "watch",
@@ -738,6 +777,7 @@ function applyLiveSnapshot(snapshot) {
   diffWatchEvents(snapshot.watch_events);
   diffVesselStates(snapshot.vessels || []);
   diffFuelLevels(snapshot.vessels || []);
+  diffEscortMode(snapshot.escort_mode);
   updateRadioStateIndicator();
 }
 
