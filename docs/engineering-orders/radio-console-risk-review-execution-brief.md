@@ -11,10 +11,10 @@
 3. **Hard preemption rules, outside the scalar model, always true:** emergency traffic preempts routine; human command gets immediate access; stale transmissions expire; critical unacknowledged orders escalate; FleetCore disconnect is always surfaced; scripted ambience never claims verified authority (moot here — scripted mode is cut); duplicate events never produce duplicate announcements.
 4. **Candidate-transmission schema**, every entry carries: source identity, source class (verified FleetCore state / station observation / human command / derived interpretation — scripted ambience class not needed, cut from scope), authority scope, confidence, supporting event/observation, timestamp, provenance. Already-answered rule: dramatize wording, never upgrade authority.
 
-## Needs one more decision before building (ask, don't assume)
+## Decided (Admiral: "one step process to a fully usable product" — no research detour)
 
-5. **Architecture candidates — how many to actually prototype now?** Packet asks for 3 (Central Director / Independent Stations + Arbiter / Conversation-Incident Graph), each with a written skeleton + verdict. Given the scale flag above: recommend starting with **Model A (Central Radio Director)** only — simplest, matches this toy's existing single-file architecture, fastest to get a real stress-tested skeleton in front of you. Build B/C only if A's skeleton reveals a real limitation, not on a fixed schedule.
-6. **Stress scenarios — full list or a starter subset?** Packet lists 10. Recommend starting with the 4 that are cheap to trigger against the *real* live fleet today (extended routine watch, quiet watch, FleetCore disconnect/recovery, human command interruption via `RecordWatchEvent`) before building synthetic-injection scenarios (sudden contact, busy harbor, repeated alarms, conflicting observations) that need fake data since FleetCore doesn't produce those yet.
+5. **Architecture: Model A (Central Radio Director) only.** Not a comparison exercise. Single component owns station state, conversation state, scheduling, suppression, pressure, airtime selection — matches this toy's existing single-file structure, fastest real path to shipped. B/C are not built unless A demonstrably fails once real and in use — not scheduled, not hedged against up front.
+6. **Stress verification: the 4 real scenarios first** — extended routine watch, quiet watch, FleetCore disconnect/recovery, human command interruption (`RecordWatchEvent`). All triggerable against the actual live fleet, no synthetic injection needed. Synthetic scenarios (busy harbor, repeated alarms, conflicting observations) are not built for this pass.
 
 ## Explicitly blocked, not silently dropped
 
