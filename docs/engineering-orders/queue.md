@@ -6,7 +6,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## FM-01 — Feature Matrix compilation
 
-- Status: claimed:claude@2026-07-15T13:45:00Z
+- Status: done@2026-07-15T13:52:00Z
 - Source: Master Packet §21
 - Output: `docs/reports/2026-07-15-feature-matrix.md`
 - Method: synthesize, don't re-audit — compile from
@@ -18,8 +18,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Verified Existing / Existing but Unverified / Required Next / Design
   Required / Deferred / Rejected or Superseded. Every §1-21 section gets a
   row or an explicit "not yet inspected" note.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: commit `2850390`, `docs/reports/2026-07-15-feature-matrix.md`
 
 ## AM-01 — Architecture Map
 
