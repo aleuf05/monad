@@ -167,24 +167,13 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 - Claimed by: — (Admiral's decision only)
 - Evidence: —
 
-## RADIO-01 — FleetCore: add ContactDetected VesselEvent
-
-- Status: claimed:claude@2026-07-15T17:15:00Z
-- Source: `docs/engineering-orders/radio-console-v1-and-fleetcore-model-upgrade.md`
-- Output: `ContactDetected` variant added to `fleetcore/src/vessel.rs`'s
-  `VesselEvent` enum, emitted once when a contact enters a vessel's
-  passive-detection range (reuse the proximity check behind
-  `passive_contacts()` in `agent.rs`) -- not per tick while in range.
-- Tests: Rust test confirming single emission on range-entry, no
-  re-emission while still in range, no emission if never in range.
-- No sudo, pure `fleetcore/` change + `cargo test`.
-- Claimed by: —
-- Evidence: —
-
 ## RADIO-02 — Radio Console: Priority Queue + Interruption Rules
 
 - Status: queued
-- Depends on: RADIO-01 (needs `ContactDetected` to exist to score against)
+- Depends on: nothing -- RADIO-01 was cut (no FleetCore change survived
+  verification; see the design doc). Scores against the 5 pre-existing
+  event types (`WaypointReached`, `RouteReplaced`, `RouteCompleted`,
+  `Holding`, `WatchEvent`).
 - Source: same doc, System 1
 - Output: scores every candidate transmission (from the 6 real event
   types) on urgency/relevance/source authority/freshness/interruption
