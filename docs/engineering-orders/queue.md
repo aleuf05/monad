@@ -41,7 +41,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GA-01 — Stale/duplicate worktree audit
 
-- Status: claimed:claude@2026-07-15T14:07:00Z
+- Status: done@2026-07-15T14:22:00Z
 - Source: Master Packet §21 ("identify dead, broken, stale, and
   duplicate systems"); flagged but never resolved at the very start of
   this session's sweep
@@ -59,8 +59,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   already or is still active. **Do not delete or unlock anything** —
   this task is inspection and classification only; removal is a
   separate, explicitly-authorized action.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: commit `3df111e`, `docs/reports/2026-07-15-feature-matrix.md` rows `WT-01`/`WT-02`/`WT-03`. **Notable: surfaced that issue #16 (still open) contradicts CLAUDE.md's current security posture -- worth the Lieutenant's attention.**
 
 ## WM-01 — Watchman scope verification
 
