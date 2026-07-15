@@ -23,7 +23,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## AM-01 — Architecture Map
 
-- Status: claimed:codex@2026-07-15T13:51:00Z
+- Status: done@2026-07-15T14:20:00Z
 - Source: Master Packet §21
 - Output: `docs/reports/2026-07-15-architecture-map.md`
 - Method: map derived from this session's inspected reality, not
@@ -36,8 +36,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   (`/home/cgl/dev/monad` via `WorkingDirectory`). Every edge must trace
   to something actually checked (systemd unit files, live curl checks,
   git history) — no inferred/assumed connections.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-architecture-map.md`
 
 ## GA-01 — Stale/duplicate worktree audit
 
