@@ -6,7 +6,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## FM-01 — Feature Matrix compilation
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T13:45:00Z
 - Source: Master Packet §21
 - Output: `docs/reports/2026-07-15-feature-matrix.md`
 - Method: synthesize, don't re-audit — compile from
