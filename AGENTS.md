@@ -49,3 +49,21 @@ safe under this protocol — that is what isolated git worktrees are
 for (see `.claude/worktrees/` for a live example), and this queue
 defers to that rather than replacing it. This queue serializes *who
 works on what*; it does not enable concurrent edits to one task.
+
+## Engineering packets
+
+Repository/service-state-changing work with real acceptance criteria
+and a rollback path — not lighter synthesis/verification — uses a full
+Master Packet §13 packet instead of a `queue.md` task. See
+[`docs/engineering-orders/packets/README.md`](docs/engineering-orders/packets/README.md)
+for the field format, when to use a packet vs. a queue task, and how a
+**refusal** gets its own recorded packet
+([`template-refused.md`](docs/engineering-orders/packets/template-refused.md))
+rather than disappearing as an unrecorded chat exchange.
+
+Three coordination mechanisms now exist, bounded against each other:
+`cmd.sh` (privileged execution only), `queue.md` (non-privileged
+lighter tasks), `packets/` (non-privileged state-changing work, or a
+refusal of such work). A packet's execution may still route through
+`cmd.sh` if it needs `sudo` — the packet records intent/evidence/
+completion, `cmd.sh` is how the privileged step actually runs.
