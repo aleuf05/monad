@@ -4,38 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## LS-01 — Litestream restore drill (Design Required, not verification)
-
-- Status: queued
-- Source: Admiral's order, 2026-07-15 -- "Prove Litestream recovery
-  with an actual restore drill, not a green replication status"
-- **Verified starting state, checked before queueing:** no `litestream`
-  binary installed, no systemd unit, zero mentions anywhere in this
-  repo. This is new infrastructure to design and build, not an
-  existing system to verify -- do not treat this entry as if Litestream
-  is already running.
-- **Scoping question, not assumed:** the only sqlite database in this
-  repo is `data/world-intake.sqlite3` (confirmed via `find`). If this
-  order means Litestream-replicating that database, say so explicitly
-  before work starts -- don't infer the target silently.
-- Output: a design doc (`docs/engineering-orders/` proposal) covering
-  install, replication config, and -- per the order's actual emphasis --
-  a **restore drill that is actually executed**, not just configured:
-  replicate, corrupt/delete the working copy in a disposable/test
-  context, restore from Litestream, verify the restored data matches.
-  A green replication status alone does not satisfy this order.
-- Constraints / authority: installing a new systemd service and
-  touching the live sqlite file requires `sudo` -- this task stops at
-  design/proposal; execution routes through `cmd.sh` per
-  `commissioning-handoff.md`, same as any other privileged work.
-- Acceptance criteria for this queue entry specifically: design doc
-  exists, names the confirmed replication target explicitly (not
-  assumed), and describes a restore drill with a concrete pass/fail
-  check (e.g. "row count and checksum of restored DB match pre-
-  corruption snapshot") -- not just "replication looked healthy."
-- Claimed by: —
-- Evidence: —
-
 ## PROV-01 — provision.sh idempotency (Design Required, not verification)
 
 - Status: queued
@@ -93,26 +61,28 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 - Claimed by: —
 - Evidence: —
 
-## SPEC-01 — Resolve missing inputs for LS-01 / PROV-01 / DRIFT-01
+## SPEC-01 — Resolve missing inputs for PROV-01 / DRIFT-01
 
 - Status: **blocked-on-human** (not a normal `queued` -- no agent can
   resolve this by inspection; it requires an answer only the Admiral
   can give)
 - Source: `docs/reports/2026-07-15-inadequate-specs.md`
-- What's missing, one line each:
-  1. **LS-01:** confirm the replication target is
-     `data/world-intake.sqlite3` (the only sqlite db in the repo), or
-     name a different one.
-  2. **PROV-01:** name "a disposable node" explicitly -- hostname,
+- ~~LS-01~~ resolved 2026-07-15: cut entirely, not built -- no stated
+  reason survived asking "why replicate" (no recorded incident, no
+  documented data-loss event). Admiral's decision, stated as a general
+  principle: **one source of truth, don't replicate it.** See the
+  report above for the full resolution.
+- What's still missing, one line each:
+  1. **PROV-01:** name "a disposable node" explicitly -- hostname,
      environment, and confirmation it's real and reachable (per
      Doctrine 001, do not let an agent infer or assume this the way
      ENG-1's fabricated hosts nearly got acted on).
-  3. **DRIFT-01:** define "drift" for this task -- config drift,
+  2. **DRIFT-01:** define "drift" for this task -- config drift,
      `toys/`-vs-`web/toys/` deploy drift (already handled manually,
      see `TOY-01`), infra drift, or something else.
-- Output: three one-line answers, appended to the respective queue
-  entries above. Once appended, `LS-01`/`PROV-01`/`DRIFT-01` convert
-  from blocked to genuinely `queued` and become claimable.
+- Output: two one-line answers, appended to the respective queue
+  entries above. Once appended, `PROV-01`/`DRIFT-01` convert from
+  blocked to genuinely `queued` and become claimable.
 - Constraints: no agent should attempt to answer these by inference --
   that's the exact failure this entry exists to prevent.
 - Claimed by: — (cannot be claimed by an agent; awaiting Admiral)

@@ -37,6 +37,18 @@ None of these three are ready to execute as written. Each needs one
 missing fact supplied before Engineering can start, not just before it
 can finish.
 
+**Resolution, LS-01 (2026-07-15, later the same day):** asked "why
+replicate" before assuming the missing target answered the whole
+question. Checked for a stated reason first -- no recorded incident, no
+documented data-loss event, no explicit disaster-recovery requirement
+anywhere in this repo's reports. The only case found was generic
+hygiene (`world-intake.sqlite3` has zero backup mechanism today).
+Admiral's decision: **one live database is sufficient, no replica
+needed. `LS-01` is cut**, not built -- rejected on its merits once
+someone asked why it existed, not because the missing input was never
+supplied. Removed from the work queue; `PROV-01`/`DRIFT-01` and their
+`SPEC-01` questions are unaffected and remain open.
+
 ## 2. Master Packet §6 -- a name list, not a spec
 
 "Orbit, follow, intercept, maintain sector, return" are given as words

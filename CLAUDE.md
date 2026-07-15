@@ -121,3 +121,15 @@ for the full policy and claim protocol:
 One-line rule: action lives in the work queue; truth lives in the
 report queue. Privileged work stays exclusively in `cmd.sh` per
 `docs/commissioning-handoff.md` -- neither queue covers that.
+
+## POLICY: One source of truth -- don't replicate it
+
+Admiral's ruling, 2026-07-15 (see `LS-01`'s resolution in
+`docs/reports/2026-07-15-inadequate-specs.md`): this project runs on a
+single live database/state store per concern, deliberately. Don't
+propose or build replication, backup daemons, or standby copies as a
+default hygiene measure -- if a real need shows up (a specific
+incident, a stated recovery requirement), it gets evaluated on its
+merits then, not assumed as good practice now. Matches this repo's
+existing "no staging, `web/` is production" posture: one source of
+truth, not several copies to keep in sync.
