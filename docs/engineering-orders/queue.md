@@ -64,7 +64,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## WM-01 — Watchman scope verification
 
-- Status: claimed:claude@2026-07-15T14:25:00Z
+- Status: done@2026-07-15T14:32:00Z
 - Source: Master Packet §16 ("A Watchman process should inspect disk,
   memory, processes, endpoints, databases, event progress, stale
   services, and failed restarts")
@@ -77,8 +77,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   implemented vs. absent. Classify using Master Packet §1's vocabulary,
   don't guess from the function names alone — read what each function
   body actually does.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: commit `e108ed4`, `docs/reports/2026-07-15-feature-matrix.md` row `WM-01` — confirmed 1.5 of 8 named checks present, rest genuinely absent
 
 ## SR-01 — System Reality Report consolidation
 
