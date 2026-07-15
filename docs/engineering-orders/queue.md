@@ -4,6 +4,17 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## ISSUES-01 — Current failure modes, report-only
+
+- Status: queued
+- Source: repo scan and queue review, 2026-07-15
+- Output: a short report naming the concrete failure modes still visible in
+  the repo state, limited to the radio-console degradation cases, the
+  intentionally narrow drift boundary, and the human-gated queue blockers.
+- Constraints: report-only, no remediation/write logic, no speculation.
+- Claimed by: —
+- Evidence: `docs/reports/2026-07-15-current-failure-modes.md`
+
 ## HUMAN-01 — Rule on issue #16 vs. CLAUDE.md contradiction
 
 - Status: blocked-on-human
