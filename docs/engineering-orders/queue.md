@@ -319,7 +319,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GH-01 — Golden Hull / img2asset pipeline verification (§16)
 
-- Status: claimed:claude@2026-07-15T16:08:00Z
+- Status: done@2026-07-15T16:15:00Z
 - Source: Master Packet §16 ("The GOLDEN HULL pipeline must preserve
   source assets, Blender files, exports, manifests, SI scale, collision
   envelopes, orientation, validation, versions, and runtime identity
@@ -337,12 +337,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   silently redefine simulation dimensions" invariant -- does anything
   validate a generated model's scale against FleetCore's real vessel
   dimensions before it ships?
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md`, `tools/img2asset/README.md`, `tools/img2asset/image_to_asset.py`, `web/assets/models/manifest.json`
 
 ## MD-01 — Mission Director verification
 
-- Status: queued
+- Status: done@2026-07-15T16:15:00Z
 - Source: Master Packet §21 (mission control should show current
   intent/objective/actors/constraints/results); never inspected beyond
   a single cursor-bug check on `mission_director.py` earlier this
@@ -358,5 +358,76 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   does `report.py` produce output usable as real mission-control
   status, or is it a narrower single-mission demo (Quacken Transit 001)
   not yet generalized?
+- Claimed by: claude
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md`, `tools/mission-director/README.md`, `tools/mission-director/mission_director.py`, `tools/mission-director/report.py`, `tools/mission-director/test_cursor.py`
+
+## LS-01 — Litestream restore drill (Design Required, not verification)
+
+- Status: queued
+- Source: Admiral's order, 2026-07-15 -- "Prove Litestream recovery
+  with an actual restore drill, not a green replication status"
+- **Verified starting state, checked before queueing:** no `litestream`
+  binary installed, no systemd unit, zero mentions anywhere in this
+  repo. This is new infrastructure to design and build, not an
+  existing system to verify -- do not treat this entry as if Litestream
+  is already running.
+- **Scoping question, not assumed:** the only sqlite database in this
+  repo is `data/world-intake.sqlite3` (confirmed via `find`). If this
+  order means Litestream-replicating that database, say so explicitly
+  before work starts -- don't infer the target silently.
+- Output: a design doc (`docs/engineering-orders/` proposal) covering
+  install, replication config, and -- per the order's actual emphasis --
+  a **restore drill that is actually executed**, not just configured:
+  replicate, corrupt/delete the working copy in a disposable/test
+  context, restore from Litestream, verify the restored data matches.
+  A green replication status alone does not satisfy this order.
+- Constraints / authority: installing a new systemd service and
+  touching the live sqlite file requires `sudo` -- this task stops at
+  design/proposal; execution routes through `cmd.sh` per
+  `commissioning-handoff.md`, same as any other privileged work.
+- Claimed by: —
+- Evidence: —
+
+## PROV-01 — provision.sh idempotency (Design Required, not verification)
+
+- Status: queued
+- Source: Admiral's order, 2026-07-15 -- "Make provision.sh idempotent,
+  secret-safe, and repeatable on a disposable node"
+- **Verified starting state, checked before queueing:** no
+  `provision.sh` exists anywhere in this repo currently.
+- **Scoping question, not assumed:** "a disposable node" is exactly the
+  kind of claim that turned out fabricated in the ENG-1 packet earlier
+  this session (`node-01/02/03.livingfleet` did not resolve, had no
+  `/etc/hosts` entry, no SSH config, zero repo history). Before writing
+  a provisioning script targeting "a disposable node," confirm what
+  node this actually means and that it's real and reachable -- do not
+  assume a target that hasn't been independently verified, per Doctrine
+  001 (Silent Dependency, Confident Wrong Answer).
+- Output: a new `provision.sh` (location TBD pending the scoping
+  question above) that is idempotent (safe to re-run), never commits or
+  logs secrets in plaintext, and is testable on whatever the confirmed
+  target actually is.
+- Claimed by: —
+- Evidence: —
+
+## DRIFT-01 — Drift detection, report-only mode (Design Required, not verification)
+
+- Status: queued
+- Source: Admiral's order, 2026-07-15 -- "Run detection in report-only
+  mode and measure false positives before any auto-remediation"
+- **Verified starting state, checked before queueing:** no drift-
+  detection code or docs exist anywhere in this repo. Note this
+  session already did extensive *manual* source/deploy drift detection
+  (`toys/` vs `web/toys/`, see `TOY-01`) -- if this order means
+  automating that specific check, say so; if it means something else
+  (config drift, infra drift), scope it explicitly before work starts.
+- Output: a design doc proposing a report-only drift detector -- no
+  auto-remediation authority, per the order's own explicit sequencing
+  ("before any auto-remediation"). Must include a plan for measuring
+  false-positive rate before any future auto-remediation proposal is
+  even considered.
+- Constraints / authority: report-only by explicit order -- any future
+  task proposing auto-remediation is a separate, later decision, not
+  bundled into this one.
 - Claimed by: —
 - Evidence: —

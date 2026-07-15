@@ -58,12 +58,18 @@ Ten repair phrases, in the packet's stated priority order:
    happened once, was disclosed, not yet patched.)*
 7. **Stale Readback** -- "A correct readback of an obsolete order is
    still incorrect execution." Every executable order states its
-   validity condition and refuses rather than proceeds if unmet.
+   validity condition and refuses rather than proceeds if unmet. When
+   an order requires external lookup, the lookup itself must be
+   bounded and explicit, e.g. `timeout 5 getent hosts <host>` or
+   `dig +time=2 +tries=1 <host>`, so a stale or unreachable dependency
+   fails visibly instead of hanging the caller.
    *(Done correctly: `cmd.sh`'s `EXPECTED_HEAD` gate refused, exit 66,
    exactly when HEAD moved after pinning -- caught, not executed wrong.)*
 8. **Silent Dependency** -- "Unknown dependencies are part of the target,
    not background noise." Every packet names non-obvious prerequisites
    (human presence, process state, cache freshness) explicitly.
+   Bounded probes belong here too: if a dependency check can block
+   indefinitely, it is not explicit enough yet.
    *(Real instance: sudo requiring a password was discovered by testing,
    not by design, after one aborted `cmd.sh` run.)*
 9. **Irreversible Fix** -- "A change is not fully controlled until
