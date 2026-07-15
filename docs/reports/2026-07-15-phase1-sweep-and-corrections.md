@@ -69,7 +69,20 @@ conflated:
 - This is exactly the gap Batch B above would close (the status API
   makes the frontend show real state), but Batch B alone doesn't add
   the missing inspection dimensions -- it surfaces what `observe()`
-  already collects, which is still partial against §9's own list.
+  already collects.
+
+**Correction (later the same day):** the narrow 2-of-8 scope is not an
+open gap. `docs/engineering-orders/living-captain-v0.2.md` documents it
+as deliberate: "V0.2's manifest permits exactly the two read endpoints
+already in use... This is infrastructure for a boundary that has
+nothing to bound yet in V0.2, and that is the point... A V0.3 order,
+not this one, is where an actual narrow write path would be proposed,
+and only after this gate is live and tested." Widening `observe()`'s
+custody manifest now, on an unprompted basis, would jump that
+project's own "prove the gate before widening what it bounds"
+sequencing. Reclassifying from "Partial, worth a decision" to
+**verified-intentional, no action warranted** -- same bucket as
+`fleetcore-control` and `periscope` turned out to be.
 
 ## World Intake V0.1 baseline (Master Packet §8) -- Reverified, holds
 
@@ -115,11 +128,10 @@ Full detail in-session; summary:
 
 ## Open items for the Lieutenant
 
-1. Batch B (Living Captain status API install) is the one piece of
-   `/home/cgl/cmd.sh` still worth doing, but the script itself needs
-   re-pinning to current HEAD (`6579b0f`) before it can run -- it will
-   refuse as written.
-2. §9's Living Captain wake sequence, once live, still only covers 2 of
-   8 named inspection dimensions -- worth a decision on whether to
-   widen `observe()` or treat the current scope as an intentional V0.2
-   boundary.
+1. `/home/cgl/cmd.sh` has been rewritten: re-pinned to HEAD `eecf16e`,
+   scoped to Batch B only (Living Captain status API install), since
+   Batch A is confirmed already live and re-running it would just be
+   redundant service restarts. Not yet executed as of this update --
+   needs to be run interactively for its `sudo` steps.
+2. ~~§9's Living Captain wake sequence... worth a decision~~ --
+   resolved above: confirmed intentional V0.2 scope, no action needed.
