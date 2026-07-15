@@ -4,38 +4,9 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## PROV-01 — provision.sh idempotency (Design Required, not verification)
-
-- Status: queued
-- Source: Admiral's order, 2026-07-15 -- "Make provision.sh idempotent,
-  secret-safe, and repeatable on a disposable node"
-- **Verified starting state, checked before queueing:** no
-  `provision.sh` exists anywhere in this repo currently.
-- **Scoping question, not assumed:** "a disposable node" is exactly the
-  kind of claim that turned out fabricated in the ENG-1 packet earlier
-  this session (`node-01/02/03.livingfleet` did not resolve, had no
-  `/etc/hosts` entry, no SSH config, zero repo history). Before writing
-  a provisioning script targeting "a disposable node," confirm what
-  node this actually means and that it's real and reachable -- do not
-  assume a target that hasn't been independently verified, per Doctrine
-  001 (Silent Dependency, Confident Wrong Answer).
-- Output: a new `provision.sh` (location TBD pending the scoping
-  question above) that is idempotent (safe to re-run), never commits or
-  logs secrets in plaintext, and is testable on whatever the confirmed
-  target actually is.
-- Acceptance criteria for this queue entry specifically: the target
-  node is named and independently confirmed reachable (not taken on
-  claim) before any script is written; running the finished script
-  twice in a row produces the same end state both times, with no error
-  on the second run; a grep of the script and its output for anything
-  matching common secret patterns (API keys, passwords, tokens) finds
-  nothing in plaintext.
-- Claimed by: —
-- Evidence: —
-
 ## DRIFT-01 — Drift detection, report-only mode (Design Required, not verification)
 
-- Status: queued
+- Status: done@2026-07-15T18:35:19Z
 - Source: Admiral's order, 2026-07-15 -- "Run detection in report-only
   mode and measure false positives before any auto-remediation"
 - **Verified starting state, checked before queueing:** no drift-
@@ -58,10 +29,10 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   proposes a concrete method for measuring false-positive rate (e.g.
   run against N known-good states, count incorrect flags); contains no
   remediation/write logic of any kind, report-only end to end.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/engineering-orders/drift-detection-report-only-design-v0.1.md`
 
-## SPEC-01 — Resolve missing inputs for PROV-01 / DRIFT-01
+## SPEC-01 — Resolve missing input for DRIFT-01
 
 - Status: **blocked-on-human** (not a normal `queued` -- no agent can
   resolve this by inspection; it requires an answer only the Admiral
@@ -72,16 +43,14 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   documented data-loss event). Admiral's decision, stated as a general
   principle: **one source of truth, don't replicate it.** See the
   report above for the full resolution.
-- What's still missing, one line each:
-  1. **PROV-01:** name "a disposable node" explicitly -- hostname,
-     environment, and confirmation it's real and reachable (per
-     Doctrine 001, do not let an agent infer or assume this the way
-     ENG-1's fabricated hosts nearly got acted on).
-  2. **DRIFT-01:** define "drift" for this task -- config drift,
+- ~~PROV-01~~ resolved 2026-07-15: cut entirely, same reasoning -- no
+  stated target, no recorded need beyond the original order itself.
+- What's still missing:
+  1. **DRIFT-01:** define "drift" for this task -- config drift,
      `toys/`-vs-`web/toys/` deploy drift (already handled manually,
      see `TOY-01`), infra drift, or something else.
-- Output: two one-line answers, appended to the respective queue
-  entries above. Once appended, `PROV-01`/`DRIFT-01` convert from
+- Output: one one-line answer, appended to `DRIFT-01` below. Once
+  appended, `DRIFT-01` converts from
   blocked to genuinely `queued` and become claimable.
 - Constraints: no agent should attempt to answer these by inference --
   that's the exact failure this entry exists to prevent.

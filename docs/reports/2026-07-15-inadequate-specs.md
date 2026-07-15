@@ -46,8 +46,14 @@ hygiene (`world-intake.sqlite3` has zero backup mechanism today).
 Admiral's decision: **one live database is sufficient, no replica
 needed. `LS-01` is cut**, not built -- rejected on its merits once
 someone asked why it existed, not because the missing input was never
-supplied. Removed from the work queue; `PROV-01`/`DRIFT-01` and their
-`SPEC-01` questions are unaffected and remain open.
+supplied. Removed from the work queue.
+
+**Resolution, PROV-01 (2026-07-15, same reasoning applied):** cut for
+the same reason as `LS-01` -- no stated target, no recorded need for a
+disposable-node provisioning script beyond the original order itself.
+Same discipline: asked before assuming, found nothing to build against,
+removed from the work queue. `DRIFT-01` and its `SPEC-01` question are
+unaffected and remain open.
 
 ## 2. Master Packet §6 -- a name list, not a spec
 
