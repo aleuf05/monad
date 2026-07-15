@@ -42,6 +42,26 @@ existing protocol — do not route privileged work through this queue.
    note added to that entry, not a silent reclaim — resolving a stale
    claim is the Lieutenant's call.
 
+### `blocked-on-human` status
+
+A fourth status, distinct from `queued`/`claimed`/`done`: a task whose
+next step requires an answer only a human can give — a missing input
+that can't be resolved by inspection, not merely unfinished work (see
+`docs/reports/2026-07-15-inadequate-specs.md` for the incident that
+produced this). Rules:
+
+- An agent must never claim a `blocked-on-human` entry, and must never
+  attempt to resolve the missing input by inference — that is the exact
+  failure this status exists to prevent (Doctrine 001, Silent
+  Dependency / Confident Wrong Answer).
+- An agent may add a `blocked-on-human` entry when it identifies a real
+  missing input during other work, same commit discipline as any other
+  queue edit.
+- Only a human answering the named question converts the entry back to
+  `queued` (by editing the entry to state the answer and changing
+  `Status` back to `queued`) — an agent does not get to decide the
+  blocker is resolved on its own judgment.
+
 ### What this does not solve
 
 True simultaneous editing of the *same* files by two agents is not
