@@ -23,7 +23,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## AM-01 — Architecture Map
 
-- Status: queued
+- Status: claimed:codex@2026-07-15T13:51:00Z
 - Source: Master Packet §21
 - Output: `docs/reports/2026-07-15-architecture-map.md`
 - Method: map derived from this session's inspected reality, not
@@ -101,7 +101,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## WO-01 — Watch Officer status (§10)
 
-- Status: queued
+- Status: done@2026-07-15T14:05:00Z
 - Source: Master Packet §10 (read-only observer agent: may observe
   FleetCore/services/events/alerts/contradictions, draft logs, summarize
   activity, recommend escalation; may not issue commands, modify state,
@@ -114,8 +114,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   (line 90), not an implementation of the component. Classify as
   "Required Next" or "Design Required" (Master Packet §1 vocabulary) —
   not "Existing but Unverified," since there is nothing to verify.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md`, row `WO-01`
 
 ## EP-01 — Escort posture / deterministic patrol mapping (§6)
 
@@ -137,7 +137,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## CT-01 — Cost tracking status (§17)
 
-- Status: queued
+- Status: done@2026-07-15T14:05:00Z
 - Source: Master Packet §17 (provider, agent, task, estimated usage,
   direct cost, daily/monthly totals, budget limits, local vs. cloud
   execution, resulting value)
@@ -148,5 +148,5 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   parameters, which is a single external-API cost detail, not the
   provider/agent/task ledger §17 describes. Classify as "Required Next"
   or "Design Required," not "Existing but Unverified."
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md`, row `CT-01`
