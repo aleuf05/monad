@@ -103,3 +103,14 @@ above). If something looks like it would leak this machine's own secrets
 (credentials, tokens, private keys) rather than just being an open demo
 world, that's still worth a one-line flag -- but the general posture here
 is ship it, don't audit it.
+
+## POLICY: Shared task queue for non-privileged work
+
+Before starting non-privileged, git-only work (docs, code changes
+committable without `sudo`), check
+[`docs/engineering-orders/queue.md`](docs/engineering-orders/queue.md)
+for queued or in-progress tasks, so a Claude session doesn't duplicate
+or silently drop work another agent (e.g. Codex) already claimed. Claim
+protocol is in [`AGENTS.md`](AGENTS.md). Privileged work stays exclusively
+in `cmd.sh` per `docs/commissioning-handoff.md` -- this queue never
+covers that.
