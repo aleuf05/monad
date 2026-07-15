@@ -16,6 +16,17 @@ const CHANNEL_LABELS = {
 };
 
 const SQUELCH_DURATION_S = 0.12;
+// Real-world wire, not FleetCore -- deliberately kept out of the
+// transmission-scoring/speech pipeline above (TRANSMISSION_PROFILES,
+// scoreTransmission()) so an NPR headline can never be spoken in the same
+// voice/urgency system as a fleet watch event, which would misrepresent
+// real-world news as fleet radio traffic. Rendered as its own panel
+// instead. Source: tools/npr-headlines/fetch.py, written server-side
+// (NPR's feed only grants CORS to apps.npr.org) to web/data/npr-headlines.json,
+// refreshed on a timer -- see docs/deployment.md for the fetch schedule.
+const NEWSWIRE_URL = "/data/npr-headlines.json";
+const NEWSWIRE_REFRESH_MS = 5 * 60 * 1000;
+let newswireRefreshTimer = null;
 const STATION_LABELS = {
   bridge: "Bridge",
   engineering: "Engineering",
@@ -187,6 +198,8 @@ const muteButton = document.querySelector("#muteButton");
 const transcriptLogEl = document.querySelector("#transcriptLog");
 const speakingIndicatorEl = document.querySelector("#speakingIndicator");
 const signalCanvas = document.querySelector("#signalMeter");
+const newswireLogEl = document.querySelector("#newswireLog");
+const newswireUpdatedEl = document.querySelector("#newswireUpdated");
 const signalCtx = signalCanvas.getContext("2d");
 
 const state = {
@@ -869,6 +882,36 @@ function drawSignalMeter() {
   state.animationFrame = window.requestAnimationFrame(drawSignalMeter);
 }
 
+function renderNewswire(payload) {
+  if (!payload || !Array.isArray(payload.items) || payload.items.length === 0) {
+    newswireLogEl.innerHTML = '<li class="empty-note">No headlines available.</li>';
+    return;
+  }
+  newswireUpdatedEl.textContent = new Date(payload.fetched_at).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  newswireLogEl.innerHTML = payload.items
+    .map((item) => {
+      const time = item.pubDate ? new Date(item.pubDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+      return (
+        `<li><a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>` +
+        `<span class="timestamp">${time}</span></li>`
+      );
+    })
+    .join("");
+}
+
+async function fetchNewswire() {
+  try {
+    const response = await fetch(`${NEWSWIRE_URL}?t=${Date.now()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    renderNewswire(await response.json());
+  } catch (error) {
+    console.warn("Radio Console: newswire fetch failed", error);
+  }
+}
+
 function setPowered(powered) {
   state.powered = powered;
   powerButton.textContent = powered ? "Power Off" : "Power On";
@@ -883,12 +926,17 @@ function setPowered(powered) {
     // No scripted schedule to start -- transmissions only ever come from
     // the live FleetCore queue (see enterLiveMode()/livePump()). If not
     // connected yet, the console just sits Offline until it is.
+    fetchNewswire();
+    clearInterval(newswireRefreshTimer);
+    newswireRefreshTimer = window.setInterval(fetchNewswire, NEWSWIRE_REFRESH_MS);
   } else {
     clearSpeechTimeout();
     clearCurrentTransmission();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     liveQueue.length = 0;
     setSpeaking(false);
+    clearInterval(newswireRefreshTimer);
+    newswireRefreshTimer = null;
   }
 }
 

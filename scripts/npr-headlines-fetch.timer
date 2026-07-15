@@ -1,0 +1,10 @@
+[Unit]
+Description=Fetch NPR headlines every 15 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+Unit=npr-headlines-fetch.service
+
+[Install]
+WantedBy=timers.target

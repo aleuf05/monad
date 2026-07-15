@@ -1,0 +1,11 @@
+[Unit]
+Description=Monad NPR headlines fetch (oneshot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/npr-headlines/fetch.py
