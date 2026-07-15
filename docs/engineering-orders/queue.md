@@ -150,3 +150,26 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   or "Design Required," not "Existing but Unverified."
 - Claimed by: claude
 - Evidence: `docs/reports/2026-07-15-feature-matrix.md`, row `CT-01`
+
+## MEM-01 — Memory subsystem verification (§11)
+
+- Status: queued
+- Source: Master Packet §11 (episodic/semantic/procedural/relational/
+  narrative memory types; retrieval combining exact lookup, metadata,
+  recency, semantic similarity, mission relevance, relationships, type,
+  salience, and verification status; local TF-IDF and Qdrant coexisting)
+- Output: update the `MEM-01` row in `docs/reports/2026-07-15-feature-matrix.md`
+  (currently marked "not yet inspected" from FM-01's first pass)
+- Method: `tools/living-fleet/memory/` has real test files
+  (`test_identity.py`, `test_embeddings.py`, `test_relational.py`,
+  `test_salience.py`, `test_reflection.py`, `test_store.py`,
+  `test_context.py`, `test_conversation.py`, `test_belief_revision.py`,
+  `test_cross_captain_sharing.py`, `test_seed_import.py`,
+  `test_reflection_atomicity.py`, `test_service_integration.py`) --
+  read the actual source files (not just test names) to determine which
+  of §11's five memory types and which retrieval-combination dimensions
+  are genuinely implemented vs. absent, same rigor as `WM-01`. Don't
+  infer coverage from test file names alone.
+- Claimed by: —
+- Evidence: —
+
