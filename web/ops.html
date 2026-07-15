@@ -87,9 +87,24 @@
   #doc ul, #doc ol { padding-left: 22px; }
   #doc table { width: 100%; border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
   #doc th, #doc td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; }
-  .status-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; }
+  .status-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 999px; white-space: nowrap; }
   .status-blocked { background: rgba(208,59,59,.15); color: var(--blocked); }
   .status-queued { background: rgba(201,133,0,.15); color: var(--warn); }
+  .status-done { background: rgba(12,163,12,.15); color: var(--good); }
+  #doc details {
+    border: 1px solid var(--line); border-radius: 10px; margin: 10px 0;
+    background: var(--page);
+  }
+  #doc summary {
+    padding: 12px 14px; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14.5px;
+  }
+  #doc summary::-webkit-details-marker { display: none; }
+  #doc summary::before { content: "\25B8"; color: var(--ink-muted); font-size: 12px; transition: transform .15s; }
+  #doc details[open] summary::before { transform: rotate(90deg); }
+  #doc summary .sum-title { flex: 1; }
+  #doc .details-body { padding: 0 14px 14px; }
+  #doc .details-body > *:first-child { margin-top: 0; }
   .error { color: var(--blocked); padding: 20px; text-align: center; }
   .hint { color: var(--ink-muted); font-size: 12px; margin-top: 16px; text-align: center; }
 </style>
@@ -169,6 +184,37 @@ function renderInline(text) {
     return `<a href="${escapeHtml(href)}">${label}</a>`;
   });
   return text;
+}
+
+function statusBadge(sectionMd) {
+  const m = sectionMd.match(/^-\s*Status:\s*\*{0,2}([a-zA-Z][a-zA-Z0-9:@.\-]*)/m);
+  if (!m) return "";
+  const raw = m[1].toLowerCase();
+  let cls = "status-queued", label = m[1];
+  if (raw.startsWith("blocked")) { cls = "status-blocked"; label = "blocked"; }
+  else if (raw.startsWith("done")) { cls = "status-done"; label = "done"; }
+  else if (raw.startsWith("claimed")) { cls = "status-queued"; label = "claimed"; }
+  else if (raw.startsWith("queued")) { cls = "status-queued"; label = "queued"; }
+  return ` <span class="status-badge ${cls}">${escapeHtml(label)}</span>`;
+}
+
+// Renders top-level ## sections as collapsed-by-default <details> blocks
+// (title + status pill visible, body hidden until tapped) so a doc with
+// many dense tasks reads as a scannable list on a phone, not one long
+// wall of text. Content before the first ## (usually a short intro) and
+// any # h1 stay expanded as-is.
+function mdToHtmlCollapsible(md) {
+  const src = md.replace(/\r\n/g, "\n");
+  const chunks = src.split(/^(?=## )/m);
+  let out = mdToHtml(chunks[0]); // intro, before any ##
+  for (let i = 1; i < chunks.length; i++) {
+    const chunk = chunks[i];
+    const titleLine = chunk.split("\n", 1)[0].replace(/^##\s+/, "");
+    const badge = statusBadge(chunk);
+    const bodyHtml = mdToHtml(chunk.replace(/^##[^\n]*\n?/, ""));
+    out += `<details><summary><span class="sum-title">${renderInline(titleLine)}</span>${badge}</summary><div class="details-body">${bodyHtml}</div></details>`;
+  }
+  return out;
 }
 
 function mdToHtml(md) {
@@ -300,7 +346,7 @@ async function renderDoc(path) {
     const res = await fetch("docs/" + path, { cache: "no-store" });
     if (!res.ok) throw new Error(res.status + " " + res.statusText);
     const text = await res.text();
-    docEl.innerHTML = mdToHtml(text);
+    docEl.innerHTML = mdToHtmlCollapsible(text);
     history.replaceState({ path }, "", "#" + encodeURIComponent(path));
   } catch (err) {
     docEl.innerHTML = `<p class="error">Couldn't load docs/${escapeHtml(path)}<br>${escapeHtml(String(err))}</p>`;
