@@ -13,6 +13,17 @@ Source: Admiral's packet, relayed 2026-07-15. This document reconstructs the
 charter from that relay — no separate source file exists. Treat this as the
 working referent; correct it directly if it misreads the original intent.
 
+> Result — 2026-07-15: All five in-scope components implemented
+> (`tools/living-captain/`). `demo_restart.py` ran against real live
+> `fleetcore-serve` and `world-intake`, not fixtures: identity and
+> `created_at` survived a hard drop-and-reassemble unchanged, `restart_count`
+> advanced by exactly one, and the action log grew by exactly one entry with
+> no gap or duplication. Sight adapters were delegated to and independently
+> verified from Codex (mocked tests plus a separate live smoke check).
+>
+> **READY FOR CUSTODY/SPEND DESIGN.** Continued in
+> [`living-captain-v0.2.md`](living-captain-v0.2.md).
+
 ## Mission
 
 Give "the Captain" a presence that survives a restart with its identity and

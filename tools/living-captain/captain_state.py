@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_CAPTAIN_ID = "captain.monad"
+DEFAULT_OBSERVE_LIMIT = 1
 
 
 def now() -> str:
@@ -32,6 +33,9 @@ def _fresh_identity(captain_id: str) -> dict[str, Any]:
         "last_seen_fleetcore_tick": None,
         "last_seen_fleetcore_event_sequence": None,
         "last_seen_world_intake_pending_count": None,
+        "custody_manifest": None,
+        "observe_count": 0,
+        "observe_limit": DEFAULT_OBSERVE_LIMIT,
     }
 
 
@@ -42,7 +46,11 @@ def load_state(path: str | Path, *, captain_id: str = DEFAULT_CAPTAIN_ID) -> dic
     path = Path(path)
     if not path.exists():
         return _fresh_identity(captain_id)
-    return json.loads(path.read_text())
+    state = json.loads(path.read_text())
+    defaults = _fresh_identity(captain_id)
+    for key, value in defaults.items():
+        state.setdefault(key, value)
+    return state
 
 
 def save_state(path: str | Path, state: dict[str, Any]) -> None:

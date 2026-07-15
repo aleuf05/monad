@@ -67,6 +67,21 @@ class SightTest(unittest.TestCase):
         with self.assertRaises(json.JSONDecodeError):
             sight.fetch_world_intake_pending()
 
+    @patch("urllib.request.urlopen")
+    def test_rejects_non_get_before_network_call(self, urlopen):
+        with self.assertRaises(sight.CustodyViolation):
+            sight.request_json(
+                "http://127.0.0.1:4771/snapshot",
+                method="POST",
+            )
+        urlopen.assert_not_called()
+
+    @patch("urllib.request.urlopen")
+    def test_rejects_out_of_manifest_url_before_network_call(self, urlopen):
+        with self.assertRaises(sight.CustodyViolation):
+            sight.request_json("http://example.invalid/forbidden")
+        urlopen.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

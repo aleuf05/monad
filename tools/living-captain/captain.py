@@ -23,6 +23,11 @@ ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STATE_DIR = ROOT / "data" / "living-captain"
 DEFAULT_FLEETCORE_URL = "http://127.0.0.1:4771/snapshot"
 DEFAULT_WORLD_INTAKE_URL = "http://127.0.0.1:4773/proposals?status=pending"
+DEFAULT_OBSERVE_LIMIT = captain_state.DEFAULT_OBSERVE_LIMIT
+
+
+class SpendBudgetExceeded(RuntimeError):
+    """Raised when the Captain has exhausted its V0.2 observe budget."""
 
 
 class LivingCaptain:
@@ -48,6 +53,7 @@ class LivingCaptain:
         captain_id: str = captain_state.DEFAULT_CAPTAIN_ID,
         fleetcore_url: str = DEFAULT_FLEETCORE_URL,
         world_intake_url: str = DEFAULT_WORLD_INTAKE_URL,
+        observe_limit: int = DEFAULT_OBSERVE_LIMIT,
     ) -> "LivingCaptain":
         state_dir = Path(state_dir)
         state_path = state_dir / "state.json"
@@ -56,6 +62,9 @@ class LivingCaptain:
         state = captain_state.load_state(state_path, captain_id=captain_id)
         state["restart_count"] = state.get("restart_count", 0) + 1
         state["last_assembled_at"] = captain_state.now()
+        state["custody_manifest"] = sight.custody_manifest()
+        state["observe_limit"] = observe_limit
+        state["observe_count"] = state.get("observe_count", 0)
         captain_state.save_state(state_path, state)
 
         return cls(state, state_path, action_log_path, fleetcore_url, world_intake_url)
@@ -71,8 +80,38 @@ class LivingCaptain:
         """Read real fleet state and the World Intake queue through the
         read-only sight adapters, persist the resulting pointers, and
         record the observation. Never mutates anything it reads."""
-        snapshot = sight.fetch_fleetcore_snapshot(self.fleetcore_url)
-        pending = sight.fetch_world_intake_pending(self.world_intake_url)
+        if self.state["observe_count"] >= self.state["observe_limit"]:
+            entry = action_log.append_action(
+                self.action_log_path,
+                kind="spend_exhausted",
+                summary=(
+                    f"observe budget exhausted at "
+                    f"{self.state['observe_count']}/{self.state['observe_limit']}"
+                ),
+                detail={
+                    "observe_count": self.state["observe_count"],
+                    "observe_limit": self.state["observe_limit"],
+                },
+            )
+            raise SpendBudgetExceeded(entry["summary"])
+
+        self.state["observe_count"] += 1
+        captain_state.save_state(self.state_path, self.state)
+
+        try:
+            snapshot = sight.fetch_fleetcore_snapshot(self.fleetcore_url)
+            pending = sight.fetch_world_intake_pending(self.world_intake_url)
+        except sight.CustodyViolation as error:
+            action_log.append_action(
+                self.action_log_path,
+                kind="custody_rejection",
+                summary=str(error),
+                detail={
+                    "fleetcore_url": self.fleetcore_url,
+                    "world_intake_url": self.world_intake_url,
+                },
+            )
+            raise
 
         self.state["last_seen_fleetcore_tick"] = snapshot.get("tick")
         self.state["last_seen_fleetcore_event_sequence"] = snapshot.get("event_sequence")
@@ -93,6 +132,32 @@ class LivingCaptain:
                 "world_intake_pending_count": len(pending),
             },
         )
+
+    def record_proposal(
+        self,
+        summary: str,
+        detail: Optional[dict[str, Any]] = None,
+    ) -> dict[str, Any]:
+        """Record a proposal note without touching canon.
+
+        V0.1 deliberately has no write/command authority. This method only
+        persists the Captain's own note that something should be considered.
+        """
+        return action_log.append_action(
+            self.action_log_path,
+            kind="proposal_note",
+            summary=summary,
+            detail=detail,
+        )
+
+    def spend_status(self) -> dict[str, Any]:
+        return {
+            "observe_count": self.state["observe_count"],
+            "observe_limit": self.state["observe_limit"],
+            "remaining_observes": max(
+                0, self.state["observe_limit"] - self.state["observe_count"]
+            ),
+        }
 
     def actions(self) -> list[dict[str, Any]]:
         return action_log.read_actions(self.action_log_path)

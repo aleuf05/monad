@@ -17,7 +17,12 @@ import time
 from pathlib import Path
 from typing import Any, Optional
 
-ALLOWED_KINDS = {"observation", "proposal_note"}
+ALLOWED_KINDS = {
+    "observation",
+    "proposal_note",
+    "custody_rejection",
+    "spend_exhausted",
+}
 
 
 def _now() -> str:
