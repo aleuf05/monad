@@ -119,7 +119,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## EP-01 — Escort posture / deterministic patrol mapping (§6)
 
-- Status: queued
+- Status: done@2026-07-15T14:40:00Z
 - Source: Master Packet §6 (candidate deterministic patrol behaviors:
   orbit, screen, follow, intercept, investigate, avoid, escort, maintain
   sector, return)
@@ -132,8 +132,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   and identify which of §6's named behaviors (orbit, follow, intercept,
   maintain sector, return) have no corresponding variant at all, rather
   than assuming the whole section is unimplemented.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `FM-A`
 
 ## CT-01 — Cost tracking status (§17)
 
