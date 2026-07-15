@@ -210,7 +210,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## AG-01-VERIFY — Agent registry / messaging full-scope verification (§12)
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T15:33:00Z
 - Source: Master Packet §12 (stable identity, role, runtime, authority
   envelope, tool access, assignment, status, memory rules, cost record,
   activity record, failure history per agent; task packets,
