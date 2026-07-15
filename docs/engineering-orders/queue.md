@@ -292,3 +292,27 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   this session's own work; say so plainly rather than hedging.
 - Claimed by: codex
 - Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `PH-01`
+
+## DOC-02 — Bounded-timeout amendment to Doctrine 001
+
+- Status: queued
+- Source: this session's ENG-1 packet incident -- verifying whether
+  `node-01/02/03.livingfleet` were real hosts required killing a
+  2-minute hung `getent hosts` chain (`exit 143`); a fabricated or
+  unreachable target can fail to fail fast, and an unbounded lookup
+  becomes a liability (session-stalling) rather than useless-but-safe
+  (quick "not found")
+- Output: amend `docs/doctrine/001-verification-command-dialect.md` --
+  add bounded-timeout verification language under Target 9 (Silent
+  Dependency) and/or Target 4 (Stale Readback)'s verification
+  requirement
+- Method: this is a small, focused addition, not a rewrite. Proposed
+  wording: "Verify host/target claims with a bounded lookup, never a
+  bare blocking one -- e.g. `timeout 5 getent hosts <host>` or
+  `dig +time=2 +tries=1 <host>`. An unbounded hang is not evidence of
+  anything, just wasted time; a fabricated or unreachable target should
+  fail fast and cheaply, not stall the session." Keep Doctrine 001's
+  Status as "Proposed -- pending Lieutenant/Admiral approval" -- this
+  amendment doesn't get to self-adopt either.
+- Claimed by: —
+- Evidence: —
