@@ -194,7 +194,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## PS-01 — Periscope full-scope verification (§8)
 
-- Status: claimed:claude@2026-07-15T15:20:00Z
+- Status: done@2026-07-15T15:30:00Z
 - Source: Master Packet §8 (labels, headings, wakes, weather,
   visibility, contacts, inspection, camera follow, bridge view, tactical
   overlays, event-based captions, visual record capture; rendering must
@@ -205,8 +205,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   classify each named capability present/absent/partial. Also confirm
   the "never alter authoritative state" invariant -- check whether
   anything in the Periscope client issues write/command calls anywhere.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: commit `55e96c9`, `docs/reports/2026-07-15-feature-matrix.md` row `PS-01` — most capabilities present, weather/camera-follow/record-capture absent, read-only invariant confirmed
 
 ## AG-01-VERIFY — Agent registry / messaging full-scope verification (§12)
 
