@@ -172,3 +172,123 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   infer coverage from test file names alone.
 - Claimed by: codex
 - Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `MEM-01`
+
+## BR-01 — Bridge full-scope verification (§7)
+
+- Status: queued
+- Source: Master Packet §7 (Command Center + Bridge: scenario creation,
+  world selection, vessel placement, routes, formations, save/load,
+  validation, launch; mission control showing intent/objective/actors/
+  constraints/results; unified live map, active mission, events/alerts,
+  agents/service health, pause controls, watch/conn)
+- Output: update the `BR-01` row in `docs/reports/2026-07-15-feature-matrix.md`
+  (currently "Existing but Unverified," only checked for toy deploy-drift,
+  not feature completeness)
+- Method: read `toys/bridge/index.html` / `app.js` (or equivalent) and
+  whatever backs it, and classify each of §7's named capabilities as
+  present/absent/partial. Don't infer from the UI shell alone -- confirm
+  whether scenario creation, save/load, and validation are real or
+  placeholder.
+- Claimed by: —
+- Evidence: —
+
+## PS-01 — Periscope full-scope verification (§8)
+
+- Status: queued
+- Source: Master Packet §8 (labels, headings, wakes, weather,
+  visibility, contacts, inspection, camera follow, bridge view, tactical
+  overlays, event-based captions, visual record capture; rendering must
+  never alter authoritative state)
+- Output: update the `PS-01` row in `docs/reports/2026-07-15-feature-matrix.md`
+  (currently only checked for toy deploy-drift, not feature completeness)
+- Method: read the actual Periscope source (`toys/periscope/`) and
+  classify each named capability present/absent/partial. Also confirm
+  the "never alter authoritative state" invariant -- check whether
+  anything in the Periscope client issues write/command calls anywhere.
+- Claimed by: —
+- Evidence: —
+
+## AG-01-VERIFY — Agent registry / messaging full-scope verification (§12)
+
+- Status: queued
+- Source: Master Packet §12 (stable identity, role, runtime, authority
+  envelope, tool access, assignment, status, memory rules, cost record,
+  activity record, failure history per agent; task packets,
+  acknowledgement, clarification, progress, evidence, exceptions,
+  completion, bounded refusal, escalation)
+- Output: update the `AG-01` row in `docs/reports/2026-07-15-feature-matrix.md`
+  (currently "Existing but Unverified," `test_schema.py` noted but not run)
+- Method: read `tools/engineering-comms/` source and its schema, run
+  `test_schema.py`, and classify which of §12's per-agent fields and
+  message types are genuinely defined/enforced vs. absent. This session's
+  own `docs/engineering-orders/queue.md` + `AGENTS.md` protocol is a real,
+  separate, working instance of part of §12 -- note that relationship
+  rather than double-counting it.
+- Claimed by: —
+- Evidence: —
+
+## DOC-01 — Doctrine and recovery audit (§15)
+
+- Status: queued
+- Source: Master Packet §15 (doctrine-entry format with name/version/
+  origin/rationale/scope/status/supersession/evidence/approval; incident
+  management; Isolation Mode; two-person authorization for sensitive
+  operations)
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+  (§15 currently has zero rows -- listed as "not yet inspected")
+- Method: check whether any doctrine entries in the repo actually follow
+  the named format (search `docs/` for doctrine-like documents), whether
+  any incident-management procedure exists beyond `docs/commissioning-handoff.md`'s
+  rollback steps, and whether "Isolation Mode" or "two-person
+  authorization" exist anywhere as real mechanisms or only as Master
+  Packet language.
+- Claimed by: —
+- Evidence: —
+
+## EXP-01 — Experiments and diagnostic methods audit (§18)
+
+- Status: queued
+- Source: Master Packet §18 (experiment tracking: hypothesis, setup,
+  variables, outputs, observations, failures, interpretation,
+  repeatability; Human-Architect-Operator interface; recursive incident
+  archaeology; Hazardous Conceptual Material handling)
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+  (§18 currently has zero rows)
+- Method: search the repo for anything resembling structured experiment
+  records (check `docs/research/`, `archive/`). Classify what exists vs.
+  what's purely aspirational language in the Master Packet.
+- Claimed by: —
+- Evidence: —
+
+## UX-01 — UX principles audit (§19)
+
+- Status: queued
+- Source: Master Packet §19 (naval command language, clear state/
+  authority, inspectable evidence, minimal ambiguity, visible separation
+  between verified state and interpretation)
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+  (§19 currently has zero rows -- only informally touched via the toy
+  sweep, no dedicated pass)
+- Method: this one is inherently more subjective than the others --
+  focus on what's checkable: does the live site (`cameronlampley.com`)
+  visibly distinguish verified/live data from narrative content anywhere
+  (e.g. staff.html's fiction vs. fleet.html's live data)? Report what's
+  observable, flag what can't be verified objectively rather than
+  asserting a UX judgment as fact.
+- Claimed by: —
+- Evidence: —
+
+## PHASE-01 — Delivery phase-gate checklist (§20)
+
+- Status: queued
+- Source: Master Packet §20 (Phase I Establish Truth, II Work Loop, III
+  Persistent Command, IV Bounded Agents, V Deepen the World, VI
+  Productize)
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+- Method: this is pure synthesis from what's already in the Feature
+  Matrix and the two Phase I reports -- for each phase, state what's
+  verified-done vs. not-started vs. partial, citing existing rows by ID
+  rather than re-investigating. Phase I itself is largely covered by
+  this session's own work; say so plainly rather than hedging.
+- Claimed by: —
+- Evidence: —
