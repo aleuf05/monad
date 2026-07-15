@@ -106,8 +106,8 @@ function deriveRadioState({ connected, powered, suppressed, pendingRequestCount,
   if (!powered) return "PAUSED";
   if (commandDiscipline === "radio_silence") return "TRAFFIC_SUPPRESSED";
   if (suppressed) return "TRAFFIC_SUPPRESSED";
-  if (pendingRequestCount > 0) return "PREPARING_REPORT";
   if (commandDiscipline === "quiet_watch") return "QUIET_WATCH";
+  if (pendingRequestCount > 0) return "PREPARING_REPORT";
   if (trafficLoad === "none") return "NO_ELIGIBLE_TRAFFIC";
   return "LIVE_READ_ONLY";
 }
