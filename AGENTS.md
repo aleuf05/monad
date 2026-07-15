@@ -33,13 +33,10 @@ document the gap and stop — don't invent an answer (see
 One-line rule: **action lives in the work queue; truth lives in the
 report queue.**
 
-## Shared task queue
-
-Non-privileged, git-only tasks (docs, code changes committable directly
-without `sudo`) are coordinated through
-[`docs/engineering-orders/queue.md`](docs/engineering-orders/queue.md),
-so two agent sessions (e.g. Claude and Codex) working this repo at
-different times don't duplicate or silently drop each other's work.
+The work queue coordinates non-privileged, git-only tasks (docs, code
+changes committable directly without `sudo`) so two agent sessions
+(e.g. Claude and Codex) working this repo at different times don't
+duplicate or silently drop each other's work.
 
 **This queue never covers anything requiring `sudo`.** Privileged work
 (service restarts, systemd installs, `/etc/caddy/Caddyfile` changes)
@@ -54,8 +51,17 @@ existing protocol — do not route privileged work through this queue.
 2. Confirm the task's `Status: queued`. If it isn't, pick a different
    task — do not contest an existing claim.
 3. Edit *only* that task's `Status` line to
-   `claimed:<agent-name>@<ISO-8601 timestamp>`. Commit that single-line
-   change alone, message naming the task ID. Push immediately.
+   `claimed:<agent-name>@<ISO-8601 timestamp>`. Before committing, run
+   `git diff --staged` on the queue file and confirm the diff contains
+   *only* your intended change — `git add <file>` stages the file's
+   entire current state, which will silently include another agent's
+   concurrent uncommitted edit to the same file if one exists (this
+   happened once this session: a `WO-01`/`CT-01` closure commit
+   accidentally carried Codex's uncommitted `AM-01` claim along with
+   it). If the staged diff has more than your one change, unstage and
+   re-stage more precisely, or let the other change land in its own
+   commit first. Commit your change alone, message naming the task ID.
+   Push immediately.
 4. If the push is rejected (someone else claimed first), pull, re-read.
    If it's now claimed by the other agent, back off — do not retry the
    same task. Git's fast-forward check is the lock; there is no
