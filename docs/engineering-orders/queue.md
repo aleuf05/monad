@@ -153,7 +153,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## MEM-01 — Memory subsystem verification (§11)
 
-- Status: queued
+- Status: done@2026-07-15T14:55:00Z
 - Source: Master Packet §11 (episodic/semantic/procedural/relational/
   narrative memory types; retrieval combining exact lookup, metadata,
   recency, semantic similarity, mission relevance, relationships, type,
@@ -170,6 +170,5 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   of §11's five memory types and which retrieval-combination dimensions
   are genuinely implemented vs. absent, same rigor as `WM-01`. Don't
   infer coverage from test file names alone.
-- Claimed by: —
-- Evidence: —
-
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `MEM-01`
