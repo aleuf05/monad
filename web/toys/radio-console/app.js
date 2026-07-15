@@ -93,6 +93,8 @@ function deriveTrafficLoad(pendingCount) {
   return "high";
 }
 
+const STATION_MEMORY_LIMIT = 6;
+
 // Command Discipline is NOT derived -- it's the operator-set mode from
 // the #commandDisciplineSelect control, read directly where needed.
 
@@ -127,24 +129,37 @@ function buildStatusLine(factors) {
     parts.push(`${factors.activeStationCount} STATIONS ACTIVE`);
     parts.push(
       factors.pendingRequestCount > 0
-        ? `${factors.pendingRequestCount} PENDING ${factors.pendingRequestCount === 1 ? "EXCHANGE" : "EXCHANGES"}`
+        ? `${factors.pendingRequestCount} PENDING ${factors.pendingRequestCount === 1 ? "REQUEST" : "REQUESTS"}`
         : "NO PENDING TRAFFIC"
     );
     if (factors.trafficLoad !== "none") parts.push(`TRAFFIC ${factors.trafficLoad.toUpperCase()}`);
     if (factors.severity !== "routine") parts.push(`SEVERITY ${factors.severity.toUpperCase()}`);
+    if (factors.stationMemoryLine) parts.push(factors.stationMemoryLine);
   }
   return parts.join(" · ");
 }
 
+function isSuppressedByDiscipline(entry, discipline) {
+  if (discipline === "radio_silence") return entry.sourceAuthority !== "human";
+  if (discipline === "quiet_watch") return entry.kind === "status";
+  return false;
+}
+
 function updateRadioStateIndicator() {
   if (!radioStateEl) return;
-  const pendingRequestCount = liveQueue.filter((entry) => entry.threadState === "pending").length;
   const discipline = commandDisciplineSelect ? commandDisciplineSelect.value : "normal";
+  // Only counts entries that would actually be eligible to transmit under
+  // the current discipline -- caught by this task's own acceptance test:
+  // counting *all* pending entries regardless of suppression made
+  // "PREPARING REPORT" show up even during quiet_watch when nothing but
+  // suppressed routine chatter was actually pending.
+  const pendingRequestCount = liveQueue.filter(
+    (entry) => entry.threadState === "pending" && !isSuppressedByDiscipline(entry, discipline)
+  ).length;
   // Reflects the same hard rule livePump() actually enforces -- true only
-  // when radio_silence is active AND something non-human is actually
-  // sitting suppressed in the queue, not just whenever the mode is set.
-  const suppressed =
-    discipline === "radio_silence" && liveQueue.some((entry) => entry.sourceAuthority !== "human");
+  // when something is actually sitting suppressed in the queue under the
+  // current discipline, not just whenever a suppressing mode is set.
+  const suppressed = liveQueue.some((entry) => isSuppressedByDiscipline(entry, discipline));
   const factors = {
     connected: liveMode,
     powered: state.powered,
@@ -153,7 +168,8 @@ function updateRadioStateIndicator() {
     trafficLoad: deriveTrafficLoad(liveQueue.length),
     severity: deriveOperationalSeverity(lastSnapshotVessels),
     commandDiscipline: discipline,
-    activeStationCount: stationChips.length
+    activeStationCount: state.activeChannels.size,
+    stationMemoryLine: stationMemoryLine(state.selectedStation)
   };
   radioStateEl.textContent = buildStatusLine(factors);
 }
@@ -185,7 +201,8 @@ const state = {
   currentTransmission: null,
   currentTransmissionScore: -Infinity,
   threadLedger: [],
-  nextThreadId: 1
+  nextThreadId: 1,
+  stationMemory: new Map()
 };
 
 let audioContext = null;
@@ -418,6 +435,79 @@ function clearCurrentTransmission() {
   state.currentTransmissionScore = -Infinity;
 }
 
+function stationMemoryEntries(station) {
+  if (!state.stationMemory.has(station)) {
+    state.stationMemory.set(station, []);
+  }
+  return state.stationMemory.get(station);
+}
+
+function stationReportSignature(station) {
+  if (station === "engineering") {
+    const fuelParts = (lastSnapshotVessels || [])
+      .filter((vessel) => typeof vessel.fuel_fraction === "number")
+      .map((vessel) => `${vessel.id}:${fuelSeverity(vessel.fuel_fraction)}`)
+      .sort();
+    return fuelParts.length ? `engineering:${fuelParts.join("|")}` : "engineering:none";
+  }
+  if (station === "traffic") {
+    const trafficParts = (lastSnapshotVessels || [])
+      .filter((vessel) => VESSEL_CHANNEL[vessel.kind] === "traffic")
+      .map((vessel) => `${vessel.id}:${vessel.status}`)
+      .sort();
+    return trafficParts.length ? `traffic:${trafficParts.join("|")}` : "traffic:none";
+  }
+  if (station === "weather") {
+    return "weather:none";
+  }
+  const bridgeParts = (lastSnapshotVessels || [])
+    .filter((vessel) => VESSEL_CHANNEL[vessel.kind] !== "traffic")
+    .map((vessel) => `${vessel.id}:${vessel.status}`)
+    .sort();
+  return `bridge:${lastWatchEventCount}:${bridgeParts.join("|") || "none"}`;
+}
+
+function stationReportSummary(station) {
+  if (station === "engineering") {
+    const severities = (lastSnapshotVessels || [])
+      .filter((vessel) => typeof vessel.fuel_fraction === "number")
+      .map((vessel) => fuelSeverity(vessel.fuel_fraction));
+    if (!severities.length) return "ENGINEERING NO FUEL REPORT";
+    if (severities.some((severity) => severity === "critical")) return "ENGINEERING CRITICAL FUEL";
+    if (severities.some((severity) => severity === "elevated")) return "ENGINEERING ELEVATED FUEL";
+    return "ENGINEERING ROUTINE";
+  }
+  if (station === "traffic") {
+    const trafficCount = (lastSnapshotVessels || []).filter((vessel) => VESSEL_CHANNEL[vessel.kind] === "traffic").length;
+    return trafficCount > 0 ? `TRAFFIC ${trafficCount} CONTACT${trafficCount === 1 ? "" : "S"}` : "TRAFFIC CLEAR";
+  }
+  if (station === "weather") {
+    return "WEATHER QUIET";
+  }
+  return lastWatchEventCount > 0 ? `BRIDGE ${lastWatchEventCount} WATCH${lastWatchEventCount === 1 ? "" : "ES"}` : "BRIDGE QUIET";
+}
+
+function rememberStationTransmission(entry) {
+  if (!entry.station) return;
+  const memory = stationMemoryEntries(entry.station);
+  memory.push({
+    signature: stationReportSignature(entry.station),
+    summary: stationReportSummary(entry.station),
+    text: entry.text,
+    at: Date.now()
+  });
+  while (memory.length > STATION_MEMORY_LIMIT) {
+    memory.shift();
+  }
+}
+
+function stationMemoryLine(station) {
+  const memory = stationMemoryEntries(station);
+  if (!memory.length) return "NO PRIOR REPORT";
+  const latest = memory[memory.length - 1];
+  return latest.signature === stationReportSignature(station) ? "NO CHANGE SINCE LAST REPORT" : "";
+}
+
 function recordThreadState(entry, nextState) {
   entry.threadState = nextState;
   entry.threadUpdatedAt = Date.now();
@@ -438,10 +528,14 @@ function completeTransmission(entry, nextState = "completed") {
   clearSpeechTimeout();
   clearCurrentTransmission();
   recordThreadState(entry, nextState);
+  if (nextState === "completed") {
+    rememberStationTransmission(entry);
+  }
   if (entry.transcriptNode) {
     const tags = entry.transcriptNode.querySelectorAll(".channel-tag");
     if (tags[2]) tags[2].textContent = nextState;
   }
+  updateRadioStateIndicator();
   setSpeaking(false);
   window.setTimeout(livePump, 0);
 }
@@ -653,12 +747,20 @@ function livePump() {
   // isn't shaped, it's absolute.
   const discipline = commandDisciplineSelect ? commandDisciplineSelect.value : "normal";
   const silenced = discipline === "radio_silence";
+  // quiet_watch is a real operating mode too, not just a label: caught by
+  // this task's own acceptance-test pass showing "PREPARING REPORT" while
+  // quiet_watch was selected, because nothing actually suppressed routine
+  // traffic. Suppresses routine status chatter; watch notes (human) and
+  // fuel reports at elevated/critical severity still get through -- quiet
+  // watch means "don't chatter," not "hide a real emergency."
+  const quietWatch = discipline === "quiet_watch";
 
   let next = null;
   for (const entry of liveQueue) {
     if (!state.activeChannels.has(entry.channel)) continue;
     if (!stationCanObserve(entry, state.selectedStation)) continue;
     if (silenced && entry.sourceAuthority !== "human") continue;
+    if (quietWatch && entry.kind === "status") continue;
     entry.score = scoreTransmission(entry, now);
     if (!next || entry.score > next.score || (entry.score === next.score && entry.queuedAt < next.queuedAt)) {
       next = entry;
