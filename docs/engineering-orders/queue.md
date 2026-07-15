@@ -210,7 +210,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## AG-01-VERIFY — Agent registry / messaging full-scope verification (§12)
 
-- Status: claimed:claude@2026-07-15T15:33:00Z
+- Status: done@2026-07-15T15:43:00Z
 - Source: Master Packet §12 (stable identity, role, runtime, authority
   envelope, tool access, assignment, status, memory rules, cost record,
   activity record, failure history per agent; task packets,
@@ -224,12 +224,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   own `docs/engineering-orders/queue.md` + `AGENTS.md` protocol is a real,
   separate, working instance of part of §12 -- note that relationship
   rather than double-counting it.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `AG-01`
 
 ## DOC-01 — Doctrine and recovery audit (§15)
 
-- Status: queued
+- Status: done@2026-07-15T15:43:00Z
 - Source: Master Packet §15 (doctrine-entry format with name/version/
   origin/rationale/scope/status/supersession/evidence/approval; incident
   management; Isolation Mode; two-person authorization for sensitive
@@ -242,12 +242,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   rollback steps, and whether "Isolation Mode" or "two-person
   authorization" exist anywhere as real mechanisms or only as Master
   Packet language.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `DOC-01`
 
 ## EXP-01 — Experiments and diagnostic methods audit (§18)
 
-- Status: queued
+- Status: done@2026-07-15T15:43:00Z
 - Source: Master Packet §18 (experiment tracking: hypothesis, setup,
   variables, outputs, observations, failures, interpretation,
   repeatability; Human-Architect-Operator interface; recursive incident
@@ -257,12 +257,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 - Method: search the repo for anything resembling structured experiment
   records (check `docs/research/`, `archive/`). Classify what exists vs.
   what's purely aspirational language in the Master Packet.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `EXP-01`
 
 ## UX-01 — UX principles audit (§19)
 
-- Status: queued
+- Status: done@2026-07-15T15:43:00Z
 - Source: Master Packet §19 (naval command language, clear state/
   authority, inspectable evidence, minimal ambiguity, visible separation
   between verified state and interpretation)
@@ -275,12 +275,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   (e.g. staff.html's fiction vs. fleet.html's live data)? Report what's
   observable, flag what can't be verified objectively rather than
   asserting a UX judgment as fact.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `UX-01`
 
 ## PHASE-01 — Delivery phase-gate checklist (§20)
 
-- Status: queued
+- Status: done@2026-07-15T15:43:00Z
 - Source: Master Packet §20 (Phase I Establish Truth, II Work Loop, III
   Persistent Command, IV Bounded Agents, V Deepen the World, VI
   Productize)
@@ -290,5 +290,5 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   verified-done vs. not-started vs. partial, citing existing rows by ID
   rather than re-investigating. Phase I itself is largely covered by
   this session's own work; say so plainly rather than hedging.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-feature-matrix.md` row `PH-01`
