@@ -169,7 +169,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## RADIO-01 — FleetCore: add ContactDetected VesselEvent
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T17:15:00Z
 - Source: `docs/engineering-orders/radio-console-v1-and-fleetcore-model-upgrade.md`
 - Output: `ContactDetected` variant added to `fleetcore/src/vessel.rs`'s
   `VesselEvent` enum, emitted once when a contact enters a vessel's
