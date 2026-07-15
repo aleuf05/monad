@@ -45,7 +45,12 @@ const state = {
   // X of Y" can be computed as legs shrink; lastVesselEvent tracks each
   // vessel's most recent event so a fresh route_replaced can show a brief
   // "Route changed" callout before settling back into leg wording.
-  processedVesselEventCount: 0,
+  // lastVesselEventSeq cursors on each event's own event_seq (GitHub issue
+  // #6), not array length/index -- vessel_events is now a bounded tail
+  // (fleetcore-serve's --vessel-event-retention), and a length-based cursor
+  // silently drops everything once the array can shrink/rotate. -1 so
+  // event_seq 0 (the very first event ever) still counts as new.
+  lastVesselEventSeq: -1,
   routeTotals: new Map(),
   lastVesselEvent: new Map()
 };
@@ -217,13 +222,32 @@ function actualSpeedMps(vessel) {
   return vessel.status === "underway" || vessel.status === "transiting" ? vessel.speed_mps : 0;
 }
 
-// vessel_events (docs/architecture/fleetcore-api.md's "Vessel Events") is
-// ever-growing and never truncated server-side, same as watch_events --
-// only look at what's new since the last snapshot, same idiom
-// renderWatchEvents already uses via renderedWatchEventCount.
+// vessel_events (docs/architecture/fleetcore-api.md's "Vessel Events",
+// docs/architecture/vessel-events-retention-investigation.md) is a bounded
+// tail as of GitHub issue #6 -- fleetcore-serve keeps only the newest
+// --vessel-event-retention entries, so array length/index is not a safe
+// cursor (a rotated/shrunk array makes a length-based cursor silently stop
+// seeing new events forever, including across this page's own WebSocket
+// auto-reconnect, which never reloads the page or resets state). Cursor on
+// each event's own event_seq instead -- stable regardless of how the array
+// itself has rotated.
 function processVesselEvents(vesselEvents) {
-  if (vesselEvents.length === state.processedVesselEventCount) return;
-  vesselEvents.slice(state.processedVesselEventCount).forEach((event) => {
+  if (!vesselEvents.length) return;
+  const oldestRetainedSeq = vesselEvents[0].event_seq;
+  if (state.lastVesselEventSeq >= 0 && oldestRetainedSeq > state.lastVesselEventSeq + 1) {
+    // A real gap: events this client hasn't processed yet have already
+    // aged out of the server's retained window (e.g. this tab sat
+    // disconnected/backgrounded through more than --vessel-event-retention
+    // worth of activity). Nothing to backfill from here -- the full history
+    // remains durable server-side in events.jsonl -- but this should be
+    // visible, not silent.
+    console.warn(
+      `fleetcore-live: vessel_events gap detected -- last seen event_seq ${state.lastVesselEventSeq}, oldest retained is now ${oldestRetainedSeq}. Some events were never processed by this client.`
+    );
+  }
+  const newEvents = vesselEvents.filter((event) => event.event_seq > state.lastVesselEventSeq);
+  if (!newEvents.length) return;
+  newEvents.forEach((event) => {
     state.lastVesselEvent.set(event.vessel_id, event);
     if (event.type === "route_replaced") {
       state.routeTotals.set(event.vessel_id, { routeId: event.new_route_id, total: event.remaining_leg_count });
@@ -240,7 +264,7 @@ function processVesselEvents(vesselEvents) {
       state.routeTotals.delete(event.vessel_id);
     }
   });
-  state.processedVesselEventCount = vesselEvents.length;
+  state.lastVesselEventSeq = newEvents[newEvents.length - 1].event_seq;
 }
 
 // Status wording derives from the vessel_events stream, not from
