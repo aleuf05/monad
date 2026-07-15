@@ -41,7 +41,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GA-01 — Stale/duplicate worktree audit
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T14:07:00Z
 - Source: Master Packet §21 ("identify dead, broken, stale, and
   duplicate systems"); flagged but never resolved at the very start of
   this session's sweep
