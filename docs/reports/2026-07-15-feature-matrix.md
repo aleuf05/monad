@@ -1,0 +1,69 @@
+# Feature Matrix — Monad Master Packet §21
+
+Date: 2026-07-15
+
+Prepared by: Claude (session claiming `FM-01` via
+`docs/engineering-orders/queue.md`)
+
+Status vocabulary is exactly Master Packet §1's six terms: **Verified
+Existing** / **Existing but Unverified** / **Required Next** / **Design
+Required** / **Deferred** / **Rejected or Superseded**.
+
+This compiles material already verified in
+[`2026-07-15-phase1-sweep-and-corrections.md`](2026-07-15-phase1-sweep-and-corrections.md),
+[`2026-07-14-captain-issue-report.md`](2026-07-14-captain-issue-report.md),
+[`2026-07-15-captain-issue-report.md`](2026-07-15-captain-issue-report.md),
+and `docs/engineering-orders/living-captain-v0.1.md` / `-v0.2.md`. Where a
+section was not touched this session, it is marked **not yet inspected**
+rather than guessed at.
+
+| ID | Feature / Module | Requirement Source | Status | Location | Tests | Dependencies | Priority | Acceptance Criteria | Owner | Verified |
+|---|---|---|---|---|---|---|---|---|---|---|
+| FC-01 | FleetCore vessel-event retention (~2,000 events, bounded) | §5 | Verified Existing | `fleetcore/src/world.rs` (`default_vessel_event_retention`) | `fleetcore/tests/vessel_events_retention.rs` | fleetcore-serve | High | Live snapshot shows `vessel_event_retention` + bounded `vessel_events` array | — | 2026-07-15 |
+| FC-02 | Checkpoint + restart recovery | §5 | Verified Existing | `fleetcore/src/persistence.rs` | `checkpoint_plus_event_tail_replays_to_current_world`, `checkpoint_retention_keeps_newest_and_genesis` (`tests/determinism.rs`) | fleetcore-serve | High | Both tests pass | — | 2026-07-15 |
+| FC-03 | Canon command validation (schema/authority/idempotency) | §5 | Verified Existing | `fleetcore/src/world.rs`, `command.rs` | `tests/canon.rs` (5/5 pass) | fleetcore-serve | High | Tests pass | — | 2026-07-15 |
+| FM-A | Escort posture / deterministic patrol behaviors | §6 | Existing but Unverified (partial mapping done, full §6 list not reconciled) | `fleetcore/src/agent.rs` (`EscortPosture` enum), `world.rs` | not isolated this session | fleetcore-serve | Medium | See `EP-01` in queue for the full behavior-name mapping | — | not fully verified |
+| BR-01 | Bridge (Command Center / mission control unification) | §7 | Existing but Unverified | `toys/bridge/`, `web/toys/bridge/` | none isolated | Caddy, fleetcore-serve | Medium | Not yet inspected against §7's full scenario/objective/approval requirements | — | not yet inspected |
+| WI-01 | World Intake V0.1 baseline (ingest/extract/queue/review/provenance, /adjudications -> FleetCore) | §8 | Verified Existing | `tools/world-intake/world_intake.py` | 12/12 pass, isolated | world-intake.service, FleetCore | High | 12 tests pass, HTTP 200 on public page and `/proposals`, disk/Qdrant healthy | — | 2026-07-15 |
+| PS-01 | Periscope (visual layer over verified state) | §8 | Existing but Unverified | `toys/periscope/`, `web/toys/periscope/` | none isolated | — | Low | Deploy-drift check only (passed, `EP-01`-adjacent); day/night, contacts, tactical overlays not verified | — | drift-clean, feature scope not verified |
+| LF-01 | Living Fleet per-vessel persistent runtime | §6 / §9 | Verified Existing | `tools/living-fleet/captain_runtime.py` (`CaptainRuntime`) | 30/30 per 2026-07-15 captain issue report | living-fleet.service | High | Live systemd service, real per-cycle FleetCore observation | — | 2026-07-15 |
+| LC-01 | Living Captain wake sequence (persistent command presence) | §9 | Verified Existing (intentionally partial scope) | `tools/living-captain/captain.py`, `sight.py`, `captain_state.py` | 9/9 (`test_sight.py`, `test_captain.py`, `test_captain_v02.py`) | living-captain-status.service (loopback status API only) | High | `observe()` inspects 2 of 8 things §9 names (FleetCore snapshot, World Intake pending) by V0.2 design -- see `docs/engineering-orders/living-captain-v0.2.md`; widening scope is a documented future V0.3-style decision, not a current gap | — | 2026-07-15 |
+| LC-02 | Living Captain status API (public, read-only) | §9 | Verified Existing | `tools/living-captain/status_server.py`, `scripts/living-captain-status.service` | n/a (read-only view) | Caddy | Medium | Loopback (`127.0.0.1:4774/status`) and public (`/living-captain-api/status`) both return correct `captain_id`; installed and verified 2026-07-15 | — | 2026-07-15 |
+| WO-01 | Watch Officer (read-only observer agent) | §10 | Required Next / Design Required | none | none | — | Medium | Confirmed this session: the only "Watch Officer" occurrence anywhere is a bare role-name string in `world_intake.py`'s `assign_role` check -- no implementation exists | — | 2026-07-15 (confirmed absent) |
+| MEM-01 | Memory (episodic/semantic/procedural/relational/narrative) + retrieval | §11 | Existing but Unverified | `tools/living-fleet/memory/` | tests exist (`memory/tests/*`), not isolated/run this session | living-fleet-memory.service, Qdrant | Medium | Not yet inspected against the five memory-type/retrieval-combination requirements specifically | — | not yet inspected |
+| AG-01 | Agent registry, authority envelopes, task-packet messaging | §12 | Existing but Unverified | `tools/engineering-comms/` (schema tests exist) | `test_schema.py` exists, not isolated this session | — | Medium | Not yet inspected against the full identity/authority/messaging-lifecycle list | — | not yet inspected |
+| Q-01 | Shared two-agent task queue (this session's own work) | §12 | Verified Existing | `AGENTS.md`, `docs/engineering-orders/queue.md`, `CLAUDE.md` pointer | protocol dogfooded live (FM-01 claimed via the documented steps, clean push) | — | — | Claim/push/back-off cycle demonstrated working end-to-end | — | 2026-07-15 |
+| PKT-01 | Engineering packet lifecycle (drafted->reviewed->authorized->assigned->...->recorded) | §13 | Existing but Unverified as a formal system; demonstrated ad hoc | conversation-level packets this session (e.g. `FC-LIVE-01`) | n/a | — | Medium | Practiced informally and successfully this session (draft -> authorize -> execute -> verify -> record), but no standing packet-tracking system exists in the repo itself | — | practiced, not systematized |
+| REPO-01 | Repository discovery, dirty-state awareness, rollback | §14 | Verified Existing (as practice, this session) | git itself; `docs/commissioning-handoff.md` for privileged rollback | n/a | — | High | Every fix this session used git status/log/diff before acting, and `cmd.sh`'s evidence-capture + rollback procedure is a real, working instance | — | 2026-07-15 |
+| WT-01 | Stale/duplicate worktrees | §21 ("identify... duplicate systems") | Existing but Unverified (confirmed present, not yet classified) | `/home/cgl/dev/monad-history-integration`, `-issue17-slice-a`, `-issue18-slice-b`, `-slice-g`, `.claude/worktrees/scout-screen-mode` | n/a | — | Medium | Confirmed none back a running service (only `/home/cgl/dev/monad` does, per `WorkingDirectory`); age/merge-status/open-PR classification not yet done -- see `GA-01` | — | partially verified |
+| WM-01 | Watchman (disk, memory, processes, endpoints, databases, event progress, stale services, failed restarts) | §16 | Existing but Unverified (partial scope confirmed) | `watchman.py` | none isolated | monad-watchman.service | Medium | Confirmed implements `disk_status`, `qdrant_health`, `git_commit`, `uptime`, heartbeat logging; memory/processes/endpoints-beyond-Qdrant/databases-beyond-Qdrant/event-progress/stale-services/failed-restarts not confirmed present or absent -- see `WM-01` in queue | — | partially verified |
+| CT-01 | Cost tracking (provider/agent/task/usage/cost/budget) | §17 | Required Next / Design Required | none | none | — | Low | Confirmed this session: no systemic ledger exists; only unrelated per-call cost params in `tools/img2asset/backends/replicate.py` | — | 2026-07-15 (confirmed absent) |
+| TOY-01 | Toy source/deploy sync (`toys/` <-> `web/toys/`) | implicit across §7/§8 | Verified Existing (actively maintained this session) | `toys/*`, `web/toys/*` | n/a | — | High | `fleetcore-live` (real bug, fixed), `bridge` (source synced), `watchbook` (confirmed deliberate defer), rest confirmed expected/in-sync | — | 2026-07-15 |
+
+## Sections not yet inspected at all this session
+
+No row above covers these directly; each needs its own pass before this
+matrix can claim full §1-21 coverage:
+
+- **§15 Doctrine and recovery** -- doctrine-entry format, incident
+  management, Isolation Mode, two-person authorization: not inspected.
+- **§18 Experiments and diagnostic methods**: not inspected.
+- **§19 UX principles**: not inspected as a structured audit (informally
+  touched via the toy-sweep, but no dedicated pass).
+- **§20 Delivery order (phase gates I-VI)**: not evaluated as a
+  checklist against current repo state.
+- **§2-4 (mission/doctrine/architecture narrative sections)**: these are
+  framing, not independently verifiable features -- no matrix rows
+  apply.
+
+## Notes on method
+
+- Every "Verified Existing" row above traces to a test run, a live curl
+  check, or a direct file read performed this session or the
+  immediately preceding one (2026-07-14 captain issue report), not to
+  memory or the Master Packet's own narrative.
+- "Existing but Unverified" is used specifically where source code or a
+  service is confirmed to exist but its behavior against the named
+  requirement was not exercised.
+- "Required Next" / "Design Required" is reserved for confirmed
+  absences (Watch Officer, cost tracking), not merely unverified areas.
