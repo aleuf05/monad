@@ -166,3 +166,84 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   human-approval requirement.
 - Claimed by: — (Admiral's decision only)
 - Evidence: —
+
+## RADIO-01 — FleetCore: add ContactDetected VesselEvent
+
+- Status: queued
+- Source: `docs/engineering-orders/radio-console-v1-and-fleetcore-model-upgrade.md`
+- Output: `ContactDetected` variant added to `fleetcore/src/vessel.rs`'s
+  `VesselEvent` enum, emitted once when a contact enters a vessel's
+  passive-detection range (reuse the proximity check behind
+  `passive_contacts()` in `agent.rs`) -- not per tick while in range.
+- Tests: Rust test confirming single emission on range-entry, no
+  re-emission while still in range, no emission if never in range.
+- No sudo, pure `fleetcore/` change + `cargo test`.
+- Claimed by: —
+- Evidence: —
+
+## RADIO-02 — Radio Console: Priority Queue + Interruption Rules
+
+- Status: queued
+- Depends on: RADIO-01 (needs `ContactDetected` to exist to score against)
+- Source: same doc, System 1
+- Output: scores every candidate transmission (from the 6 real event
+  types) on urgency/relevance/source authority/freshness/interruption
+  permission/expiry. Decides what airs, what waits, what expires
+  unspoken.
+- Claimed by: —
+- Evidence: —
+
+## RADIO-03 — Radio Console: Station Knowledge Scoping
+
+- Status: queued
+- Depends on: RADIO-02
+- Source: same doc, System 2
+- Output: per-station filter predicate over the event stream -- no
+  shared omniscience, each station sees only what its role could
+  plausibly observe.
+- Claimed by: —
+- Evidence: —
+
+## RADIO-04 — Radio Console: Request/Acknowledge/Response Threading
+
+- Status: queued
+- Depends on: RADIO-02
+- Source: same doc, System 3
+- Output: `pending -> acked -> completed / timeout -> escalated` state
+  machine per exchange.
+- Claimed by: —
+- Evidence: —
+
+## RADIO-05 — Radio Console: Channel Pressure scalar
+
+- Status: queued
+- Depends on: RADIO-02
+- Source: same doc, System 4
+- Output: single 0-1 derived value from event rate + unacknowledged-
+  request count, driving line length/suppression/interruption odds.
+  One number, no parallel mood system.
+- Claimed by: —
+- Evidence: —
+
+## RADIO-06 — Radio Console: Short-Term Transmission Memory
+
+- Status: queued
+- Depends on: RADIO-02
+- Source: same doc, System 5
+- Output: ring buffer, last N transmissions per station, enables "no
+  change since last report."
+- Claimed by: —
+- Evidence: —
+
+## RADIO-07 — Radio Console: minimum v1 UX, integrate, deploy, verify live
+
+- Status: queued
+- Depends on: RADIO-02 through RADIO-06 all landed
+- Source: same doc, acceptance test
+- Output: one status line (`QUIET WATCH · 3 ACTIVE STATIONS · 1 PENDING
+  REQUEST · TRAFFIC LOW`), all 5 systems wired together, deployed
+  `toys/` -> `web/toys/`, live-verified: console goes silent when
+  nothing matters, interrupts itself when something does, says "no
+  change since last report" -- all three emergent, none hardcoded.
+- Claimed by: —
+- Evidence: —
