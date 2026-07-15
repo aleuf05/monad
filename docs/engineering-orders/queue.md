@@ -226,17 +226,17 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## RADIO-06 — Radio Console: Short-Term Transmission Memory
 
-- Status: queued
+- Status: done@2026-07-15T18:33:00Z
 - Depends on: RADIO-02
 - Source: same doc, System 5
 - Output: ring buffer, last N transmissions per station, enables "no
   change since last report."
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `toys/radio-console/app.js`, `web/toys/radio-console/app.js`, `node --check toys/radio-console/app.js`, `node --check web/toys/radio-console/app.js`
 
 ## RADIO-07 — Radio Console: minimum v1 UX, integrate, deploy, verify live
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T18:35:00Z
 - Depends on: RADIO-02 through RADIO-06 all landed
 - Source: same doc, acceptance test
 - Output: one status line (`QUIET WATCH · 3 ACTIVE STATIONS · 1 PENDING
