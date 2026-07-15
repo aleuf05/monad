@@ -1,8 +1,8 @@
 # Doctrine 001 — Verification Command Dialect
 
-**Status:** Proposed -- pending Lieutenant/Admiral approval, not yet canon
+**Status:** Adopted
 **Author:** Claude (this session, from Commander's Campaign Target List packet)
-**Adopted:** 2026-07-15 (draft date -- this doctrine is not yet adopted; see Status)
+**Adopted:** 2026-07-15
 
 ## Principle
 

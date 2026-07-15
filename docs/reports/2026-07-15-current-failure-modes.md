@@ -10,15 +10,12 @@ speculation and no remediation logic.
 ## What is actually open
 
 There are no open implementation tasks left in the radio-console slice.
-The only queue items still open are human-gated decisions or access
-blockers:
+The only queue item still open is the access-blocked scout-screen-mode
+worktree:
 
-- `HUMAN-01`
-- `HUMAN-02`
 - `HUMAN-03`
-- `HUMAN-04`
 
-Those are not code defects. They are decision or access dependencies.
+That is not a code defect. It is a host-access dependency.
 
 ## Concrete failure modes
 
@@ -37,11 +34,11 @@ Config drift, infra drift, and host/package drift remain out of scope by
 design. That is not a bug, but it is a boundary that can be mistaken for a
 broader drift detector if it is not documented.
 
-### 3. Human-gated queue items can stall progress indefinitely
+### 3. Host access can stall the last blocked worktree indefinitely
 
-The queue currently contains four blocked human items. If those decisions do
-not arrive, the queue will remain partially open even though no agent-side work
-is outstanding.
+The queue now contains one blocked access item. If host permissions do not
+arrive, that worktree will remain unresolved even though no agent-side work is
+outstanding.
 
 ### 4. Report-only detectors cannot repair drift
 

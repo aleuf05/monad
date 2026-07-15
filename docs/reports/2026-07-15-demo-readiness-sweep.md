@@ -63,5 +63,5 @@ vertically instead of overlapping, zero console errors, contact-select
 
 One real, visible defect found this pass (`BS3-01`); fixed, deployed,
 verified live. Everything else checked live came back clean. Remaining
-open items are exclusively the four `blocked-on-human` queue entries
-(`HUMAN-01` through `HUMAN-04`) -- decisions or access, not code defects.
+open item is the access-blocked scout-screen-mode worktree
+(`HUMAN-03`) -- access, not a code defect.

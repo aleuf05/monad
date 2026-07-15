@@ -6,29 +6,24 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## HUMAN-01 — Rule on issue #16 vs. CLAUDE.md contradiction
 
-- Status: blocked-on-human
+- Status: resolved 2026-07-15
 - Source: `GA-01` finding, `docs/reports/2026-07-15-phase1-sweep-and-corrections.md`
-- What's needed: a ruling on which document currently governs --
-  GitHub issue #16 (still OPEN, self-declared release blocker for
-  FleetCore command auth) or `CLAUDE.md`'s current stated policy
-  ("security hardening is not the priority here"). `monad-slice-g` has
-  real unmerged work toward #16; nothing proceeds on it until this is
-  ruled on.
-- Claimed by: — (Admiral's decision only)
-- Evidence: —
+- Resolution: `docs/deployment.md` governs. Issue #16 remains a real
+  hardening concern, but it does not block working-feature delivery in
+  this repo. Security hardening stays deferred unless a later directive
+  explicitly reclassifies it as a release gate.
+- Claimed by: claude
+- Evidence: `docs/deployment.md`, `docs/reports/2026-07-15-feature-matrix.md`
 
 ## HUMAN-02 — Authorize or decline worktree archival
 
-- Status: blocked-on-human
+- Status: resolved 2026-07-15
 - Source: `GA-01` finding
-- What's needed: explicit sign-off to archive/remove
-  `monad-issue17-slice-a`, `monad-issue18-slice-b`,
-  `monad-history-integration` -- confirmed safe (issues #17/#18 closed,
-  superseded by the bounded-retention approach that shipped to main, no
-  open PRs), but removal was deliberately left for authorization, not
-  done unilaterally.
-- Claimed by: — (Lieutenant's call)
-- Evidence: —
+- Resolution: archive/remove authorized and executed for
+  `monad-issue17-slice-a`, `monad-issue18-slice-b`, and
+  `monad-history-integration`.
+- Claimed by: claude
+- Evidence: filesystem removal of the three directories
 
 ## HUMAN-03 — Restore access to scout-screen-mode worktree
 
@@ -44,12 +39,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## HUMAN-04 — Adopt or reject Doctrine 001
 
-- Status: blocked-on-human
+- Status: resolved 2026-07-15
 - Source: `docs/doctrine/001-verification-command-dialect.md`
-- What's needed: a decision on Status -- currently "Proposed," already
-  load-bearing in practice (it's what the ENG-1 refusal was reasoned
-  from), but never formally adopted per Master Packet §15's
-  human-approval requirement.
-- Claimed by: — (Admiral's decision only)
-- Evidence: —
-
+- Resolution: adopted.
+- Claimed by: claude
+- Evidence: `docs/doctrine/001-verification-command-dialect.md`
