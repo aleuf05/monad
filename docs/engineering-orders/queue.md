@@ -195,17 +195,17 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## RADIO-04 — Radio Console: Request/Acknowledge/Response Threading
 
-- Status: queued
+- Status: done@2026-07-15T18:12:00Z
 - Depends on: RADIO-02
 - Source: same doc, System 3
 - Output: `pending -> acked -> completed / timeout -> escalated` state
   machine per exchange.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `toys/radio-console/app.js`, `web/toys/radio-console/app.js`, `node --check toys/radio-console/app.js`, `node --check web/toys/radio-console/app.js`
 
 ## RADIO-05 — Radio Console: three independent control signals (not a god scalar)
 
-- Status: claimed:claude@2026-07-15T18:05:00Z
+- Status: done@2026-07-15T18:20:00Z
 - Depends on: RADIO-02 (done)
 - Source: superseded by the Admiral's supplemental risk-review packet §4
   -- a single channel-pressure scalar was explicitly rejected as a "god
@@ -219,7 +219,10 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   must be discoverable) as a composite status line reading these three
   signals plus connection/power state.
 - Claimed by: claude
-- Evidence: —
+- Evidence: commit `36f3889`; verified live via headless browser against
+  the real fleet -- connection state, composite status line with real
+  pending-exchange counts, and `radio_silence` suppression all confirmed
+  working end-to-end, not just syntax-checked
 
 ## RADIO-06 — Radio Console: Short-Term Transmission Memory
 
