@@ -5,6 +5,34 @@ agent/model is running here (URL/port policy, live-tests-no-staging,
 "if the Lt. can't see it, it doesn't exist," security-hardening
 posture).
 
+## Work queue / report queue
+
+Two names, two roles, kept strictly separate:
+
+- **Work queue** (`docs/engineering-orders/queue.md`) — active tasks
+  only: `queued`, `claimed`, `blocked-on-human`. Live engineering
+  orders go here.
+- **Report queue** — not a separate file. It's the existing
+  `docs/reports/*.md` (Feature Matrix rows, findings reports) and
+  `docs/doctrine/*.md` — completed evidence and findings live there,
+  already. Don't create a duplicate file for this.
+- Process-change requests (like this section) go under
+  `docs/engineering-orders/` as their own doc, not mixed into either
+  queue.
+
+Rules: one item belongs to one queue at a time. **When a task is done,
+remove its entry from `queue.md` immediately** — don't leave it sitting
+there marked `done`. Its evidence already lives in the report queue
+(a report file, a Feature Matrix row, a commit) by the time it's
+removed; the work queue entry's job was done the moment that evidence
+existed. Don't mix implementation items with record-keeping items in
+either direction. If a spec is unclear or missing a source of truth,
+document the gap and stop — don't invent an answer (see
+`docs/reports/2026-07-15-inadequate-specs.md`).
+
+One-line rule: **action lives in the work queue; truth lives in the
+report queue.**
+
 ## Shared task queue
 
 Non-privileged, git-only tasks (docs, code changes committable directly
@@ -34,9 +62,12 @@ existing protocol — do not route privileged work through this queue.
    separate lock server.
 5. Do the work normally. Only one agent holds a given claim at a time,
    so there is no simultaneous editing of the same task's files.
-6. On completion: update `Status: done@<timestamp>`, add
-   `Evidence: <commit hash or report path>`, commit, push (same
-   pull-first discipline).
+6. On completion: first make sure the finding/evidence actually lives
+   in the report queue (a report file, a Feature Matrix row, a
+   commit) — then **delete the task's entire section from
+   `queue.md`** in the same commit, citing that evidence in the commit
+   message. Don't leave a `done` entry sitting in the work queue (same
+   pull-first discipline as any other queue edit).
 7. Never edit another agent's claimed entry without an explicit human
    override. A claim with no commits for an unreasonable stretch gets a
    note added to that entry, not a silent reclaim — resolving a stale
