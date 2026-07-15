@@ -194,7 +194,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## PS-01 — Periscope full-scope verification (§8)
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T15:20:00Z
 - Source: Master Packet §8 (labels, headings, wakes, weather,
   visibility, contacts, inspection, camera follow, bridge view, tactical
   overlays, event-based captions, visual record capture; rendering must
