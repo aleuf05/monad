@@ -82,7 +82,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## SR-01 — System Reality Report consolidation
 
-- Status: queued
+- Status: claimed:codex@2026-07-15T13:44:09Z
 - Source: Master Packet §21 (named as its own deliverable, separate
   from the Feature Matrix)
 - Output: `docs/reports/2026-07-15-system-reality-report.md`
