@@ -82,7 +82,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## SR-01 — System Reality Report consolidation
 
-- Status: claimed:codex@2026-07-15T13:44:09Z
+- Status: done@2026-07-15T13:46:14Z
 - Source: Master Packet §21 (named as its own deliverable, separate
   from the Feature Matrix)
 - Output: `docs/reports/2026-07-15-system-reality-report.md`
@@ -96,8 +96,8 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   done). Where §21 asks for something not yet covered by existing
   reports, mark it "not yet inspected" rather than filling the gap with
   assumption.
-- Claimed by: —
-- Evidence: —
+- Claimed by: codex
+- Evidence: `docs/reports/2026-07-15-system-reality-report.md`
 
 ## WO-01 — Watch Officer status (§10)
 
