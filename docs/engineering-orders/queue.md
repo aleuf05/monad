@@ -449,3 +449,28 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   remediation/write logic of any kind, report-only end to end.
 - Claimed by: —
 - Evidence: —
+
+## SPEC-01 — Resolve missing inputs for LS-01 / PROV-01 / DRIFT-01
+
+- Status: **blocked-on-human** (not a normal `queued` -- no agent can
+  resolve this by inspection; it requires an answer only the Admiral
+  can give)
+- Source: `docs/reports/2026-07-15-inadequate-specs.md`
+- What's missing, one line each:
+  1. **LS-01:** confirm the replication target is
+     `data/world-intake.sqlite3` (the only sqlite db in the repo), or
+     name a different one.
+  2. **PROV-01:** name "a disposable node" explicitly -- hostname,
+     environment, and confirmation it's real and reachable (per
+     Doctrine 001, do not let an agent infer or assume this the way
+     ENG-1's fabricated hosts nearly got acted on).
+  3. **DRIFT-01:** define "drift" for this task -- config drift,
+     `toys/`-vs-`web/toys/` deploy drift (already handled manually,
+     see `TOY-01`), infra drift, or something else.
+- Output: three one-line answers, appended to the respective queue
+  entries above. Once appended, `LS-01`/`PROV-01`/`DRIFT-01` convert
+  from blocked to genuinely `queued` and become claimable.
+- Constraints: no agent should attempt to answer these by inference --
+  that's the exact failure this entry exists to prevent.
+- Claimed by: — (cannot be claimed by an agent; awaiting Admiral)
+- Evidence: —
