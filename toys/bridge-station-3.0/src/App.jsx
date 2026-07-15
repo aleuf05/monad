@@ -87,6 +87,28 @@ function toChart(bounds, position) {
   return { x, y };
 }
 
+// Two vessels close together on the chart (e.g. holding station near each
+// other) otherwise render their callsign labels on top of one another,
+// illegible. Nudges each label's default position (point.y - 16) down in
+// 12px steps until it clears every label already placed this pass.
+function layoutLabelPositions(vessels, bounds) {
+  const placed = [];
+  return vessels.map((v) => {
+    const point = toChart(bounds, v.position);
+    const width = Math.max(v.callsign.length * 5.5, 20);
+    let y = point.y - 16;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const collides = placed.some(
+        (p) => Math.abs(p.x - point.x) < (p.width + width) / 2 && Math.abs(p.y - y) < 11
+      );
+      if (!collides) break;
+      y += 12;
+    }
+    placed.push({ x: point.x, y, width });
+    return { id: v.id, x: point.x, y, callsign: v.callsign };
+  });
+}
+
 function toGeo(bounds, point) {
   const { minLat, maxLat, minLng, maxLng } = bounds;
   const lng = minLng + ((point.x - MARGIN) / (CHART_W - MARGIN * 2)) * (maxLng - minLng);
@@ -354,21 +376,18 @@ export default function BridgeStation() {
             })}
 
             {/* labels (unrotated) */}
-            {bounds && vessels.map((v) => {
-              const point = toChart(bounds, v.position);
-              return (
-                <text
-                  key={v.id + "-label"}
-                  x={point.x} y={point.y - 16}
-                  textAnchor="middle"
-                  className="bs-mono"
-                  fontSize="9"
-                  fill={v.id === selectedId ? "#DCE6F2" : "#6B7C93"}
-                >
-                  {v.callsign}
-                </text>
-              );
-            })}
+            {bounds && layoutLabelPositions(vessels, bounds).map((l) => (
+              <text
+                key={l.id + "-label"}
+                x={l.x} y={l.y}
+                textAnchor="middle"
+                className="bs-mono"
+                fontSize="9"
+                fill={l.id === selectedId ? "#DCE6F2" : "#6B7C93"}
+              >
+                {l.callsign}
+              </text>
+            ))}
           </svg>
         </div>
 
