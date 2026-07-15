@@ -249,3 +249,41 @@ queue data through the proxy (not the UI's demo-mode fallback).
 per-visitor auth on the review/adjudication actions. See "Known
 limitation, accepted for now" above; the same acceptance applies here,
 not a new gap.
+
+## Living Captain — `toys/living-captain/`, Public
+
+Read-only status view over `tools/living-captain/`: one persistent
+identity (`captain.monad`), sight into real FleetCore/World Intake state,
+a custody-gated read boundary, a spend-limited observe budget, and an
+append-only action record. See
+`docs/engineering-orders/living-captain-v0.1.md` and `-v0.2.md` for the
+design. **No canon-mutating write authority exists anywhere in this
+system** — every canon change still goes through FleetCore's own
+authenticated command path, same as World Intake.
+
+**Backend.** `living-captain-status.service`
+(`scripts/living-captain-status.service`) runs
+`tools/living-captain/status_server.py`, a single-threaded stdlib
+`http.server` bound to loopback (`127.0.0.1:4774`). It only reads
+`data/living-captain/state.json` and `actions.jsonl` — it never
+assembles a `LivingCaptain` instance and never calls `observe()`, so
+running it costs no spend budget and has no dependency on
+`fleetcore-serve` or `world-intake` being up. The Captain identity
+itself is only ever advanced by an operator-invoked run (currently
+`tools/living-captain/demo_all.py`, or a direct `LivingCaptain.assemble()`
+call) — there is no scheduler or unattended loop yet.
+
+Install/restart via `scripts/install-living-captain.sh`, same
+build-and-enable pattern as the other services in this file.
+
+**Public route.** `handle_path /living-captain-api/* { reverse_proxy
+127.0.0.1:4774 }` in `/etc/caddy/Caddyfile`, alongside the other
+`handle_path` blocks in the same `cameronlampley.com { ... }` block. The
+static UI lives at `web/toys/living-captain/` (copied from
+`toys/living-captain/`, no build step) and is linked from the homepage
+card grid.
+
+**Command authority:** none exists to have a tradeoff about. The status
+API is GET-only and read-only by construction; the Captain's own
+outbound reads are custody-gated to exactly two URLs
+(`tools/living-captain/sight.py`'s manifest).
