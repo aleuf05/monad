@@ -196,6 +196,29 @@ dd {
   display: none;
 }
 
+.watchbook-redirect {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 14px;
+  max-width: 560px;
+  padding: 24px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.watchbook-redirect a {
+  color: var(--signal);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.watchbook-redirect a:hover,
+.watchbook-redirect a:focus-visible {
+  color: var(--amber);
+  outline: none;
+}
+
 .live-console {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
