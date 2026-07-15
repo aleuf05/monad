@@ -175,7 +175,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## BR-01 — Bridge full-scope verification (§7)
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T15:05:00Z
 - Source: Master Packet §7 (Command Center + Bridge: scenario creation,
   world selection, vessel placement, routes, formations, save/load,
   validation, launch; mission control showing intent/objective/actors/
