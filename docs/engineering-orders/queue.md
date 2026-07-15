@@ -385,6 +385,11 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   touching the live sqlite file requires `sudo` -- this task stops at
   design/proposal; execution routes through `cmd.sh` per
   `commissioning-handoff.md`, same as any other privileged work.
+- Acceptance criteria for this queue entry specifically: design doc
+  exists, names the confirmed replication target explicitly (not
+  assumed), and describes a restore drill with a concrete pass/fail
+  check (e.g. "row count and checksum of restored DB match pre-
+  corruption snapshot") -- not just "replication looked healthy."
 - Claimed by: —
 - Evidence: —
 
@@ -407,6 +412,13 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   question above) that is idempotent (safe to re-run), never commits or
   logs secrets in plaintext, and is testable on whatever the confirmed
   target actually is.
+- Acceptance criteria for this queue entry specifically: the target
+  node is named and independently confirmed reachable (not taken on
+  claim) before any script is written; running the finished script
+  twice in a row produces the same end state both times, with no error
+  on the second run; a grep of the script and its output for anything
+  matching common secret patterns (API keys, passwords, tokens) finds
+  nothing in plaintext.
 - Claimed by: —
 - Evidence: —
 
@@ -429,5 +441,11 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 - Constraints / authority: report-only by explicit order -- any future
   task proposing auto-remediation is a separate, later decision, not
   bundled into this one.
+- Acceptance criteria for this queue entry specifically: design doc
+  names exactly what "drift" means for this task (config, deployed-vs-
+  source, infra, or something else -- explicitly, not left ambiguous);
+  proposes a concrete method for measuring false-positive rate (e.g.
+  run against N known-good states, count incorrect flags); contains no
+  remediation/write logic of any kind, report-only end to end.
 - Claimed by: —
 - Evidence: —
