@@ -169,29 +169,29 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## RADIO-02 — Radio Console: Priority Queue + Interruption Rules
 
-- Status: queued
+- Status: done@2026-07-15T17:47:36Z
 - Depends on: nothing -- RADIO-01 was cut (no FleetCore change survived
   verification; see the design doc). Scores against the 5 pre-existing
   event types (`WaypointReached`, `RouteReplaced`, `RouteCompleted`,
   `Holding`, `WatchEvent`).
 - Source: same doc, System 1
-- Output: scores every candidate transmission (from the 6 real event
+- Output: scores every candidate transmission (from the 5 real event
   types) on urgency/relevance/source authority/freshness/interruption
   permission/expiry. Decides what airs, what waits, what expires
   unspoken.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `toys/radio-console/app.js`, `web/toys/radio-console/app.js`, `node --check toys/radio-console/app.js`, `node --check web/toys/radio-console/app.js`
 
 ## RADIO-03 — Radio Console: Station Knowledge Scoping
 
-- Status: queued
+- Status: done@2026-07-15T17:53:38Z
 - Depends on: RADIO-02
 - Source: same doc, System 2
 - Output: per-station filter predicate over the event stream -- no
   shared omniscience, each station sees only what its role could
   plausibly observe.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `toys/radio-console/app.js`, `web/toys/radio-console/app.js`, `toys/radio-console/README.md`, `node --check toys/radio-console/app.js`, `node --check web/toys/radio-console/app.js`
 
 ## RADIO-04 — Radio Console: Request/Acknowledge/Response Threading
 
@@ -203,15 +203,22 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 - Claimed by: —
 - Evidence: —
 
-## RADIO-05 — Radio Console: Channel Pressure scalar
+## RADIO-05 — Radio Console: three independent control signals (not a god scalar)
 
-- Status: queued
-- Depends on: RADIO-02
-- Source: same doc, System 4
-- Output: single 0-1 derived value from event rate + unacknowledged-
-  request count, driving line length/suppression/interruption odds.
-  One number, no parallel mood system.
-- Claimed by: —
+- Status: claimed:claude@2026-07-15T18:05:00Z
+- Depends on: RADIO-02 (done)
+- Source: superseded by the Admiral's supplemental risk-review packet §4
+  -- a single channel-pressure scalar was explicitly rejected as a "god
+  scalar" risk. Rebuilt as three independently observable signals:
+  **Traffic Load** (candidate/pending-transmission count), **Operational
+  Severity** (derived from real `fuel_fraction` -- the only real
+  numeric severity signal that exists, per this session's verification),
+  **Command Discipline** (operator-set UI control: quiet watch / normal
+  / harbor / priority / battle stations / radio silence -- not derived).
+  Also builds the 9-state radio-state indicator (packet §1: silence
+  must be discoverable) as a composite status line reading these three
+  signals plus connection/power state.
+- Claimed by: claude
 - Evidence: —
 
 ## RADIO-06 — Radio Console: Short-Term Transmission Memory
