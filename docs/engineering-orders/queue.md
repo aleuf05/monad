@@ -316,3 +316,47 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   amendment doesn't get to self-adopt either.
 - Claimed by: —
 - Evidence: —
+
+## GH-01 — Golden Hull / img2asset pipeline verification (§16)
+
+- Status: queued
+- Source: Master Packet §16 ("The GOLDEN HULL pipeline must preserve
+  source assets, Blender files, exports, manifests, SI scale, collision
+  envelopes, orientation, validation, versions, and runtime identity
+  linkage. Visual assets may not silently redefine simulation
+  dimensions.") -- never checked by any of the 14 completed tasks
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+- Method: `tools/img2asset/README.md` describes "Image -> 3D asset
+  pipeline... drops a `.glb` into `web/assets/models/` with a manifest
+  entry" -- this is very likely what the Master Packet calls "GOLDEN
+  HULL" under a different name, but that needs confirming, not
+  assuming. Read the actual source and manifest format and classify
+  each named requirement (source-asset preservation, SI scale,
+  collision envelopes, orientation, validation, versioning, runtime
+  identity linkage) present/absent. Specifically check the "may not
+  silently redefine simulation dimensions" invariant -- does anything
+  validate a generated model's scale against FleetCore's real vessel
+  dimensions before it ships?
+- Claimed by: —
+- Evidence: —
+
+## MD-01 — Mission Director verification
+
+- Status: queued
+- Source: Master Packet §21 (mission control should show current
+  intent/objective/actors/constraints/results); never inspected beyond
+  a single cursor-bug check on `mission_director.py` earlier this
+  session
+- Output: a new section in `docs/reports/2026-07-15-feature-matrix.md`
+- Method: `tools/mission-director/README.md` describes a real state
+  machine over FleetCore's actual events (`vessel_events`), issuing
+  only two real commands (`spawn-passive-contact`,
+  `record-watch-event`), explicitly never fabricating simulation
+  progress. Read `mission_director.py` and `report.py` in full, run
+  `test_cursor.py`, and confirm: does the state machine's phase
+  tracking actually match what it claims (no fabricated progress), and
+  does `report.py` produce output usable as real mission-control
+  status, or is it a narrower single-mission demo (Quacken Transit 001)
+  not yet generalized?
+- Claimed by: —
+- Evidence: —
