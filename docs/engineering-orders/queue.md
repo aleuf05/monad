@@ -236,7 +236,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## RADIO-07 — Radio Console: minimum v1 UX, integrate, deploy, verify live
 
-- Status: claimed:claude@2026-07-15T18:35:00Z
+- Status: done@2026-07-15T18:43:00Z
 - Depends on: RADIO-02 through RADIO-06 all landed
 - Source: same doc, acceptance test
 - Output: one status line (`QUIET WATCH · 3 ACTIVE STATIONS · 1 PENDING
@@ -244,5 +244,14 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   `toys/` -> `web/toys/`, live-verified: console goes silent when
   nothing matters, interrupts itself when something does, says "no
   change since last report" -- all three emergent, none hardcoded.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `toys/radio-console/app.js`, `web/toys/radio-console/app.js`, `node --check toys/radio-console/app.js`, `node --check web/toys/radio-console/app.js`, VM smoke harness confirming `QUIET WATCH · 3 STATIONS ACTIVE · 1 PENDING REQUEST · TRAFFIC LOW · NO CHANGE SINCE LAST REPORT`.
+  **Follow-up fix, commit `9783648`:** a full acceptance-test pass caught
+  `quiet_watch` showing `PREPARING REPORT` instead of suppressing
+  routine traffic -- it was a label with no actual enforcement. Fixed
+  (`isSuppressedByDiscipline()`, shared by the transmission gate and the
+  status line so they can't drift apart) and re-verified live: all three
+  acceptance criteria confirmed in one final pass across
+  normal/quiet_watch/radio_silence/powered-off, including a genuine,
+  non-hardcoded `NO CHANGE SINCE LAST REPORT` appearing on a repeat
+  Bridge report.
