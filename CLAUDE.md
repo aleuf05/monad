@@ -104,13 +104,20 @@ above). If something looks like it would leak this machine's own secrets
 world, that's still worth a one-line flag -- but the general posture here
 is ship it, don't audit it.
 
-## POLICY: Shared task queue for non-privileged work
+## POLICY: Work queue / report queue for non-privileged work
 
-Before starting non-privileged, git-only work (docs, code changes
-committable without `sudo`), check
-[`docs/engineering-orders/queue.md`](docs/engineering-orders/queue.md)
-for queued or in-progress tasks, so a Claude session doesn't duplicate
-or silently drop work another agent (e.g. Codex) already claimed. Claim
-protocol is in [`AGENTS.md`](AGENTS.md). Privileged work stays exclusively
-in `cmd.sh` per `docs/commissioning-handoff.md` -- this queue never
-covers that.
+Two locations, kept strictly separate -- see [`AGENTS.md`](AGENTS.md)
+for the full policy and claim protocol:
+
+- **Work queue** -- [`docs/engineering-orders/queue.md`](docs/engineering-orders/queue.md).
+  Active/blocked tasks only. Check this before starting non-privileged,
+  git-only work so a Claude session doesn't duplicate or silently drop
+  work another agent (e.g. Codex) already claimed. When a task is
+  done, its entry is deleted from here, not marked done in place.
+- **Report queue** -- not a separate file. It's `docs/reports/*.md`,
+  the Feature Matrix, and `docs/doctrine/*.md`, where completed
+  findings and evidence actually live.
+
+One-line rule: action lives in the work queue; truth lives in the
+report queue. Privileged work stays exclusively in `cmd.sh` per
+`docs/commissioning-handoff.md` -- neither queue covers that.
