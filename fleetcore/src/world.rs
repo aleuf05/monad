@@ -20,17 +20,27 @@ use serde::{Deserialize, Serialize};
 const ARRIVAL_RADIUS_METERS: f64 = 80.0;
 
 // Escort formation geometry: scouts are spread evenly across this many
-// degrees, centered dead astern (180 deg relative to the flagship's
-// course), sorted by vessel id for a stable slot assignment. Radius varies
+// degrees, sorted by vessel id for a stable slot assignment. Radius varies
 // by mode; Patrol reuses Loose's radius and adds a slow, deterministic
 // bearing sweep on top of each slot's base offset, driven by tick count
 // (not wall-clock time) so it stays replay-deterministic like everything
-// else in this engine.
+// else in this engine. Off/Loose/Patrol/Tight are centered dead astern
+// (180 deg relative to the flagship's course); Screen is centered ahead
+// instead -- see below.
 const ESCORT_WEDGE_SPREAD_DEGREES: f64 = 70.0;
 const ESCORT_LOOSE_RADIUS_METERS: f64 = 1200.0;
 const ESCORT_TIGHT_RADIUS_METERS: f64 = 350.0;
 const ESCORT_PATROL_SWEEP_DEGREES: f64 = 40.0;
 const ESCORT_PATROL_SWEEP_RATE: f64 = 0.002;
+// Screen anticipates the flagship's track: the station anchor is projected
+// forward along the flagship's *current* course (not a full route lookahead
+// -- advance_vessel already recomputes course toward the next waypoint every
+// tick, so "current course" already means "the way it's actually headed").
+// Scouts then take up the same wedge-plus-sweep pattern as Patrol around
+// that forward anchor instead of around the flagship itself, so they lead
+// rather than trail and keep weaving instead of holding a fixed point.
+const ESCORT_SCREEN_LOOKAHEAD_METERS: f64 = 2500.0;
+const ESCORT_SCREEN_RADIUS_METERS: f64 = 1200.0;
 type AgentMovementPlan = (String, Position, Option<(String, String)>);
 
 fn escort_station(
@@ -46,11 +56,16 @@ fn escort_station(
         -ESCORT_WEDGE_SPREAD_DEGREES / 2.0
             + ESCORT_WEDGE_SPREAD_DEGREES * (slot_index as f64) / ((slot_count - 1) as f64)
     };
-    let sweep = if mode == EscortMode::Patrol {
+    let sweep = if mode == EscortMode::Patrol || mode == EscortMode::Screen {
         ESCORT_PATROL_SWEEP_DEGREES * ((tick as f64) * ESCORT_PATROL_SWEEP_RATE).sin()
     } else {
         0.0
     };
+    if mode == EscortMode::Screen {
+        let anchor = point_at_distance(leader.position, leader.course, ESCORT_SCREEN_LOOKAHEAD_METERS);
+        let bearing = normalize_degrees(leader.course + slot_offset + sweep);
+        return point_at_distance(anchor, bearing, ESCORT_SCREEN_RADIUS_METERS);
+    }
     let radius = match mode {
         EscortMode::Tight => ESCORT_TIGHT_RADIUS_METERS,
         _ => ESCORT_LOOSE_RADIUS_METERS,

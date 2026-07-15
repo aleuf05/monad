@@ -16,19 +16,27 @@ pub enum VesselKind {
 
 // Off leaves scouts under whatever route (or lack of one) they last had --
 // see advance_vessel in world.rs, where a scout with an empty route simply
-// holds position (unlike passive-traffic, which dead-reckons forever).
+// holds position (unlike passive-traffic, which dead-reckons forever). Off
+// is a deliberate operator halt (a real hazard, a hold-for-review moment),
+// not the resting state -- Screen is the default, so scouts are actively
+// maneuvering unless someone explicitly pauses them.
 // Loose/Tight hold scouts at fixed bearings off the flagship's stern at
 // different radii; Patrol uses the same radius as Loose but sweeps the
 // relative bearing back and forth over time instead of holding a fixed
-// slot. See escort_station() in world.rs for the actual geometry.
+// slot. Screen leads instead of trails: scouts station ahead of the
+// flagship's current course (anticipating where it's headed, since course
+// already points at its next waypoint) and sweep the same way Patrol does,
+// so they're always maneuvering rather than sitting on a fixed point. See
+// escort_station() in world.rs for the actual geometry.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "kebab-case")]
 pub enum EscortMode {
-    #[default]
     Off,
     Loose,
     Patrol,
     Tight,
+    #[default]
+    Screen,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
