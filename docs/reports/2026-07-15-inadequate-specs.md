@@ -52,8 +52,22 @@ supplied. Removed from the work queue.
 the same reason as `LS-01` -- no stated target, no recorded need for a
 disposable-node provisioning script beyond the original order itself.
 Same discipline: asked before assuming, found nothing to build against,
-removed from the work queue. `DRIFT-01` and its `SPEC-01` question are
-unaffected and remain open.
+removed from the work queue.
+
+**Resolution, DRIFT-01 (2026-07-15):** a real design doc was produced
+first (`docs/engineering-orders/drift-detection-report-only-design-v0.1.md`,
+defining drift narrowly as the `toys/` <-> `web/toys/` mirror pair --
+design-only, zero code). Then cut anyway, same reasoning as the other
+two: with the Lieutenant's priority being a fully functioning demo
+right now, no stated need survived asking why an automated detector
+was worth building for a drift class this session already swept
+manually (`TOY-01`). The doc is kept as a shelved reference, not
+deleted -- discarding work-in-progress isn't the same as discarding
+the record of it.
+
+**All three of LS-01/PROV-01/DRIFT-01 are now cut. `SPEC-01` is fully
+resolved and closed** -- no outstanding missing-input questions remain
+from this batch.
 
 ## 2. Master Packet §6 -- a name list, not a spec
 
@@ -90,3 +104,5 @@ one-line minimum this session already learned the hard way: name the
 target explicitly, or the spec isn't a spec yet, it's an intention.
 Concretely, `LS-01`/`PROV-01`/`DRIFT-01` should not be claimed until
 their missing inputs (database, node, drift definition) are supplied.
+`LS-01` is now cut, `DRIFT-01` is now defined, and `PROV-01` remains
+blocked on the missing node.

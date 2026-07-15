@@ -4,59 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## DRIFT-01 — Drift detection, report-only mode (Design Required, not verification)
-
-- Status: done@2026-07-15T18:35:19Z
-- Source: Admiral's order, 2026-07-15 -- "Run detection in report-only
-  mode and measure false positives before any auto-remediation"
-- **Verified starting state, checked before queueing:** no drift-
-  detection code or docs exist anywhere in this repo. Note this
-  session already did extensive *manual* source/deploy drift detection
-  (`toys/` vs `web/toys/`, see `TOY-01`) -- if this order means
-  automating that specific check, say so; if it means something else
-  (config drift, infra drift), scope it explicitly before work starts.
-- Output: a design doc proposing a report-only drift detector -- no
-  auto-remediation authority, per the order's own explicit sequencing
-  ("before any auto-remediation"). Must include a plan for measuring
-  false-positive rate before any future auto-remediation proposal is
-  even considered.
-- Constraints / authority: report-only by explicit order -- any future
-  task proposing auto-remediation is a separate, later decision, not
-  bundled into this one.
-- Acceptance criteria for this queue entry specifically: design doc
-  names exactly what "drift" means for this task (config, deployed-vs-
-  source, infra, or something else -- explicitly, not left ambiguous);
-  proposes a concrete method for measuring false-positive rate (e.g.
-  run against N known-good states, count incorrect flags); contains no
-  remediation/write logic of any kind, report-only end to end.
-- Claimed by: claude
-- Evidence: `docs/engineering-orders/drift-detection-report-only-design-v0.1.md`
-
-## SPEC-01 — Resolve missing input for DRIFT-01
-
-- Status: **blocked-on-human** (not a normal `queued` -- no agent can
-  resolve this by inspection; it requires an answer only the Admiral
-  can give)
-- Source: `docs/reports/2026-07-15-inadequate-specs.md`
-- ~~LS-01~~ resolved 2026-07-15: cut entirely, not built -- no stated
-  reason survived asking "why replicate" (no recorded incident, no
-  documented data-loss event). Admiral's decision, stated as a general
-  principle: **one source of truth, don't replicate it.** See the
-  report above for the full resolution.
-- ~~PROV-01~~ resolved 2026-07-15: cut entirely, same reasoning -- no
-  stated target, no recorded need beyond the original order itself.
-- What's still missing:
-  1. **DRIFT-01:** define "drift" for this task -- config drift,
-     `toys/`-vs-`web/toys/` deploy drift (already handled manually,
-     see `TOY-01`), infra drift, or something else.
-- Output: one one-line answer, appended to `DRIFT-01` below. Once
-  appended, `DRIFT-01` converts from
-  blocked to genuinely `queued` and become claimable.
-- Constraints: no agent should attempt to answer these by inference --
-  that's the exact failure this entry exists to prevent.
-- Claimed by: — (cannot be claimed by an agent; awaiting Admiral)
-- Evidence: —
-
 ## HUMAN-01 — Rule on issue #16 vs. CLAUDE.md contradiction
 
 - Status: blocked-on-human
