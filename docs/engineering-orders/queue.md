@@ -295,7 +295,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## DOC-02 — Bounded-timeout amendment to Doctrine 001
 
-- Status: queued
+- Status: done@2026-07-15T16:05:00Z
 - Source: this session's ENG-1 packet incident -- verifying whether
   `node-01/02/03.livingfleet` were real hosts required killing a
   2-minute hung `getent hosts` chain (`exit 143`); a fabricated or
@@ -314,12 +314,12 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   fail fast and cheaply, not stall the session." Keep Doctrine 001's
   Status as "Proposed -- pending Lieutenant/Admiral approval" -- this
   amendment doesn't get to self-adopt either.
-- Claimed by: —
-- Evidence: —
+- Claimed by: claude
+- Evidence: `docs/doctrine/001-verification-command-dialect.md`
 
 ## GH-01 — Golden Hull / img2asset pipeline verification (§16)
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T16:08:00Z
 - Source: Master Packet §16 ("The GOLDEN HULL pipeline must preserve
   source assets, Blender files, exports, manifests, SI scale, collision
   envelopes, orientation, validation, versions, and runtime identity
