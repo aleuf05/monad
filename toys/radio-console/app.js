@@ -1,46 +1,20 @@
 // Ambience bridge instrument: transmissions spoken aloud via the browser's
 // SpeechSynthesis API where available, over a synthesized static bed and
-// squelch pops built with Web Audio. Every page load attempts a read-only
-// FleetCore connection (see connectFleetCoreLive()); once one lands, the
-// scripted scheduler stops and transmissions fire only when
-// fleetcore-serve's snapshots show a real change (a vessel's status
-// transition, a RecordWatchEvent message) instead of a random timer.
-// Until/unless that happens -- no server reachable, or it times out --
-// this stays exactly what it always was: a random line from TRANSMISSIONS
-// every 6-16 seconds, no FleetCore dependency at all. Ambience mechanics
-// (static bed, squelch pop, mute/volume, channel filters, the speaking
-// indicator) are shared unchanged between both modes; only what triggers
-// transmit and what it says differs. ?fleetcoreServer= overrides the
-// server URL if needed.
-const TRANSMISSIONS = [
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "Scout Alpha, Monad Actual, report position and status." },
-  { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, holding station, all quiet." },
-  { channel: "fleet-comms", speaker: "Scout Bravo", text: "Bridge, this is Scout Bravo, screen clear, no contacts of interest." },
-  { channel: "fleet-comms", speaker: "Scout Charlie", text: "Monad Actual, Scout Charlie, contact bearing two-seven-zero, range eight, no immediate concern." },
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "All stations, Monad Actual, course and speed unchanged, log entry recorded." },
-  { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, relieving Bravo on picket in five." },
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "Fleet, Monad Actual, radio check, respond in sequence." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Arabian Sea advisory: winds light and variable, sea state one, visibility unrestricted." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Weather update: haze reducing visibility to six nautical miles near the strait, monitor radar." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "No small craft advisories in effect. Swell under one meter through the watch." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Overnight forecast: clear skies, light easterly breeze, no change expected before dawn." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Barometric pressure steady. No systems tracked within two hundred nautical miles." },
-  { channel: "traffic", speaker: "Harbor Control", text: "Tanker Gulf Star, requesting routing clearance, over." },
-  { channel: "traffic", speaker: "Dhow Lantern", text: "All stations, this is Dhow Lantern, transiting outbound, maintaining course and speed." },
-  { channel: "traffic", speaker: "Pilot Amber", text: "Harbor Control, Pilot Amber, pilot aboard, proceeding to berth." },
-  { channel: "traffic", speaker: "Coaster Qeshm", text: "Coaster Qeshm, standing by on channel, holding for inbound clearance." },
-  { channel: "traffic", speaker: "Harbor Control", text: "All stations, routine traffic advisory, channel congestion expected near the anchorage through the watch." },
-  { channel: "traffic", speaker: "Gulf Star", text: "Harbor Control, Gulf Star, clearance received, underway." }
-];
-
+// squelch pops built with Web Audio. Fully FleetCore-connected, on
+// purpose: no scripted fallback. connectFleetCoreLive() runs on load and
+// keeps retrying with backoff until fleetcore-serve's snapshots start
+// arriving; only then does it enter live mode and start speaking, driven
+// by real state changes (a vessel's status transition, a
+// RecordWatchEvent message) -- never a random timer. While disconnected,
+// the console stays visibly "Offline -- reconnecting", never silent
+// scripted chatter standing in for real data. ?fleetcoreServer= overrides
+// the server URL if needed.
 const CHANNEL_LABELS = {
   "fleet-comms": "Fleet Comms",
   weather: "Weather",
   traffic: "Traffic"
 };
 
-const MIN_INTERVAL_MS = 6000;
-const MAX_INTERVAL_MS = 16000;
 const SQUELCH_DURATION_S = 0.12;
 
 const powerButton = document.querySelector("#powerButton");
@@ -59,7 +33,6 @@ const state = {
   powered: false,
   muted: false,
   activeChannels: new Set(["fleet-comms", "weather", "traffic"]),
-  scheduleTimer: null,
   speaking: false,
   voiceForSpeaker: new Map(),
   animationFrame: null,
@@ -258,22 +231,6 @@ function transmitEntry(entry) {
   speak(entry);
 }
 
-function transmit() {
-  const pool = TRANSMISSIONS.filter((entry) => state.activeChannels.has(entry.channel));
-  if (!pool.length) return;
-  transmitEntry(pool[Math.floor(Math.random() * pool.length)]);
-}
-
-function scheduleNext() {
-  window.clearTimeout(state.scheduleTimer);
-  if (!state.powered || liveMode) return;
-  const delay = MIN_INTERVAL_MS + Math.random() * (MAX_INTERVAL_MS - MIN_INTERVAL_MS);
-  state.scheduleTimer = window.setTimeout(() => {
-    if (state.activeChannels.size) transmit();
-    scheduleNext();
-  }, delay);
-}
-
 // --- Live mode: event-driven transmissions from a real fleetcore-serve ---
 //
 // watch_events only ever contains what a human explicitly recorded via a
@@ -318,8 +275,8 @@ function queueLiveEntry(entry) {
 }
 
 function speakerNameFor(vessel) {
-  // Matches TRANSMISSIONS' existing voice: MONAD refers to itself as
-  // "Monad Actual" in dialogue, everyone else by their title-case name.
+  // MONAD refers to itself as "Monad Actual" in dialogue, everyone else
+  // by their title-case name.
   if (vessel.kind === "flagship") return "Monad Actual";
   return vessel.name || vessel.callsign || vessel.id;
 }
@@ -367,9 +324,25 @@ function livePump() {
   transmitEntry(next);
 }
 
+function setOfflineState(label) {
+  liveMode = false;
+  window.clearInterval(livePumpTimer);
+  if (dataSourceEl) {
+    dataSourceEl.textContent = label;
+    dataSourceEl.classList.remove("is-on");
+  }
+}
+
+function scheduleReconnect() {
+  window.clearTimeout(liveReconnectTimer);
+  liveReconnectTimer = setTimeout(() => {
+    liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
+    connectFleetCoreLive();
+  }, liveReconnectDelayMs);
+}
+
 function enterLiveMode() {
   liveMode = true;
-  window.clearTimeout(state.scheduleTimer);
   if (dataSourceEl) {
     dataSourceEl.textContent = "FleetCore Live";
     dataSourceEl.classList.add("is-on");
@@ -379,6 +352,7 @@ function enterLiveMode() {
 
 function connectFleetCoreLive() {
   let settled = false;
+  setOfflineState(liveReconnectDelayMs > 1000 ? "Offline — reconnecting" : "Connecting…");
   const socket = new WebSocket(fleetCoreServerUrl());
   const timeout = setTimeout(() => {
     if (settled) return;
@@ -410,14 +384,9 @@ function connectFleetCoreLive() {
     if (!settled) {
       settled = true;
       clearTimeout(timeout);
-      return;
     }
-    if (liveMode) {
-      liveReconnectTimer = setTimeout(() => {
-        liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
-        connectFleetCoreLive();
-      }, liveReconnectDelayMs);
-    }
+    if (liveMode) setOfflineState("Offline — reconnecting");
+    scheduleReconnect();
   });
 
   liveSocket = socket;
@@ -450,9 +419,10 @@ function setPowered(powered) {
     initAudio();
     if (audioContext && audioContext.state === "suspended") audioContext.resume();
     applyVolume();
-    scheduleNext();
+    // No scripted schedule to start -- transmissions only ever come from
+    // the live FleetCore queue (see enterLiveMode()/livePump()). If not
+    // connected yet, the console just sits Offline until it is.
   } else {
-    window.clearTimeout(state.scheduleTimer);
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     setSpeaking(false);
   }

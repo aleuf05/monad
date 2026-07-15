@@ -1,8 +1,8 @@
 # Radio Console
 
-A bridge instrument for ambience, not for information. It plays scripted "in-world" radio chatter — fleet comms, weather, routine maritime traffic — through a console UI, spoken aloud via the browser's `SpeechSynthesis` API over a synthesized static bed and squelch pops built with the Web Audio API.
+A bridge instrument, fully FleetCore-connected: it speaks real fleet chatter — vessel status transitions, explicit watch notes — through a console UI, spoken aloud via the browser's `SpeechSynthesis` API over a synthesized static bed and squelch pops built with the Web Audio API. No scripted fallback: while disconnected from `fleetcore-serve`, the console shows "Offline — reconnecting" rather than substituting invented chatter.
 
-Requested as a prestige/ambience feature (see `logs/captains/2026/2026-07-11_radio-console-v1.md`): "giving Monad's bridge a lived-in, simulated presence" without requiring any real data feed.
+Originally requested as a prestige/ambience feature (see `logs/captains/2026/2026-07-11_radio-console-v1.md`) with a scripted fallback for when no data feed was available; the fallback was removed (Admiral's call, ambitious-scope pass) so the instrument never presents invented chatter as real.
 
 ## Run
 
@@ -16,16 +16,16 @@ Then open `http://localhost:8080/toys/radio-console/`. Click **Power On** — br
 
 ## What it does
 
-- A bank of scripted transmission lines across three channels (Fleet Comms, Weather, Traffic), using the same vessel names and callsigns as the rest of Monad's world (`MONAD`, `SCOUT ALPHA/BRAVO/CHARLIE`, and the passive-traffic contacts from `fleetcore/data/seed-world.json` — `Dhow Lantern`, `Gulf Star`, `Pilot Amber`, `Coaster Qeshm`) for continuity, not because it reads that data live.
-- A scheduler picks a random transmission from the currently-monitored channels every 6–16 seconds, appends it to the transcript, and speaks it aloud (assigning each named speaker a consistent voice, if more than one is available, so "Scout Alpha" always sounds the same).
+- Speaks real fleet chatter through a console UI, using the same vessel names and callsigns as the rest of Monad's world (`MONAD`, `SCOUT ALPHA/BRAVO/CHARLIE`, and the passive-traffic contacts from `fleetcore/data/seed-world.json` — `Dhow Lantern`, `Gulf Star`, `Pilot Amber`, `Coaster Qeshm`).
+- Transmissions fire only when a live FleetCore snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — never on a random timer, never invented.
 - A filtered-noise static bed plays only while a transmission is "on the air" (ducked quiet under the voice), and stays silent — squelch closed — during dead air, like a real monitored channel. A squelch pop marks the transmission ending (PTT release).
 - Channel chips (multi-select) control which categories are monitored; Volume and Mute control the Web Audio output and speech volume together.
 
-## Live Mode (FleetCore)
+## Live connection (FleetCore) — required, not optional
 
-Every page load attempts a read-only WebSocket connection to `fleetcore-serve` (Admiral's call, 2026-07-11: live is the default now, no longer opt-in) — see `docs/architecture/fleetcore-api.md`. If one lands, event-driven chatter replaces the scripted random scheduler: transmissions fire only when a snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — rather than on a random timer. The static bed, squelch pop, mute/volume, and channel filters are unchanged; only what triggers a transmission and what it says differs. There's no live "Weather" channel — FleetCore has no weather concept — so that channel simply produces nothing while live (still toggleable, just silent).
+Every page load opens a WebSocket to `fleetcore-serve` (see `docs/architecture/fleetcore-api.md`) and keeps retrying with backoff until it lands — there is no scripted mode to fall back to. Once connected, transmissions fire only when a snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message. The static bed, squelch pop, mute/volume, and channel filters work the same regardless of connection state. There's no live "Weather" channel — FleetCore has no weather concept — so that channel simply produces nothing while connected (still toggleable, just silent).
 
-If nothing answers in time (no reachable `fleetcore-serve`, or the public reverse-proxy path isn't finished — see `docs/deployment.md`), this stays exactly what it always was: presentation layer, not world state, scripted chatter on a random timer, no FleetCore dependency. `?fleetcoreServer=ws://host:port/ws` overrides the server URL if the default (derived from the page's own origin) isn't right. Making the connection attempt unconditional rather than opt-in means a failed attempt now logs a browser-native console error no application code can suppress on any page load where FleetCore isn't reachable — an accepted tradeoff, not an oversight; see `docs/deployment.md` for why.
+While disconnected (no reachable `fleetcore-serve`, or the public reverse-proxy path isn't finished — see `docs/deployment.md`), the console shows **"Offline — reconnecting"** and stays silent — it does not substitute scripted chatter. `?fleetcoreServer=ws://host:port/ws` overrides the server URL if the default (derived from the page's own origin) isn't right. A failed connection attempt logs a browser-native console error no application code can suppress — an accepted tradeoff, not an oversight; see `docs/deployment.md` for why.
 
 ## Graceful degradation
 
