@@ -64,7 +64,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## WM-01 — Watchman scope verification
 
-- Status: queued
+- Status: claimed:claude@2026-07-15T14:25:00Z
 - Source: Master Packet §16 ("A Watchman process should inspect disk,
   memory, processes, endpoints, databases, event progress, stale
   services, and failed restarts")
