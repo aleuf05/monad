@@ -20,6 +20,7 @@ Then open `http://localhost:8080/toys/radio-console/`. Click **Power On** — br
 - Transmissions fire only when a live FleetCore snapshot shows something actually happened — a vessel's status transition (underway, arrived, holding, ...) or an explicit `RecordWatchEvent` message — never on a random timer, never invented.
 - A filtered-noise static bed plays only while a transmission is "on the air" (ducked quiet under the voice), and stays silent — squelch closed — during dead air, like a real monitored channel. A squelch pop marks the transmission ending (PTT release).
 - Channel chips (multi-select) control which categories are monitored; Volume and Mute control the Web Audio output and speech volume together.
+- Station chips apply a per-station scope filter before anything airs: Bridge hears everything, Traffic only hears traffic-side observations, and Weather stays effectively silent because FleetCore has no weather model.
 
 ## Live connection (FleetCore) — required, not optional
 

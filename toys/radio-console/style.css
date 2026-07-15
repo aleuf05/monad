@@ -108,6 +108,26 @@ h1 {
   color: var(--amber);
 }
 
+.status-strip-wide {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.status-strip-wide span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.status-strip-wide strong {
+  font-size: 0.9rem;
+  color: var(--signal);
+  letter-spacing: 0.03em;
+}
+
 .control-deck {
   display: flex;
   flex-wrap: wrap;

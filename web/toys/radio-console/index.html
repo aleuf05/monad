@@ -32,6 +32,10 @@
             <span>Data Source</span>
             <strong id="dataSourceValue">Connecting…</strong>
           </div>
+          <div class="status-strip-wide">
+            <span>Watch</span>
+            <strong id="radioStateValue">—</strong>
+          </div>
         </section>
       </header>
 
@@ -42,6 +46,25 @@
           <button type="button" class="channel-chip is-active" data-channel="fleet-comms">Fleet Comms</button>
           <button type="button" class="channel-chip is-active" data-channel="weather">Weather</button>
           <button type="button" class="channel-chip is-active" data-channel="traffic">Traffic</button>
+        </div>
+
+        <div class="volume-control">
+          <label for="commandDisciplineSelect">Command Discipline</label>
+          <select id="commandDisciplineSelect">
+            <option value="quiet_watch">Quiet Watch</option>
+            <option value="normal" selected>Normal</option>
+            <option value="harbor">Harbor</option>
+            <option value="priority">Priority Traffic</option>
+            <option value="battle_stations">Battle Stations</option>
+            <option value="radio_silence">Radio Silence</option>
+          </select>
+        </div>
+
+        <div class="channel-chips" role="group" aria-label="Station knowledge scope">
+          <button type="button" class="channel-chip is-active" data-station="bridge">Bridge</button>
+          <button type="button" class="channel-chip" data-station="engineering">Engineering</button>
+          <button type="button" class="channel-chip" data-station="traffic">Traffic</button>
+          <button type="button" class="channel-chip" data-station="weather">Weather</button>
         </div>
 
         <div class="volume-control">
