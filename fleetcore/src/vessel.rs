@@ -41,6 +41,22 @@ pub enum VesselStatus {
     Arrived,
 }
 
+// Starting fuel fraction (full tank) for a freshly-spawned or freshly-reset
+// vessel. Also the default for state files saved before this field existed
+// -- assuming a full tank on load is more honest than assuming empty for
+// data that was never tracked.
+pub fn default_fuel_fraction() -> f64 {
+    1.0
+}
+
+// Consumption rate: fuel fraction depleted per meter traveled. Chosen so a
+// vessel cruising continuously at a representative ~25 m/s depletes a full
+// tank over several hours of sim time, not tuned against any real-world
+// vessel spec -- a starting assumption for the radio-console feature this
+// field exists for, not a claim about real fuel economy. Revisit once
+// there's a reason to.
+const FUEL_CONSUMPTION_PER_METER: f64 = 1.0 / 400_000.0;
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Vessel {
     pub id: String,
@@ -65,6 +81,14 @@ pub struct Vessel {
     // field existed -- 0 is a reasonable genesis value.
     #[serde(default)]
     pub route_id: u64,
+    // Real, tracked FleetCore state -- Tier 1 (Verified FleetCore state) in
+    // the radio console's source-authority hierarchy, not a value invented
+    // client-side. Depletes with distance traveled (advance_vessel in
+    // world.rs); reset to full on ResetFleet. No replenishment mechanism
+    // exists yet -- clamped at 0.0, not an error, and out of scope for this
+    // pass; see docs/engineering-orders/radio-console-v1-and-fleetcore-model-upgrade.md.
+    #[serde(default = "default_fuel_fraction")]
+    pub fuel_fraction: f64,
 }
 
 impl Vessel {
@@ -75,6 +99,21 @@ impl Vessel {
         }
         self.position.lat = quantize(self.position.lat.clamp(-90.0, 90.0));
         self.position.lng = quantize(normalize_longitude(self.position.lng));
+        self.fuel_fraction = quantize(self.fuel_fraction.clamp(0.0, 1.0));
+    }
+
+    // Called once per tick with the distance actually traveled this tick
+    // (0.0 if holding/arrived) -- shared by both advance_vessel branches
+    // (route-following and passive-traffic dead-reckoning) so consumption
+    // logic lives in exactly one place.
+    pub fn deplete_fuel(&mut self, distance_meters: f64) {
+        // quantize() immediately, same as course at its point of update
+        // (world.rs advance_vessel) -- checkpoint+event-tail replay and a
+        // from-genesis replay must accumulate floating-point error
+        // identically tick-by-tick, or determinism.rs's byte-for-byte
+        // snapshot comparison fails exactly like it's supposed to.
+        self.fuel_fraction =
+            quantize((self.fuel_fraction - distance_meters * FUEL_CONSUMPTION_PER_METER).max(0.0));
     }
 }
 

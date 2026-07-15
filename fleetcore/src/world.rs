@@ -704,6 +704,7 @@ impl World {
                     route: Vec::new(),
                     last_update: self.clock.sim_time(),
                     route_id: 0,
+                    fuel_fraction: crate::vessel::default_fuel_fraction(),
                 };
                 vessel.normalize();
                 self.vessels.push(vessel);
@@ -743,6 +744,7 @@ impl World {
                         vessel.route_id += 1;
                         vessel.status = VesselStatus::Underway;
                         vessel.last_update = sim_time.clone();
+                        vessel.fuel_fraction = crate::vessel::default_fuel_fraction();
                     }
                     // A missing id (e.g. the flagship or a scout id was
                     // somehow renamed) is silently skipped rather than
@@ -1155,6 +1157,7 @@ fn advance_vessel(
     if let Some(target) = vessel.route.first().copied() {
         let remaining = distance_meters(vessel.position, target);
         if remaining <= ARRIVAL_RADIUS_METERS {
+            vessel.deplete_fuel(remaining);
             vessel.position = target;
             vessel.route.remove(0);
             vessel.last_update = sim_time.to_string();
@@ -1164,11 +1167,13 @@ fn advance_vessel(
         vessel.course = quantize(bearing_degrees(vessel.position, target));
         let step = vessel.speed_mps * elapsed_seconds;
         if step >= remaining {
+            vessel.deplete_fuel(remaining);
             vessel.position = target;
             vessel.route.remove(0);
             vessel.last_update = sim_time.to_string();
             return Some(leg_or_route_complete(vessel, target, tick, sim_time));
         }
+        vessel.deplete_fuel(step);
         vessel.position = point_at_distance(vessel.position, vessel.course, step);
         vessel.status = VesselStatus::Underway;
         vessel.last_update = sim_time.to_string();
@@ -1176,11 +1181,9 @@ fn advance_vessel(
     }
 
     if vessel.kind == VesselKind::PassiveTraffic {
-        vessel.position = point_at_distance(
-            vessel.position,
-            vessel.course,
-            vessel.speed_mps * elapsed_seconds,
-        );
+        let step = vessel.speed_mps * elapsed_seconds;
+        vessel.deplete_fuel(step);
+        vessel.position = point_at_distance(vessel.position, vessel.course, step);
         vessel.status = VesselStatus::Transiting;
         vessel.last_update = sim_time.to_string();
     }
