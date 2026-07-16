@@ -14,7 +14,8 @@
 const CHANNEL_LABELS = {
   "fleet-comms": "Fleet Comms",
   weather: "Weather",
-  traffic: "Traffic"
+  traffic: "Traffic",
+  captain: "Captain"
 };
 
 const SQUELCH_DURATION_S = 0.12;
@@ -253,7 +254,7 @@ const qualityVerdictEl = document.querySelector("#qualityVerdict");
 const state = {
   powered: false,
   muted: false,
-  activeChannels: new Set(["fleet-comms", "weather", "traffic"]),
+  activeChannels: new Set(["fleet-comms", "weather", "traffic", "captain"]),
   selectedStation: "bridge",
   speaking: false,
   voiceForSpeaker: new Map(),
@@ -307,6 +308,9 @@ let lastCaptainControlSignatures = null; // Map<vesselId, signature>, null until
 let lastEscortIntentSignatures = null; // Map<decisionId, signature>, null until seeded
 let lastAgentDecisionCount = null; // null until seeded
 let firstOperationalSnapshot = true;
+let lastCaptainActionSequence = null;
+let captainPollTimer = null;
+const CAPTAIN_POLL_MS = 10000;
 const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
@@ -337,6 +341,34 @@ const STATUS_LINES = {
 function updateChannelCount() {
   const count = state.activeChannels.size;
   channelCountEl.textContent = count === 0 ? "No channels" : `${count} channel${count === 1 ? "" : "s"}`;
+}
+
+async function pollLivingCaptain() {
+  if (!state.powered) return;
+  try {
+    const response = await fetch("/living-captain-api/status?limit=20", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    const actions = Array.isArray(data.recent_actions) ? data.recent_actions : [];
+    const newest = actions.reduce((max, action) => Math.max(max, Number(action.sequence) || 0), 0);
+    if (lastCaptainActionSequence === null) {
+      lastCaptainActionSequence = newest;
+      return;
+    }
+    actions
+      .filter((action) => Number(action.sequence) > lastCaptainActionSequence)
+      .sort((a, b) => Number(a.sequence) - Number(b.sequence))
+      .forEach((action) => queueLiveEntry({
+        kind: "status",
+        channel: "captain",
+        speaker: "Living Captain",
+        text: `Captain's record. ${action.summary}`,
+        station: "bridge"
+      }));
+    lastCaptainActionSequence = Math.max(lastCaptainActionSequence, newest);
+  } catch (error) {
+    // Optional read-only source: retry later without degrading FleetCore radio.
+  }
 }
 
 function updateStationScope() {
@@ -2042,6 +2074,9 @@ function setPowered(powered) {
     fetchNewswire();
     clearInterval(newswireRefreshTimer);
     newswireRefreshTimer = window.setInterval(fetchNewswire, NEWSWIRE_REFRESH_MS);
+    pollLivingCaptain();
+    clearInterval(captainPollTimer);
+    captainPollTimer = window.setInterval(pollLivingCaptain, CAPTAIN_POLL_MS);
   } else {
     clearSpeechTimeout();
     clearCurrentTransmission();
@@ -2050,6 +2085,8 @@ function setPowered(powered) {
     setSpeaking(false);
     clearInterval(newswireRefreshTimer);
     newswireRefreshTimer = null;
+    clearInterval(captainPollTimer);
+    captainPollTimer = null;
     resetAudioPath();
   }
   updateDiagnostics();

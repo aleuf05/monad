@@ -46,6 +46,7 @@
           <button type="button" class="channel-chip is-active" data-channel="fleet-comms">Fleet Comms</button>
           <button type="button" class="channel-chip is-active" data-channel="weather">Weather</button>
           <button type="button" class="channel-chip is-active" data-channel="traffic">Traffic</button>
+          <button type="button" class="channel-chip is-active" data-channel="captain">Captain</button>
           <button type="button" class="channel-chip" id="nprChannelChip" data-npr-channel aria-pressed="false" title="Arms an automatic NPR headline read at the top of every hour. Off by default -- never speaks news unattended unless you turn this on.">NPR</button>
         </div>
 
@@ -187,8 +188,38 @@
           <li class="empty-note">Power on to receive the wire.</li>
         </ul>
       </section>
+
+      <section class="podcast-panel" aria-label="NPR Podcasts">
+        <div class="podcast-header">
+          <p class="label"><span class="new-badge">New</span> NPR Podcasts</p>
+          <p class="podcast-attribution">Real NPR audio, streamed directly from NPR's own servers &mdash; separate
+            from fleet radio and the Newswire headlines above. Newest episode per show is shown first;
+            older episodes are one click away, not in the way.</p>
+        </div>
+
+        <div class="podcast-controls">
+          <select id="podcastShowSelect" aria-label="Choose an NPR show"></select>
+          <button id="podcastSurpriseButton" class="console-button secondary" type="button">Surprise Me</button>
+        </div>
+
+        <div class="podcast-now-playing" id="podcastNowPlaying" hidden>
+          <p class="podcast-now-playing-kicker">Now Playing</p>
+          <p class="podcast-now-playing-show" id="podcastNowPlayingShow"></p>
+          <h3 id="podcastNowPlayingTitle"></h3>
+          <audio id="podcastAudio" controls></audio>
+        </div>
+
+        <div class="podcast-latest" id="podcastLatest">
+          <p class="empty-note">Power on to receive the podcast list.</p>
+        </div>
+
+        <details class="podcast-older">
+          <summary id="podcastOlderSummary">Older episodes</summary>
+          <ul id="podcastOlderList" class="podcast-older-list"></ul>
+        </details>
+      </section>
     </main>
 
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=10"></script>
   </body>
 </html>
