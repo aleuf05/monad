@@ -1,0 +1,14 @@
+{
+  "name": "radio-traffic-eval",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Bot 2 evaluator for RADIO-TRAFFIC-EVALUATION-0.1.md -- drives toys/radio-console/app.js's real editorial gate through deterministic fixtures and scores the result. Never edits Radio Console itself.",
+  "type": "commonjs",
+  "scripts": {
+    "selftest": "node selftest.js",
+    "evaluate": "node evaluate.js"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1"
+  }
+}
