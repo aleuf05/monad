@@ -20,17 +20,27 @@ use serde::{Deserialize, Serialize};
 const ARRIVAL_RADIUS_METERS: f64 = 80.0;
 
 // Escort formation geometry: scouts are spread evenly across this many
-// degrees, centered dead astern (180 deg relative to the flagship's
-// course), sorted by vessel id for a stable slot assignment. Radius varies
+// degrees, sorted by vessel id for a stable slot assignment. Radius varies
 // by mode; Patrol reuses Loose's radius and adds a slow, deterministic
 // bearing sweep on top of each slot's base offset, driven by tick count
 // (not wall-clock time) so it stays replay-deterministic like everything
-// else in this engine.
+// else in this engine. Off/Loose/Patrol/Tight are centered dead astern
+// (180 deg relative to the flagship's course); Screen is centered ahead
+// instead -- see below.
 const ESCORT_WEDGE_SPREAD_DEGREES: f64 = 70.0;
 const ESCORT_LOOSE_RADIUS_METERS: f64 = 1200.0;
 const ESCORT_TIGHT_RADIUS_METERS: f64 = 350.0;
 const ESCORT_PATROL_SWEEP_DEGREES: f64 = 40.0;
 const ESCORT_PATROL_SWEEP_RATE: f64 = 0.002;
+// Screen anticipates the flagship's track: the station anchor is projected
+// forward along the flagship's *current* course (not a full route lookahead
+// -- advance_vessel already recomputes course toward the next waypoint every
+// tick, so "current course" already means "the way it's actually headed").
+// Scouts then take up the same wedge-plus-sweep pattern as Patrol around
+// that forward anchor instead of around the flagship itself, so they lead
+// rather than trail and keep weaving instead of holding a fixed point.
+const ESCORT_SCREEN_LOOKAHEAD_METERS: f64 = 2500.0;
+const ESCORT_SCREEN_RADIUS_METERS: f64 = 1200.0;
 type AgentMovementPlan = (String, Position, Option<(String, String)>);
 
 fn escort_station(
@@ -46,11 +56,16 @@ fn escort_station(
         -ESCORT_WEDGE_SPREAD_DEGREES / 2.0
             + ESCORT_WEDGE_SPREAD_DEGREES * (slot_index as f64) / ((slot_count - 1) as f64)
     };
-    let sweep = if mode == EscortMode::Patrol {
+    let sweep = if mode == EscortMode::Patrol || mode == EscortMode::Screen {
         ESCORT_PATROL_SWEEP_DEGREES * ((tick as f64) * ESCORT_PATROL_SWEEP_RATE).sin()
     } else {
         0.0
     };
+    if mode == EscortMode::Screen {
+        let anchor = point_at_distance(leader.position, leader.course, ESCORT_SCREEN_LOOKAHEAD_METERS);
+        let bearing = normalize_degrees(leader.course + slot_offset + sweep);
+        return point_at_distance(anchor, bearing, ESCORT_SCREEN_RADIUS_METERS);
+    }
     let radius = match mode {
         EscortMode::Tight => ESCORT_TIGHT_RADIUS_METERS,
         _ => ESCORT_LOOSE_RADIUS_METERS,
@@ -186,12 +201,33 @@ pub struct World {
     #[serde(default)]
     pub escort_mode: EscortMode,
     // Structured per-vessel route/motion events -- see VesselEvent's own
-    // doc comment. Grows forever, same as watch_events, never truncated
-    // server-side; clients diff against length/tick to find what's new
-    // (same pattern renderWatchEvents already uses client-side). Defaulted
-    // for backward compat with state files saved before this existed.
+    // doc comment. Bounded to the newest `vessel_event_retention` entries
+    // (GitHub issue #6) -- full history remains durable forever in the
+    // separate, never-truncated events.jsonl command log; this field is a
+    // derived, replay-reconstructible convenience view for live consumers,
+    // not an independent source of history. Clients must cursor on each
+    // event's own event_seq, not array length or tick (see
+    // docs/architecture/vessel-events-retention-investigation.md).
+    // Defaulted for backward compat with state files saved before this
+    // existed.
     #[serde(default)]
     pub vessel_events: Vec<VesselEvent>,
+    // Monotonic counter for VesselEvent::event_seq -- distinct from `tick`,
+    // since multiple vessels can each push an event within one tick.
+    // Persisted so it survives restart/replay without ever repeating a
+    // value. Defaulted to 0 for old state files; World::normalize()
+    // detects that case (0 counter, non-empty vessel_events) and assigns
+    // fresh sequential values on load rather than leaving old events
+    // uniformly at the same default.
+    #[serde(default)]
+    pub next_vessel_event_seq: u64,
+    // How many of the newest vessel_events to retain in this field (and
+    // therefore in world.json/checkpoints/live snapshots). Configurable via
+    // fleetcore-serve's --vessel-event-retention flag, not hard-coded into
+    // the protocol -- deliberately per Command ruling on GitHub issue #6.
+    // Full history is unaffected either way; see the field comment above.
+    #[serde(default = "default_vessel_event_retention")]
+    pub vessel_event_retention: usize,
     #[serde(default)]
     pub agent_fleet_paused: bool,
     #[serde(default)]
@@ -216,7 +252,30 @@ pub struct World {
     pub canon_events: Vec<CanonEvent>,
 }
 
+// GitHub issue #6's approved default: generous relative to observed
+// production rate (~2.8-3 events/tick) while removing nearly all growth.
+// Configurable per-process via --vessel-event-retention; this is only the
+// fallback for state files that predate the field or omit the flag.
+pub fn default_vessel_event_retention() -> usize {
+    2000
+}
+
 impl World {
+    // Assigns the next monotonic event_seq, pushes, and trims to
+    // vessel_event_retention -- the one place vessel_events is ever
+    // mutated, so live ticking and replay (which both funnel through
+    // apply_command) can never diverge on numbering or bounding.
+    fn record_vessel_event(&mut self, mut event: VesselEvent) {
+        event.set_event_seq(self.next_vessel_event_seq);
+        self.next_vessel_event_seq += 1;
+        self.vessel_events.push(event);
+        if self.vessel_events.len() > self.vessel_event_retention {
+            let excess = self.vessel_events.len() - self.vessel_event_retention;
+            self.vessel_events.drain(0..excess);
+        }
+    }
+
+
     fn apply_canon_change(
         &mut self,
         command_id: &str,
@@ -495,6 +554,27 @@ impl World {
         }
         self.captain_controls
             .sort_by(|a, b| a.vessel_id.cmp(&b.vessel_id));
+
+        // Migration for state files saved before event_seq/retention existed:
+        // next_vessel_event_seq defaults to 0 on load; a genuinely fresh
+        // world also has an empty vessel_events, so "0 counter, non-empty
+        // vessel_events" unambiguously means an old file. Assign fresh
+        // sequential values in existing (already chronological) order
+        // rather than leaving every old event at the same defaulted 0.
+        if self.next_vessel_event_seq == 0 && !self.vessel_events.is_empty() {
+            for (index, event) in self.vessel_events.iter_mut().enumerate() {
+                event.set_event_seq(index as u64 + 1);
+            }
+            self.next_vessel_event_seq = self.vessel_events.len() as u64 + 1;
+        }
+        // Enforce the current retention bound on load too, so an
+        // already-oversized world.json/checkpoint from before this change
+        // shrinks on next load rather than staying oversized until the next
+        // natural push-and-trim.
+        if self.vessel_events.len() > self.vessel_event_retention {
+            let excess = self.vessel_events.len() - self.vessel_event_retention;
+            self.vessel_events.drain(0..excess);
+        }
     }
 
     pub fn apply_command(&mut self, command: Command) -> Result<Event, String> {
@@ -544,6 +624,7 @@ impl World {
                             vessel_id: vessel_id.clone(),
                             tick,
                             sim_time: sim_time.clone(),
+                            event_seq: 0,
                         })
                     } else if vessel.status == VesselStatus::Underway && !vessel.route.is_empty() {
                         let old_route_id = vessel.route_id;
@@ -563,6 +644,7 @@ impl World {
                             issuing_authority: "operator".to_string(),
                             tick,
                             sim_time: sim_time.clone(),
+                            event_seq: 0,
                         })
                     } else {
                         vessel.route_id += 1;
@@ -573,7 +655,7 @@ impl World {
                     }
                 };
                 if let Some(event) = event_to_emit {
-                    self.vessel_events.push(event);
+                    self.record_vessel_event(event);
                 }
                 "route-set"
             }
@@ -637,6 +719,7 @@ impl World {
                     route: Vec::new(),
                     last_update: self.clock.sim_time(),
                     route_id: 0,
+                    fuel_fraction: crate::vessel::default_fuel_fraction(),
                 };
                 vessel.normalize();
                 self.vessels.push(vessel);
@@ -676,6 +759,7 @@ impl World {
                         vessel.route_id += 1;
                         vessel.status = VesselStatus::Underway;
                         vessel.last_update = sim_time.clone();
+                        vessel.fuel_fraction = crate::vessel::default_fuel_fraction();
                     }
                     // A missing id (e.g. the flagship or a scout id was
                     // somehow renamed) is silently skipped rather than
@@ -687,7 +771,20 @@ impl World {
                 "fleet-reset"
             }
             Command::SetEscortMode { mode } => {
+                let old_mode = self.escort_mode;
                 self.escort_mode = *mode;
+                if old_mode != *mode {
+                    let sim_time = self.clock.sim_time();
+                    let tick = self.clock.tick;
+                    self.record_vessel_event(VesselEvent::EscortStationChanged {
+                        vessel_id: "fleet".to_string(),
+                        old_mode,
+                        new_mode: *mode,
+                        tick,
+                        sim_time,
+                        event_seq: 0,
+                    });
+                }
                 if *mode == EscortMode::Off {
                     // Hold position cleanly rather than coasting toward a
                     // stale station point -- see advance_vessel, where a
@@ -1054,10 +1151,27 @@ impl World {
             }
         }
 
+        let mut emitted = Vec::new();
         for vessel in &mut self.vessels {
+            let severity_before = crate::vessel::fuel_severity(vessel.fuel_fraction);
             if let Some(event) = advance_vessel(vessel, tick_duration, &sim_time, tick) {
-                self.vessel_events.push(event);
+                emitted.push(event);
             }
+            let severity_after = crate::vessel::fuel_severity(vessel.fuel_fraction);
+            if severity_after != severity_before {
+                emitted.push(VesselEvent::FuelStatusChanged {
+                    vessel_id: vessel.id.clone(),
+                    old_severity: severity_before.to_string(),
+                    new_severity: severity_after.to_string(),
+                    fuel_fraction: vessel.fuel_fraction,
+                    tick,
+                    sim_time: sim_time.clone(),
+                    event_seq: 0,
+                });
+            }
+        }
+        for event in emitted {
+            self.record_vessel_event(event);
         }
     }
 
@@ -1084,6 +1198,7 @@ fn advance_vessel(
     if let Some(target) = vessel.route.first().copied() {
         let remaining = distance_meters(vessel.position, target);
         if remaining <= ARRIVAL_RADIUS_METERS {
+            vessel.deplete_fuel(remaining);
             vessel.position = target;
             vessel.route.remove(0);
             vessel.last_update = sim_time.to_string();
@@ -1093,11 +1208,13 @@ fn advance_vessel(
         vessel.course = quantize(bearing_degrees(vessel.position, target));
         let step = vessel.speed_mps * elapsed_seconds;
         if step >= remaining {
+            vessel.deplete_fuel(remaining);
             vessel.position = target;
             vessel.route.remove(0);
             vessel.last_update = sim_time.to_string();
             return Some(leg_or_route_complete(vessel, target, tick, sim_time));
         }
+        vessel.deplete_fuel(step);
         vessel.position = point_at_distance(vessel.position, vessel.course, step);
         vessel.status = VesselStatus::Underway;
         vessel.last_update = sim_time.to_string();
@@ -1105,11 +1222,9 @@ fn advance_vessel(
     }
 
     if vessel.kind == VesselKind::PassiveTraffic {
-        vessel.position = point_at_distance(
-            vessel.position,
-            vessel.course,
-            vessel.speed_mps * elapsed_seconds,
-        );
+        let step = vessel.speed_mps * elapsed_seconds;
+        vessel.deplete_fuel(step);
+        vessel.position = point_at_distance(vessel.position, vessel.course, step);
         vessel.status = VesselStatus::Transiting;
         vessel.last_update = sim_time.to_string();
     }
@@ -1132,6 +1247,7 @@ fn leg_or_route_complete(
             route_id: vessel.route_id,
             tick,
             sim_time: sim_time.to_string(),
+            event_seq: 0,
         }
     } else {
         vessel.status = VesselStatus::Underway;
@@ -1142,6 +1258,7 @@ fn leg_or_route_complete(
             remaining_leg_count: vessel.route.len(),
             tick,
             sim_time: sim_time.to_string(),
+            event_seq: 0,
         }
     }
 }

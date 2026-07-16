@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>sea-monster-hunt-001 — Adventure Stations</title>
+<style>
+  :root {
+    --bg: #07111d;
+    --panel: #0d1a2b;
+    --panel-2: #102238;
+    --line: #1f3550;
+    --text: #e5f1ff;
+    --muted: #8aa2bf;
+    --sea: #4fd1c5;
+    --amber: #e8b14c;
+    --coral: #ef6f61;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: radial-gradient(circle at top, #10243a 0%, var(--bg) 55%); color: var(--text); font-family: "Segoe UI", Arial, sans-serif; }
+  body { padding: 32px 18px 72px; }
+  main { max-width: 1040px; margin: 0 auto; }
+  .eyebrow { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.68rem; color: var(--muted); margin: 0; }
+  h1 { margin: 8px 0 10px; font-size: clamp(2rem, 4vw, 3rem); }
+  header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; padding-bottom: 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .badge { border-radius: 999px; padding: 10px 16px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(79,209,197,0.12); color: var(--sea); border: 1px solid rgba(79,209,197,0.35); }
+  .lede { max-width: 72ch; color: var(--muted); line-height: 1.6; margin: 14px 0 0; }
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 16px; margin-top: 28px; }
+  .panel { background: rgba(13,26,43,0.92); border: 1px solid var(--line); border-radius: 18px; padding: 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.28); }
+  .panel h2 { margin: 0 0 12px; font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--amber); }
+  .stations { grid-column: 1 / -1; }
+  .station-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .station { background: var(--panel-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px; min-height: 150px; }
+  .station h3 { margin: 0 0 8px; font-size: 1rem; }
+  .station p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 0.92rem; }
+  .stats { grid-column: 1 / 5; }
+  .log { grid-column: 5 / -1; }
+  .stat-row { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(31,53,80,0.7); }
+  .stat-row:last-child { border-bottom: none; }
+  .label { color: var(--muted); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.08em; }
+  .value { font-weight: 700; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { padding: 12px 0; border-bottom: 1px solid rgba(31,53,80,0.7); }
+  .timeline li:last-child { border-bottom: none; }
+  .time { color: var(--muted); font-family: ui-monospace, monospace; font-size: 0.78rem; display: block; margin-bottom: 4px; }
+  .kind { color: var(--sea); font-weight: 700; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; }
+  .note { color: var(--muted); margin-top: 18px; font-size: 0.86rem; line-height: 1.6; }
+  footer { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 0.78rem; }
+  @media (max-width: 900px) {
+    .stats, .log { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">Monad · Adventure Station</p>
+      <h1>Sea Monster Hunt</h1>
+      <p class="lede">
+        A bounded, inspectable narrative slice: five stations, one deep contact,
+        and a crew that stays disciplined while the swell does the dramatic work.
+      </p>
+    </div>
+    <span class="badge">Adventure Ready</span>
+  </header>
+
+  <section class="grid">
+    <article class="panel stations">
+      <h2>Station Deck</h2>
+      <div class="station-list">
+        <div class="station">
+          <h3>Lookout Station</h3>
+          <p>Eyes on the horizon, the slicks, and every ugly shape the light tries to hide.</p>
+        </div>
+        <div class="station">
+          <h3>Echo Station</h3>
+          <p>Reads the deep return and keeps the team honest when the monster stays below the surface.</p>
+        </div>
+        <div class="station">
+          <h3>Lure Station</h3>
+          <p>Runs bait lamps, sound pings, and drift markers to draw the contact into view.</p>
+        </div>
+        <div class="station">
+          <h3>Net Station</h3>
+          <p>Holds the barrier lines and the retreat path. Nothing dramatic gets to call that cowardice.</p>
+        </div>
+        <div class="station">
+          <h3>Recovery Station</h3>
+          <p>Handles damage, triage, and the part of the story the deckhands tell twice.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel stats">
+      <h2>Mission State</h2>
+      <div class="stat-row"><span class="label">Mission</span><span class="value mono">sea-monster-hunt-001</span></div>
+      <div class="stat-row"><span class="label">Phase</span><span class="value mono">READY</span></div>
+      <div class="stat-row"><span class="label">Outcome</span><span class="value mono">in_progress</span></div>
+      <div class="stat-row"><span class="label">Stations</span><span class="value mono">5</span></div>
+      <div class="stat-row"><span class="label">Contact</span><span class="value mono">subsurface, moving slow</span></div>
+      <div class="stat-row"><span class="label">Updated</span><span class="value mono">2026-07-15T01:30:00Z</span></div>
+    </article>
+
+    <article class="panel log">
+      <h2>Encounter Log</h2>
+      <ul class="timeline">
+        <li>
+          <span class="time">2026-07-15T01:30:00Z</span>
+          <span class="kind">briefing</span>
+          <div>Adventure Stations established for a bounded sea-monster hunt scenario.</div>
+        </li>
+        <li>
+          <span class="time">2026-07-15T01:30:00Z</span>
+          <span class="kind">station_assignment</span>
+          <div>Lookout, Echo, Lure, Net, and Recovery stations assigned.</div>
+        </li>
+        <li>
+          <span class="time">2026-07-15T01:30:00Z</span>
+          <span class="kind">contact_report</span>
+          <div>A slow-moving shape was seen under the swell; no hostile action detected.</div>
+        </li>
+      </ul>
+      <p class="note">
+        This is a narrative adventure slice, not a FleetCore command surface.
+        The sea monster stays fictional until a real mission system says otherwise.
+      </p>
+    </article>
+  </section>
+
+  <footer>
+    <span>MONAD · ADVENTURE STATION</span>
+    <span class="mono">sea-monster-hunt-001</span>
+  </footer>
+</main>
+</body>
+</html>

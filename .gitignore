@@ -20,6 +20,8 @@ target/
 fleetcore/target/
 data/fleetcore/
 data/living-fleet/
+data/living-captain/
+data/world-intake.sqlite3*
 logs/fleetcore-serve.log
 logs/lan-web-server.log
 logs/bridge-station-2.1-server.log

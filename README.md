@@ -1,3 +1,7 @@
+# HIGHEST PRIORITY
+
+Read [`000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md`](000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md) before any other repository document.
+
 # Monad
 
 Monad is an AI-assisted software engineering workspace. The current product

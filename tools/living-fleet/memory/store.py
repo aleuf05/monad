@@ -55,23 +55,25 @@ def _decode_row(table: str, row: Optional[sqlite3.Row]) -> Optional[dict[str, An
     return result
 
 
-def insert(conn: sqlite3.Connection, table: str, fields: dict[str, Any]) -> dict[str, Any]:
+def insert(conn: sqlite3.Connection, table: str, fields: dict[str, Any], *, commit: bool = True) -> dict[str, Any]:
     encoded = _encode_row(table, fields)
     columns = list(encoded.keys())
     placeholders = ", ".join(["?"] * len(columns))
     sql = f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})"
     conn.execute(sql, [encoded[column] for column in columns])
-    conn.commit()
+    if commit:
+        conn.commit()
     return fields
 
 
-def update(conn: sqlite3.Connection, table: str, row_id: Any, fields: dict[str, Any]) -> None:
+def update(conn: sqlite3.Connection, table: str, row_id: Any, fields: dict[str, Any], *, commit: bool = True) -> None:
     id_column = ID_COLUMNS[table]
     encoded = _encode_row(table, fields)
     assignments = ", ".join(f"{column} = ?" for column in encoded)
     sql = f"UPDATE {table} SET {assignments} WHERE {id_column} = ?"
     conn.execute(sql, [*encoded.values(), row_id])
-    conn.commit()
+    if commit:
+        conn.commit()
 
 
 def fetch_one(conn: sqlite3.Connection, table: str, row_id: Any) -> Optional[dict[str, Any]]:

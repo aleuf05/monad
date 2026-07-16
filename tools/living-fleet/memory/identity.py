@@ -66,7 +66,7 @@ def seed_for(captain_id: str, role: str = "") -> dict:
     }
 
 
-def ensure_identity(conn: sqlite3.Connection, captain_id: str, role: str = "") -> dict[str, Any]:
+def ensure_identity(conn: sqlite3.Connection, captain_id: str, role: str = "", *, commit: bool = True) -> dict[str, Any]:
     existing = store.fetch_one(conn, "identity_traits", captain_id)
     if existing:
         return existing
@@ -79,7 +79,7 @@ def ensure_identity(conn: sqlite3.Connection, captain_id: str, role: str = "") -
         "drift_log_json": [],
         "updated_at": now(),
     }
-    store.insert(conn, "identity_traits", row)
+    store.insert(conn, "identity_traits", row, commit=commit)
     return store.fetch_one(conn, "identity_traits", captain_id)
 
 
@@ -93,11 +93,13 @@ def apply_trait_shift(
     proposed_shift: dict[str, float],
     reason: str,
     reflection_id: Optional[str] = None,
+    *,
+    commit: bool = True,
 ) -> dict[str, Any]:
     """Clamp each proposed delta, clamp the resulting value into bounds, log
     the change, and persist. Returns the updated identity_traits row.
     """
-    identity = ensure_identity(conn, captain_id)
+    identity = ensure_identity(conn, captain_id, commit=commit)
     traits = dict(identity["traits_json"])
     bounds = identity["trait_bounds_json"]
     drift_log = list(identity["drift_log_json"])
@@ -130,6 +132,7 @@ def apply_trait_shift(
         "identity_traits",
         captain_id,
         {"traits_json": traits, "drift_log_json": drift_log, "updated_at": at},
+        commit=commit,
     )
     return store.fetch_one(conn, "identity_traits", captain_id)
 

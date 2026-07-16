@@ -1,69 +1,221 @@
 // Ambience bridge instrument: transmissions spoken aloud via the browser's
 // SpeechSynthesis API where available, over a synthesized static bed and
-// squelch pops built with Web Audio. Every page load attempts a read-only
-// FleetCore connection (see connectFleetCoreLive()); once one lands, the
-// scripted scheduler stops and transmissions fire only when
-// fleetcore-serve's snapshots show a real change (a vessel's status
-// transition, a RecordWatchEvent message) instead of a random timer.
-// Until/unless that happens -- no server reachable, or it times out --
-// this stays exactly what it always was: a random line from TRANSMISSIONS
-// every 6-16 seconds, no FleetCore dependency at all. Ambience mechanics
-// (static bed, squelch pop, mute/volume, channel filters, the speaking
-// indicator) are shared unchanged between both modes; only what triggers
-// transmit and what it says differs. ?fleetcoreServer= overrides the
-// server URL if needed.
-const TRANSMISSIONS = [
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "Scout Alpha, Monad Actual, report position and status." },
-  { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, holding station, all quiet." },
-  { channel: "fleet-comms", speaker: "Scout Bravo", text: "Bridge, this is Scout Bravo, screen clear, no contacts of interest." },
-  { channel: "fleet-comms", speaker: "Scout Charlie", text: "Monad Actual, Scout Charlie, contact bearing two-seven-zero, range eight, no immediate concern." },
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "All stations, Monad Actual, course and speed unchanged, log entry recorded." },
-  { channel: "fleet-comms", speaker: "Scout Alpha", text: "Monad Actual, Scout Alpha, relieving Bravo on picket in five." },
-  { channel: "fleet-comms", speaker: "Watch Officer", text: "Fleet, Monad Actual, radio check, respond in sequence." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Arabian Sea advisory: winds light and variable, sea state one, visibility unrestricted." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Weather update: haze reducing visibility to six nautical miles near the strait, monitor radar." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "No small craft advisories in effect. Swell under one meter through the watch." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Overnight forecast: clear skies, light easterly breeze, no change expected before dawn." },
-  { channel: "weather", speaker: "Coastal Weather Service", text: "Barometric pressure steady. No systems tracked within two hundred nautical miles." },
-  { channel: "traffic", speaker: "Harbor Control", text: "Tanker Gulf Star, requesting routing clearance, over." },
-  { channel: "traffic", speaker: "Dhow Lantern", text: "All stations, this is Dhow Lantern, transiting outbound, maintaining course and speed." },
-  { channel: "traffic", speaker: "Pilot Amber", text: "Harbor Control, Pilot Amber, pilot aboard, proceeding to berth." },
-  { channel: "traffic", speaker: "Coaster Qeshm", text: "Coaster Qeshm, standing by on channel, holding for inbound clearance." },
-  { channel: "traffic", speaker: "Harbor Control", text: "All stations, routine traffic advisory, channel congestion expected near the anchorage through the watch." },
-  { channel: "traffic", speaker: "Gulf Star", text: "Harbor Control, Gulf Star, clearance received, underway." }
-];
-
+// squelch pops built with Web Audio. Fully FleetCore-connected, on
+// purpose: no scripted fallback. connectFleetCoreLive() runs on load and
+// keeps retrying with backoff until fleetcore-serve's snapshots start
+// arriving; only then does it enter live mode and start speaking, driven
+// by real state changes (a vessel's status transition, a
+// RecordWatchEvent message) -- never a random timer. While disconnected,
+// the console stays visibly "Offline -- reconnecting", never silent
+// scripted chatter standing in for real data. ?fleetcoreServer= overrides
+// the server URL if needed.
 const CHANNEL_LABELS = {
   "fleet-comms": "Fleet Comms",
   weather: "Weather",
   traffic: "Traffic"
 };
 
-const MIN_INTERVAL_MS = 6000;
-const MAX_INTERVAL_MS = 16000;
 const SQUELCH_DURATION_S = 0.12;
+// Real-world wire, not FleetCore -- deliberately kept out of the
+// transmission-scoring/speech pipeline above (TRANSMISSION_PROFILES,
+// scoreTransmission()) so an NPR headline can never be spoken in the same
+// voice/urgency system as a fleet watch event, which would misrepresent
+// real-world news as fleet radio traffic. Rendered as its own panel
+// instead. Source: tools/npr-headlines/fetch.py, written server-side
+// (NPR's feed only grants CORS to apps.npr.org) to web/data/npr-headlines.json,
+// refreshed on a timer -- see docs/deployment.md for the fetch schedule.
+const NEWSWIRE_URL = "/data/npr-headlines.json";
+const NEWSWIRE_REFRESH_MS = 5 * 60 * 1000;
+let newswireRefreshTimer = null;
+const STATION_LABELS = {
+  bridge: "Bridge",
+  engineering: "Engineering",
+  traffic: "Traffic",
+  weather: "Weather"
+};
+const TRANSMISSION_PROFILES = {
+  watch: {
+    sourceAuthority: "human",
+    urgency: 0.98,
+    relevance: 0.96,
+    authority: 1.0,
+    expiresAfterMs: 30000,
+    interruptible: true
+  },
+  status: {
+    sourceAuthority: "fleetcore",
+    urgency: 0.74,
+    relevance: 0.76,
+    authority: 0.86,
+    expiresAfterMs: 12000,
+    interruptible: true
+  },
+  // Fuel reports cite fleetcore's own tracked fuel_fraction (see
+  // fleetcore/src/vessel.rs) -- never an invented number. Scored above
+  // routine status chatter but below an explicit human watch note:
+  // real, but a lower-urgency observation until it actually crosses a
+  // threshold worth interrupting for.
+  fuel: {
+    sourceAuthority: "fleetcore",
+    urgency: 0.8,
+    relevance: 0.82,
+    authority: 0.9,
+    expiresAfterMs: 15000,
+    interruptible: true
+  }
+};
+
+// Operational Severity thresholds (fuel_fraction, 0-1) -- the only real
+// numeric signal FleetCore tracks today that maps to "how serious are
+// things" (no alarm/degraded concept exists elsewhere; verified this
+// session). See docs/engineering-orders/radio-console-v1-and-fleetcore-
+// model-upgrade.md.
+const FUEL_SEVERITY_THRESHOLDS = { critical: 0.15, elevated: 0.3 };
+
+function fuelSeverity(fraction) {
+  if (typeof fraction !== "number") return "unknown";
+  if (fraction <= FUEL_SEVERITY_THRESHOLDS.critical) return "critical";
+  if (fraction <= FUEL_SEVERITY_THRESHOLDS.elevated) return "elevated";
+  return "routine";
+}
+
+// --- Three independent control signals (packet §4 -- not a god scalar) ---
+// Fleet-wide Operational Severity: worst per-vessel fuel severity across
+// the fleet. Thin (fuel is the only real severity signal that exists
+// today), but real -- never a fabricated "alarm" concept.
+const SEVERITY_RANK = { unknown: 0, routine: 1, elevated: 2, critical: 3 };
+
+function deriveOperationalSeverity(vessels) {
+  let worst = "routine";
+  (vessels || []).forEach((vessel) => {
+    const severity = fuelSeverity(vessel.fuel_fraction);
+    if (SEVERITY_RANK[severity] > SEVERITY_RANK[worst]) worst = severity;
+  });
+  return worst;
+}
+
+// Traffic Load: how much is actually requesting airtime right now, not
+// how serious it is (that's severity) and not how restricted the channel
+// is supposed to be (that's command discipline, operator-set below).
+function deriveTrafficLoad(pendingCount) {
+  if (pendingCount === 0) return "none";
+  if (pendingCount <= 2) return "low";
+  if (pendingCount <= 5) return "moderate";
+  return "high";
+}
+
+const STATION_MEMORY_LIMIT = 6;
+
+// Command Discipline is NOT derived -- it's the operator-set mode from
+// the #commandDisciplineSelect control, read directly where needed.
+
+// --- Radio state (packet §1: silence must be discoverable) ---
+// One of these is always true; which one explains *why* the console is
+// quiet or not, so silence never reads as broken.
+function deriveRadioState({ connected, powered, suppressed, pendingRequestCount, trafficLoad, commandDiscipline }) {
+  if (!connected) return "FLEETCORE_DISCONNECTED";
+  if (!powered) return "PAUSED";
+  if (commandDiscipline === "radio_silence") return "TRAFFIC_SUPPRESSED";
+  if (suppressed) return "TRAFFIC_SUPPRESSED";
+  if (commandDiscipline === "quiet_watch") return "QUIET_WATCH";
+  if (pendingRequestCount > 0) return "PREPARING_REPORT";
+  if (trafficLoad === "none") return "NO_ELIGIBLE_TRAFFIC";
+  return "LIVE_READ_ONLY";
+}
+
+const RADIO_STATE_LABELS = {
+  QUIET_WATCH: "QUIET WATCH",
+  NO_ELIGIBLE_TRAFFIC: "NO ELIGIBLE TRAFFIC",
+  TRAFFIC_SUPPRESSED: "TRAFFIC SUPPRESSED",
+  PREPARING_REPORT: "PREPARING REPORT",
+  FLEETCORE_DISCONNECTED: "DEGRADED · FLEETCORE DISCONNECTED",
+  SCHEDULER_FAILURE: "DEGRADED · SCHEDULER FAILURE",
+  PAUSED: "PAUSED",
+  LIVE_READ_ONLY: "LIVE READ-ONLY"
+};
+
+function buildStatusLine(factors) {
+  const parts = [RADIO_STATE_LABELS[deriveRadioState(factors)] || "UNKNOWN"];
+  if (factors.connected) {
+    parts.push(`${factors.activeStationCount} STATIONS ACTIVE`);
+    parts.push(
+      factors.pendingRequestCount > 0
+        ? `${factors.pendingRequestCount} PENDING ${factors.pendingRequestCount === 1 ? "REQUEST" : "REQUESTS"}`
+        : "NO PENDING TRAFFIC"
+    );
+    if (factors.trafficLoad !== "none") parts.push(`TRAFFIC ${factors.trafficLoad.toUpperCase()}`);
+    if (factors.severity !== "routine") parts.push(`SEVERITY ${factors.severity.toUpperCase()}`);
+    if (factors.stationMemoryLine) parts.push(factors.stationMemoryLine);
+  }
+  return parts.join(" · ");
+}
+
+function isSuppressedByDiscipline(entry, discipline) {
+  if (discipline === "radio_silence") return entry.sourceAuthority !== "human";
+  if (discipline === "quiet_watch") return entry.kind === "status";
+  return false;
+}
+
+function updateRadioStateIndicator() {
+  if (!radioStateEl) return;
+  const discipline = commandDisciplineSelect ? commandDisciplineSelect.value : "normal";
+  // Only counts entries that would actually be eligible to transmit under
+  // the current discipline -- caught by this task's own acceptance test:
+  // counting *all* pending entries regardless of suppression made
+  // "PREPARING REPORT" show up even during quiet_watch when nothing but
+  // suppressed routine chatter was actually pending.
+  const pendingRequestCount = liveQueue.filter(
+    (entry) => entry.threadState === "pending" && !isSuppressedByDiscipline(entry, discipline)
+  ).length;
+  // Reflects the same hard rule livePump() actually enforces -- true only
+  // when something is actually sitting suppressed in the queue under the
+  // current discipline, not just whenever a suppressing mode is set.
+  const suppressed = liveQueue.some((entry) => isSuppressedByDiscipline(entry, discipline));
+  const factors = {
+    connected: liveMode,
+    powered: state.powered,
+    suppressed,
+    pendingRequestCount,
+    trafficLoad: deriveTrafficLoad(liveQueue.length),
+    severity: deriveOperationalSeverity(lastSnapshotVessels),
+    commandDiscipline: discipline,
+    activeStationCount: state.activeChannels.size,
+    stationMemoryLine: stationMemoryLine(state.selectedStation)
+  };
+  radioStateEl.textContent = buildStatusLine(factors);
+}
 
 const powerButton = document.querySelector("#powerButton");
 const powerStatusEl = document.querySelector("#powerStatus");
 const channelCountEl = document.querySelector("#channelCount");
 const dataSourceEl = document.querySelector("#dataSourceValue");
-const channelChips = Array.from(document.querySelectorAll(".channel-chip"));
+const radioStateEl = document.querySelector("#radioStateValue");
+const commandDisciplineSelect = document.querySelector("#commandDisciplineSelect");
+const channelChips = Array.from(document.querySelectorAll(".channel-chip[data-channel]"));
+const stationChips = Array.from(document.querySelectorAll(".channel-chip[data-station]"));
 const volumeSlider = document.querySelector("#volumeSlider");
 const muteButton = document.querySelector("#muteButton");
 const transcriptLogEl = document.querySelector("#transcriptLog");
 const speakingIndicatorEl = document.querySelector("#speakingIndicator");
 const signalCanvas = document.querySelector("#signalMeter");
+const newswireLogEl = document.querySelector("#newswireLog");
+const newswireUpdatedEl = document.querySelector("#newswireUpdated");
 const signalCtx = signalCanvas.getContext("2d");
 
 const state = {
   powered: false,
   muted: false,
   activeChannels: new Set(["fleet-comms", "weather", "traffic"]),
-  scheduleTimer: null,
+  selectedStation: "bridge",
   speaking: false,
   voiceForSpeaker: new Map(),
   animationFrame: null,
-  meterLevels: new Array(24).fill(0.08)
+  meterLevels: new Array(24).fill(0.08),
+  currentTransmission: null,
+  currentTransmissionScore: -Infinity,
+  threadLedger: [],
+  nextThreadId: 1,
+  stationMemory: new Map()
 };
 
 let audioContext = null;
@@ -76,8 +228,12 @@ let liveSocket = null;
 let liveReconnectTimer = null;
 let liveReconnectDelayMs = 1000;
 let livePumpTimer = null;
+let speechTimeoutTimer = null;
 let lastVesselStatus = null; // Map<vesselId, status>, null until the first live snapshot seeds it
-let lastWatchEventCount = 0;
+let lastSnapshotVessels = []; // most recent snapshot's vessels, for on-demand severity derivation
+let lastWatchEventCount = null; // null until the first live snapshot seeds it
+let lastFuelSeverity = null; // Map<vesselId, "routine"|"elevated"|"critical">, null until seeded
+let lastEscortMode = null; // null until the first live snapshot seeds it
 const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
@@ -93,6 +249,12 @@ const STATUS_LINES = {
 function updateChannelCount() {
   const count = state.activeChannels.size;
   channelCountEl.textContent = count === 0 ? "No channels" : `${count} channel${count === 1 ? "" : "s"}`;
+}
+
+function updateStationScope() {
+  stationChips.forEach((chip) => {
+    chip.classList.toggle("is-active", chip.dataset.station === state.selectedStation);
+  });
 }
 
 function hashString(value) {
@@ -210,8 +372,11 @@ function appendTranscript(entry) {
   const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   item.innerHTML =
     `<span class="channel-tag">${CHANNEL_LABELS[entry.channel]}</span>` +
+    `<span class="channel-tag">${stationLabelFor(entry.station)}</span>` +
+    `<span class="channel-tag">${entry.threadState || "transit"}</span>` +
     `<span class="speaker">${entry.speaker}</span>${entry.text}` +
     `<span class="timestamp">${time}</span>`;
+  entry.transcriptNode = item;
   transcriptLogEl.appendChild(item);
   transcriptLogEl.scrollTop = transcriptLogEl.scrollHeight;
 
@@ -226,6 +391,178 @@ function estimatedSpeakingMs(text) {
   return Math.min(8000, Math.max(1500, text.length * 90));
 }
 
+function transmissionProfileFor(entry) {
+  return TRANSMISSION_PROFILES[entry.kind] || TRANSMISSION_PROFILES.status;
+}
+
+function stationLabelFor(station) {
+  return STATION_LABELS[station] || station;
+}
+
+function stationForEntry(entry) {
+  if (entry.kind === "fuel") return "engineering";
+  if (entry.kind === "watch") return "bridge";
+  if (entry.channel === "traffic") return "traffic";
+  if (entry.channel === "weather") return "weather";
+  return "bridge";
+}
+
+function normalizeQueuedEntry(entry) {
+  const profile = transmissionProfileFor(entry);
+  return {
+    ...entry,
+    kind: entry.kind || "status",
+    sourceAuthority: entry.sourceAuthority || profile.sourceAuthority,
+    urgency: entry.urgency ?? profile.urgency,
+    relevance: entry.relevance ?? profile.relevance,
+    authority: entry.authority ?? profile.authority,
+    expiresAfterMs: entry.expiresAfterMs ?? profile.expiresAfterMs,
+    interruptible: entry.interruptible ?? profile.interruptible,
+    queuedAt: entry.queuedAt ?? Date.now(),
+    score: entry.score ?? null,
+    station: entry.station || stationForEntry(entry)
+  };
+}
+
+function scoreTransmission(entry, now = Date.now()) {
+  const ageMs = Math.max(0, now - entry.queuedAt);
+  const freshness = Math.max(0, 1 - ageMs / entry.expiresAfterMs);
+  const interruptBonus = entry.interruptible ? 0.05 : 0;
+  return (
+    entry.authority * 1000 +
+    entry.urgency * 100 +
+    entry.relevance * 50 +
+    freshness * 40 +
+    interruptBonus
+  );
+}
+
+function clearSpeechTimeout() {
+  if (speechTimeoutTimer !== null) {
+    window.clearTimeout(speechTimeoutTimer);
+    speechTimeoutTimer = null;
+  }
+}
+
+function clearCurrentTransmission() {
+  state.currentTransmission = null;
+  state.currentTransmissionScore = -Infinity;
+}
+
+function stationMemoryEntries(station) {
+  if (!state.stationMemory.has(station)) {
+    state.stationMemory.set(station, []);
+  }
+  return state.stationMemory.get(station);
+}
+
+function stationReportSignature(station) {
+  if (station === "engineering") {
+    const fuelParts = (lastSnapshotVessels || [])
+      .filter((vessel) => typeof vessel.fuel_fraction === "number")
+      .map((vessel) => `${vessel.id}:${fuelSeverity(vessel.fuel_fraction)}`)
+      .sort();
+    return fuelParts.length ? `engineering:${fuelParts.join("|")}` : "engineering:none";
+  }
+  if (station === "traffic") {
+    const trafficParts = (lastSnapshotVessels || [])
+      .filter((vessel) => VESSEL_CHANNEL[vessel.kind] === "traffic")
+      .map((vessel) => `${vessel.id}:${vessel.status}`)
+      .sort();
+    return trafficParts.length ? `traffic:${trafficParts.join("|")}` : "traffic:none";
+  }
+  if (station === "weather") {
+    return "weather:none";
+  }
+  const bridgeParts = (lastSnapshotVessels || [])
+    .filter((vessel) => VESSEL_CHANNEL[vessel.kind] !== "traffic")
+    .map((vessel) => `${vessel.id}:${vessel.status}`)
+    .sort();
+  return `bridge:${lastWatchEventCount}:${bridgeParts.join("|") || "none"}`;
+}
+
+function stationReportSummary(station) {
+  if (station === "engineering") {
+    const severities = (lastSnapshotVessels || [])
+      .filter((vessel) => typeof vessel.fuel_fraction === "number")
+      .map((vessel) => fuelSeverity(vessel.fuel_fraction));
+    if (!severities.length) return "ENGINEERING NO FUEL REPORT";
+    if (severities.some((severity) => severity === "critical")) return "ENGINEERING CRITICAL FUEL";
+    if (severities.some((severity) => severity === "elevated")) return "ENGINEERING ELEVATED FUEL";
+    return "ENGINEERING ROUTINE";
+  }
+  if (station === "traffic") {
+    const trafficCount = (lastSnapshotVessels || []).filter((vessel) => VESSEL_CHANNEL[vessel.kind] === "traffic").length;
+    return trafficCount > 0 ? `TRAFFIC ${trafficCount} CONTACT${trafficCount === 1 ? "" : "S"}` : "TRAFFIC CLEAR";
+  }
+  if (station === "weather") {
+    return "WEATHER QUIET";
+  }
+  return lastWatchEventCount > 0 ? `BRIDGE ${lastWatchEventCount} WATCH${lastWatchEventCount === 1 ? "" : "ES"}` : "BRIDGE QUIET";
+}
+
+function rememberStationTransmission(entry) {
+  if (!entry.station) return;
+  const memory = stationMemoryEntries(entry.station);
+  memory.push({
+    signature: stationReportSignature(entry.station),
+    summary: stationReportSummary(entry.station),
+    text: entry.text,
+    at: Date.now()
+  });
+  while (memory.length > STATION_MEMORY_LIMIT) {
+    memory.shift();
+  }
+}
+
+function stationMemoryLine(station) {
+  const memory = stationMemoryEntries(station);
+  if (!memory.length) return "NO PRIOR REPORT";
+  const latest = memory[memory.length - 1];
+  return latest.signature === stationReportSignature(station) ? "NO CHANGE SINCE LAST REPORT" : "";
+}
+
+function recordThreadState(entry, nextState) {
+  entry.threadState = nextState;
+  entry.threadUpdatedAt = Date.now();
+  state.threadLedger.push({
+    threadId: entry.threadId,
+    speaker: entry.speaker,
+    channel: entry.channel,
+    station: entry.station,
+    state: nextState,
+    at: entry.threadUpdatedAt
+  });
+  while (state.threadLedger.length > 50) {
+    state.threadLedger.shift();
+  }
+}
+
+function completeTransmission(entry, nextState = "completed") {
+  clearSpeechTimeout();
+  clearCurrentTransmission();
+  recordThreadState(entry, nextState);
+  if (nextState === "completed") {
+    rememberStationTransmission(entry);
+  }
+  if (entry.transcriptNode) {
+    const tags = entry.transcriptNode.querySelectorAll(".channel-tag");
+    if (tags[2]) tags[2].textContent = nextState;
+  }
+  updateRadioStateIndicator();
+  setSpeaking(false);
+  window.setTimeout(livePump, 0);
+}
+
+function interruptCurrentTransmission() {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  clearSpeechTimeout();
+  clearCurrentTransmission();
+  setSpeaking(false);
+}
+
 function speak(entry) {
   // No SpeechSynthesis at all, muted, or no voices installed (common on
   // minimal Linux desktops and headless/sandboxed environments) all fall
@@ -234,7 +571,11 @@ function speak(entry) {
   const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
   if (!window.speechSynthesis || state.muted || !voices.length) {
     setSpeaking(true);
-    window.setTimeout(() => setSpeaking(false), estimatedSpeakingMs(entry.text));
+    clearSpeechTimeout();
+    speechTimeoutTimer = window.setTimeout(() => {
+      speechTimeoutTimer = null;
+      completeTransmission(entry);
+    }, estimatedSpeakingMs(entry.text));
     return;
   }
   const utterance = new SpeechSynthesisUtterance(entry.text);
@@ -244,34 +585,29 @@ function speak(entry) {
   utterance.rate = 1.05;
   utterance.pitch = 0.95;
   utterance.onstart = () => setSpeaking(true);
-  utterance.onend = () => setSpeaking(false);
-  utterance.onerror = () => setSpeaking(false);
+  utterance.onend = () => {
+    completeTransmission(entry);
+  };
+  utterance.onerror = () => {
+    completeTransmission(entry, "completed");
+  };
   // Safety net: if onstart/onend never fire at all (observed in some
   // sandboxed environments even when getVoices() reports voices), don't
   // leave the indicator stuck on "Transmitting..." forever.
-  window.setTimeout(() => setSpeaking(false), estimatedSpeakingMs(entry.text) + 2000);
+  clearSpeechTimeout();
+  speechTimeoutTimer = window.setTimeout(() => {
+    speechTimeoutTimer = null;
+    completeTransmission(entry);
+  }, estimatedSpeakingMs(entry.text) + 2000);
   window.speechSynthesis.speak(utterance);
 }
 
 function transmitEntry(entry) {
+  state.currentTransmission = entry;
+  state.currentTransmissionScore = entry.score ?? scoreTransmission(entry);
+  recordThreadState(entry, "acked");
   appendTranscript(entry);
   speak(entry);
-}
-
-function transmit() {
-  const pool = TRANSMISSIONS.filter((entry) => state.activeChannels.has(entry.channel));
-  if (!pool.length) return;
-  transmitEntry(pool[Math.floor(Math.random() * pool.length)]);
-}
-
-function scheduleNext() {
-  window.clearTimeout(state.scheduleTimer);
-  if (!state.powered || liveMode) return;
-  const delay = MIN_INTERVAL_MS + Math.random() * (MAX_INTERVAL_MS - MIN_INTERVAL_MS);
-  state.scheduleTimer = window.setTimeout(() => {
-    if (state.activeChannels.size) transmit();
-    scheduleNext();
-  }, delay);
 }
 
 // --- Live mode: event-driven transmissions from a real fleetcore-serve ---
@@ -314,12 +650,21 @@ function statusLineFor(vessel) {
 }
 
 function queueLiveEntry(entry) {
-  liveQueue.push(entry);
+  const queued = normalizeQueuedEntry(entry);
+  queued.threadId = queued.threadId || state.nextThreadId++;
+  recordThreadState(queued, "pending");
+  liveQueue.push(queued);
+  window.setTimeout(livePump, 0);
+}
+
+function stationCanObserve(entry, station) {
+  if (station === "bridge") return true;
+  return entry.station === station;
 }
 
 function speakerNameFor(vessel) {
-  // Matches TRANSMISSIONS' existing voice: MONAD refers to itself as
-  // "Monad Actual" in dialogue, everyone else by their title-case name.
+  // MONAD refers to itself as "Monad Actual" in dialogue, everyone else
+  // by their title-case name.
   if (vessel.kind === "flagship") return "Monad Actual";
   return vessel.name || vessel.callsign || vessel.id;
 }
@@ -335,50 +680,193 @@ function diffVesselStates(vessels) {
     if (!line) return;
     const channel = VESSEL_CHANNEL[vessel.kind] || "fleet-comms";
     const name = speakerNameFor(vessel);
-    queueLiveEntry({ channel, speaker: name, text: `${name}, ${line}` });
+    queueLiveEntry({
+      kind: "status",
+      channel,
+      speaker: name,
+      text: `${name}, ${line}`,
+      station: channel === "traffic" ? "traffic" : "bridge"
+    });
+  });
+}
+
+// Reports only on a severity *transition* (routine -> elevated -> critical,
+// or back), not every tick fuel_fraction ticks down -- same anti-spam
+// discipline as diffVesselStates. Cites the real fuel_fraction value from
+// the snapshot; never invents a number.
+function diffFuelLevels(vessels) {
+  const seeding = lastFuelSeverity === null;
+  if (seeding) lastFuelSeverity = new Map();
+  vessels.forEach((vessel) => {
+    if (typeof vessel.fuel_fraction !== "number") return;
+    const severity = fuelSeverity(vessel.fuel_fraction);
+    const previous = lastFuelSeverity.get(vessel.id);
+    lastFuelSeverity.set(vessel.id, severity);
+    if (seeding || previous === severity || severity === "routine") return;
+    const percent = Math.round(vessel.fuel_fraction * 100);
+    const name = speakerNameFor(vessel);
+    const recommendation = severity === "critical" ? "recommend holding" : "monitoring consumption";
+    queueLiveEntry({
+      kind: "fuel",
+      channel: "fleet-comms",
+      speaker: "Engineering",
+      text: `Engineering reports ${name} at ${percent} percent fuel margin, ${recommendation}.`,
+      station: "engineering"
+    });
+  });
+}
+
+const ESCORT_MODE_LABELS = {
+  off: "escort stood down",
+  loose: "loose escort",
+  patrol: "patrol escort",
+  tight: "tight escort",
+  screen: "screening formation"
+};
+
+// Fleet-wide (World::escort_mode is one value for the whole fleet, not
+// per-vessel -- see fleetcore/src/vessel.rs's EscortStationChanged doc
+// comment), so this is a single scalar diff, not a per-vessel map like
+// diffVesselStates/diffFuelLevels above.
+function diffEscortMode(escortMode) {
+  if (typeof escortMode !== "string") return;
+  const seeding = lastEscortMode === null;
+  const previous = lastEscortMode;
+  lastEscortMode = escortMode;
+  if (seeding || previous === escortMode) return;
+  const label = ESCORT_MODE_LABELS[escortMode] || escortMode;
+  queueLiveEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Bridge, escorts shifting to ${label}.`,
+    station: "bridge"
   });
 }
 
 function diffWatchEvents(watchEvents) {
   const events = watchEvents || [];
-  if (events.length <= lastWatchEventCount) {
+  const seeding = lastWatchEventCount === null;
+  if (seeding || events.length <= lastWatchEventCount) {
     lastWatchEventCount = events.length;
     return;
   }
+  // Fixes a real starvation bug: before this, every power-on/reconnect
+  // replayed the *entire* watch-event history at once (lastWatchEventCount
+  // started at 0, so a multi-day-old backlog looked "new"). Those replayed
+  // entries are watch-kind (authority 1.0, 30s expiry) and always outscore
+  // status-kind entries (authority 0.86, 12s expiry) in scoreTransmission,
+  // so anything else -- including a fresh EscortStationChanged/fuel report
+  // -- got queued behind them and silently expired before ever airing.
+  // Seeding on the first snapshot (matching diffVesselStates/diffFuelLevels'
+  // existing pattern) means only genuinely new watch events queue at all.
   events.slice(lastWatchEventCount).forEach((event) => {
-    queueLiveEntry({ channel: "fleet-comms", speaker: "Watch Officer", text: event.message });
+    queueLiveEntry({
+      kind: "watch",
+      channel: "fleet-comms",
+      speaker: "Watch Officer",
+      text: event.message,
+      station: "bridge"
+    });
   });
   lastWatchEventCount = events.length;
 }
 
 function applyLiveSnapshot(snapshot) {
+  lastSnapshotVessels = snapshot.vessels || [];
   diffWatchEvents(snapshot.watch_events);
   diffVesselStates(snapshot.vessels || []);
+  diffFuelLevels(snapshot.vessels || []);
+  diffEscortMode(snapshot.escort_mode);
+  updateRadioStateIndicator();
 }
 
 function livePump() {
-  if (!state.powered || state.speaking || !liveQueue.length) return;
-  const next = liveQueue.find((entry) => state.activeChannels.has(entry.channel));
+  updateRadioStateIndicator();
+  if (!state.powered || !liveQueue.length) return;
+
+  const now = Date.now();
+  for (let i = liveQueue.length - 1; i >= 0; i -= 1) {
+    const entry = liveQueue[i];
+    if (now - entry.queuedAt > entry.expiresAfterMs) {
+      recordThreadState(entry, entry.kind === "watch" ? "escalated" : "timeout");
+      liveQueue.splice(i, 1);
+    }
+  }
+
+  // Hard rule (packet §4): radio_silence is not just a status label -- it
+  // actually suppresses everything except human-command-class traffic,
+  // regardless of score. Discipline shapes the channel; this one rule
+  // isn't shaped, it's absolute.
+  const discipline = commandDisciplineSelect ? commandDisciplineSelect.value : "normal";
+  const silenced = discipline === "radio_silence";
+  // quiet_watch is a real operating mode too, not just a label: caught by
+  // this task's own acceptance-test pass showing "PREPARING REPORT" while
+  // quiet_watch was selected, because nothing actually suppressed routine
+  // traffic. Suppresses routine status chatter; watch notes (human) and
+  // fuel reports at elevated/critical severity still get through -- quiet
+  // watch means "don't chatter," not "hide a real emergency."
+  const quietWatch = discipline === "quiet_watch";
+
+  let next = null;
+  for (const entry of liveQueue) {
+    if (!state.activeChannels.has(entry.channel)) continue;
+    if (!stationCanObserve(entry, state.selectedStation)) continue;
+    if (silenced && entry.sourceAuthority !== "human") continue;
+    if (quietWatch && entry.kind === "status") continue;
+    entry.score = scoreTransmission(entry, now);
+    if (!next || entry.score > next.score || (entry.score === next.score && entry.queuedAt < next.queuedAt)) {
+      next = entry;
+    }
+  }
   if (!next) {
     liveQueue.length = 0; // Nothing filtered-in queued is worth holding onto once channels change.
     return;
   }
+
+  if (state.speaking) {
+    const currentScore = state.currentTransmissionScore;
+    if (!next.interruptible || next.score <= currentScore) {
+      return;
+    }
+    interruptCurrentTransmission();
+  }
+
   liveQueue.splice(liveQueue.indexOf(next), 1);
   transmitEntry(next);
 }
 
+function setOfflineState(label) {
+  liveMode = false;
+  window.clearInterval(livePumpTimer);
+  if (dataSourceEl) {
+    dataSourceEl.textContent = label;
+    dataSourceEl.classList.remove("is-on");
+  }
+  updateRadioStateIndicator();
+}
+
+function scheduleReconnect() {
+  window.clearTimeout(liveReconnectTimer);
+  liveReconnectTimer = setTimeout(() => {
+    liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
+    connectFleetCoreLive();
+  }, liveReconnectDelayMs);
+}
+
 function enterLiveMode() {
   liveMode = true;
-  window.clearTimeout(state.scheduleTimer);
   if (dataSourceEl) {
     dataSourceEl.textContent = "FleetCore Live";
     dataSourceEl.classList.add("is-on");
   }
   livePumpTimer = window.setInterval(livePump, LIVE_PUMP_INTERVAL_MS);
+  updateRadioStateIndicator();
 }
 
 function connectFleetCoreLive() {
   let settled = false;
+  setOfflineState(liveReconnectDelayMs > 1000 ? "Offline — reconnecting" : "Connecting…");
   const socket = new WebSocket(fleetCoreServerUrl());
   const timeout = setTimeout(() => {
     if (settled) return;
@@ -410,14 +898,9 @@ function connectFleetCoreLive() {
     if (!settled) {
       settled = true;
       clearTimeout(timeout);
-      return;
     }
-    if (liveMode) {
-      liveReconnectTimer = setTimeout(() => {
-        liveReconnectDelayMs = Math.min(liveReconnectDelayMs * 1.6, 15000);
-        connectFleetCoreLive();
-      }, liveReconnectDelayMs);
-    }
+    if (liveMode) setOfflineState("Offline — reconnecting");
+    scheduleReconnect();
   });
 
   liveSocket = socket;
@@ -439,6 +922,36 @@ function drawSignalMeter() {
   state.animationFrame = window.requestAnimationFrame(drawSignalMeter);
 }
 
+function renderNewswire(payload) {
+  if (!payload || !Array.isArray(payload.items) || payload.items.length === 0) {
+    newswireLogEl.innerHTML = '<li class="empty-note">No headlines available.</li>';
+    return;
+  }
+  newswireUpdatedEl.textContent = new Date(payload.fetched_at).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+  newswireLogEl.innerHTML = payload.items
+    .map((item) => {
+      const time = item.pubDate ? new Date(item.pubDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+      return (
+        `<li><a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>` +
+        `<span class="timestamp">${time}</span></li>`
+      );
+    })
+    .join("");
+}
+
+async function fetchNewswire() {
+  try {
+    const response = await fetch(`${NEWSWIRE_URL}?t=${Date.now()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    renderNewswire(await response.json());
+  } catch (error) {
+    console.warn("Radio Console: newswire fetch failed", error);
+  }
+}
+
 function setPowered(powered) {
   state.powered = powered;
   powerButton.textContent = powered ? "Power Off" : "Power On";
@@ -450,11 +963,20 @@ function setPowered(powered) {
     initAudio();
     if (audioContext && audioContext.state === "suspended") audioContext.resume();
     applyVolume();
-    scheduleNext();
+    // No scripted schedule to start -- transmissions only ever come from
+    // the live FleetCore queue (see enterLiveMode()/livePump()). If not
+    // connected yet, the console just sits Offline until it is.
+    fetchNewswire();
+    clearInterval(newswireRefreshTimer);
+    newswireRefreshTimer = window.setInterval(fetchNewswire, NEWSWIRE_REFRESH_MS);
   } else {
-    window.clearTimeout(state.scheduleTimer);
+    clearSpeechTimeout();
+    clearCurrentTransmission();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    liveQueue.length = 0;
     setSpeaking(false);
+    clearInterval(newswireRefreshTimer);
+    newswireRefreshTimer = null;
   }
 }
 
@@ -473,6 +995,23 @@ channelChips.forEach((chip) => {
     updateChannelCount();
   });
 });
+
+stationChips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    state.selectedStation = chip.dataset.station;
+    updateStationScope();
+    window.setTimeout(livePump, 0);
+  });
+});
+
+if (commandDisciplineSelect) {
+  commandDisciplineSelect.addEventListener("change", () => {
+    // Command Discipline is operator-set, never derived (packet §4) --
+    // radio_silence takes effect immediately, same pump cycle.
+    updateRadioStateIndicator();
+    window.setTimeout(livePump, 0);
+  });
+}
 
 volumeSlider.addEventListener("input", applyVolume);
 
@@ -502,6 +1041,8 @@ try {
 }
 
 updateChannelCount();
+updateStationScope();
+updateRadioStateIndicator();
 drawSignalMeter();
 
 // Live is the default now (Admiral's call, 2026-07-11), matching Fleet

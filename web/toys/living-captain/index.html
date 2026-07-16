@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monad Living Captain</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23090d10'/%3E%3Cpath d='M7 23V9l9-5 9 5v14l-9 5z' fill='none' stroke='%238ad7c1' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%23d8b46a'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Monad / Living Captain <span class="new-badge">New</span></p>
+          <h1>Living Captain</h1>
+          <p class="subtitle">Durable command presence: one persistent identity, read-only sight onto real fleet
+            state, and an inspectable action record. No canon-mutating authority exists yet -- every canon change
+            still goes through FleetCore's own authenticated command path.</p>
+        </div>
+        <div class="link-state">
+          <span id="liveDot" class="live-dot"></span>
+          <div><small>Status API</small><strong id="linkStatus">Connecting&hellip;</strong></div>
+        </div>
+      </header>
+
+      <section class="control-bar" aria-label="Identity summary">
+        <div><small>Captain ID</small><strong id="captainId">&mdash;</strong></div>
+        <div><small>Restart Count</small><strong id="restartCount">&mdash;</strong></div>
+        <div><small>Created</small><strong id="createdAt">&mdash;</strong></div>
+        <div><small>Last Assembled</small><strong id="lastAssembled">&mdash;</strong></div>
+      </section>
+      <p id="feedback" class="feedback" role="status" hidden></p>
+
+      <section>
+        <div class="section-heading">
+          <div><p class="eyebrow">Sight</p><h2>Last Observed Fleet State</h2></div>
+          <p>Read-only. Only two endpoints are on the custody manifest -- FleetCore's snapshot and World Intake's
+            pending queue.</p>
+        </div>
+        <div class="captain-grid" id="sightGrid"></div>
+      </section>
+
+      <section class="memory-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">Spend Boundary</p><h2>Observe Budget</h2></div>
+          <p>Persisted, restart-safe. Exhausted budget stays exhausted until an operator explicitly raises it.</p>
+        </div>
+        <div class="budget-row">
+          <div class="trait-bar">
+            <span id="spendLabel">&mdash; / &mdash;</span>
+            <div class="trait-bar-track"><div id="spendFill" class="trait-bar-fill" style="width:0%"></div></div>
+            <span id="spendRemaining">&mdash;</span>
+          </div>
+        </div>
+        <h3 style="margin-top:1.2rem;font-size:.95rem;">Custody Manifest</h3>
+        <ul id="custodyList" class="custody-list"></ul>
+      </section>
+
+      <section class="history-panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">Durable Record</p><h2>Recent Actions</h2></div>
+          <p><span id="actionLogLength">&mdash;</span> total entries recorded, append-only.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Seq</th><th>Recorded</th><th>Kind</th><th>Summary</th></tr></thead>
+            <tbody id="actionBody"><tr><td colspan="4">Awaiting status API&hellip;</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

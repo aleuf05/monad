@@ -1,0 +1,52 @@
+{
+  "mission_id": "sea-monster-hunt-001",
+  "title": "Adventure Stations: Sea Monster Hunt",
+  "phase": "READY",
+  "outcome": "in_progress",
+  "created_at": "2026-07-15T01:30:00Z",
+  "updated_at": "2026-07-15T01:30:00Z",
+  "station_deck": [
+    {
+      "id": "lookout",
+      "name": "Lookout Station",
+      "purpose": "Spot surface disturbance, birds, slicks, and anything that breaks the horizon."
+    },
+    {
+      "id": "echo",
+      "name": "Echo Station",
+      "purpose": "Track the deep shape under the boat and call out any moving mass below."
+    },
+    {
+      "id": "lure",
+      "name": "Lure Station",
+      "purpose": "Deploy bait lights, sound, and drift markers to tempt the monster into view."
+    },
+    {
+      "id": "net",
+      "name": "Net Station",
+      "purpose": "Ready barriers, lines, and a safe fallback route if the contact surges."
+    },
+    {
+      "id": "recovery",
+      "name": "Recovery Station",
+      "purpose": "Handle damage, injuries, and the story that comes back with the crew."
+    }
+  ],
+  "evidence": [
+    {
+      "kind": "briefing",
+      "at": "2026-07-15T01:30:00Z",
+      "detail": "Adventure Stations established for a bounded sea-monster hunt scenario."
+    },
+    {
+      "kind": "station_assignment",
+      "at": "2026-07-15T01:30:00Z",
+      "detail": "Lookout, Echo, Lure, Net, and Recovery stations assigned."
+    },
+    {
+      "kind": "contact_report",
+      "at": "2026-07-15T01:30:00Z",
+      "detail": "A slow-moving shape was seen under the swell; no hostile action detected."
+    }
+  ]
+}

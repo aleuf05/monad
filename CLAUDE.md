@@ -1,11 +1,23 @@
-d give it a standing instruction like:
-Prefer rapid, reversible implementation over exhaustive validation.
-Use the smallest test set that gives reasonable confidence.
-Avoid repeated re-checking unless a failure or ambiguity appears.
-Make localized changes, commit early, and leave deeper hardening for a later pass.
-Flag risks briefly, but do not block progress on low-risk issues.
-And maybe one sharper line:
-Do not spend more time proving the change works than implementing the change unless the change affects security, persistence, or shared state.
+# HIGHEST PRIORITY
+
+Read [`000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md`](000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md) before taking action in this repository.
+
+## POLICY: Bold, rapid, workflow-improving execution
+
+Prefer rapid, reversible implementation over exhaustive validation. Use the
+smallest test set that gives reasonable confidence. Avoid repeated
+re-checking unless a failure or ambiguity appears. Make localized changes,
+commit early, and leave deeper hardening for a later pass. Flag risks
+briefly, but do not block progress on low-risk issues. Do not spend more
+time proving a change works than implementing it, unless the change affects
+security, persistence, or shared state.
+
+Take bold steps. When a task surfaces friction in the workflow itself --
+a broken permission, a missing tool, a doc that no longer matches reality,
+a manual step that should be automated -- fix or flag it as part of the
+work rather than working around it quietly every time. Small, reversible
+process improvements don't need a separate mandate to justify making them
+alongside the task that revealed them.
 
 ## POLICY: Live tests, rapid iteration
 
@@ -91,3 +103,33 @@ above). If something looks like it would leak this machine's own secrets
 (credentials, tokens, private keys) rather than just being an open demo
 world, that's still worth a one-line flag -- but the general posture here
 is ship it, don't audit it.
+
+## POLICY: Work queue / report queue for non-privileged work
+
+Two locations, kept strictly separate -- see [`AGENTS.md`](AGENTS.md)
+for the full policy and claim protocol:
+
+- **Work queue** -- [`docs/engineering-orders/queue.md`](docs/engineering-orders/queue.md).
+  Active/blocked tasks only. Check this before starting non-privileged,
+  git-only work so a Claude session doesn't duplicate or silently drop
+  work another agent (e.g. Codex) already claimed. When a task is
+  done, its entry is deleted from here, not marked done in place.
+- **Report queue** -- not a separate file. It's `docs/reports/*.md`,
+  the Feature Matrix, and `docs/doctrine/*.md`, where completed
+  findings and evidence actually live.
+
+One-line rule: action lives in the work queue; truth lives in the
+report queue. Privileged work stays exclusively in `cmd.sh` per
+`docs/commissioning-handoff.md` -- neither queue covers that.
+
+## POLICY: One source of truth -- don't replicate it
+
+Admiral's ruling, 2026-07-15 (see `LS-01`'s resolution in
+`docs/reports/2026-07-15-inadequate-specs.md`): this project runs on a
+single live database/state store per concern, deliberately. Don't
+propose or build replication, backup daemons, or standby copies as a
+default hygiene measure -- if a real need shows up (a specific
+incident, a stated recovery requirement), it gets evaluated on its
+merits then, not assumed as good practice now. Matches this repo's
+existing "no staging, `web/` is production" posture: one source of
+truth, not several copies to keep in sync.

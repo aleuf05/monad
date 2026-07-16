@@ -61,6 +61,28 @@ python3 mission_director.py publish       # regenerate the report without advanc
 Set `FLEETCORE_URL` to point at a non-default server (defaults to
 `http://localhost:4771`).
 
+## Tests
+
+`vessel_events` is a bounded tail as of GitHub issue #6 (see
+`docs/architecture/fleetcore-api.md`), so `advance()` cursors on each
+event's own `event_seq`, not array length -- `state["last_vessel_event_seq"]`
+persists across restarts via `save_state`/`load_state`. `test_cursor.py`
+exercises the real `advance()`/`new_state()` directly with synthetic
+snapshots (no FleetCore server needed -- `advance()` is pure with respect
+to its arguments):
+
+```sh
+python3 -m unittest tools/mission-director/test_cursor.py
+```
+
+Covers: cursor/phase advancement on a genuinely new event, only-new-events
+filtering on repeated polls, surviving a rotated/shrunk `vessel_events`
+array without losing a transition (the persisted-cursor failure mode this
+migration exists to fix -- unlike a browser tab, this tool has no
+restart-equivalent reset), a no-op on an unchanged poll, untracked-vessel
+events still advancing the cursor without moving the phase, and a
+same-tick multi-event batch evaluated in order.
+
 ## Captures
 
 `CAPTURE_REQUESTED` entries (event, recommended view, caption) are

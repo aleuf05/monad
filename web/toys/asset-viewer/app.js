@@ -14,11 +14,24 @@ const modelDetail = document.querySelector("#modelDetail");
 const detailSource = document.querySelector("#detailSource");
 const detailBackend = document.querySelector("#detailBackend");
 const detailCreated = document.querySelector("#detailCreated");
+const detailOutput = document.querySelector("#detailOutput");
+const detailDownload = document.querySelector("#detailDownload");
+const stagedPanel = document.querySelector("#stagedPanel");
+const stagedPreview = document.querySelector("#stagedPreview");
+const stagedName = document.querySelector("#stagedName");
+const stagedType = document.querySelector("#stagedType");
+const stagedSize = document.querySelector("#stagedSize");
+const clearStagedButton = document.querySelector("#clearStagedButton");
 const uploadForm = document.querySelector("#uploadForm");
 const uploadInput = document.querySelector("#uploadInput");
 const uploadNameInput = document.querySelector("#uploadNameInput");
 const uploadButton = document.querySelector("#uploadButton");
 const uploadStatus = document.querySelector("#uploadStatus");
+const progressPanel = document.querySelector("#progressPanel");
+const progressLabel = document.querySelector("#progressLabel");
+const progressElapsed = document.querySelector("#progressElapsed");
+const progressBar = document.querySelector("#progressBar");
+const dropZone = document.querySelector("#dropZone");
 
 // tools/img2asset/serve.py is a separate process on its own port (not
 // something Caddy proxies) -- loopback-bound by default, same posture as
@@ -31,6 +44,7 @@ const uploadStatus = document.querySelector("#uploadStatus");
 // -- a .glb upload finishes almost instantly but is fine waiting on the
 // same timeout.
 const PIPELINE_TIMEOUT_MS = 240000;
+const PROGRESS_TICK_MS = 250;
 
 function pipelineServerUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -46,6 +60,9 @@ function selectModel(entry, li) {
   detailSource.textContent = entry.source_image || "—";
   detailBackend.textContent = entry.backend || "—";
   detailCreated.textContent = entry.created_at ? new Date(entry.created_at).toLocaleString() : "—";
+  detailOutput.textContent = entry.glb_path || "—";
+  detailDownload.href = `../../${entry.glb_path.replace(/^web\//, "")}`;
+  detailDownload.download = entry.glb_path ? entry.glb_path.split("/").pop() : "output.glb";
 }
 
 function renderModelList(models, selectName) {
@@ -91,6 +108,128 @@ function setUploadStatus(text, kind) {
   uploadStatus.className = `upload-status${kind ? ` is-${kind}` : ""}`;
 }
 
+let progressTimer = null;
+let progressStartedAt = 0;
+let progressValue = 0;
+
+function stopProgress(finalLabel, finalValue) {
+  if (progressTimer) {
+    clearInterval(progressTimer);
+    progressTimer = null;
+  }
+  if (typeof finalLabel === "string") progressLabel.textContent = finalLabel;
+  if (typeof finalValue === "number") progressBar.value = finalValue;
+  progressElapsed.textContent = `${((Date.now() - progressStartedAt) / 1000).toFixed(1)}s`;
+}
+
+function startProgress(label) {
+  clearInterval(progressTimer);
+  progressStartedAt = Date.now();
+  progressValue = 8;
+  progressPanel.hidden = false;
+  progressLabel.textContent = label;
+  progressElapsed.textContent = "0.0s";
+  progressBar.value = progressValue;
+  progressTimer = setInterval(() => {
+    const elapsed = Date.now() - progressStartedAt;
+    const growth = Math.min(2.2, elapsed / 15000);
+    progressValue = Math.min(92, progressValue + growth);
+    progressBar.value = progressValue;
+    progressElapsed.textContent = `${(elapsed / 1000).toFixed(1)}s`;
+  }, PROGRESS_TICK_MS);
+}
+
+function completeProgress(label) {
+  stopProgress(label, 100);
+  setTimeout(() => {
+    progressPanel.hidden = true;
+    progressBar.value = 0;
+    progressLabel.textContent = "Idle";
+    progressElapsed.textContent = "0.0s";
+  }, 1200);
+}
+
+function failProgress(label) {
+  stopProgress(label, Math.max(progressValue, 100));
+}
+
+function formatBytes(bytes) {
+  if (!Number.isFinite(bytes)) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function clearStagedFile() {
+  uploadInput.value = "";
+  stagedPanel.hidden = true;
+  stagedPreview.innerHTML = "";
+  stagedName.textContent = "—";
+  stagedType.textContent = "—";
+  stagedSize.textContent = "—";
+}
+
+function fileToFormSubmission(file) {
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  uploadInput.files = dataTransfer.files;
+}
+
+function handleDroppedFiles(files) {
+  const file = files?.[0];
+  if (!file) return;
+  fileToFormSubmission(file);
+  stagedPanel.hidden = false;
+  stagedName.textContent = file.name;
+  stagedType.textContent = file.type || "application/octet-stream";
+  stagedSize.textContent = formatBytes(file.size);
+  stagedPreview.innerHTML = "";
+  if (file.type.startsWith("image/")) {
+    const img = document.createElement("img");
+    img.alt = `Preview of ${file.name}`;
+    img.src = URL.createObjectURL(file);
+    img.addEventListener("load", () => URL.revokeObjectURL(img.src), { once: true });
+    stagedPreview.appendChild(img);
+  } else {
+    const label = document.createElement("div");
+    label.className = "staged-file-icon";
+    label.textContent = file.name.toLowerCase().endsWith(".glb") ? "GLB" : "FILE";
+    stagedPreview.appendChild(label);
+  }
+  setUploadStatus(`Ready to upload ${file.name}.`, "success");
+}
+
+dropZone.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  dropZone.classList.add("is-dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+  dropZone.classList.remove("is-dragover");
+});
+
+dropZone.addEventListener("drop", (event) => {
+  event.preventDefault();
+  dropZone.classList.remove("is-dragover");
+  handleDroppedFiles(event.dataTransfer?.files);
+});
+
+dropZone.addEventListener("click", () => uploadInput.click());
+dropZone.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    uploadInput.click();
+  }
+});
+
+uploadInput.addEventListener("change", () => {
+  const file = uploadInput.files?.[0];
+  if (file) handleDroppedFiles([file]);
+  else clearStagedFile();
+});
+
+clearStagedButton.addEventListener("click", clearStagedFile);
+
 uploadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const file = uploadInput.files?.[0];
@@ -106,6 +245,7 @@ uploadForm.addEventListener("submit", async (event) => {
   }
 
   uploadButton.disabled = true;
+  startProgress(isGlb ? "Cataloging file" : "Generating asset");
   setUploadStatus(
     isGlb
       ? "Uploading and cataloging…"
@@ -129,6 +269,7 @@ uploadForm.addEventListener("submit", async (event) => {
       throw new Error(result.error || `pipeline failed (${response.status})`);
     }
     setUploadStatus(`${isGlb ? "Cataloged" : "Generated"} ${result.entry.name}.`, "success");
+    completeProgress(`${isGlb ? "Cataloged" : "Generated"} successfully`);
     uploadForm.reset();
     await loadManifest(result.entry.name);
   } catch (error) {
@@ -143,6 +284,7 @@ uploadForm.addEventListener("submit", async (event) => {
         : error.message,
       "error"
     );
+    failProgress("Generation failed");
   } finally {
     clearTimeout(timeout);
     uploadButton.disabled = false;

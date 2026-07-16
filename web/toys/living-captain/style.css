@@ -1,0 +1,49 @@
+:root { color-scheme: dark; --bg:#06090b; --panel:#0d1518; --line:rgba(196,229,223,.2); --text:#e8f0ed; --muted:#95aaa6; --signal:#8ad7c1; --amber:#d8b46a; --danger:#e0876a; }
+* { box-sizing: border-box; }
+html,body { margin:0; min-height:100%; }
+body { font-family:"Segoe UI",system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at 50% 0,rgba(50,89,86,.32),transparent 40rem),var(--bg); }
+.shell { max-width:1240px; margin:auto; padding:clamp(1rem,3vw,2rem); display:grid; gap:1.4rem; }
+.hero,.control-bar,.history-panel,.memory-panel { border:1px solid var(--line); background:rgba(13,21,24,.9); }
+.hero { display:flex; justify-content:space-between; gap:1rem; align-items:flex-start; padding:1.4rem; }
+.eyebrow { margin:0 0 .35rem; color:var(--amber); font-size:.68rem; font-weight:700; letter-spacing:.13em; text-transform:uppercase; }
+.new-badge { margin-left:.4rem; padding:.15rem .35rem; background:var(--amber); color:#151108; }
+h1,h2,h3,p { margin-top:0; }
+h1 { margin-bottom:.35rem; font-size:clamp(1.8rem,4vw,3rem); }
+h2 { margin-bottom:0; }
+h3 { margin:0; font-size:1.3rem; }
+.subtitle,.section-heading>p { margin:0; color:var(--muted); max-width:48rem; }
+.link-state { display:flex; gap:.65rem; align-items:center; min-width:150px; }
+.link-state small,.control-bar small { display:block; color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; }
+.link-state strong,.control-bar strong { display:block; color:var(--signal); margin-top:.2rem; }
+.live-dot { width:.65rem; height:.65rem; border-radius:50%; background:var(--muted); }
+.live-dot.is-live { background:var(--signal); box-shadow:0 0 14px rgba(138,215,193,.8); }
+.live-dot.is-error { background:var(--danger); }
+.control-bar { display:flex; flex-wrap:wrap; align-items:center; gap:1rem 2.5rem; padding:1rem 1.25rem; }
+.feedback { margin:0; padding:.7rem 1rem; border:1px solid var(--signal); background:rgba(138,215,193,.08); }
+.feedback.is-error { border-color:var(--danger); color:var(--danger); }
+.section-heading { display:flex; justify-content:space-between; gap:1rem; align-items:end; margin-bottom:.8rem; }
+.section-heading>p { font-size:.82rem; }
+.captain-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+.captain-card { border:1px solid var(--line); background:linear-gradient(180deg,rgba(19,37,39,.94),rgba(9,14,16,.95)); padding:1rem; min-width:0; }
+dl { display:grid; gap:.75rem; margin:0; }
+dt { color:var(--muted); font-size:.64rem; text-transform:uppercase; letter-spacing:.1em; }
+dd { margin:.2rem 0 0; line-height:1.4; font-size:.86rem; overflow-wrap:anywhere; }
+.memory-panel { padding:1rem 1.25rem; }
+.budget-row { margin-top:.4rem; }
+.trait-bar { display:grid; grid-template-columns:6.5rem 1fr 5rem; gap:.5rem; align-items:center; font-size:.7rem; color:var(--muted); }
+.trait-bar-track { height:8px; background:rgba(196,229,223,.15); position:relative; border-radius:4px; overflow:hidden; }
+.trait-bar-fill { position:absolute; inset:0 auto 0 0; background:var(--signal); transition:width .3s ease; }
+.trait-bar-fill.is-exhausted { background:var(--danger); }
+.custody-list { list-style:none; margin:.6rem 0 0; padding:0; display:grid; gap:.4rem; font-size:.78rem; }
+.custody-list li { border:1px solid var(--line); padding:.4rem .6rem; color:var(--signal); font-family:"SFMono-Regular",Consolas,monospace; }
+.custody-list .method { color:var(--amber); margin-right:.5rem; }
+.history-panel { padding:1rem; }
+.table-wrap { overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:.8rem; }
+th,td { padding:.65rem; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
+th { color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; }
+.kind-observation { color:var(--signal); }
+.kind-proposal_note { color:var(--amber); }
+.kind-custody_rejection,.kind-spend_exhausted { color:var(--danger); }
+@media(max-width:900px){ .captain-grid{grid-template-columns:1fr;} }
+@media(max-width:600px){ .hero,.section-heading{display:grid;} }

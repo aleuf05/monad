@@ -108,6 +108,26 @@ h1 {
   color: var(--amber);
 }
 
+.status-strip-wide {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.status-strip-wide span {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.status-strip-wide strong {
+  font-size: 0.9rem;
+  color: var(--signal);
+  letter-spacing: 0.03em;
+}
+
 .control-deck {
   display: flex;
   flex-wrap: wrap;
@@ -348,6 +368,70 @@ body.is-embedded #signalMeter {
 .empty-note {
   color: var(--muted);
   font-style: italic;
+}
+
+.newswire-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 1rem 1.1rem;
+}
+
+.newswire-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.newswire-attribution {
+  margin: 0;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.newswire-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 14rem;
+  overflow-y: auto;
+}
+
+.newswire-log li {
+  border-left: 2px solid var(--steel-2);
+  padding: 0.2rem 0 0.2rem 0.7rem;
+  font-size: 0.86rem;
+}
+
+.newswire-log a {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.newswire-log a:hover {
+  color: var(--signal);
+  text-decoration: underline;
+}
+
+.newswire-log .timestamp {
+  display: block;
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-top: 0.1rem;
+}
+
+body.is-embedded .newswire-panel {
+  padding: 0.6rem 0.75rem;
+}
+
+body.is-embedded .newswire-log {
+  max-height: 6rem;
 }
 
 @media (max-width: 780px) {

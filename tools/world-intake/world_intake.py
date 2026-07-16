@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Living World Intake: proposals around, never writes to, canonical state."""
 from __future__ import annotations
-import argparse, hashlib, hmac, json, os, re, sqlite3, urllib.request, uuid
+import argparse, hashlib, hmac, json, os, re, sqlite3, urllib.error, urllib.request, uuid
 from pathlib import Path
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -190,6 +190,37 @@ class Intake:
         key=hashlib.sha256(json.dumps(payload,sort_keys=True).encode()).hexdigest()
         self.db.execute("INSERT OR IGNORE INTO commands(id,assertion_id,adjudication_id,idempotency_key,payload_json,status) VALUES(?,?,?,?,?,'compiled')",(ident,row["assertion_id"],row["adjudication_id"],key,json.dumps(payload,sort_keys=True))); self.db.execute("UPDATE corrections SET command_id=? WHERE id=?",(ident,correction_id)); self.db.commit(); return ident,payload
 
+# The missing link: an approved, compiled command previously sat forever at
+# status='compiled' -- nothing ever called Intake.commit() with a real
+# submit(), so no proposal approved through the review desk could ever
+# actually reach FleetCore (confirmed empirically post-commissioning, see
+# GitHub issue #13). FLEETCORE_COMMAND_URL is overridable for testing;
+# defaults to the loopback endpoint world-intake.service already depends on
+# (Requires=fleetcore-serve.service in scripts/world-intake.service).
+FLEETCORE_COMMAND_URL = os.getenv("FLEETCORE_COMMAND_URL", "http://127.0.0.1:4771/command")
+
+
+def submit_to_fleetcore(payload, idempotency_key):
+    request = urllib.request.Request(
+        FLEETCORE_COMMAND_URL,
+        data=json.dumps(payload).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=5) as response:
+            body = json.loads(response.read())
+            return {"accepted": True, "tick": body.get("tick")}
+    except urllib.error.HTTPError as error:
+        try:
+            detail = json.loads(error.read())
+        except (ValueError, json.JSONDecodeError):
+            detail = {"error": str(error)}
+        return {"accepted": False, "status": error.code, **detail}
+    except urllib.error.URLError as error:
+        return {"accepted": False, "error": f"fleetcore unreachable: {error.reason}"}
+
+
 def serve(intake, host="127.0.0.1", port=4773):
     review_token=os.getenv("WORLD_INTAKE_REVIEW_TOKEN")
     if not review_token: raise RuntimeError("WORLD_INTAKE_REVIEW_TOKEN is required for adjudication service")
@@ -217,7 +248,14 @@ def serve(intake, host="127.0.0.1", port=4773):
                 adjudication_id=intake.review(assertion_id,action,edit=edit)
                 response={"adjudication_id":adjudication_id,"decision":action,"canon_mutated":False}
                 if action in {"approve","amend","unverified","link"}:
-                    command_id,command=intake.compile(adjudication_id); response.update({"command_id":command_id,"command":command,"status":"awaiting-fleetcore-submission"})
+                    command_id,command=intake.compile(adjudication_id)
+                    response.update({"command_id":command_id,"command":command})
+                    canon_event=intake.commit(command_id,submit_to_fleetcore)
+                    if canon_event:
+                        response.update({"canon_mutated":True,"status":"accepted","canon_event":canon_event})
+                    else:
+                        row=intake.db.execute("SELECT response_json FROM commands WHERE id=?",(command_id,)).fetchone()
+                        response.update({"status":"rejected","fleetcore_response":json.loads(row["response_json"]) if row and row["response_json"] else None})
                 self.send_json(response,201)
             except (KeyError,ValueError,json.JSONDecodeError) as error: self.send_json({"error":str(error)},422)
         def do_OPTIONS(self):

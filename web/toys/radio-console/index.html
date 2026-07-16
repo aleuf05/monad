@@ -13,7 +13,7 @@
         <div>
           <p class="eyebrow">Monad / Bridge Instrument</p>
           <h1>Radio Console</h1>
-          <p class="subtitle">Simulated fleet, weather, and traffic chatter for ambience. Scripted transmissions, spoken aloud where the browser supports it &mdash; not a live feed.</p>
+          <p class="subtitle">Live fleet chatter, driven directly by FleetCore's real event stream and spoken aloud where the browser supports it. Offline means disconnected, not scripted.</p>
         </div>
         <section class="status-strip" aria-label="Console status">
           <div>
@@ -30,7 +30,11 @@
           </div>
           <div>
             <span>Data Source</span>
-            <strong id="dataSourceValue">Scripted</strong>
+            <strong id="dataSourceValue">Connecting…</strong>
+          </div>
+          <div class="status-strip-wide">
+            <span>Watch</span>
+            <strong id="radioStateValue">—</strong>
           </div>
         </section>
       </header>
@@ -42,6 +46,25 @@
           <button type="button" class="channel-chip is-active" data-channel="fleet-comms">Fleet Comms</button>
           <button type="button" class="channel-chip is-active" data-channel="weather">Weather</button>
           <button type="button" class="channel-chip is-active" data-channel="traffic">Traffic</button>
+        </div>
+
+        <div class="volume-control">
+          <label for="commandDisciplineSelect">Command Discipline</label>
+          <select id="commandDisciplineSelect">
+            <option value="quiet_watch">Quiet Watch</option>
+            <option value="normal" selected>Normal</option>
+            <option value="harbor">Harbor</option>
+            <option value="priority">Priority Traffic</option>
+            <option value="battle_stations">Battle Stations</option>
+            <option value="radio_silence">Radio Silence</option>
+          </select>
+        </div>
+
+        <div class="channel-chips" role="group" aria-label="Station knowledge scope">
+          <button type="button" class="channel-chip is-active" data-station="bridge">Bridge</button>
+          <button type="button" class="channel-chip" data-station="engineering">Engineering</button>
+          <button type="button" class="channel-chip" data-station="traffic">Traffic</button>
+          <button type="button" class="channel-chip" data-station="weather">Weather</button>
         </div>
 
         <div class="volume-control">
@@ -64,6 +87,16 @@
             <li class="empty-note">Power on to begin monitoring.</li>
           </ul>
         </article>
+      </section>
+
+      <section class="newswire-panel" aria-label="NPR Newswire">
+        <div class="newswire-header">
+          <p class="label">Newswire</p>
+          <p class="newswire-attribution">NPR News Headlines &mdash; <span id="newswireUpdated">not yet fetched</span></p>
+        </div>
+        <ul id="newswireLog" class="newswire-log">
+          <li class="empty-note">Power on to receive the wire.</li>
+        </ul>
       </section>
     </main>
 

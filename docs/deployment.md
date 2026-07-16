@@ -109,6 +109,17 @@ Interactive artifacts that must be reachable under `https://cameronlampley.com/`
 - `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) is whatever the server grants this connection on its own — there is no client-supplied token field or URL passthrough here anymore.
 - `web/toys/agent-ops/` — Agent Operations, copied from `toys/agent-ops/` (`index.html`, `app.js`, `style.css`). Reads Living Fleet state from the public FleetCore WebSocket and sends only captain enable/pause controls. Depends on both FleetCore and the portless captain runtime below.
 - `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. Linked from `web/index.html` and `web/command-deck.html`'s "Bridge Instruments" section, alongside (not replacing) the existing `toys/bridge/` "Bridge Station" card.
+- `web/toys/radio-console/` — copied from `toys/radio-console/`. Its Newswire panel additionally depends on `web/data/npr-headlines.json` being kept fresh — see "NPR Newswire Feed" below; that file is not part of the toy copy itself and is not touched by a plain re-deploy.
+
+### NPR Newswire Feed
+
+Radio Console's Newswire panel reads `web/data/npr-headlines.json`, written by `tools/npr-headlines/fetch.py` from NPR's public "NPR Topics: News" RSS feed (`https://feeds.npr.org/1001/rss.xml`). Deliberately kept out of the transmission-scoring/speech pipeline the rest of the console uses (see the comment at `NEWSWIRE_URL` in `toys/radio-console/app.js`) so real-world news is never spoken in the same voice/urgency system as a fleet watch event.
+
+This is the first real *external* (non-FleetCore) source the console carries — see NPR's terms of use before changing what the fetcher writes: headlines/links/other feed content may be displayed on a personal/noncommercial site with attribution and without modification, but NPR audio files may not be redistributed. The fetcher writes title/link/pubDate only, no audio, no full article text, and the panel renders the required "NPR News Headlines" attribution next to the content, not just in alt text.
+
+NPR's feed only grants CORS to `apps.npr.org`, so the browser can't fetch it directly from `cameronlampley.com` — `tools/npr-headlines/fetch.py` is the server-side hop that avoids that, same-origin JSON on the other side.
+
+**Current fetch schedule is a temporary bridge, not the final mechanism**: a user crontab entry (`crontab -l`, no sudo — added directly since this doesn't require privileged access) runs the fetch every 15 minutes. The proper systemd timer (`scripts/npr-headlines-fetch.service` / `.timer`, matching every other scheduled job in this repo, e.g. `living-fleet-memory-reflect.timer`) is written and ready but not yet installed — that's a privileged step (see `scripts/install-npr-headlines.sh`, which also removes the temporary cron entry once the timer takes over). Until someone with sudo runs that install script, the cron entry is what's actually keeping the feed live — check `crontab -l` before assuming the timer is what's running.
 
 ### Watchbook is intentionally not public
 
@@ -212,3 +223,78 @@ toy (`fleetcore-control`, `fleetcore-live`, `bridge`, `fleet-motion`'s
 whatever the server grants a connection is what that connection gets. If real
 per-client auth is ever added server-side, these clients will need a token
 mechanism reintroduced.
+
+## Living World Intake — `toys/world-intake/`, Public
+
+Captain review desk for the intake pipeline (`ingest → extract → review →
+compile → commit`) that turns adjudicated narrative assertions into real
+FleetCore canon changes. Deployed the same shape as Captain Memory/Agent
+Operations: a loopback-only Python backend behind a Caddy `handle_path`
+proxy, plus a static `web/` copy of the review UI.
+
+**Backend.** `world-intake.service` (`scripts/world-intake.service`) runs
+`tools/world-intake/world_intake.py ... serve`, a single-threaded stdlib
+`http.server` bound to loopback, `Requires=fleetcore-serve.service`. It
+owns its own SQLite store at `data/world-intake.sqlite3` and talks to
+FleetCore's real command endpoint (`http://127.0.0.1:4771/command`) to
+submit adjudicated proposals as `apply-canon-change` commands — this is
+the one seam that has to match FleetCore's real schema exactly
+(`CanonChange` enum + full 6-field `CanonProvenance`), which
+`world_intake.py`'s `compile()` builds directly rather than through a
+separate mapping layer.
+
+Install/restart via `scripts/install-world-intake.sh`, same
+build-and-enable pattern as the other services in this file.
+
+**Public route.** `handle_path /world-intake-api/* { reverse_proxy
+127.0.0.1:4773 }` in `/etc/caddy/Caddyfile`, alongside the other
+`handle_path` blocks in the same `cameronlampley.com { ... }` block. The
+static UI lives at `web/toys/world-intake/` (copied from
+`toys/world-intake/`, no build step) and is linked from the homepage
+card grid. Verified live as of 2026-07-14:
+`https://cameronlampley.com/toys/world-intake/` returns 200, and
+`https://cameronlampley.com/world-intake-api/proposals` returns real
+queue data through the proxy (not the UI's demo-mode fallback).
+
+**Command authority:** same standing tradeoff as FleetCore itself — no
+per-visitor auth on the review/adjudication actions. See "Known
+limitation, accepted for now" above; the same acceptance applies here,
+not a new gap.
+
+## Living Captain — `toys/living-captain/`, Public
+
+Read-only status view over `tools/living-captain/`: one persistent
+identity (`captain.monad`), sight into real FleetCore/World Intake state,
+a custody-gated read boundary, a spend-limited observe budget, and an
+append-only action record. See
+`docs/engineering-orders/living-captain-v0.1.md` and `-v0.2.md` for the
+design. **No canon-mutating write authority exists anywhere in this
+system** — every canon change still goes through FleetCore's own
+authenticated command path, same as World Intake.
+
+**Backend.** `living-captain-status.service`
+(`scripts/living-captain-status.service`) runs
+`tools/living-captain/status_server.py`, a single-threaded stdlib
+`http.server` bound to loopback (`127.0.0.1:4774`). It only reads
+`data/living-captain/state.json` and `actions.jsonl` — it never
+assembles a `LivingCaptain` instance and never calls `observe()`, so
+running it costs no spend budget and has no dependency on
+`fleetcore-serve` or `world-intake` being up. The Captain identity
+itself is only ever advanced by an operator-invoked run (currently
+`tools/living-captain/demo_all.py`, or a direct `LivingCaptain.assemble()`
+call) — there is no scheduler or unattended loop yet.
+
+Install/restart via `scripts/install-living-captain.sh`, same
+build-and-enable pattern as the other services in this file.
+
+**Public route.** `handle_path /living-captain-api/* { reverse_proxy
+127.0.0.1:4774 }` in `/etc/caddy/Caddyfile`, alongside the other
+`handle_path` blocks in the same `cameronlampley.com { ... }` block. The
+static UI lives at `web/toys/living-captain/` (copied from
+`toys/living-captain/`, no build step) and is linked from the homepage
+card grid.
+
+**Command authority:** none exists to have a tradeoff about. The status
+API is GET-only and read-only by construction; the Captain's own
+outbound reads are custody-gated to exactly two URLs
+(`tools/living-captain/sight.py`'s manifest).

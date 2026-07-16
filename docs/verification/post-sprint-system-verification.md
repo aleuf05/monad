@@ -74,7 +74,15 @@ Verified durable and independently re-readable three ways after the command retu
 4. Confirmed reads still work against the post-crash DB (`MemoryService.request_context()` succeeded, `identity_summary` present).
 5. **Recovery:** re-ran the script normally against the crashed copy. Exit 0, all 3 captains reflected, `reflections` count went 15 → 18 (exactly 3 new rows, no duplicates from the earlier killed attempts).
 
-**Result:** clean, idempotent recovery in every trial. One caveat: the script's actual DB-write phase is fast enough relative to Python interpreter startup that none of the 8 kill attempts is confirmed to have landed *inside* a multi-row write sequence (all showed 0 rows written, i.e. killed before writing started) — so crash-mid-write safety is inferred from WAL guarantees and per-statement commits in `store.py`, not directly observed. Noted as a residual gap, not a failure.
+**Result:** clean, idempotent recovery in every trial. One caveat: the script's actual DB-write phase is fast enough relative to Python interpreter startup that none of the 8 kill attempts is confirmed to have landed *inside* a multi-row write sequence (all showed 0 rows written, i.e. killed before writing started) — so crash-mid-write safety was inferred from WAL guarantees and per-statement commits in `store.py`, not directly observed. Flagged as a residual gap — resolved below (GitHub issue #14).
+
+**Update, deterministic fault injection (resolves the caveat above):** timing-based kills couldn't reliably land mid-write, so instead of retrying with different delays, `store.insert`/`store.update` gained an optional `commit: bool = True` parameter, and `reflection.apply_reflection()` was rewritten to run every write for one triggered reflection (belief revisions, procedural lessons, relationship updates, trait shifts, the summary row) inside one shared transaction — `commit=False` on each individual statement, one `conn.commit()` at the end, `conn.rollback()` and re-raise on any exception. This closes a real gap the code comments already flagged as intentional-but-unenforced: before this, a crash between inserting a new superseding belief and updating the old belief's `status`/`superseded_by_belief_id` could leave a half-linked revision.
+
+Two new tests (`tools/living-fleet/memory/tests/test_reflection_atomicity.py`) monkeypatch `store.insert` to raise a `RuntimeError` deterministically right after the *first* write of a multi-write reflection succeeds — guaranteed to land inside the belief-insert/belief-update pair, unlike the earlier timing-based attempts:
+- `test_injected_failure_leaves_no_partial_state`: after the injected crash, `PRAGMA integrity_check` is `ok`, **and** no new belief exists, the old belief is still `active` with `superseded_by_belief_id` still `NULL`, and no procedural-lesson or reflections row landed either — the whole batch rolled back, not just the interrupted pair.
+- `test_restart_then_clean_reflection_recovers_with_no_duplication`: closes and reopens the connection (simulated restart), then re-runs the same reflection cleanly — exactly one revision exists afterward, the old belief is correctly marked superseded, no duplicate from the rolled-back attempt.
+
+Both pass. Full suite still green: 32/32 (`tools/living-fleet` + `tools/living-fleet/memory`), up from 30 — no regressions from threading `commit=False` through `identity.ensure_identity`/`apply_trait_shift` (all other call sites keep the `commit=True` default, unchanged behavior).
 
 ## Logs and Observability
 
@@ -109,13 +117,13 @@ No source, config, or data files were changed. All destructive/crash testing ran
 ## Tests Run and Results
 
 - `cargo test --manifest-path fleetcore/Cargo.toml` — **6/6 passed** (3 determinism/persistence integration tests, 3 Living Fleet authority/fallback tests).
-- `python3 -m unittest discover -s tools/living-fleet -p 'test_*.py'` — **30/30 passed** (captain runtime doctrine/fallback tests + full captain memory suite: belief revision, identity drift, salience, cross-captain isolation, seed-import idempotency, service/store restart-continuity).
-- No new regression tests added — no code defect was found that a unit test could target; the one real defect (unbounded `vessel_events`) is an architectural/capacity issue, not a logic bug, and fixing it is a scoped design decision left for a follow-up pass.
+- `python3 -m unittest discover -s tools/living-fleet -p 'test_*.py'` — **32/32 passed** (captain runtime doctrine/fallback tests + full captain memory suite: belief revision, identity drift, salience, cross-captain isolation, seed-import idempotency, service/store restart-continuity, reflection atomicity).
+- Two new regression tests added for the reflection-atomicity fix (GitHub issue #14) — see the Failure and Recovery Test section. The `vessel_events` growth defect (issue #6) remains an architectural/capacity issue tracked separately; see `docs/architecture/vessel-events-retention-investigation.md`.
 
 ## Remaining Risks
 
 - `vessel_events` unbounded growth (Defect 1) — not urgent, but will keep getting more expensive every day it's left as-is; worth scheduling before it becomes a visible performance problem rather than after.
-- Crash-mid-write safety for the memory DB is inferred from WAL semantics, not directly observed under load (residual test gap noted above).
+- ~~Crash-mid-write safety for the memory DB is inferred from WAL semantics, not directly observed under load.~~ **Resolved** — see the deterministic fault-injection update above (GitHub issue #14). `apply_reflection()` is now atomic at the per-reflection boundary and proven so by a fault that's guaranteed to land mid-sequence, not a timing race.
 - No privileged-restart test was performed against the actual production `fleetcore-serve`/`living-fleet` systemd units in this session (no sudo available) — confidence in restart behavior rests on the real reboot that already occurred plus the isolated CLI-level restart proof, which together are strong but not identical to an operator-triggered `systemctl restart` under this session's control.
 - `monad-watchman` gap (Defect 2) — staged in the current privileged commissioning package.
 

@@ -6,6 +6,13 @@ Prepared for: Captain
 
 Scope: Monad post-reboot, Living Fleet Effort B, and Living World Intake V0.1
 
+> Resolution note — 2026-07-14: The commissioning gate described below was
+> cleared at `2026-07-14T04:40:51Z` on accepted revision
+> `8bcb14b6adfb96d13a4e6a5f22ca4175527b84e1`. The historical HOLD finding is
+> superseded by **COMMISSIONED — CONTROLLED OPERATION AUTHORIZED**. The original
+> report remains unchanged below as the pre-commissioning record. See
+> [`2026-07-14-post-commissioning-closeout.md`](2026-07-14-post-commissioning-closeout.md).
+
 ## Executive status
 
 The code and public static surfaces are integrated, tested, merged, and clean.

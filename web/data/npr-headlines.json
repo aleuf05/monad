@@ -1,0 +1,47 @@
+{
+  "source": "NPR News Headlines",
+  "source_url": "https://www.npr.org/sections/news/",
+  "fetched_at": "2026-07-16T12:30:01.594113+00:00",
+  "items": [
+    {
+      "title": "Trump wants to fence off the park closest to the White House, a popular protest spot",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5893465/dc-lafayette-square-park-permanent-fencing-proposal",
+      "pubDate": "Thu, 16 Jul 2026 08:13:23 -0400"
+    },
+    {
+      "title": "Zelenskyy fires Ukraine's tech-savvy defense minister in government reshuffle",
+      "link": "https://www.npr.org/2026/07/16/g-s1-133920/ukraine-defense-minister-fired",
+      "pubDate": "Thu, 16 Jul 2026 07:33:11 -0400"
+    },
+    {
+      "title": "The political risks from war in Iran. And, ICE's use of force is rising, report finds",
+      "link": "https://www.npr.org/2026/07/16/g-s1-133918/up-first-newsletter-iran-us-trump-jay-clayton-ice-use-of-force",
+      "pubDate": "Thu, 16 Jul 2026 07:29:01 -0400"
+    },
+    {
+      "title": "Oil companies are making billions. In the U.S., calls to tax their windfall are growing",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5845818/oil-prices-windfall-tax-iran-war",
+      "pubDate": "Thu, 16 Jul 2026 05:01:00 -0400"
+    },
+    {
+      "title": "DHS pledged body cams for all immigration agents. Months later, that hasn't happened",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5894825/body-cams-ice-shootings",
+      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Bike lanes and speed cameras disappear from the DOT's list of proven safety measures",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5893672/dot-bike-lanes-speed-cameras-safety-measures",
+      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
+    },
+    {
+      "title": "TrumpRx promised a supermarket for cheaper drugs but delivered a boutique",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5894947/trump-rx-medicine-drugs-health-care-pfizer-low-prices-gilead",
+      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
+    },
+    {
+      "title": "No Asian team managed to go far this World Cup (again). What's holding them back?",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5884732/world-cup-asian-football-confederation-korea-japan",
+      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
+    }
+  ]
+}

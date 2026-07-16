@@ -22,6 +22,10 @@ cameronlampley.com {
 		reverse_proxy 127.0.0.1:4773
 	}
 
+	handle_path /living-captain-api/* {
+		reverse_proxy 127.0.0.1:4774
+	}
+
 	handle {
 		root * /home/cgl/dev/monad/web
 		file_server
