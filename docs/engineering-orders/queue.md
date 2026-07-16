@@ -33,18 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-04 — Design Mission Coordinator lifecycle
-
-- Status: claimed:codex@2026-07-16T17:49:00Z
-- Source: missing-glue architecture review
-- Depends on: GLUE-01, GLUE-02, GLUE-03
-- Objective: specify create, inspect, execute, pause/cancel, resume, timeout,
-  human-review, and completion behavior for a lightweight coordinator.
-- Constraint: orchestration never grants authority or applies FleetCore commands
-  on its own.
-- Done evidence: state machine, sequence diagram for one Kraken inquiry, failure
-  recovery rules, and a bounded implementation packet.
-
 ## GLUE-05 — Generalize the human-review inbox
 
 - Status: queued
