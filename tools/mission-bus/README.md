@@ -5,6 +5,8 @@ Append-only, read-only-to-FleetCore inquiry pilot.
 ```sh
 python3 tools/mission-bus/mission_bus.py create
 python3 tools/mission-bus/mission_bus.py execute
+python3 tools/mission-bus/mission_bus.py pause --reason "Operator hold"
+python3 tools/mission-bus/mission_bus.py resume --reason "Continue inquiry"
 python3 tools/mission-bus/mission_bus.py review accept \
   --reviewer lieutenant.cgl --authority human-command --reason "..."
 python3 tools/mission-bus/mission_bus.py project

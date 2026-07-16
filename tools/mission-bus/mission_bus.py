@@ -47,11 +47,21 @@ def execute(r,url):
   r.append('artifact_recorded',a,f'missionevent.kraken.hypothesis-{i}')
  verdict={'schema_version':'monad.artifact.v0.1','artifact_id':'artifact.cognition.kraken.verdict-01','mission_id':MID,'correlation_id':CID,'component':'stub-cognition','artifact_type':'recommendation-candidate','status':'review-required','created_at':now(),'input_refs':[ev['evidence_id']],'evidence_refs':[ev['evidence_id']],'requires_review':True,'review_authority':'human-command','supersedes_artifact_id':None,'data':{'mode':'stub','recommendation':'Continue passive observation, maintain separation, and escalate only on new verified evidence.','unknowns':['identity','intent'],'fleetcore_mutation':False}}
  r.append('artifact_recorded',verdict,'missionevent.kraken.verdict'); r.append('status_changed',envelope('review-required'),'missionevent.kraken.review-required')
-def review(r,action,reviewer,authority,reason,decision_id):
+def transition(r,status,reason):
+ current=r.status(); allowed={('created','paused'),('running','paused'),('blocked','running'),('paused','running')}
+ if not (status=='cancelled' and current not in TERMINAL) and (current,status) not in allowed: raise Error(f'cannot transition {current} to {status}')
+ payload=envelope(status); payload['data']={'reason':reason}; r.append('status_changed',payload,stable('missionevent.transition',{'from':current,'to':status,'reason':reason}))
+def review(r,action,reviewer,authority,reason,decision_id,amended=None,revision=1):
  if r.status()!='review-required': raise Error('mission is not review-required')
  if authority!='human-command': raise Error('human-command authority required')
- if action not in {'accept','reject'}: raise Error('action must be accept or reject')
- a={'schema_version':'monad.artifact.v0.1','artifact_id':'artifact.review.kraken.decision-01','mission_id':MID,'correlation_id':CID,'component':'human-review','artifact_type':'review-decision','status':'accepted' if action=='accept' else 'rejected','created_at':now(),'input_refs':['artifact.cognition.kraken.verdict-01'],'evidence_refs':['evidence.fleetcore.kraken-watch'],'requires_review':False,'review_authority':'human-command','supersedes_artifact_id':None,'data':{'decision_id':decision_id,'action':action,'decided_by':{'id':reviewer,'authority':authority},'reason':reason,'fleetcore_mutation':False}}
+ if action not in {'accept','reject','edit'}: raise Error('action must be accept, reject, or edit')
+ verdicts=[x['payload'] for x in r.events() if x['event_type']=='artifact_recorded' and x['payload'].get('artifact_type')=='recommendation-candidate']; current_revision=len(verdicts)
+ if revision!=current_revision: raise Error(f'stale review revision {revision}; current is {current_revision}')
+ if action=='edit':
+  if not amended: raise Error('edit requires amended recommendation')
+  prior=verdicts[-1]; updated=json.loads(json.dumps(prior)); updated['artifact_id']=f'artifact.cognition.kraken.verdict-{current_revision+1:02d}'; updated['supersedes_artifact_id']=prior['artifact_id']; updated['created_at']=now(); updated['data']['recommendation']=amended; updated['data']['revision']=current_revision+1
+  r.append('artifact_recorded',updated,'missionevent.'+decision_id+'.edit'); return
+ a={'schema_version':'monad.artifact.v0.1','artifact_id':'artifact.review.kraken.decision-01','mission_id':MID,'correlation_id':CID,'component':'human-review','artifact_type':'review-decision','status':'accepted' if action=='accept' else 'rejected','created_at':now(),'input_refs':[verdicts[-1]['artifact_id']],'evidence_refs':['evidence.fleetcore.kraken-watch'],'requires_review':False,'review_authority':'human-command','supersedes_artifact_id':None,'data':{'decision_id':decision_id,'action':action,'review_revision':revision,'decided_by':{'id':reviewer,'authority':authority},'reason':reason,'fleetcore_mutation':False}}
  r.append('artifact_recorded',a,'missionevent.'+decision_id); r.append('status_changed',envelope('completed' if action=='accept' else 'rejected'),'missionevent.kraken.'+('completed' if action=='accept' else 'rejected'))
 def project(r,path=OUT):
  ev=r.events(); arts=[x['payload'] for x in ev if x['event_type']=='artifact_recorded']; evidence=[x['payload'] for x in ev if x['event_type']=='evidence_cited']; decision=next((a for a in reversed(arts) if a['artifact_type']=='review-decision'),None)
@@ -60,12 +70,17 @@ def project(r,path=OUT):
 def main():
  p=argparse.ArgumentParser(); p.add_argument('--db',type=Path,default=DEFAULT_DB); p.add_argument('--fleetcore-url',default='http://127.0.0.1:4771'); sub=p.add_subparsers(dest='cmd',required=True)
  for x in ('create','execute','inspect','project'): sub.add_parser(x)
- q=sub.add_parser('review'); q.add_argument('action',choices=['accept','reject']); q.add_argument('--reviewer',required=True); q.add_argument('--authority',required=True); q.add_argument('--reason',required=True); q.add_argument('--decision-id',default='decision.kraken.001')
+ for x in ('pause','cancel','resume'):
+  z=sub.add_parser(x); z.add_argument('--reason',required=True)
+ q=sub.add_parser('review'); q.add_argument('action',choices=['accept','reject','edit']); q.add_argument('--reviewer',required=True); q.add_argument('--authority',required=True); q.add_argument('--reason',required=True); q.add_argument('--decision-id',default='decision.kraken.001'); q.add_argument('--amended'); q.add_argument('--revision',type=int,default=1)
  a=p.parse_args(); r=Record(a.db)
  try:
   if a.cmd=='create': create(r)
   elif a.cmd=='execute': execute(r,a.fleetcore_url)
-  elif a.cmd=='review': review(r,a.action,a.reviewer,a.authority,a.reason,a.decision_id)
+  elif a.cmd=='review': review(r,a.action,a.reviewer,a.authority,a.reason,a.decision_id,a.amended,a.revision)
+  elif a.cmd=='pause': transition(r,'paused',a.reason)
+  elif a.cmd=='cancel': transition(r,'cancelled',a.reason)
+  elif a.cmd=='resume': transition(r,'running',a.reason)
   if a.cmd=='project': result=project(r)
   else: result={'status':r.status(),'events':r.events()}
  except Error as e: p.error(str(e))
