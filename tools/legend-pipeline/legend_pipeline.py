@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Assemble evidence and validate provider-produced fleet legends."""
+"""Assemble evidence, generate, and validate provider-produced fleet legends."""
 
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
+import urllib.error
+import urllib.request
 from pathlib import Path
 from typing import Any
 
 
 COMPLETE_PHASE = "MISSION_COMPLETE"
 REQUIRED_CANDIDATE_FIELDS = {"title", "mythology", "classification", "source_ids"}
+GEMINI_MODEL = "gemini-3.5-flash"
+GEMINI_MAX_ATTEMPTS = 3
 
 
 class PipelineError(ValueError):
@@ -103,6 +108,100 @@ def generation_request(bundle: dict[str, Any], fact: dict[str, Any]) -> dict[str
     }
 
 
+def extract_json_object(text: str) -> dict[str, Any]:
+    """Finds the first balanced {...} object in text and parses only that,
+    ignoring anything before or after it. Gemini's responseMimeType:
+    'application/json' mostly produces clean output, but live testing
+    (Cognition Graph, 2026-07-16) showed it can still occasionally emit
+    trailing non-whitespace content after a complete, valid object --
+    bracket counting (respecting string literals/escapes so a brace inside
+    a quoted string doesn't miscount) is robust to that without guessing at
+    whatever the trailing content was.
+    """
+    start = text.find("{")
+    if start == -1:
+        raise PipelineError("no JSON object found in model output")
+    depth = 0
+    in_string = False
+    escaped = False
+    for index in range(start, len(text)):
+        char = text[index]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return json.loads(text[start : index + 1])
+    raise PipelineError("unbalanced JSON object in model output")
+
+
+def call_gemini(system_prompt: str, user_prompt: str, api_key: str) -> dict[str, Any]:
+    """Calls Gemini directly (server-side CLI, so no CORS concern the way a
+    browser call would have). Same three real failure modes discovered
+    live wiring Gemini into the Cognition Graph, handled the same way here:
+    gemini-3.5-flash always spends hidden "thinking" tokens before visible
+    output (thinkingBudget caps but cannot disable this for 3.x models),
+    multi-part responses must be concatenated with no separator, and
+    sampling non-determinism means the same prompt can occasionally
+    produce malformed output on one attempt and clean output on the next
+    -- retried rather than assumed away.
+    """
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent?key={api_key}"
+    body = json.dumps(
+        {
+            "systemInstruction": {"parts": [{"text": system_prompt}]},
+            "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
+            "generationConfig": {
+                "thinkingConfig": {"thinkingBudget": 512},
+                "maxOutputTokens": 2048,
+                "responseMimeType": "application/json",
+            },
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"}, method="POST")
+    last_error: Exception | None = None
+    for _ in range(GEMINI_MAX_ATTEMPTS):
+        try:
+            with urllib.request.urlopen(request, timeout=30) as response:
+                data = json.loads(response.read())
+            candidate = data.get("candidates", [{}])[0]
+            if candidate.get("finishReason") == "MAX_TOKENS":
+                raise PipelineError("Gemini response truncated (hit maxOutputTokens before finishing)")
+            parts = candidate.get("content", {}).get("parts", [])
+            text = "".join(part.get("text", "") for part in parts)
+            return extract_json_object(text)
+        except (urllib.error.URLError, PipelineError, json.JSONDecodeError) as error:
+            last_error = error
+    raise PipelineError(f"Gemini call failed after {GEMINI_MAX_ATTEMPTS} attempts: {last_error}")
+
+
+def generate(bundle: dict[str, Any], fact: dict[str, Any], gen_request: dict[str, Any], api_key: str) -> dict[str, Any]:
+    system_prompt = (
+        "You are a fleet legend writer for Monad. "
+        + gen_request["task"]
+        + " Respond ONLY with JSON, no markdown, matching this schema: "
+        + json.dumps(gen_request["output_schema"])
+    )
+    user_prompt = (
+        "Verified record:\n"
+        + json.dumps(gen_request["verified_record"], indent=2)
+        + "\n\nRules:\n"
+        + "\n".join(f"- {rule}" for rule in gen_request["rules"])
+    )
+    candidate = call_gemini(system_prompt, user_prompt, api_key)
+    return validate_candidate(bundle, fact, candidate)
+
+
 def validate_candidate(bundle: dict[str, Any], fact: dict[str, Any], candidate: dict[str, Any]) -> dict[str, Any]:
     errors: list[str] = []
     missing = REQUIRED_CANDIDATE_FIELDS - candidate.keys()
@@ -149,11 +248,18 @@ def main() -> int:
     validate_parser = subparsers.add_parser("validate")
     validate_parser.add_argument("mission", type=Path)
     validate_parser.add_argument("candidate", type=Path)
+    generate_parser = subparsers.add_parser("generate", help="prepare, call Gemini, and validate in one step")
+    generate_parser.add_argument("mission", type=Path)
     args = parser.parse_args()
     try:
         result = prepare(args.mission)
         if args.command == "validate":
             result = validate_candidate(result["evidence_bundle"], result["fact"], load_json(args.candidate))
+        elif args.command == "generate":
+            api_key = os.environ.get("GEMINI_API_KEY")
+            if not api_key:
+                parser.error("generate requires the GEMINI_API_KEY environment variable")
+            result = generate(result["evidence_bundle"], result["fact"], result["generation_request"], api_key)
     except PipelineError as error:
         parser.error(str(error))
     print(json.dumps(result, indent=2, sort_keys=True))
