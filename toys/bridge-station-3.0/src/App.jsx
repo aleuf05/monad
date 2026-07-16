@@ -491,6 +491,7 @@ export default function BridgeStation() {
 
   return (
     <div style={styles.root}>
+      <a href="../../index.html" className="bs-mono monad-home-link">⚓ Fleet Monad</a>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
         * { box-sizing: border-box; }
@@ -524,6 +525,13 @@ export default function BridgeStation() {
         }
         .station-tab-btn:hover { color: #DCE6F2; }
         .station-tab-btn.is-active { color: #E8A33D; border-bottom-color: #E8A33D; }
+        .monad-home-link {
+          position: fixed; top: 10px; left: 10px; z-index: 9999; font-size: 11px;
+          letter-spacing: 0.05em; color: #9BB0C8; background: rgba(11,18,32,0.85);
+          border: 1px solid rgba(79,209,197,0.35); border-radius: 4px; padding: 5px 10px;
+          text-decoration: none; transition: color 150ms ease, border-color 150ms ease;
+        }
+        .monad-home-link:hover { color: #4FD1C5; border-color: #4FD1C5; }
       `}</style>
 
       {/* Top status bar */}
