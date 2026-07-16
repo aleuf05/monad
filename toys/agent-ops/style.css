@@ -43,6 +43,12 @@ dd { margin:.2rem 0 0; line-height:1.4; font-size:.86rem; overflow-wrap:anywhere
 .captain-card footer span { color:var(--muted); font-size:.7rem; }
 .captain-card footer button { font-size:.76rem; padding:.45rem .6rem; }
 .history-panel { padding:1rem; }
+.artifact-registry { border:1px solid var(--signal); background:rgba(13,21,24,.9); padding:1rem 1.25rem; }
+.artifact-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.7rem; }
+.artifact-card { border:1px solid var(--line); padding:.8rem; background:rgba(138,215,193,.04); min-width:0; }
+.artifact-card header { display:flex; justify-content:space-between; gap:.6rem; align-items:start; }
+.artifact-card p { color:var(--amber); font-size:.76rem; margin:.55rem 0; }
+.artifact-card small { display:block; color:var(--muted); overflow-wrap:anywhere; margin-top:.3rem; }
 .mission-inquiry { border:1px solid var(--amber); background:linear-gradient(135deg,rgba(216,180,106,.1),rgba(13,21,24,.94)); padding:1rem 1.25rem; box-shadow:0 0 24px rgba(216,180,106,.08); }
 .mission-inquiry .new-badge { margin-left:0; margin-right:.4rem; }
 .no-mutation { color:var(--signal); font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; }

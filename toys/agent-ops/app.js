@@ -15,6 +15,8 @@ const inquiryStatus = document.querySelector("#inquiryStatus");
 const inquiryEvidence = document.querySelector("#inquiryEvidence");
 const inquiryFindings = document.querySelector("#inquiryFindings");
 const inquiryDecision = document.querySelector("#inquiryDecision");
+const artifactGrid = document.querySelector("#artifactGrid");
+const registryFreshness = document.querySelector("#registryFreshness");
 
 const state = { socket: null, authority: false, snapshot: null, reconnectTimer: null };
 
@@ -228,6 +230,27 @@ async function refreshInquiry() {
 }
 refreshInquiry();
 setInterval(refreshInquiry, 10000);
+
+async function refreshRegistry() {
+  try {
+    const response = await fetch("../../data/mission-artifacts.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const data = await response.json();
+    const artifacts = data.artifacts || [];
+    registryFreshness.textContent = `${artifacts.length} current artifacts · Mission Record cursor ${data.source_record_cursor}`;
+    artifactGrid.innerHTML = artifacts.map((item) => `<article class="artifact-card">
+      <header><strong>${escapeHtml(item.title)}</strong><span class="runtime-status">${escapeHtml(title(item.status))}</span></header>
+      <p>${escapeHtml(title(item.artifact_type))} · ${escapeHtml(title(item.classification))}</p>
+      <small>${escapeHtml(item.artifact_id)}</small>
+      <small>Provenance: ${escapeHtml(item.locator?.value || "unavailable")}</small>
+    </article>`).join("") || "No public Mission Record artifacts.";
+  } catch (error) {
+    registryFreshness.textContent = "Registry unavailable";
+    artifactGrid.textContent = `Artifact projection unavailable (${error.message}).`;
+  }
+}
+refreshRegistry();
+setInterval(refreshRegistry, 10000);
 
 fleetPauseButton.addEventListener("click", () => {
   send({ type: "set-agent-fleet-paused", paused: !state.snapshot.agent_fleet_paused });
