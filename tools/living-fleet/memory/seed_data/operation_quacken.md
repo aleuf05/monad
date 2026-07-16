@@ -1,7 +1,7 @@
 # Seed narrative: Operation QUACKEN
 
 Two explicitly separate registers for the same real event. `seed_import.py`
-generates the FACT text live from `web/missions/quacken-transit-002/
+generates the FACT text live from `web/archive/missions/quacken-transit-002/
 mission.json` at import time (so it can never silently drift from the real
 source); the MYTHOLOGY text below is hand-authored fleet culture that does
 not exist anywhere else in this repository and is never treated as

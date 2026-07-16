@@ -28,7 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 SEED_DATA = Path(__file__).with_name("seed_data")
 DEFAULT_DB = REPO_ROOT / "data" / "living-fleet" / "memory.db"
 DEFAULT_CAPTAINS = Path(__file__).resolve().parents[1] / "captains.json"
-QUACKEN_MISSION = REPO_ROOT / "web" / "missions" / "quacken-transit-002" / "mission.json"
+QUACKEN_MISSION = REPO_ROOT / "web" / "archive" / "missions" / "quacken-transit-002" / "mission.json"
 
 
 def _seed_id(*parts: str) -> str:
@@ -224,7 +224,7 @@ def _import_operation_quacken(conn, captains: list[dict]) -> int:
                 "who_json": ["vessel.monad", "contact.rubber-ducky"],
                 "what": fact_summary,
                 "outcome": fact["outcome"],
-                "evidence_json": [{"file": "web/missions/quacken-transit-002/mission.json"}],
+                "evidence_json": [{"file": "web/archive/missions/quacken-transit-002/mission.json"}],
                 "certainty": 1.0,
                 "interpretation": None,
                 "interpretation_history_json": [],

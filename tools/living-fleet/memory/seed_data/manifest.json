@@ -26,7 +26,7 @@
     },
     {
       "id": "operation-quacken",
-      "source": "operation_quacken.md + web/missions/quacken-transit-002/mission.json",
+      "source": "operation_quacken.md + web/archive/missions/quacken-transit-002/mission.json",
       "target_table": "episodic_memories + narrative_memories",
       "scope": "fleet + per-captain",
       "description": "FACT parsed live from the real mission record; MYTHOLOGY hand-authored, kept explicitly separate."

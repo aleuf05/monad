@@ -1,0 +1,170 @@
+{
+  "mission_id": "quacken-transit-002",
+  "phase": "MISSION_COMPLETE",
+  "phase_entered_at": 1783970870.9539974,
+  "stalled_from_phase": null,
+  "processed_vessel_event_count": 75783,
+  "rendezvous_dwell_started_at": null,
+  "evidence": [
+    {
+      "kind": "command",
+      "detail": "spawned QUACKEN at {'lat': 24.8, 'lng': 58.6}",
+      "phase": "MISSION_INITIALIZED",
+      "at": 1783953930.0472531,
+      "tick": 17467,
+      "sim_time": "2026-07-11T00:51:07Z"
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "MISSION_INITIALIZED -> TRANSIT_UNDERWAY: mission start (operator action)",
+      "phase": "MISSION_INITIALIZED",
+      "at": 1783953930.1191137,
+      "tick": 17467,
+      "sim_time": "2026-07-11T00:51:07Z"
+    },
+    {
+      "kind": "capture_requested",
+      "detail": "mission_start: quacken-transit-002: mission start, QUACKEN on station at {'lat': 24.8, 'lng': 58.6}.",
+      "phase": "TRANSIT_UNDERWAY",
+      "at": 1783953930.119142
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "TRANSIT_UNDERWAY -> STRAIT_TRANSIT: waypoint_reached (leg 7 remaining)",
+      "phase": "TRANSIT_UNDERWAY",
+      "at": 1783957256.973851,
+      "tick": 20794,
+      "sim_time": "2026-07-11T01:46:34Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 7 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783957256.9738693,
+      "tick": 20794,
+      "sim_time": "2026-07-11T01:46:34Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 6 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783958236.7799027,
+      "tick": 21774,
+      "sim_time": "2026-07-11T02:02:54Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 5 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783959690.7308655,
+      "tick": 23228,
+      "sim_time": "2026-07-11T02:27:08Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 4 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783962344.7815657,
+      "tick": 25882,
+      "sim_time": "2026-07-11T03:11:22Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 3 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783965267.0154457,
+      "tick": 28804,
+      "sim_time": "2026-07-11T04:00:04Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 2 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783967852.9739096,
+      "tick": 31390,
+      "sim_time": "2026-07-11T04:43:10Z"
+    },
+    {
+      "kind": "progress",
+      "detail": "waypoint_reached (leg 1 remaining)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783970619.820337,
+      "tick": 34397,
+      "sim_time": "2026-07-11T05:33:17Z"
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "STRAIT_TRANSIT -> APPROACH_QUACKEN: route_completed (final transit waypoint reached)",
+      "phase": "STRAIT_TRANSIT",
+      "at": 1783970839.9280577,
+      "tick": 39897,
+      "sim_time": "2026-07-11T07:04:57Z"
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "APPROACH_QUACKEN -> RENDEZVOUS_HOLD: RendezvousReached (Director-derived: 300m <= 500m radius)",
+      "phase": "APPROACH_QUACKEN",
+      "at": 1783970839.9281173,
+      "tick": 39897,
+      "sim_time": "2026-07-11T07:04:57Z"
+    },
+    {
+      "kind": "capture_requested",
+      "detail": "rendezvous_reached: MONAD entered rendezvous radius with QUACKEN at tick 39897.",
+      "phase": "RENDEZVOUS_HOLD",
+      "at": 1783970839.928127
+    },
+    {
+      "kind": "phase_transition",
+      "detail": "RENDEZVOUS_HOLD -> MISSION_COMPLETE: hold criteria satisfied (31s continuous dwell inside radius)",
+      "phase": "RENDEZVOUS_HOLD",
+      "at": 1783970870.9539933,
+      "tick": 40288,
+      "sim_time": "2026-07-11T07:11:28Z"
+    },
+    {
+      "kind": "capture_requested",
+      "detail": "mission_complete: quacken-transit-002: rendezvous hold complete, mission success.",
+      "phase": "MISSION_COMPLETE",
+      "at": 1783970870.9540079
+    }
+  ],
+  "captures": [
+    {
+      "id": 1,
+      "event": "mission_start",
+      "recommended_view": "fleetcore-live",
+      "caption": "quacken-transit-002: mission start, QUACKEN on station at {'lat': 24.8, 'lng': 58.6}.",
+      "requested_at": 1783953930.1191382,
+      "phase": "TRANSIT_UNDERWAY",
+      "attachment": null
+    },
+    {
+      "id": 2,
+      "event": "rendezvous_reached",
+      "recommended_view": "fleetcore-live",
+      "caption": "MONAD entered rendezvous radius with QUACKEN at tick 39897.",
+      "requested_at": 1783970839.9281237,
+      "phase": "RENDEZVOUS_HOLD",
+      "attachment": null
+    },
+    {
+      "id": 3,
+      "event": "mission_complete",
+      "recommended_view": "bridge-station-3.0",
+      "caption": "quacken-transit-002: rendezvous hold complete, mission success.",
+      "requested_at": 1783970870.9540024,
+      "phase": "MISSION_COMPLETE",
+      "attachment": null
+    }
+  ],
+  "next_capture_id": 4,
+  "outcome": "success",
+  "created_at": 1783953929.9224713,
+  "updated_at": 1783970871.3625183,
+  "last_vessel_position": {
+    "lat": 24.799999970649,
+    "lng": 58.597027944754
+  },
+  "last_progress_at": 1783970870.9539976
+}

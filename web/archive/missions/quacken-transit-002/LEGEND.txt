@@ -1,0 +1,45 @@
+THE LEGEND OF OPERATION QUACKEN
+Archived 2026-07-16
+
+CLASSIFICATION
+Fleet lore. This telling is not simulation truth and does not replace the
+mission record beside it.
+
+VERIFIED RECORD
+MONAD transited the strait and reached contact QUACKEN. At tick 39,897 the
+vessel entered the 500-meter rendezvous radius. MONAD then maintained a
+continuous 31-second dwell inside that radius. At tick 40,288 the mission
+entered MISSION_COMPLETE with outcome success.
+
+FLEET LEGEND
+Ask any hand aboard MONAD and they will tell it differently.
+
+They say the watch sighted a shadow broad enough to darken the strait and
+heard, through steel and weather, a challenge like forty-two thousand ducks
+calling battle stations at once. The creature was QUACKEN: the great
+mega-anatid of the narrow sea, breaker of formations, thief of unattended
+breadcrumbs, and sworn enemy of tidy navigation plots.
+
+MONAD did not chase it. She held her course.
+
+The scouts wove their screen, the bridge kept the watch, and the vessel closed
+the distance without mistaking noise for danger or legend for fact. When the
+great bird tried every turn in its ancient book, MONAD answered with the most
+terrible maneuver known to monsters and junior officers alike: she arrived on
+station and remained there.
+
+For thirty-one unbroken seconds the fleet held fast. On the thirty-second,
+QUACKEN yielded the strait, the watch declared the beast brought to heel, and
+somewhere below decks a celebration began before permission could catch it.
+
+That is how the fleet captured a forty-two-quackton monster.
+
+That is also how MONAD completed a contact rendezvous and dwell hold.
+
+Both accounts are carried aboard. Only the second steers the ship.
+
+PROVENANCE
+- Authoritative record: mission.json in this directory
+- Human-readable evidence: log.md in this directory
+- Lore seed: tools/living-fleet/memory/seed_data/operation_quacken.md
+- Operational outcome: success

@@ -78,15 +78,13 @@
     </div>
 
     <div class="section" style="padding-top: 20px;">
-      <div class="mission-widget mw-active" id="mission-widget">
+      <div class="mission-widget mw-ok">
         <div class="mw-left">
-          <span class="mw-new">NEW</span>
-          <span class="mw-label">ACTIVE MISSION</span>
-          <span class="mw-id mono">quacken-transit-002</span>
-          <span class="mw-phase mono" id="mw-phase">loading&hellip;</span>
-          <span class="mw-since mono" id="mw-since"></span>
+          <span class="mw-label">MISSION ARCHIVE</span>
+          <span class="mw-id mono">QUACKEN · 2 completed runs</span>
+          <span class="mw-phase mono">RETIRED FROM ACTIVE WATCH</span>
         </div>
-        <a class="mw-link" href="missions/quacken-transit-002/">full report &rarr;</a>
+        <a class="mw-link" href="archive/missions/quacken-transit-002/">archived report &rarr;</a>
       </div>
       <div class="mission-widget mw-active" style="margin-top: 8px;">
         <div class="mw-left">
@@ -306,50 +304,5 @@
       </div>
     </footer>
   </div>
-  <script>
-  (function () {
-    var MISSION_ID = "quacken-transit-002";
-    var wrap = document.getElementById("mission-widget");
-    var phaseEl = document.getElementById("mw-phase");
-    var sinceEl = document.getElementById("mw-since");
-
-    var PHASE_CLASS = {
-      MISSION_COMPLETE: "mw-ok",
-      MISSION_STALLED: "mw-warn",
-      MISSION_ABORTED: "mw-warn",
-      MISSION_FAILED: "mw-fail",
-    };
-
-    function fmtDuration(seconds) {
-      if (seconds < 60) return Math.floor(seconds) + "s";
-      if (seconds < 3600) return Math.floor(seconds / 60) + "m";
-      return (seconds / 3600).toFixed(1) + "h";
-    }
-
-    function refresh() {
-      fetch("missions/" + MISSION_ID + "/mission.json", { cache: "no-store" })
-        .then(function (r) {
-          if (!r.ok) throw new Error("status " + r.status);
-          return r.json();
-        })
-        .then(function (d) {
-          phaseEl.textContent = d.phase;
-          wrap.className = "mission-widget " + (PHASE_CLASS[d.phase] || "mw-active");
-          // mission.json only regenerates on a phase transition (or manual
-          // `publish`), not continuously -- so this is "time in this phase
-          // as of the last published transition", not a live heartbeat.
-          sinceEl.textContent = "in phase " + fmtDuration(Date.now() / 1000 - d.phase_entered_at) + " (as of last publish)";
-        })
-        .catch(function () {
-          phaseEl.textContent = "unavailable";
-          wrap.className = "mission-widget mw-warn";
-          sinceEl.textContent = "";
-        });
-    }
-
-    refresh();
-    setInterval(refresh, 15000);
-  })();
-  </script>
 </body>
 </html>

@@ -9,7 +9,7 @@ Prepare a request from a real mission:
 
 ```sh
 python3 tools/legend-pipeline/legend_pipeline.py prepare \
-  web/missions/quacken-transit-002/mission.json
+  web/archive/missions/quacken-transit-002/mission.json
 ```
 
 A model/provider must return JSON with `title`, `mythology`, `classification`
@@ -17,7 +17,7 @@ A model/provider must return JSON with `title`, `mythology`, `classification`
 
 ```sh
 python3 tools/legend-pipeline/legend_pipeline.py validate \
-  web/missions/quacken-transit-002/mission.json candidate.json
+  web/archive/missions/quacken-transit-002/mission.json candidate.json
 ```
 
 No provider is selected here on purpose. `prepare` is the stable adapter

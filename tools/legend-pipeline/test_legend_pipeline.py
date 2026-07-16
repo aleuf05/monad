@@ -11,7 +11,7 @@ legend_pipeline = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader
 SPEC.loader.exec_module(legend_pipeline)
 ROOT = Path(__file__).resolve().parents[2]
-MISSION = ROOT / "web/missions/quacken-transit-002/mission.json"
+MISSION = ROOT / "web/archive/missions/quacken-transit-002/mission.json"
 
 
 class LegendPipelineTests(unittest.TestCase):

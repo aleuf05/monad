@@ -189,7 +189,7 @@ not cite itself. Revisions create a new artifact whose
     "evidence_id": "evidence.mission.quacken-transit-002",
     "source_system": "mission-director",
     "source_id": "mission.quacken-transit-002",
-    "locator": {"kind": "file", "value": "web/missions/quacken-transit-002/mission.json"},
+    "locator": {"kind": "file", "value": "web/archive/missions/quacken-transit-002/mission.json"},
     "content_sha256": "1f6332e95c5b0b2eb957a3a8bf35691d616b23666e43d218faa6b4e1a78ce871",
     "observed_at": "2026-07-11T07:11:28Z",
     "recorded_at": "2026-07-16T17:23:01Z",
