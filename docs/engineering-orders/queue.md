@@ -33,18 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-03 — Inventory and map component adapters
-
-- Status: claimed:codex@2026-07-16T17:45:00Z
-- Source: missing-glue architecture review
-- Depends on: GLUE-01
-- Objective: map each existing component's real inputs/outputs onto the shared
-  contract and identify the thinnest adapter required for each.
-- Components: FleetCore, Cognition Graph, Living Fleet, Mission Director,
-  World Intake, Legend Pipeline, img2asset, Agent Ops, Bridge, and Radio.
-- Done evidence: report matrix naming endpoint/file, authority, adapter shape,
-  missing fields, and whether the component is producer, consumer, or projection.
-
 ## GLUE-04 — Design Mission Coordinator lifecycle
 
 - Status: queued
