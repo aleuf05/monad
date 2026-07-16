@@ -4,25 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## BRIDGE-RETIRE-01 — Retire stale web/bridge.html
-
-- Status: claimed:claude@2026-07-16T22:10:00Z
-- Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 1
-- Objective: `web/bridge.html` reads `web/bridge-state.json`, confirmed
-  stale (last written 2026-07-09, a week old as of this packet). Pre-dates
-  FleetCore's live WebSocket feed. Retire it; `toys/bridge/` ("Bridge
-  Station") and `toys/bridge-station-3.0/` already cover this need live.
-- Scope: remove `web/bridge.html`, `web/bridge-state.json`, and any script
-  that regenerates the latter (grep first — do not assume none exists).
-  Remove the "Bridge" footer link from `web/index.html` and
-  `web/command-deck.html`. Update `docs/deployment.md`'s own description
-  of `web/bridge.html` to reflect its removal, not leave it describing a
-  file that no longer exists.
-- Exclusions: do not touch `toys/bridge/` or `toys/bridge-station-3.0/`.
-- Done evidence: `https://cameronlampley.com/bridge.html` returns 404 (or
-  the link simply no longer exists on the live site, per policy); no
-  broken internal links remain; drift checker still clean.
-
 ## CMDDECK-SYNC-01 — Resync command-deck.html with index.html
 
 - Status: queued
@@ -31,10 +12,11 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   an identical mirror of `web/index.html` (distinct `<title>` only) so old
   bookmarked URLs keep working. It has drifted -- missing 3 links added to
   `index.html` since (`ops.html`, Cognition Graph, Living Captain).
-  Resync it. Also apply BRIDGE-RETIRE-01's link removal here too, if that
-  task lands first (check the queue/git log before starting).
-- Scope: `web/command-deck.html` only, plus the same `docs/deployment.md`
-  update BRIDGE-RETIRE-01 makes if these two tasks land out of order.
+  Resync it. BRIDGE-RETIRE-01 already landed (`web/bridge.html` retired,
+  Bridge links now point to `toys/bridge/`) — `command-deck.html`'s
+  footer link was updated as part of that commit, so no separate action
+  needed here for that part.
+- Scope: `web/command-deck.html` only.
 - Exclusions: no content changes to `web/index.html` itself.
 - Done evidence: diffing the two files' link sets shows zero difference
   (same check used to find this drift in the first place).
