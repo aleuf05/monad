@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-06 — Define artifact registry and projections
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T18:02:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01, GLUE-02
 - Objective: specify a registry that references existing mission reports,
