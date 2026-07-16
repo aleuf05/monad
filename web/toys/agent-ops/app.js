@@ -17,6 +17,8 @@ const inquiryFindings = document.querySelector("#inquiryFindings");
 const inquiryDecision = document.querySelector("#inquiryDecision");
 const artifactGrid = document.querySelector("#artifactGrid");
 const registryFreshness = document.querySelector("#registryFreshness");
+const reviewGrid = document.querySelector("#reviewGrid");
+const reviewSummary = document.querySelector("#reviewSummary");
 
 const state = { socket: null, authority: false, snapshot: null, reconnectTimer: null };
 
@@ -251,6 +253,27 @@ async function refreshRegistry() {
 }
 refreshRegistry();
 setInterval(refreshRegistry, 10000);
+
+async function refreshReviews() {
+  try {
+    const response = await fetch("../../data/mission-reviews.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const data = await response.json();
+    reviewSummary.textContent = `${data.pending_count} pending · Mission Record cursor ${data.source_record_cursor}`;
+    reviewGrid.innerHTML = (data.cards || []).map((card) => `<article class="artifact-card review-${escapeHtml(card.status)}">
+      <header><strong>${escapeHtml(title(card.artifact_type))}</strong><span class="runtime-status">${escapeHtml(title(card.status))}</span></header>
+      <p>${escapeHtml(card.summary)}</p>
+      <small>Requires: ${escapeHtml(title(card.required_authority))} · revision ${escapeHtml(card.revision)}</small>
+      <small>Accept does not mutate FleetCore.</small>
+      <small>${escapeHtml(card.artifact_id)}</small>
+    </article>`).join("") || "No review cards recorded.";
+  } catch (error) {
+    reviewSummary.textContent = "Review projection unavailable";
+    reviewGrid.textContent = `Review cards unavailable (${error.message}).`;
+  }
+}
+refreshReviews();
+setInterval(refreshReviews, 10000);
 
 fleetPauseButton.addEventListener("click", () => {
   send({ type: "set-agent-fleet-paused", paused: !state.snapshot.agent_fleet_paused });

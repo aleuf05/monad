@@ -11,6 +11,7 @@ python3 tools/mission-bus/mission_bus.py review accept \
   --reviewer lieutenant.cgl --authority human-command --reason "..."
 python3 tools/mission-bus/mission_bus.py project
 python3 tools/mission-bus/mission_bus.py registry
+python3 tools/mission-bus/mission_bus.py reviews
 ```
 
 The SQLite Mission Record is runtime state under `data/mission-record/`. The
@@ -19,3 +20,5 @@ The public, rebuildable artifact index is `web/data/mission-artifacts.json`.
 It is derived only from Mission Record events, uses record-event locators for
 JSON artifacts, excludes superseded revisions, and fails closed on unknown
 artifact types.
+The read-only review-card projection is `web/data/mission-reviews.json`. It
+joins candidates to immutable decision artifacts without rewriting either.

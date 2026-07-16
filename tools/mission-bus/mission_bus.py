@@ -14,7 +14,7 @@ import argparse, hashlib, json, sqlite3, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'
+ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'; REVIEW_OUT=ROOT/'web/data/mission-reviews.json'
 KRAKEN_MID='mission.kraken-inquiry-001'; KRAKEN_CID='run.kraken-inquiry-001'
 KRAKEN_OBJECTIVE='What does the verified evidence justify about contact K-1?'
 TERMINAL={'completed','rejected','cancelled','failed'}
@@ -120,12 +120,26 @@ def build_registry(r,path=REGISTRY_OUT):
  artifacts.sort(key=lambda item:item['artifact_id'])
  out={'schema_version':'monad.registry-index.v0.1','generated_at':events[-1]['recorded_at'] if events else None,'source_record_cursor':events[-1]['seq'] if events else 0,'artifacts':artifacts}
  path.parent.mkdir(parents=True,exist_ok=True); encoded=json.dumps(out,indent=2,sort_keys=True)+'\n'; tmp=path.with_suffix('.tmp'); tmp.write_text(encoded); tmp.replace(path); return out
+def build_reviews(r,path=REVIEW_OUT):
+ """Project review cards by joining immutable candidates and decisions."""
+ events=r.events(); artifacts=[event['payload'] for event in events if event['event_type']=='artifact_recorded']
+ decisions=[artifact for artifact in artifacts if artifact.get('artifact_type')=='review-decision']
+ decided={ref:decision for decision in decisions for ref in decision.get('input_refs',[])}
+ cards=[]
+ for artifact in artifacts:
+  if not artifact.get('requires_review'): continue
+  decision=decided.get(artifact['artifact_id']); action=decision.get('data',{}).get('action') if decision else None
+  summary=artifact.get('data',{}).get('recommendation') or artifact.get('data',{}).get('candidate',{}).get('mythology') or artifact['artifact_id']
+  cards.append({'schema_version':'monad.review.v0.1','review_id':'review.'+artifact['artifact_id'].removeprefix('artifact.'),'mission_id':artifact['mission_id'],'artifact_id':artifact['artifact_id'],'artifact_type':artifact['artifact_type'],'revision':artifact.get('data',{}).get('revision',1),'status':('accepted' if action=='accept' else 'rejected' if action=='reject' else 'pending'),'requested_action':'accept-'+artifact['artifact_type'],'required_authority':artifact.get('review_authority','human-command'),'evidence_refs':artifact.get('evidence_refs',[]),'conflicts':artifact.get('data',{}).get('conflicts',[]),'summary':summary,'proposed_data':artifact.get('data',{}),'created_at':artifact['created_at'],'supersedes_review_id':None,'decision_artifact_id':decision['artifact_id'] if decision else None,'fleetcore_mutation':False})
+ cards.sort(key=lambda card:card['review_id'])
+ out={'schema_version':'monad.review-index.v0.1','generated_at':events[-1]['recorded_at'] if events else None,'source_record_cursor':events[-1]['seq'] if events else 0,'pending_count':sum(card['status']=='pending' for card in cards),'cards':cards}
+ path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp'); tmp.write_text(json.dumps(out,indent=2,sort_keys=True)+'\n'); tmp.replace(path); return out
 def main():
  p=argparse.ArgumentParser(); p.add_argument('--db',type=Path,default=DEFAULT_DB)
  p.add_argument('--fleetcore-url',default='http://127.0.0.1:4771')
  p.add_argument('--mission-id',default=KRAKEN_MID); p.add_argument('--correlation-id',default=KRAKEN_CID); p.add_argument('--objective',default=KRAKEN_OBJECTIVE)
  sub=p.add_subparsers(dest='cmd',required=True)
- for x in ('create','execute','inspect','project','registry'): sub.add_parser(x)
+ for x in ('create','execute','inspect','project','registry','reviews'): sub.add_parser(x)
  for x in ('pause','cancel','resume'):
   z=sub.add_parser(x); z.add_argument('--reason',required=True)
  q=sub.add_parser('review'); q.add_argument('action',choices=['accept','reject','edit']); q.add_argument('--reviewer',required=True); q.add_argument('--authority',required=True); q.add_argument('--reason',required=True); q.add_argument('--decision-id',default='decision.kraken.001'); q.add_argument('--amended'); q.add_argument('--revision',type=int,default=1)
@@ -139,6 +153,7 @@ def main():
   elif a.cmd=='resume': transition(r,'running',a.reason,a.objective)
   if a.cmd=='project': result=project(r,OUT,a.objective)
   elif a.cmd=='registry': result=build_registry(r,REGISTRY_OUT)
+  elif a.cmd=='reviews': result=build_reviews(r,REVIEW_OUT)
   else: result={'status':r.status(),'events':r.events()}
  except Error as e: p.error(str(e))
  print(json.dumps(result,indent=2,default=str)); return 0

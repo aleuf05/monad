@@ -59,4 +59,15 @@ class T(unittest.TestCase):
   ids={item['artifact_id'] for item in first['artifacts']}
   self.assertNotIn(f'artifact.cognition.{self.r.mission_id}.verdict-01',ids)
   self.assertIn(f'artifact.cognition.{self.r.mission_id}.verdict-02',ids)
+ def test_review_projection_joins_decision_without_rewriting_candidate(self):
+  old=m.snapshot; m.snapshot=lambda u:{'tick':42,'watch_events':[]}
+  try: m.execute(self.r,'x')
+  finally: m.snapshot=old
+  pending=m.build_reviews(self.r,Path(self.d.name)/'reviews.json')
+  self.assertEqual(pending['pending_count'],1); self.assertEqual(pending['cards'][0]['status'],'pending')
+  m.review(self.r,'accept','lieutenant.cgl','human-command','proportionate','review-projection')
+  decided=m.build_reviews(self.r,Path(self.d.name)/'reviews.json')
+  self.assertEqual(decided['pending_count'],0); self.assertEqual(decided['cards'][0]['status'],'accepted')
+  verdict=next(x['payload'] for x in self.r.events() if x['event_type']=='artifact_recorded' and x['payload']['artifact_type']=='recommendation-candidate')
+  self.assertEqual(verdict['status'],'review-required')
 if __name__=='__main__': unittest.main()
