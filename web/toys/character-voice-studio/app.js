@@ -4,6 +4,44 @@ let handle = null;
 let availableVoices = [];
 let voiceAssignments = {};
 const voiceOverrides = new Map();
+let richConfigured = false;
+let lastRichEstimate = null;
+
+function richPayload() {
+  const character = selectedCharacter();
+  const tension = Number($("tension").value);
+  const warmth = Number($("warmth").value);
+  const energy = Number($("energy").value);
+  const restraint = Number($("restraint").value);
+  return {
+    character_id: character.id,
+    transcript: $("text").value.trim(),
+    performance: {
+      intent: $("intent").value,
+      audience: "the listener",
+      setting: "a close, dry studio recording",
+      affect: `tension ${tension}/100, warmth ${warmth}/100, energy ${energy}/100`,
+      pace: energy > 70 ? "brisk but intelligible" : energy < 35 ? "slow and reflective" : "measured",
+      restraint: `${restraint}/100; remain natural and resist caricature`
+    }
+  };
+}
+
+async function richRequest(path, payload) {
+  const response = await fetch(`/voice-api/${path}`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || `Rich voice ${response.status}`);
+  return result;
+}
+
+fetch("/voice-api/status").then((response) => response.json()).then((status) => {
+  richConfigured = status.configured;
+  $("richStatus").textContent = status.configured
+    ? `Rich voice ready · Gemini · $${status.budget.usd_used.toFixed(4)} / $${status.budget.usd_limit.toFixed(2)} today`
+    : "Rich voice service online · Gemini key not commissioned · free rehearsal remains available";
+}).catch(() => { $("richStatus").textContent = "Rich voice service not commissioned · free rehearsal remains available"; });
 
 function selectedCharacter() { return MonadCharacters.get($("character").value); }
 function showCharacter() {
@@ -65,4 +103,29 @@ $("speak").addEventListener("click", async () => {
 $("reset").addEventListener("click", () => {
   MonadPerformance.reset(selectedCharacter().id);
   $("inspection").textContent = "Continuity reset for selected character.";
+});
+
+$("estimateRich").addEventListener("click", async () => {
+  $("generateRich").disabled = true;
+  $("richStatus").textContent = "Estimating locally — no Gemini call…";
+  try {
+    lastRichEstimate = await richRequest("estimate", richPayload());
+    $("richStatus").textContent = lastRichEstimate.cache_hit
+      ? "Cached rich take ready · generation cost $0"
+      : `New rich take · up to ${lastRichEstimate.seconds.toFixed(1)} sec · estimated $${lastRichEstimate.max_usd.toFixed(4)} · generation requires one explicit click`;
+    $("generateRich").disabled = !(lastRichEstimate.cache_hit || richConfigured);
+  } catch (error) { $("richStatus").textContent = error.message; }
+});
+
+$("generateRich").addEventListener("click", async () => {
+  $("generateRich").disabled = true;
+  $("richStatus").textContent = lastRichEstimate?.cache_hit ? "Loading cached take…" : "Generating one Gemini rich take…";
+  try {
+    const artifact = await richRequest("render", richPayload());
+    const audio = $("richAudio");
+    audio.src = artifact.audio_url;
+    audio.hidden = false;
+    await audio.play();
+    $("richStatus").textContent = `${artifact.cache_hit ? "Cached" : "Generated"} rich take · ${artifact.seconds.toFixed(1)} sec · $${artifact.usd.toFixed(4)}`;
+  } catch (error) { $("richStatus").textContent = error.message; }
 });
