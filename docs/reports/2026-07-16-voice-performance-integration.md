@@ -16,6 +16,8 @@ Living Captain is the first experiment. A normal status is a measured operationa
 
 The Living Captain page now also provides the first authoring surface: an intent selector, tension/warmth/energy/restraint controls, an audible preview, and a Return to Context action. Manual targets pass through the same bounded planner and remain visibly attributable as operator-directed.
 
+The character boundary is now general. `MonadCharacters` owns runtime character projections and synthetic provenance; `MonadPerformance` consumes any character; `MonadVoice` renders the resulting delivery. Captain Monad is one registered test character alongside Alpha, Bravo and Charlie. Living Captain resolves that entry rather than defining Captain traits locally, while Character Voice Studio is the general authoring and comparison surface.
+
 ## Missing primitives after this experiment
 
 - A shared adapter from Living Fleet's real identity/context bundle into a performance direction. The demo currently supplies a conservative local captain baseline because Living Captain's intentionally minimal status API does not expose Fleet memory.

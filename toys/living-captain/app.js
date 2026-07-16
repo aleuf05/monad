@@ -55,6 +55,7 @@ function stopCaptainVoice() {
 }
 
 function speakCaptainStatus(data, prefix) {
+  const character = MonadCharacters.get("captain.monad");
   const actions = data.recent_actions || [];
   const latest = actions.length ? actions[actions.length - 1] : null;
   const contextualIntent = latest?.kind === "custody_rejection" || latest?.kind === "spend_exhausted" ? "urgent" : "operational";
@@ -62,13 +63,13 @@ function speakCaptainStatus(data, prefix) {
   const intent = selectedIntent === "auto" ? contextualIntent : selectedIntent;
   const pressure = intent === "urgent" ? 0.75 : Math.min(0.5, (data.spend?.observe_count || 0) / Math.max(1, data.spend?.observe_limit || 1));
   const performance = MonadPerformance.plan("captain.monad", {
-    character: { caution: 0.65, initiative: 0.45, humor: 0.2, trust: 0.55 },
+    character: character.traits,
     state: { pressure },
     intent,
     controls: operatorPerformanceControls(),
     context: { audience: "lieutenant", setting: "private-status", latest_action_kind: latest?.kind || null }
   });
-  MonadVoice.setProfile({ speaker: "captain.monad", provider_id: "browser-speechsynthesis", ...performance.voice });
+  MonadVoice.setProfile({ speaker: character.id, ...character.voice, ...performance.voice });
   el("performanceStatus").textContent = `${performance.label} · tension ${Math.round(performance.axes.tension * 100)} · energy ${Math.round(performance.axes.energy * 100)} · ${performance.reasons.join(" / ")}`;
   MonadVoice.speak("captain.monad", `${prefix}${buildStatusSentence(data)}`).then(({ handle, fallback_used }) => {
     captainVoiceHandle = handle;

@@ -1,0 +1,11 @@
+# General Character Voice Model 0.1
+
+1. **Originating intent** — The Lieutenant ruled that Captain should be a test case served by a general character model, not the special component around which voice performance is designed.
+2. **Verified starting state** — `MonadPerformance` was speaker-generic, but Living Captain hard-coded Captain traits and contained the only authoring console. No shared runtime character registry existed.
+3. **Objective / problem** — Establish a reusable character definition boundary, convert Captain to an ordinary registered character, and expose a general test workbench.
+4. **Scope and exclusions** — Add a browser-neutral character registry with four synthetic Fleet characters, provenance and voice defaults; make Living Captain resolve its character; ship a Character Voice Studio with arbitrary line input and performance controls. Exclude durable identity mutation, model-provider additions, real-person voices and Fleet Radio migration.
+5. **Constraints / authority** — Living Fleet remains authoritative for durable evolving identity; registry entries are runtime projections/test fixtures. Performance and synthesis remain separate layers. All voices declare synthetic-character provenance.
+6. **Acceptance criteria** — Registry validates and lists characters; Captain is one selectable entry; Living Captain contains no hard-coded Captain traits; Studio can select characters, perform arbitrary text, inspect axes/targets/reasons and reset continuity; homepage links to it; live/source copies match.
+7. **Tests / rollback** — Character, performance and voice unit tests; JS syntax; drift check; live HTTPS page/script/homepage markers. Revert this packet and registry/Studio/consumer changes.
+8. **Assigned actor** — Codex, authorized by the Lieutenant on 2026-07-16.
+9. **Evidence and completion state** — Verified complete and recorded. Character, voice and performance tests pass; JS syntax and source/live drift checks pass. Live HTTPS exposes the homepage card, general Studio, character selector, arbitrary text input, performance controls and inspection output. Living Captain live loads `characters.js` and its versioned consumer resolves `captain.monad` from the registry.

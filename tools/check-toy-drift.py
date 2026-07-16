@@ -33,6 +33,7 @@ SOURCE_ONLY_NAMES = {
     "package-lock.json",
     "test_vessel_events_cursor.js",
     "test_performance.js",
+    "test_characters.js",
     "test_voice.js",
     "vite.config.js",
 }
