@@ -1,0 +1,11 @@
+# Distinct Character Rehearsal 0.1
+
+1. **Originating intent** — The Lieutenant challenged whether character progress was real when all characters sounded alike, ordered the core limitation fixed, and required a rich-engine design that tolerates implementation difficulty but little API spend.
+2. **Verified starting state** — Characters shared Browser Speech's default installed voice. Gemini controllable TTS supports prompted style/tone/accent/pace and exact TTS use cases, but no rich provider, cache or spend boundary exists in Monad.
+3. **Objective / problem** — Make free rehearsal voices perceptually distinct where device inventory permits, expose the actual binding/coverage, and record the complete cache-first Gemini design rather than spending from the browser.
+4. **Scope and exclusions** — Stable unique installed-voice assignment, visible/overridable Studio binding, coverage warning, tests and rich-engine architecture. Exclude Gemini commissioning, API keys, backend service creation and autonomous generation.
+5. **Constraints / authority** — All generative calls remain Gemini; browser rehearsal costs zero; limited voice inventory is disclosed rather than disguised; unrelated NPR data remains untouched.
+6. **Acceptance criteria** — Four available test voices yield four distinct cast bindings; Studio shows actual voice and inventory limitation; performed profile carries the selected voice ID; source/live files match; full rich-engine records, API, cache, budget, evaluation and rollout are specified.
+7. **Tests / rollback** — Character/voice/performance tests, JS syntax, drift and live markers. Revert bindings/Studio changes and packet; architecture doc may remain as recorded design.
+8. **Assigned actor** — Codex, authorized by the Lieutenant on 2026-07-16.
+9. **Evidence and completion state** — Verified complete and recorded. Four fixture voices produce four distinct tested bindings; character, voice and performance tests plus JS syntax and drift checks pass. Live Studio exposes installed-voice discovery, binding override, device cast-coverage warning and the actual voice in its inspection output. The cache-first rich engine is fully specified in `docs/architecture/rich-character-voice-engine-v1.md`.
