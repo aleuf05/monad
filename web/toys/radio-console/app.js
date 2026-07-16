@@ -209,9 +209,14 @@ const newswireTopicTimeEl = document.querySelector("#newswireTopicTime");
 const newswireTopicLinkEl = document.querySelector("#newswireTopicLink");
 const newswireReadButton = document.querySelector("#newswireReadButton");
 const newswireVoiceStatusEl = document.querySelector("#newswireVoiceStatus");
+const nprChannelChip = document.querySelector("#nprChannelChip");
+const nprAutoStatusEl = document.querySelector("#nprAutoStatus");
 const signalCtx = signalCanvas.getContext("2d");
 let selectedNewswireItem = null;
 let newswireUtterance = null;
+let nprChannelActive = false;
+let lastAnnouncedHourKey = null; // "Thu Jul 16 2026 17" -- date-qualified so a session spanning midnight doesn't collide on hour number alone
+const NPR_HOUR_CHIME_CHECK_MS = 20000;
 
 // --- Diagnostics DOM refs (Captain's packet, 2026-07-16: "connected is not
 // the same as heard") ---
@@ -259,6 +264,7 @@ let noiseBuffer = null;
 let analyserNode = null;
 let analyserData = null;
 let activeTestTone = null;
+let qualityTestCancelled = false;
 // Only ever set true by a *measured* audible test tone pass (see
 // runTestTone()) -- never by a transmission simply completing. Speech
 // synthesis output never passes through the analyser (browsers don't
@@ -810,6 +816,19 @@ function diffVesselEvents(events) {
         break;
       }
       case "route_completed": {
+        // Measured live 2026-07-16: 27 route_completed events in 12s, all
+        // 27 from scouts, none from the flagship. Escort-mode station-
+        // keeping (Patrol/Screen/Loose) continuously recalculates a short
+        // route to the scout's next station point, so a scout "completes
+        // a route" essentially every time it re-settles -- this is the
+        // exact same routine-autonomy spam waypoint_reached was cut for
+        // above, just one event later in the same cycle, and the earlier
+        // fix didn't measure that this one needed the same treatment.
+        // escort_station_changed (below) still narrates real, rare
+        // postural changes; flagship and passive-traffic route
+        // completions (genuinely occasional) are unaffected.
+        const vessel = vesselById(event.vessel_id);
+        if (vessel?.kind === "scout") break;
         const name = vesselDisplayName(event.vessel_id);
         queueNarratedEntry({
           kind: "status",
@@ -1018,8 +1037,19 @@ function renderAudioPath() {
 function ensureAnalyser() {
   if (!audioContext || analyserNode) return;
   analyserNode = audioContext.createAnalyser();
-  analyserNode.fftSize = 256;
-  analyserData = new Uint8Array(analyserNode.frequencyBinCount);
+  // 2048 (not the smaller default) so the Audio Quality Test's
+  // frequency-domain peak detection has a meaningfully tight bin width --
+  // ~21-23Hz at typical sample rates, vs. ~170Hz at fftSize 256, which
+  // would make "peak frequency within tolerance of 440Hz" too coarse to
+  // mean much. Level/RMS reads (currentLevel(), used by the simple
+  // presence meter) are unaffected either way.
+  analyserNode.fftSize = 2048;
+  // getByteTimeDomainData() (used by currentLevel()) reads fftSize
+  // samples, not frequencyBinCount (fftSize/2, that's the frequency-
+  // domain bin count used separately by getByteFrequencyData() in
+  // runQualityTest()) -- sizing this to frequencyBinCount would silently
+  // read only the first half of each time-domain window.
+  analyserData = new Uint8Array(analyserNode.fftSize);
   masterGain.connect(analyserNode);
 }
 
@@ -1189,6 +1219,162 @@ function runTestTone() {
   window.requestAnimationFrame(sample);
 }
 
+// --- Audio Quality Test ---
+// Play Test Tone (above) proves *presence* -- any measurable signal at
+// all. This proves *quality*: is the measured signal actually the tone
+// requested (frequency-domain peak within tolerance of 440Hz, not some
+// other artifact), how far above the noise floor is it (SNR in dB, not
+// just "above a fixed threshold"), does it hold steady for the duration
+// (dropout count), and how long after start() does it become measurable
+// (startup latency). All four are read directly off the AnalyserNode --
+// none are estimated or simulated.
+const QUALITY_TEST_FREQUENCY_HZ = 440;
+const QUALITY_TEST_DURATION_MS = 600;
+const QUALITY_NOISE_SAMPLE_MS = 150;
+
+function rafDelay() {
+  return new Promise((resolve) => window.requestAnimationFrame(resolve));
+}
+
+async function runQualityTest() {
+  if (activeTestTone || qualityTestButton.disabled) return;
+  initAudio();
+  if (!audioContext) {
+    logDiag("quality_test", "fail", "Web Audio unavailable in this browser.");
+    return;
+  }
+  if (audioContext.state === "suspended") await audioContext.resume();
+  ensureAnalyser();
+
+  qualityTestButton.disabled = true;
+  qualityTestButton.textContent = "Testing…";
+  qualityTestCancelled = false;
+  resetAudioPath();
+  setAudioPathStage("synthesisRequested", "ok");
+  interruptCurrentTransmission(); // see runTestTone()'s comment: cancels any pending real-transmission timer, not just the current one
+  setSpeaking(true);
+  state.currentTransmissionScore = Infinity;
+
+  // 1. Noise floor -- measured with nothing intentionally playing, so SNR
+  // below is relative to this console's own real ambient level, not a
+  // hardcoded guess.
+  let noiseSum = 0;
+  let noiseSamples = 0;
+  const noiseStart = performance.now();
+  while (performance.now() - noiseStart < QUALITY_NOISE_SAMPLE_MS && !qualityTestCancelled) {
+    noiseSum += currentLevel();
+    noiseSamples += 1;
+    await rafDelay();
+  }
+  const noiseFloor = noiseSamples ? noiseSum / noiseSamples : 0;
+  const threshold = Math.max(noiseFloor * 3, 0.02);
+
+  // 2. Play the known-frequency tone.
+  const osc = audioContext.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = QUALITY_TEST_FREQUENCY_HZ;
+  const toneGain = audioContext.createGain();
+  toneGain.gain.value = 0.25;
+  osc.connect(toneGain);
+  toneGain.connect(masterGain);
+  setAudioPathStage("audioGenerated", "ok");
+  const startedAt = performance.now();
+  osc.start(audioContext.currentTime);
+  activeTestTone = osc;
+  setAudioPathStage("streamDelivered", "ok");
+
+  // 3. Sample RMS level (presence/SNR/dropouts/latency) and FFT peak bin
+  // (frequency accuracy) together for the test duration.
+  const freqData = new Uint8Array(analyserNode.frequencyBinCount);
+  const binHz = audioContext.sampleRate / analyserNode.fftSize;
+  let latencyMs = null;
+  let peakLevel = 0;
+  let wasAboveThreshold = false;
+  let dropouts = 0;
+  let peakFreqHz = null;
+  let peakFreqMagnitude = 0;
+  let playbackStartedMarked = false;
+
+  while (performance.now() - startedAt < QUALITY_TEST_DURATION_MS && !qualityTestCancelled) {
+    const level = currentLevel();
+    if (!playbackStartedMarked && level > threshold) {
+      setAudioPathStage("playbackStarted", "ok");
+      playbackStartedMarked = true;
+    }
+    if (latencyMs === null && level > threshold) {
+      latencyMs = performance.now() - startedAt;
+    }
+    if (level > peakLevel) peakLevel = level;
+    // A dropout is the signal falling back near the noise floor *after*
+    // it was already established above threshold -- a real underrun/gap,
+    // not just the ramp-up before the tone starts.
+    if (wasAboveThreshold && level < threshold * 0.3) dropouts += 1;
+    if (level > threshold) wasAboveThreshold = true;
+
+    analyserNode.getByteFrequencyData(freqData);
+    let maxBin = 0;
+    let maxMagnitude = 0;
+    for (let i = 1; i < freqData.length; i += 1) {
+      if (freqData[i] > maxMagnitude) {
+        maxMagnitude = freqData[i];
+        maxBin = i;
+      }
+    }
+    if (maxMagnitude > peakFreqMagnitude) {
+      peakFreqMagnitude = maxMagnitude;
+      peakFreqHz = maxBin * binHz;
+    }
+    await rafDelay();
+  }
+
+  try { osc.stop(); } catch (error) { /* already stopped */ }
+  activeTestTone = null;
+  if (!playbackStartedMarked) setAudioPathStage("playbackStarted", "fail", "signal never exceeded threshold");
+
+  const audible = peakLevel > threshold;
+  const snrDb = noiseFloor > 0.0001 ? 20 * Math.log10(peakLevel / noiseFloor) : (audible ? 60 : 0);
+  const freqErrorHz = peakFreqHz !== null ? Math.abs(peakFreqHz - QUALITY_TEST_FREQUENCY_HZ) : null;
+  // Tolerance is 2 FFT bins, not a fixed Hz value -- bin width depends on
+  // this device's actual sample rate / fftSize, so a fixed tolerance
+  // would be either too strict or too loose depending on hardware.
+  const freqOk = freqErrorHz !== null && freqErrorHz <= binHz * 2;
+
+  let verdict = "FAIL";
+  if (audible && freqOk && dropouts === 0 && snrDb >= 10) verdict = "PASS";
+  else if (audible) verdict = "DEGRADED";
+
+  qualityFreqEl.textContent = peakFreqHz !== null
+    ? `${Math.round(peakFreqHz)} Hz (target ${QUALITY_TEST_FREQUENCY_HZ} Hz, ${freqOk ? "within tolerance" : `off by ${Math.round(freqErrorHz)} Hz`})`
+    : "no signal detected";
+  qualitySnrEl.textContent = audible ? `${snrDb.toFixed(1)} dB (noise floor ${noiseFloor.toFixed(4)})` : "n/a — no signal above noise floor";
+  qualityDropoutsEl.textContent = String(dropouts);
+  qualityLatencyEl.textContent = latencyMs !== null ? `${latencyMs.toFixed(0)} ms` : "signal never detected";
+  qualityVerdictEl.textContent = verdict;
+  qualityVerdictEl.className = verdict === "PASS" ? "quality-pass" : verdict === "DEGRADED" ? "quality-degraded" : "quality-fail";
+
+  const detail = `peak ${peakFreqHz !== null ? Math.round(peakFreqHz) : "?"}Hz (target ${QUALITY_TEST_FREQUENCY_HZ}Hz), SNR ${snrDb.toFixed(1)}dB, ${dropouts} dropout${dropouts === 1 ? "" : "s"}, latency ${latencyMs !== null ? `${latencyMs.toFixed(0)}ms` : "n/a"}`;
+  logDiag("quality_test", verdict === "PASS" ? "pass" : verdict === "DEGRADED" ? "degraded" : "fail", detail);
+  setAudioPathStage("audibleVerified", audible ? "ok" : "fail", detail);
+  if (verdict === "PASS") {
+    audioConfirmedThisSession = true;
+    lastAudioFault = null;
+  } else if (verdict === "FAIL") {
+    lastAudioFault = `quality test failed: ${detail}`;
+  }
+  updateDiagSummary();
+
+  qualityTestButton.disabled = false;
+  qualityTestButton.textContent = "Run Quality Test";
+
+  // Same reasoning as runTestTone()'s hold: give a human a moment to
+  // actually see the result before real content reclaims the slot.
+  window.setTimeout(() => {
+    setSpeaking(false);
+    state.currentTransmissionScore = -Infinity;
+    window.setTimeout(livePump, 0);
+  }, 1800);
+}
+
 function runTestMessage() {
   if (!state.powered) {
     logDiag("inject_test_message", "fail", "Radio is powered off.");
@@ -1217,6 +1403,7 @@ function runStopPlayback() {
     try { activeTestTone.stop(); } catch (error) { /* already stopped */ }
     activeTestTone = null;
   }
+  qualityTestCancelled = true;
   interruptCurrentTransmission();
   logDiag("stop_playback", "ok", "Playback stopped.");
   updateDiagnostics();
@@ -1271,6 +1458,7 @@ if (outputDeviceSelect) {
 if (testToneButton) testToneButton.addEventListener("click", runTestTone);
 if (testMessageButton) testMessageButton.addEventListener("click", runTestMessage);
 if (stopPlaybackButton) stopPlaybackButton.addEventListener("click", runStopPlayback);
+if (qualityTestButton) qualityTestButton.addEventListener("click", runQualityTest);
 
 function transmitEntry(entry) {
   state.currentTransmission = entry;
@@ -1664,13 +1852,17 @@ function stopNewswireSpeech() {
   newswireVoiceStatusEl.classList.remove("is-reading");
 }
 
-function readSelectedNewswireHeadline() {
-  if (newswireUtterance) return stopNewswireSpeech();
+// Shared by the manual "Read NPR headline" button and the automatic
+// top-of-hour chime -- both read the same selectedNewswireItem through
+// the same voice-selection and speaking-state logic, differing only in
+// the spoken prefix. Keeping one implementation means a fix or voice
+// preference change can't accidentally apply to only one of the two.
+function speakNewswireHeadline(prefix) {
   if (!selectedNewswireItem || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
     newswireVoiceStatusEl.textContent = "News voice unavailable in this browser";
-    return;
+    return false;
   }
-  const utterance = new SpeechSynthesisUtterance(`From NPR News Headlines. ${selectedNewswireItem.title}`);
+  const utterance = new SpeechSynthesisUtterance(`${prefix} ${selectedNewswireItem.title}`);
   const voices = window.speechSynthesis.getVoices();
   utterance.voice = voices.find((voice) => /^en(-|_)/i.test(voice.lang) && /natural|enhanced|premium/i.test(voice.name))
     || voices.find((voice) => /^en(-|_)/i.test(voice.lang))
@@ -1687,6 +1879,12 @@ function readSelectedNewswireHeadline() {
   utterance.onerror = stopNewswireSpeech;
   newswireUtterance = utterance;
   window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function readSelectedNewswireHeadline() {
+  if (newswireUtterance) return stopNewswireSpeech();
+  speakNewswireHeadline("From NPR News Headlines.");
 }
 
 newswireReadButton.addEventListener("click", readSelectedNewswireHeadline);
@@ -1700,6 +1898,65 @@ async function fetchNewswire() {
     console.warn("Radio Console: newswire fetch failed", error);
   }
 }
+
+// --- NPR channel chip: opt-in top-of-hour auto-read ---
+// Off by default, same principle as NPR-HEADLINE-READER-1.0's "no
+// autoplay" -- this console never speaks news unattended unless the
+// operator explicitly arms it via this chip. Reuses the fleet channel
+// chips' visual style (.channel-chip) but a separate data attribute and
+// separate state, since NPR content never flows through the fleet
+// liveQueue/TRANSMISSION_PROFILES pipeline (see NEWSWIRE_URL's own
+// comment) and toggling it must never affect fleet channel filtering.
+function updateNprAutoStatus() {
+  if (!nprAutoStatusEl) return;
+  if (!nprChannelActive) {
+    nprAutoStatusEl.textContent = "Auto top-of-hour: off — enable via the NPR chip above";
+    nprAutoStatusEl.classList.remove("is-armed");
+    return;
+  }
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(now.getHours() + 1, 0, 0, 0);
+  const nextLabel = next.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  nprAutoStatusEl.textContent = `Auto top-of-hour: armed — next chime ${nextLabel}`;
+  nprAutoStatusEl.classList.add("is-armed");
+}
+
+if (nprChannelChip) {
+  nprChannelChip.addEventListener("click", () => {
+    nprChannelActive = !nprChannelActive;
+    nprChannelChip.classList.toggle("is-active", nprChannelActive);
+    nprChannelChip.setAttribute("aria-pressed", String(nprChannelActive));
+    updateNprAutoStatus();
+  });
+}
+
+async function playTopOfHourChime() {
+  if (newswireUtterance) stopNewswireSpeech(); // don't stack onto an in-progress manual read
+  // Refetch first so the chime reads the genuinely current lead headline,
+  // not whatever was cached (possibly up to NEWSWIRE_REFRESH_MS stale) or
+  // whatever the operator last manually selected -- "top of the hour
+  // news" means the news as of now, same convention a real station uses.
+  await fetchNewswire();
+  const spoke = speakNewswireHeadline("Top of the hour. NPR News.");
+  if (spoke && nprAutoStatusEl) {
+    const label = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    nprAutoStatusEl.textContent = `Auto top-of-hour: armed — last chime ${label}`;
+    nprAutoStatusEl.classList.add("is-armed");
+  }
+}
+
+function checkTopOfHourChime() {
+  if (!nprChannelActive || !state.powered) return;
+  const now = new Date();
+  if (now.getMinutes() !== 0) return;
+  const hourKey = `${now.toDateString()} ${now.getHours()}`;
+  if (hourKey === lastAnnouncedHourKey) return;
+  lastAnnouncedHourKey = hourKey;
+  playTopOfHourChime();
+}
+
+window.setInterval(checkTopOfHourChime, NPR_HOUR_CHIME_CHECK_MS);
 
 function setPowered(powered) {
   state.powered = powered;
@@ -1796,6 +2053,7 @@ updateChannelCount();
 updateStationScope();
 updateRadioStateIndicator();
 resetAudioPath();
+updateNprAutoStatus();
 populateOutputDevices();
 if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
   navigator.mediaDevices.addEventListener("devicechange", populateOutputDevices);

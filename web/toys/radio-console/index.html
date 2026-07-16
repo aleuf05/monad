@@ -46,6 +46,7 @@
           <button type="button" class="channel-chip is-active" data-channel="fleet-comms">Fleet Comms</button>
           <button type="button" class="channel-chip is-active" data-channel="weather">Weather</button>
           <button type="button" class="channel-chip is-active" data-channel="traffic">Traffic</button>
+          <button type="button" class="channel-chip" id="nprChannelChip" data-npr-channel aria-pressed="false" title="Arms an automatic NPR headline read at the top of every hour. Off by default -- never speaks news unattended unless you turn this on.">NPR</button>
         </div>
 
         <div class="volume-control">
@@ -179,6 +180,7 @@
             </div>
           </div>
           <p id="newswireVoiceStatus" class="newswire-voice-status">News voice idle · separate from fleet radio</p>
+          <p id="nprAutoStatus" class="newswire-auto-status">Auto top-of-hour: off — enable via the NPR chip above</p>
         </article>
         <p class="newswire-instruction">Select a headline to retune the topic.</p>
         <ul id="newswireLog" class="newswire-log">
@@ -187,6 +189,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=7"></script>
   </body>
 </html>

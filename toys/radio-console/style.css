@@ -697,6 +697,16 @@ body.is-embedded .diag-grid {
   color: var(--amber);
 }
 
+.newswire-auto-status {
+  margin: 0.3rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.newswire-auto-status.is-armed {
+  color: var(--signal);
+}
+
 .newswire-log {
   list-style: none;
   margin: 0;
