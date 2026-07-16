@@ -4,6 +4,7 @@
   const providers = new Map();
   const profiles = new Map();
   const listeners = new Set();
+  const VOICE_ENUMERATION_TIMEOUT_MS = 1500;
 
   function emit(event) {
     listeners.forEach((listener) => listener(event));
@@ -17,6 +18,31 @@
       || null;
   }
 
+  function waitForBrowserVoices(synth) {
+    const available = () => synth.getVoices();
+    const initial = available();
+    if (initial.length) return Promise.resolve(initial);
+
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = (voices) => {
+        if (settled) return;
+        settled = true;
+        global.clearInterval(poll);
+        global.clearTimeout(timeout);
+        synth.removeEventListener?.("voiceschanged", check);
+        resolve(voices);
+      };
+      const check = () => {
+        const voices = available();
+        if (voices.length) finish(voices);
+      };
+      const poll = global.setInterval(check, 50);
+      const timeout = global.setTimeout(() => finish(available()), VOICE_ENUMERATION_TIMEOUT_MS);
+      synth.addEventListener?.("voiceschanged", check);
+    });
+  }
+
   const browserProvider = {
     id: "browser-speechsynthesis",
     label: "Browser Speech",
@@ -27,7 +53,8 @@
     },
     async listVoices() {
       if (!this.isAvailable()) return [];
-      return global.speechSynthesis.getVoices().map((voice) => ({
+      const voices = await waitForBrowserVoices(global.speechSynthesis);
+      return voices.map((voice) => ({
         voice_id: voice.voiceURI || voice.name,
         label: voice.name,
         lang: voice.lang || "",
