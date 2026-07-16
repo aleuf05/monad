@@ -103,12 +103,9 @@ Interactive artifacts that must be reachable under `https://cameronlampley.com/`
 
 - `web/toys/fleet-motion/` — Fleet Motion Mk2, copied from `toys/fleet-motion/`. Depends on `web/toys/shared/fleet-state.js`.
 - `web/toys/periscope/` — Periscope Station, copied from `toys/periscope/` (`index.html`, `style.css`, `app.js`, `state.js`, `scene.js`, `effects.js`, `duck.js`, and the asset files under `assets/backgrounds/` and `assets/sprites/` that `ASSET_PATHS` loads). Depends on `web/toys/shared/fleet-state.js`. **One intentional divergence**: `duck.js`'s GLB path is `../../web/assets/models/uss-rubber-ducky.glb` in source (correct from `toys/periscope/`, two levels up to the repo root, then into `web/assets/models/`) but must be `../../assets/models/uss-rubber-ducky.glb` in the deployed copy (two levels up from `web/toys/periscope/` already reaches `web/`, so no extra `web/` segment) -- copy the file, then re-apply this one-line path fix by hand, don't raw-copy it.
-- `web/toys/bridge/` — Bridge Station's Live Console, copied from `toys/bridge/`, **with one intentional divergence from source**: the Watchbook tab's panel is not an iframe pointing at a Watchbook instance (Watchbook is not deployed publicly — see below) but a static message linking to `web/logs.html`. If `toys/bridge/index.html`'s Watchbook panel markup changes, re-apply that patch by hand rather than doing a raw copy.
 - `web/toys/shared/fleet-state.js` — the `MonadFleetState` contract, copied from `toys/shared/fleet-state.js`. Fleet Motion, Periscope, and Bridge Station all depend on this being present and in sync with the source; a stale copy silently breaks cross-instrument selection sync (this happened once — `web/toys/fleet-motion/` sat un-refreshed since the `7003852` schema-v2 refactor until it was caught during the Bridge Station Mk III deploy).
-- `web/toys/fleetcore-live/` — copied from `toys/fleetcore-live/`, **with one intentional divergence from source**: `index.html`'s default `#serverUrl` value is `wss://cameronlampley.com/fleetcore-ws/ws` (the public reverse-proxy path below) instead of `ws://localhost:4771/ws`. Unlike every other public artifact here, this one doesn't work from a plain file copy alone — see "FleetCore Live Backend" below for what else has to be running.
-- `web/toys/fleetcore-control/` — FleetCore Control Center, copied from `toys/fleetcore-control/` (`app.js`, `index.html`, `style.css`; no README, same as every other toy). **Same intentional divergence as `web/toys/fleetcore-live/` and for the same reason**: `index.html`'s default `#serverUrl` is the public `wss://cameronlampley.com/fleetcore-ws/ws` reverse-proxy path, not `ws://localhost:4771/ws`. Also depends on the "FleetCore Live Backend" section below being reachable, same as `web/toys/fleetcore-live/` — a plain file copy alone does nothing without a real server on the other end of that URL. Command authority (spawning contacts, setting routes) is whatever the server grants this connection on its own — there is no client-supplied token field or URL passthrough here anymore.
 - `web/toys/agent-ops/` — Agent Operations, copied from `toys/agent-ops/` (`index.html`, `app.js`, `style.css`). Reads Living Fleet state from the public FleetCore WebSocket and sends only captain enable/pause controls. Depends on both FleetCore and the portless captain runtime below.
-- `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. Linked from `web/index.html` and `web/command-deck.html`'s "Bridge Instruments" section, alongside (not replacing) the existing `toys/bridge/` "Bridge Station" card.
+- `web/toys/bridge-station-3.0/` — Bridge Station 3.0, a `vite build` output (not a plain file copy) from `toys/bridge-station-3.0/`. See "Bridge Station" below for the build config it needed to work from a subpath and to reach the public FleetCore WebSocket. As of `BRIDGE3-CONSOLIDATE-01` (2026-07-16) this is the *only* "look at or command FleetCore" toy — `toys/bridge/`, `toys/fleetcore-live/`, and `toys/fleetcore-control/` are retired, their capability folded into this one as tabs. Linked from `web/index.html` and `web/command-deck.html`'s "Bridge Instruments" section.
 - `web/toys/radio-console/` — copied from `toys/radio-console/`. Its Newswire panel additionally depends on `web/data/npr-headlines.json` being kept fresh — see "NPR Newswire Feed" below; that file is not part of the toy copy itself and is not touched by a plain re-deploy.
 
 ### NPR Newswire Feed
@@ -125,15 +122,15 @@ NPR's feed only grants CORS to `apps.npr.org`, so the browser can't fetch it dir
 
 Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches (`../../logs/captains/...`). Deploying it as-is would publish the full captain/admiral watch log history — including internal ops/infra logs — to the public site. That has not been done. The public site's own Ship's Log page (`web/logs.html` / `web/assets/js/logs.js`) is the intentional, separate public-facing equivalent, and is what Bridge Station's Watchbook tab links out to instead of embedding Watchbook.
 
-`web/bridge.html` (a separate, older, hand-built public "Bridge" page, distinct from `web/toys/bridge/`) was retired 2026-07-16 (`BRIDGE-RETIRE-01`, `docs/architecture/component-consolidation-master-plan-v0.1.md`): its data source, `web/bridge-state.json`, had gone stale (last written a week prior, pre-dating FleetCore's live WebSocket feed) and was silently showing frozen fleet state with no indication it wasn't live. Every "Bridge" link across the site (`index.html`, `command-deck.html`, `logs.html`, `fleet.html`) now points to `toys/bridge/` ("Bridge Station"), which covers the same need with genuinely live data.
+`web/bridge.html` (a separate, older, hand-built public "Bridge" page, distinct from `toys/bridge/`) was retired 2026-07-16 (`BRIDGE-RETIRE-01`, `docs/architecture/component-consolidation-master-plan-v0.1.md`): its data source, `web/bridge-state.json`, had gone stale (last written a week prior, pre-dating FleetCore's live WebSocket feed) and was silently showing frozen fleet state with no indication it wasn't live. `toys/bridge/` itself was retired the same day (`BRIDGE3-CONSOLIDATE-01`, see below) — every "Bridge" link across the site (`index.html`, `command-deck.html`, `logs.html`, `fleet.html`) now points straight to `toys/bridge-station-3.0/`.
 
 ## Site Root Is the Front Door — Links to Every Toy
 
-`web/index.html` was briefly a redirect straight into `toys/bridge/` (see git history if that behavior is ever wanted back). It's the homepage again: mission/doctrine/fleet roster/Ship's Log content, plus an "Interactive Artifact" section (`#artifacts`) linking every deployed public toy — Radio Console, FleetCore Live, Bridge Station, Fleet Motion, Periscope Station, Reaction-Diffusion Painter. `web/command-deck.html` is kept as an identical mirror (same content, distinct `<title>`) so the old URL still works — **update both together**, `web/index.html` is not the single source of truth here. Add a new `.artifact-launch-layout` card to both whenever a new toy gets deployed publicly.
+`web/index.html` was briefly a redirect straight into `toys/bridge/` (see git history if that behavior is ever wanted back; `toys/bridge/` itself is since retired). It's the homepage again: mission/doctrine/fleet roster/Ship's Log content, plus sectioned card grids linking every deployed public toy — Radio Console, Bridge Station 3.0, Fleet Motion, Periscope Station, Reaction-Diffusion Painter, and the rest. `web/command-deck.html` is kept as an identical mirror (same content, distinct `<title>`) so the old URL still works — **update both together**, `web/index.html` is not the single source of truth here. Add a new card to both whenever a new toy gets deployed publicly.
 
 ## FleetCore Live Backend
 
-`web/toys/fleetcore-live/` is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike every other public artifact in this repo, which are all fully self-contained static pages.
+`web/toys/bridge-station-3.0/` (the sole remaining "look at or command FleetCore" toy — see `BRIDGE3-CONSOLIDATE-01` above) is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike most other public artifacts in this repo, which are fully self-contained static pages.
 
 Living Fleet adds `living-fleet.service`, one shared Python captain runtime with
 no listening port. It talks only to FleetCore on `127.0.0.1:4771`; do not add a
@@ -163,7 +160,7 @@ As of 2026-07-13, `scripts/fleetcore-serve.service`'s `ExecStart` already ships 
 
 As of 2026-07-13, `web-lan/` and its `monad-lan-web.service` unit have been retired — `web/` (served at `https://cameronlampley.com/`) is the single deploy target now. There is no longer a separate LAN-only mirror; the constraint that originally motivated one (Caddy's root wasn't LAN-scoped, and `fleetcore-serve` was loopback-only) was resolved once the public hatch was finished end-to-end (see `docs/deployment/public-hatch.md`), making the second deploy target redundant.
 
-`bridge-3-0-lan` is moot in practice: `fleetcore-serve` currently grants command authority to every connection unconditionally regardless of what token (if any) is presented (see "Known limitation" below), and none of this repo's toy UIs can even present a token anymore — the Command Token field/param that used to exist in `toys/fleetcore-live/`, `toys/fleetcore-control/`, `toys/bridge/`, `toys/fleet-motion/`, and `toys/bridge-station-3.0/` was removed everywhere once that became clear. **The token itself was never a real secret regardless**: it's committed in plaintext across this repo's own git history (watch logs, this file, past commit messages), and the public `/fleetcore-ws/` reverse proxy was finished without rotating it first — see the Bridge Station 2.1/3.0 section below for the full history. If you ever want real command-authority isolation, the server needs actual per-client auth (not just a shared token), and every client above would need a way to present credentials reintroduced.
+`bridge-3-0-lan` is moot in practice: `fleetcore-serve` currently grants command authority to every connection unconditionally regardless of what token (if any) is presented (see "Known limitation" below), and none of this repo's toy UIs can even present a token anymore — the Command Token field/param that used to exist in `toys/fleet-motion/` and `toys/bridge-station-3.0/` (plus the now-retired `toys/fleetcore-live/`, `toys/fleetcore-control/`, and `toys/bridge/`) was removed everywhere once that became clear. **The token itself was never a real secret regardless**: it's committed in plaintext across this repo's own git history (watch logs, this file, past commit messages), and the public `/fleetcore-ws/` reverse proxy was finished without rotating it first — see the Bridge Station 2.1/3.0 section below for the full history. If you ever want real command-authority isolation, the server needs actual per-client auth (not just a shared token), and every client above would need a way to present credentials reintroduced.
 
 **Exposing it publicly.** A `handle_path` block in `/etc/caddy/Caddyfile` proxies the public path to the loopback-only server:
 
@@ -193,9 +190,37 @@ sudo systemctl reload caddy
 As of 2026-07-13, Bridge Station 3.0 (real FleetCore data, Vite + React) is the only
 surviving generation of the Bridge Station lineage. `toys/bridge-2/` (2.0) and
 `toys/bridge-station-2.1/` (mock-data 2.1) have been removed from the repo and their
-ad hoc dev-server processes killed — superseded, not needed. `toys/bridge/` (the
-original, unrelated "Live Console" — iframe-composited Fleet Motion/Periscope/Radio
-Console) is a different toy entirely and is untouched.
+ad hoc dev-server processes killed — superseded, not needed.
+
+**2026-07-16 (`BRIDGE3-CONSOLIDATE-01`): the four toys that overlapped on "look
+at or command FleetCore" are now one.** `toys/bridge/` (the original "Live
+Console" — iframe-composited Fleet Motion/Periscope/Radio Console),
+`toys/fleetcore-live/` (raw Leaflet-map feed viewer), and
+`toys/fleetcore-control/` (spawn/despawn/scenario/Harbor Pilot Boarding
+console) are retired — `git rm`'d from both `toys/` and `web/toys/`, not
+archived. Bridge Station 3.0 absorbed their capability as three additional
+tabs alongside its existing default view (now labeled "Bridge"):
+
+- **Control** — spawn/despawn forms, pause/resume + time scale, reset fleet,
+  the three quick scenarios (distress call, storm convoy, collision course),
+  and the full Harbor Pilot Boarding phase state machine, ported from
+  `fleetcore-control/app.js`'s `HARBOR_STEPS`.
+- **Radio** — the same `<iframe src="../radio-console/">` embed old Bridge
+  used; Radio Console's own `is-embedded` styling still auto-detects it.
+- **Raw Feed** — a table/list readout of the same snapshot fields FleetCore
+  Live's Leaflet map showed (tick, sim time, clock state, time scale, command
+  authority, vessel table, watch events, vessel events) — table form instead
+  of a map, so no new map-library dependency was needed.
+
+All three tabs reuse the same open WebSocket connection Bridge Station 3.0
+already holds for its default view, rather than opening a second connection
+per tab. Verified live via Playwright against the real deployed page before
+the old toys were removed: all four tabs render with zero console errors, a
+real Distress Call command round-tripped (spawned vessel and matching watch
+event both appeared), and the Radio tab's iframe loads. `web/index.html` and
+`web/command-deck.html`'s "Bridge Station"/"FleetCore Live"/"FleetCore
+Control Center" cards are gone; every "Bridge" link across the site now
+points to `toys/bridge-station-3.0/` directly.
 
 Bridge Station 3.0 is deployed the same way as every other public toy: `npm run
 build` in `toys/bridge-station-3.0/`, then the `dist/` output copied into

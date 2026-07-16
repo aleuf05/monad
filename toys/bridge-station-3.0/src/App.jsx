@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Navigation, Crosshair, Anchor } from "lucide-react";
+import { Navigation, Crosshair, Anchor, Radio, Terminal, SlidersHorizontal } from "lucide-react";
 
 /*
   BRIDGE STATION 3.0
@@ -49,6 +49,13 @@ function norm360(deg) {
 // regardless of what speed_mps says.
 function actualSpeedMps(vessel) {
   return vessel.status === "underway" || vessel.status === "transiting" ? vessel.speed_mps : 0;
+}
+
+// Same id-uniqueness trick as fleetcore-control's idSuffix() -- not
+// cryptographically unique, just unique enough that two clicks in the same
+// millisecond don't collide.
+function idSuffix() {
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 }
 
 function shortestDelta(from, to) {
@@ -136,6 +143,8 @@ export default function BridgeStation() {
     { t: 0, text: "Bridge Station online. Awaiting live world…" },
   ]);
   const [flash, setFlash] = useState(false);
+  const [activeTab, setActiveTab] = useState("bridge");
+  const [commandAuthority, setCommandAuthority] = useState(false);
   const logRef = useRef(null);
   const socketRef = useRef(null);
   const reconnectDelayRef = useRef(1000);
@@ -145,6 +154,20 @@ export default function BridgeStation() {
   const addLog = useCallback((text) => {
     setLog((prev) => [...prev.slice(-7), { t: Date.now(), text }]);
   }, []);
+
+  // Shared by both the chart click-to-waypoint flow and the Control tab --
+  // every command is a plain object over the same open socket, same as
+  // fleetcore-control's sendCommand().
+  const sendCommand = useCallback(
+    (command) => {
+      if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+        addLog("Command not sent — link is not live.");
+        return;
+      }
+      socketRef.current.send(JSON.stringify(command));
+    },
+    [addLog]
+  );
 
   useEffect(() => {
     function connect() {
@@ -165,7 +188,9 @@ export default function BridgeStation() {
         } catch {
           return;
         }
-        if (message.type === "snapshot") {
+        if (message.type === "connected") {
+          setCommandAuthority(Boolean(message.command_authority));
+        } else if (message.type === "snapshot") {
           setSnapshot(message.snapshot);
           setBounds((prev) => prev || computeBounds(message.snapshot.vessels));
           if (!hasLoggedLiveRef.current) {
@@ -235,6 +260,218 @@ export default function BridgeStation() {
     addLog(`Waypoint command sent — bearing ${brg}°. Awaiting world response.`);
   };
 
+  // ---- Control tab: folded in from toys/fleetcore-control/app.js ----
+  const [spawnForm, setSpawnForm] = useState({
+    name: "", callsign: "", lat: "", lng: "", course: "0", speed: "0",
+  });
+  const [despawnId, setDespawnId] = useState("");
+  const [timeScale, setTimeScale] = useState(1);
+  const [harbor, setHarbor] = useState({
+    phase: "idle", pilotId: null, pilotCallsign: null, harborPoint: null,
+  });
+
+  const flagshipPos = flagship ? flagship.position : null;
+
+  const handleSpawnSubmit = (e) => {
+    e.preventDefault();
+    const lat = Number(spawnForm.lat);
+    const lng = Number(spawnForm.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      addLog("Spawn rejected — lat/lng must be numbers.");
+      return;
+    }
+    const name = spawnForm.name.trim() || "Unnamed Contact";
+    const callsign = spawnForm.callsign.trim() || name.toUpperCase();
+    sendCommand({
+      type: "spawn-passive-contact",
+      id: `manual-${idSuffix()}`,
+      name,
+      callsign,
+      position: { lat, lng },
+      course: Number.isFinite(Number(spawnForm.course)) ? Number(spawnForm.course) : 0,
+      speed_mps: Number.isFinite(Number(spawnForm.speed)) ? Number(spawnForm.speed) : 0,
+    });
+    addLog(`Spawned ${callsign} at ${lat.toFixed(3)}, ${lng.toFixed(3)}.`);
+    setSpawnForm({ name: "", callsign: "", lat: "", lng: "", course: "0", speed: "0" });
+  };
+
+  const handleDespawn = (e) => {
+    e.preventDefault();
+    if (!despawnId) {
+      addLog("Despawn rejected — no contact selected.");
+      return;
+    }
+    const target = vessels.find((v) => v.id === despawnId);
+    sendCommand({ type: "despawn-vessel", id: despawnId });
+    addLog(`Despawn command sent for ${target ? target.callsign : despawnId}.`);
+    setDespawnId("");
+  };
+
+  const handleResetFleet = () => {
+    if (!window.confirm("Reset Monad and all three scout escorts to their starting position, course, speed, and route? This affects every connected visitor and cannot be undone.")) {
+      return;
+    }
+    sendCommand({ type: "reset-fleet" });
+    addLog("Fleet reset command sent.");
+  };
+
+  const handlePauseResume = () => {
+    sendCommand({ type: snapshot?.clock_state === "running" ? "pause-clock" : "resume-clock" });
+  };
+
+  const handleApplyTimeScale = () => {
+    const scale = Number(timeScale);
+    if (!Number.isFinite(scale) || scale < 1) return;
+    sendCommand({ type: "set-time-scale", scale: Math.round(scale) });
+    addLog(`Time scale set to ${Math.round(scale)}x.`);
+  };
+
+  const runScenario = (kind) => {
+    if (!flagshipPos) {
+      addLog("Scenario rejected — no flagship position yet.");
+      return;
+    }
+    const suffix = idSuffix();
+    if (kind === "distress-call") {
+      const callsign = `MAYDAY ${suffix.slice(-4).toUpperCase()}`;
+      sendCommand({
+        type: "spawn-passive-contact", id: `distress-${suffix}`, name: "Distressed Vessel", callsign,
+        position: { lat: flagshipPos.lat + 0.06, lng: flagshipPos.lng + 0.04 }, course: 0, speed_mps: 0,
+      });
+      sendCommand({ type: "record-watch-event", message: `Distress call received from ${callsign}` });
+      addLog(`Scenario: distress call from ${callsign}.`);
+    } else if (kind === "storm-convoy") {
+      [-0.12, 0, 0.12].forEach((offset, index) => {
+        const id = `storm-${suffix}-${index}`;
+        sendCommand({
+          type: "spawn-passive-contact", id, name: `Storm Convoy ${index + 1}`, callsign: `CONVOY ${index + 1}`,
+          position: { lat: flagshipPos.lat + 0.35, lng: flagshipPos.lng + offset }, course: 180, speed_mps: 7,
+        });
+        sendCommand({
+          type: "set-route", vessel_id: id,
+          route: [{ lat: flagshipPos.lat + 0.1, lng: flagshipPos.lng + offset * 0.4 }],
+        });
+      });
+      sendCommand({ type: "record-watch-event", message: "Storm convoy of 3 vessels reported entering the area" });
+      addLog("Scenario: storm convoy of 3 spawned.");
+    } else if (kind === "collision-course") {
+      const id = `collision-${suffix}`;
+      const callsign = `BOGEY ${suffix.slice(-4).toUpperCase()}`;
+      sendCommand({
+        type: "spawn-passive-contact", id, name: "Unidentified Contact", callsign,
+        position: { lat: flagshipPos.lat + 0.4, lng: flagshipPos.lng + 0.4 }, course: 225, speed_mps: 9,
+      });
+      sendCommand({ type: "set-route", vessel_id: id, route: [flagshipPos] });
+      sendCommand({ type: "record-watch-event", message: "Contact on possible collision bearing with flagship" });
+      addLog(`Scenario: ${callsign} on collision bearing.`);
+    }
+  };
+
+  // Harbor Pilot Boarding — same multi-phase scenario as
+  // fleetcore-control/app.js (see that file's comment for the full
+  // rationale: manual phase advancement, no FleetCore-side state machine).
+  const HARBOR_STEPS = {
+    idle: {
+      label: "Begin Harbor Approach",
+      note: "Spawns the pilot boat and harbor traffic at a synthetic harbor point; pilot boat gets a real intercept route toward the flagship.",
+      run: () => {
+        if (!flagshipPos) return addLog("Harbor scenario rejected — no flagship position yet.");
+        const suffix = idSuffix();
+        const harborPoint = { lat: flagshipPos.lat + 0.5, lng: flagshipPos.lng - 0.35 };
+        const pilotId = `harbor-pilot-${suffix}`;
+        const pilotCallsign = `PILOT BOAT ${suffix.slice(-3).toUpperCase()}`;
+        sendCommand({
+          type: "spawn-passive-contact", id: pilotId, name: "Harbor Pilot Boat", callsign: pilotCallsign,
+          position: harborPoint, course: 0, speed_mps: 6,
+        });
+        sendCommand({ type: "set-route", vessel_id: pilotId, route: [flagshipPos] });
+        [0, 1].forEach((index) => {
+          sendCommand({
+            type: "spawn-passive-contact", id: `harbor-traffic-${suffix}-${index}`, name: `Harbor Traffic ${index + 1}`,
+            callsign: `HARBOR TRAFFIC ${index + 1}`,
+            position: {
+              lat: harborPoint.lat + (index === 0 ? 0.02 : -0.03),
+              lng: harborPoint.lng + (index === 0 ? -0.02 : 0.015),
+            },
+            course: 90 + index * 40, speed_mps: 3,
+          });
+        });
+        sendCommand({
+          type: "record-watch-event",
+          message: `Harbor Pilot requested. ${pilotCallsign} departing harbor — ETA approximately 12 minutes.`,
+        });
+        setHarbor({ phase: "inbound", pilotId, pilotCallsign, harborPoint });
+      },
+    },
+    inbound: {
+      label: "Confirm Pilot Boat Detected",
+      note: "Fleet Motion and Periscope should already show the pilot boat closing — this advances the watch narrative, it doesn't move anything itself.",
+      run: () => {
+        sendCommand({ type: "record-watch-event", message: `${harbor.pilotCallsign} visually acquired, closing on intercept course.` });
+        setHarbor((h) => ({ ...h, phase: "detected" }));
+      },
+    },
+    detected: {
+      label: "Acknowledge Pilot Boat",
+      note: "Grant permission to come alongside — this is the radio trigger the scenario waits on.",
+      hail: () => `"Monad, this is ${harbor.pilotCallsign}. Request permission to come alongside."`,
+      run: () => {
+        sendCommand({ type: "record-watch-event", message: `Monad to ${harbor.pilotCallsign}: Permission granted, come alongside.` });
+        if (flagshipPos) sendCommand({ type: "set-route", vessel_id: harbor.pilotId, route: [flagshipPos] });
+        setHarbor((h) => ({ ...h, phase: "hailed" }));
+      },
+    },
+    hailed: {
+      label: "Confirm Boarding",
+      note: "Pilot boat should now be closing tightly on the flagship for the boarding transfer.",
+      run: () => {
+        sendCommand({ type: "record-watch-event", message: "Harbor Pilot aboard." });
+        setHarbor((h) => ({ ...h, phase: "boarding" }));
+      },
+    },
+    boarding: {
+      label: "Grant the Conn",
+      note: "Transfers temporary ship-handling authority and issues the pilot's staged helm orders as a real route on the flagship itself.",
+      hail: () => `"Captain, request the conn."`,
+      run: () => {
+        if (!flagship) return addLog("No flagship position yet.");
+        sendCommand({ type: "record-watch-event", message: "Captain to Harbor Pilot: The conn is yours." });
+        const berth = harbor.harborPoint;
+        const start = flagship.position;
+        const legs = [
+          { lat: start.lat + (berth.lat - start.lat) * 0.33, lng: start.lng + (berth.lng - start.lng) * 0.2, order: "Port five" },
+          { lat: start.lat + (berth.lat - start.lat) * 0.6, lng: start.lng + (berth.lng - start.lng) * 0.55, order: "Dead slow ahead" },
+          { lat: start.lat + (berth.lat - start.lat) * 0.85, lng: start.lng + (berth.lng - start.lng) * 0.8, order: "Midships" },
+          { lat: berth.lat, lng: berth.lng, order: "Ease to starboard" },
+        ];
+        sendCommand({ type: "set-route", vessel_id: flagship.id, route: legs.map(({ lat, lng }) => ({ lat, lng })) });
+        legs.forEach((leg) => sendCommand({ type: "record-watch-event", message: `Pilot orders: ${leg.order}` }));
+        setHarbor((h) => ({ ...h, phase: "transit" }));
+      },
+    },
+    transit: {
+      label: "Arrive at Berth",
+      note: "Flagship should be following the staged route toward the harbor point. Pilot boat departs once berthed.",
+      run: () => {
+        sendCommand({ type: "record-watch-event", message: "Monad arrives at berth. Harbor transit complete." });
+        if (harbor.pilotId && harbor.harborPoint) {
+          sendCommand({ type: "set-route", vessel_id: harbor.pilotId, route: [harbor.harborPoint] });
+        }
+        sendCommand({
+          type: "record-watch-event",
+          message: `${harbor.pilotCallsign} disembarks and returns to harbor. Harbor Pilot Boarding scenario complete.`,
+        });
+        setHarbor((h) => ({ ...h, phase: "complete" }));
+      },
+    },
+  };
+  const HARBOR_PHASE_LABELS = {
+    idle: "Not started", inbound: "Phase 1 — Inbound Transit", detected: "Phase 2 — Detection",
+    hailed: "Phase 3 — Radio Contact", boarding: "Phase 4 — Boarding",
+    transit: "Phase 5–6 — Conn Transferred / Harbor Transit", complete: "Phase 7 — Completion",
+  };
+  const currentHarborStep = HARBOR_STEPS[harbor.phase];
+
   const targetBearing =
     selected && flagship && selected.id !== flagship.id
       ? bearingDegrees(flagship.position, selected.position)
@@ -279,6 +516,14 @@ export default function BridgeStation() {
         @media (max-width: 860px) {
           .bs-main { grid-template-columns: 1fr !important; }
         }
+        .station-tab-btn {
+          display: flex; align-items: center; gap: 6px;
+          background: transparent; border: none; border-bottom: 2px solid transparent;
+          color: #6B7C93; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+          padding: 9px 14px; cursor: pointer; transition: color 120ms ease, border-color 120ms ease;
+        }
+        .station-tab-btn:hover { color: #DCE6F2; }
+        .station-tab-btn.is-active { color: #E8A33D; border-bottom-color: #E8A33D; }
       `}</style>
 
       {/* Top status bar */}
@@ -294,8 +539,29 @@ export default function BridgeStation() {
         </div>
       </div>
 
+      {/* Station tabs */}
+      <nav className="bs-mono" style={styles.stationTabs} aria-label="Bridge stations">
+        {[
+          { id: "bridge", label: "Bridge", icon: Anchor },
+          { id: "control", label: "Control", icon: SlidersHorizontal },
+          { id: "radio", label: "Radio", icon: Radio },
+          { id: "raw", label: "Raw Feed", icon: Terminal },
+        ].map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            type="button"
+            className={`bs-mono station-tab-btn ${activeTab === id ? "is-active" : ""}`}
+            style={styles.stationTabBtn}
+            onClick={() => setActiveTab(id)}
+          >
+            <Icon size={12} />
+            {label}
+          </button>
+        ))}
+      </nav>
+
       {/* Main dual view */}
-      <div className="bs-main" style={styles.main}>
+      <div className="bs-main" style={{ ...styles.main, display: activeTab === "bridge" ? "grid" : "none" }}>
         {/* FLEET MOTION */}
         <div style={styles.panel}>
           <div style={styles.panelHeader}>
@@ -435,7 +701,7 @@ export default function BridgeStation() {
       </div>
 
       {/* Contextual action panel */}
-      <div style={styles.actionRow}>
+      <div style={{ ...styles.actionRow, display: activeTab === "bridge" ? "block" : "none" }}>
         {selected ? (
           <div style={styles.actionPanel}>
             <div style={styles.actionInfo}>
@@ -465,6 +731,182 @@ export default function BridgeStation() {
           </div>
         )}
       </div>
+
+      {/* CONTROL tab — folded in from toys/fleetcore-control/ */}
+      {activeTab === "control" && (
+        <div className="bs-mono" style={styles.controlPane}>
+          {!commandAuthority && (
+            <p style={styles.controlWarn}>
+              This connection has not been granted command authority yet — commands below may be rejected.
+            </p>
+          )}
+          <p style={styles.controlNote}>
+            This world is shared by every visitor. Every command below acts on the live world for everyone connected, not just you.
+          </p>
+
+          <div style={styles.controlGrid}>
+            <section style={styles.controlCard}>
+              <h3 className="bs-display" style={styles.controlCardTitle}>Clock</h3>
+              <div style={styles.controlRow}>
+                <button className="cmd-btn" onClick={handlePauseResume}>
+                  {snapshot?.clock_state === "running" ? "Pause" : "Resume"}
+                </button>
+                <input
+                  type="number" min="1" max="500" value={timeScale}
+                  onChange={(e) => setTimeScale(e.target.value)}
+                  style={styles.controlInput}
+                />
+                <button className="cmd-btn" onClick={handleApplyTimeScale}>Apply Scale</button>
+              </div>
+              <div style={styles.controlRow}>
+                <button className="cmd-btn" style={styles.dangerBtn} onClick={handleResetFleet}>Reset Fleet</button>
+              </div>
+            </section>
+
+            <section style={styles.controlCard}>
+              <h3 className="bs-display" style={styles.controlCardTitle}>Spawn Passive Contact</h3>
+              <form onSubmit={handleSpawnSubmit} style={styles.controlForm}>
+                <input placeholder="Name" value={spawnForm.name} style={styles.controlInput}
+                  onChange={(e) => setSpawnForm((f) => ({ ...f, name: e.target.value }))} />
+                <input placeholder="Callsign" value={spawnForm.callsign} style={styles.controlInput}
+                  onChange={(e) => setSpawnForm((f) => ({ ...f, callsign: e.target.value }))} />
+                <div style={styles.controlRow}>
+                  <input placeholder="Lat" value={spawnForm.lat} style={styles.controlInput}
+                    onChange={(e) => setSpawnForm((f) => ({ ...f, lat: e.target.value }))} />
+                  <input placeholder="Lng" value={spawnForm.lng} style={styles.controlInput}
+                    onChange={(e) => setSpawnForm((f) => ({ ...f, lng: e.target.value }))} />
+                </div>
+                <div style={styles.controlRow}>
+                  <input placeholder="Course°" value={spawnForm.course} style={styles.controlInput}
+                    onChange={(e) => setSpawnForm((f) => ({ ...f, course: e.target.value }))} />
+                  <input placeholder="Speed m/s" value={spawnForm.speed} style={styles.controlInput}
+                    onChange={(e) => setSpawnForm((f) => ({ ...f, speed: e.target.value }))} />
+                </div>
+                <button className="cmd-btn" type="submit">Spawn</button>
+              </form>
+            </section>
+
+            <section style={styles.controlCard}>
+              <h3 className="bs-display" style={styles.controlCardTitle}>Despawn Contact</h3>
+              <form onSubmit={handleDespawn} style={styles.controlForm}>
+                <select value={despawnId} onChange={(e) => setDespawnId(e.target.value)} style={styles.controlInput}>
+                  <option value="">Select a contact…</option>
+                  {vessels.filter((v) => v.kind !== "flagship").map((v) => (
+                    <option key={v.id} value={v.id}>{v.callsign}</option>
+                  ))}
+                </select>
+                <button className="cmd-btn" style={styles.dangerBtn} type="submit">Despawn</button>
+              </form>
+            </section>
+
+            <section style={styles.controlCard}>
+              <h3 className="bs-display" style={styles.controlCardTitle}>Quick Scenarios</h3>
+              <div style={styles.controlForm}>
+                <button className="cmd-btn" onClick={() => runScenario("distress-call")}>Distress Call</button>
+                <button className="cmd-btn" onClick={() => runScenario("storm-convoy")}>Storm Convoy</button>
+                <button className="cmd-btn" onClick={() => runScenario("collision-course")}>Collision Course</button>
+              </div>
+            </section>
+
+            <section style={{ ...styles.controlCard, gridColumn: "1 / -1" }}>
+              <h3 className="bs-display" style={styles.controlCardTitle}>Harbor Pilot Boarding</h3>
+              <p style={styles.controlNote}>{HARBOR_PHASE_LABELS[harbor.phase]}</p>
+              {currentHarborStep && (
+                <>
+                  {currentHarborStep.hail && (
+                    <p style={styles.harborHail}>{currentHarborStep.hail()}</p>
+                  )}
+                  <p style={styles.controlNote}>{currentHarborStep.note}</p>
+                  <div style={styles.controlRow}>
+                    <button className="cmd-btn" onClick={currentHarborStep.run}>{currentHarborStep.label}</button>
+                    {harbor.phase !== "idle" && (
+                      <button
+                        className="cmd-btn"
+                        style={styles.dangerBtn}
+                        onClick={() => {
+                          setHarbor({ phase: "idle", pilotId: null, pilotCallsign: null, harborPoint: null });
+                          addLog("Harbor scenario tracker reset. Previously spawned vessels are still in the world — there is no despawn-all command.");
+                        }}
+                      >
+                        Reset Tracker
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </section>
+          </div>
+        </div>
+      )}
+
+      {/* RADIO tab — folded in from toys/radio-console/, same iframe embed old Bridge used */}
+      {activeTab === "radio" && (
+        <div style={styles.radioPane}>
+          <iframe
+            title="Radio Console instrument"
+            src="../radio-console/"
+            style={styles.radioFrame}
+          />
+        </div>
+      )}
+
+      {/* RAW FEED tab — folded in from toys/fleetcore-live/, table form instead of the Leaflet map */}
+      {activeTab === "raw" && (
+        <div className="bs-mono" style={styles.rawPane}>
+          <div style={styles.rawStrip}>
+            <span>TICK <b style={{ color: "#4FD1C5" }}>{snapshot?.tick ?? "—"}</b></span>
+            <span>SIM TIME <b style={{ color: "#4FD1C5" }}>{snapshot?.sim_time || "—"}</b></span>
+            <span>CLOCK <b style={{ color: "#4FD1C5" }}>{snapshot?.clock_state || "—"}</b></span>
+            <span>TIME SCALE <b style={{ color: "#4FD1C5" }}>{snapshot?.time_scale ?? "—"}x</b></span>
+            <span>AUTHORITY <b style={{ color: commandAuthority ? "#4FD1C5" : "#E05252" }}>{commandAuthority ? "Command" : "Read-only"}</b></span>
+            <span>EVENT RETENTION <b style={{ color: "#4FD1C5" }}>{snapshot?.vessel_event_retention ?? "—"}</b></span>
+          </div>
+
+          <h3 className="bs-display" style={styles.rawHeading}>Vessels ({vessels.length})</h3>
+          <div style={styles.rawTableWrap}>
+            <table style={styles.rawTable}>
+              <thead>
+                <tr>
+                  <th style={styles.rawTh}>Callsign</th>
+                  <th style={styles.rawTh}>Kind</th>
+                  <th style={styles.rawTh}>Status</th>
+                  <th style={styles.rawTh}>Position</th>
+                  <th style={styles.rawTh}>Course</th>
+                  <th style={styles.rawTh}>Speed</th>
+                  <th style={styles.rawTh}>Route legs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vessels.map((v) => (
+                  <tr key={v.id}>
+                    <td style={styles.rawTd}>{v.callsign}</td>
+                    <td style={styles.rawTd}>{v.kind}</td>
+                    <td style={styles.rawTd}>{v.status}</td>
+                    <td style={styles.rawTd}>{v.position.lat.toFixed(4)}, {v.position.lng.toFixed(4)}</td>
+                    <td style={styles.rawTd}>{Math.round(v.course)}°</td>
+                    <td style={styles.rawTd}>{v.speed_mps.toFixed(1)} m/s</td>
+                    <td style={styles.rawTd}>{v.route ? v.route.length : 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <h3 className="bs-display" style={styles.rawHeading}>Watch Events ({(snapshot?.watch_events || []).length})</h3>
+          <ul style={styles.rawList}>
+            {(snapshot?.watch_events || []).slice(-10).reverse().map((event, i) => (
+              <li key={i} style={styles.rawListItem}>[tick {event.tick}] {event.message}</li>
+            ))}
+          </ul>
+
+          <h3 className="bs-display" style={styles.rawHeading}>Vessel Events ({(snapshot?.vessel_events || []).length})</h3>
+          <ul style={styles.rawList}>
+            {(snapshot?.vessel_events || []).slice(-10).reverse().map((event, i) => (
+              <li key={i} style={styles.rawListItem}>[tick {event.tick}] {event.vessel_id}: {event.type}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Log strip */}
       <div ref={logRef} className="bs-mono" style={styles.log}>
@@ -542,4 +984,45 @@ const styles = {
     color: "#6B7C93",
   },
   logLine: { padding: "2px 0" },
+
+  stationTabs: {
+    display: "flex", gap: 2, background: "#0D1626", borderBottom: "1px solid #1E2C42", padding: "0 14px",
+  },
+  stationTabBtn: {},
+
+  controlPane: { padding: "16px", overflowY: "auto", flex: "1 1 auto", minHeight: 320 },
+  controlWarn: { color: "#E8A33D", fontSize: 11, marginBottom: 10 },
+  controlNote: { color: "#6B7C93", fontSize: 11, marginBottom: 12, lineHeight: 1.5 },
+  controlGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 },
+  controlCard: {
+    background: "#111A2B", border: "1px solid #1E2C42", borderRadius: 6, padding: "14px 16px",
+  },
+  controlCardTitle: { fontSize: 12, letterSpacing: "0.1em", color: "#DCE6F2", marginBottom: 10, textTransform: "uppercase" },
+  controlRow: { display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" },
+  controlForm: { display: "flex", flexDirection: "column", gap: 8 },
+  controlInput: {
+    background: "#0D1626", border: "1px solid #1E2C42", borderRadius: 3, color: "#DCE6F2",
+    padding: "8px 10px", fontSize: 12, fontFamily: "'JetBrains Mono', monospace", flex: "1 1 0",
+  },
+  dangerBtn: { background: "#E05252" },
+  harborHail: {
+    color: "#4FD1C5", fontStyle: "italic", fontSize: 12, marginBottom: 8,
+    borderLeft: "2px solid #4FD1C5", paddingLeft: 10,
+  },
+
+  radioPane: { flex: "1 1 auto", minHeight: 420, display: "flex" },
+  radioFrame: { flex: "1 1 auto", width: "100%", border: "none" },
+
+  rawPane: { padding: "16px", overflowY: "auto", flex: "1 1 auto", minHeight: 320, fontSize: 12 },
+  rawStrip: {
+    display: "flex", flexWrap: "wrap", gap: 16, color: "#6B7C93", fontSize: 11,
+    paddingBottom: 12, marginBottom: 14, borderBottom: "1px solid #1E2C42",
+  },
+  rawHeading: { fontSize: 12, letterSpacing: "0.08em", color: "#DCE6F2", textTransform: "uppercase", margin: "16px 0 8px" },
+  rawTableWrap: { overflowX: "auto" },
+  rawTable: { width: "100%", borderCollapse: "collapse", fontSize: 11 },
+  rawTh: { textAlign: "left", color: "#6B7C93", padding: "6px 10px", borderBottom: "1px solid #1E2C42" },
+  rawTd: { padding: "6px 10px", borderBottom: "1px solid #14203380", color: "#DCE6F2" },
+  rawList: { listStyle: "none", padding: 0, margin: 0 },
+  rawListItem: { padding: "5px 0", borderBottom: "1px solid #14203380", color: "#9BB0C8", fontSize: 11 },
 };

@@ -1,5 +1,14 @@
 # Bridge Station 3.0
 
+**2026-07-16 update (`BRIDGE3-CONSOLIDATE-01`):** this is now the sole "look at
+or command FleetCore" toy — `toys/bridge/`, `toys/fleetcore-live/`, and
+`toys/fleetcore-control/` are retired, folded in as three additional tabs
+(Control, Radio, Raw Feed) alongside the original single-panel view below,
+now labeled "Bridge" in the tab bar. See `docs/deployment.md`'s "Bridge
+Station" section for what moved where. It is deployed publicly at
+`web/toys/bridge-station-3.0/` (see "Build and serve" below) — the "LAN-only"
+deployment note further down describes an earlier, since-superseded stage.
+
 The merge: 2.1's operator loop (Select → Act → World changes → Instruments respond), wired to 2.0's real `fleetcore-serve` data. "Act" is genuinely real here — Set Waypoint sends an actual `set-route` `Command` over the WebSocket, and every panel re-renders from whatever snapshot the server broadcasts back. There is no local physics simulation left in this component at all; the real backend's tick loop is what actually moves the ship.
 
 ## What changed from 2.1

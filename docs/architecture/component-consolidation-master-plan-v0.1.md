@@ -48,7 +48,9 @@ Four toys all do "look at or command FleetCore," with genuine, confirmed overlap
 4. Verify each addition live against the real deployed page before touching what it replaces.
 5. Only once all three are verified equivalent: retire `toys/bridge/`, `toys/fleetcore-live/`, `toys/fleetcore-control/`.
 
-Net: **4 toys → 1**, no feature dropped, one authoritative "Bridge" instead of three-plus things partially claiming that name. Not started — this is real React work against a build-step toy, staged deliberately so nothing gets retired before its replacement is verified equivalent.
+Net: **4 toys → 1**, no feature dropped, one authoritative "Bridge" instead of three-plus things partially claiming that name.
+
+**Done, 2026-07-16 (`BRIDGE3-CONSOLIDATE-01`).** All 5 stages landed in one pass rather than across sessions: Bridge Station 3.0 gained Control/Radio/Raw-Feed tabs alongside its existing default view (renamed "Bridge" in the tab bar), each verified live via Playwright against the real deployed page — including a real Distress Call command round-tripping end to end — before `toys/bridge/`, `toys/fleetcore-live/`, and `toys/fleetcore-control/` were `git rm`'d from both `toys/` and `web/toys/`. Every homepage/footer "Bridge" link now points straight at `toys/bridge-station-3.0/`; the three retired toys' cards are gone from `web/index.html` and `web/command-deck.html`. See `docs/deployment.md`'s "Bridge Station" section for the full writeup.
 
 ## Phase 3 — Named but not scoped (design exists, no code)
 
