@@ -6,7 +6,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## WATCHMAN-01 — Flesh out Watchman's missing checks
 
-- Status: queued
+- Status: claimed:claude@2026-07-16T23:05:00Z
 - Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 1
 - Objective: `watchman.py` implements 2 of the 8 checks its own role
   implies (disk usage, Qdrant health). Add process monitoring and
