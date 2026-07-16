@@ -4,6 +4,34 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## MISSIONBUS-01 — Generalize Mission Bus beyond the single hardcoded Kraken mission
+
+- Status: claimed:claude@2026-07-16T20:55:00Z
+- Source: Lieutenant request, 2026-07-16, following up on the GLUE-01
+  through GLUE-07 design chain and the shipped Kraken Inquiry Pilot.
+- Objective: `tools/mission-bus/mission_bus.py` hardcodes `MID` and `CID`
+  as module-level constants for the one Kraken pilot mission. Generalize
+  `create`/`execute`/`review`/`transition`/`project` to accept a mission
+  ID, objective, and correlation ID as parameters instead, so a second
+  mission can exist without a second hardcoded copy of this file. This is
+  the blocking dependency for every other component adapter GLUE-03
+  designed (Cognition Graph export, Mission Director import, Legend
+  Pipeline wrap, etc.) -- none of them can land without a Mission Bus
+  that supports more than one mission.
+- Scope: `tools/mission-bus/mission_bus.py` and its tests only. Preserve
+  the existing Kraken pilot's exact behavior and CLI surface (running it
+  with no new arguments must behave identically to today). No new
+  component adapters in this pass -- that's follow-up work once this
+  lands.
+- Exclusions: no change to the Mission Record's SQLite schema (GLUE-02's
+  schema already supports multiple `mission_id` values; this is a Python
+  API/CLI generalization, not a storage change). No FleetCore changes.
+- Done evidence: existing Kraken pilot tests still pass unmodified; a new
+  test creates and completes a second, differently-IDed mission
+  independently of the Kraken one; CLI accepts `--mission-id`/`--objective`
+  flags, defaulting to the Kraken pilot's values when omitted.
+- Claimed by: claude
+
 ## HUMAN-03 — Restore access to scout-screen-mode worktree
 
 - Status: blocked-on-human
