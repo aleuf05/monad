@@ -32,18 +32,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   flags, defaulting to the Kraken pilot's values when omitted.
 - Claimed by: claude
 
-## HUMAN-03 — Restore access to scout-screen-mode worktree
-
-- Status: blocked-on-human
-- Source: `GA-01` finding
-- What's needed: someone with host permissions to resolve the "dubious
-  ownership" git error on `.claude/worktrees/scout-screen-mode`, or
-  confirm whether the locked worktree (`worktree-scout-screen-mode`) is
-  still active work or safe to release. No agent this session could
-  inspect it.
-- Claimed by: — (needs host-level access)
-- Evidence: —
-
 ## HEART-01 — Provision live model-provider credentials for Track A
 
 - Status: blocked-on-human
