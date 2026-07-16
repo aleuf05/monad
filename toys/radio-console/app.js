@@ -278,6 +278,49 @@ const state = {
   stationMemory: new Map()
 };
 
+const EDITORIAL_COOLDOWN_MS = 45000;
+const MAX_UTTERANCES_PER_TOPIC = 2;
+const editorialTopics = new Map();
+const editorialSuppressions = new Map();
+
+function recordEditorialSuppression(reason, topic) {
+  const count = (editorialSuppressions.get(reason) || 0) + 1;
+  editorialSuppressions.set(reason, count);
+  if (count === 1 || count % 10 === 0) {
+    logDiag("editorial_suppression", "accepted", `${reason} · ${count} total · ${topic}`);
+  }
+  updateDiagnostics();
+}
+
+function suppressRadioEvent(reason, topic) {
+  recordEditorialSuppression(reason, topic);
+  return false;
+}
+
+function editorializeEntry(entry) {
+  return {
+    ...entry,
+    topic: entry.topic || `${entry.channel || "fleet-comms"}:${entry.kind || "status"}:${entry.speaker || "unknown"}:${truncated(entry.text, 48)}`,
+    intent: entry.intent || (entry.kind === "fuel" ? "recommend action" : entry.kind === "watch" ? "inform the watch" : "coordinate"),
+    audience: entry.audience || "fleet",
+    editorialReason: entry.editorialReason || (entry.sourceAuthority === "human" ? "human-authored operational message" : "material operational change")
+  };
+}
+
+function passesEditorialGate(entry, now = Date.now()) {
+  const prior = editorialTopics.get(entry.topic);
+  const cooldown = Math.max(EDITORIAL_COOLDOWN_MS, entry.dedupeWindowMs || 0);
+  if (prior && now - prior.lastAt < cooldown) {
+    if (prior.utterances >= MAX_UTTERANCES_PER_TOPIC || entry.speaker === prior.lastSpeaker) {
+      recordEditorialSuppression("recent-topic-duplicate", entry.topic);
+      return false;
+    }
+  }
+  const utterances = prior && now - prior.lastAt < EDITORIAL_COOLDOWN_MS ? prior.utterances + 1 : 1;
+  editorialTopics.set(entry.topic, { lastAt: now, lastSpeaker: entry.speaker, utterances });
+  return true;
+}
+
 let audioContext = null;
 let masterGain = null;
 let staticGain = null;
@@ -758,13 +801,7 @@ function diffCaptainControls(controls) {
     const previous = lastCaptainControlSignatures.get(control.vessel_id);
     if (previous === signature) return;
     lastCaptainControlSignatures.set(control.vessel_id, signature);
-    queueNarratedEntry({
-      kind: "status",
-      channel: "fleet-comms",
-      speaker: "Bridge",
-      text: `${control.captain_id} on ${control.vessel_id} is now ${control.runtime_status.toLowerCase()}${control.enabled ? "" : " and disabled"}.`,
-      station: "bridge"
-    });
+    suppressRadioEvent("captain-runtime-telemetry", `captain-control:${control.vessel_id}`);
   });
 }
 
@@ -794,15 +831,23 @@ function diffAgentDecisions(records) {
     lastSpokenScoutPosture.set(record.vessel_id, record.posture);
     const speaker = vesselDisplayName(record.vessel_id);
     const phrases = {
-      "investigate-contact": `Monad, ${speaker}. Contact in sight; holding observation stand-off. Out.`,
-      "widen-flank": `Monad, ${speaker}. Moving to the wide flank. Out.`,
-      "cover-rear": `Monad, ${speaker}. Taking rear guard. Out.`,
-      "advance-screen": `Monad, ${speaker}. Advancing the screen. Out.`,
-      "recover-formation": `Monad, ${speaker}. Rejoining formation. Out.`,
-      "hold-station": `Monad, ${speaker}. Holding station. Out.`,
+      "investigate-contact": `Monad, ${speaker}. Contact in sight; I’m holding observation stand-off.`,
+      "widen-flank": `Monad, ${speaker}. I’m widening the flank for a cleaner view.`,
+      "cover-rear": `Monad, ${speaker}. I’ll cover the rear sector.`,
+      "advance-screen": `Monad, ${speaker}. I’m advancing the screen.`,
+      "recover-formation": `Monad, ${speaker}. I’m recovering formation.`,
+      "hold-station": `Monad, ${speaker}. I’ll hold this station.`,
       "emergency-separation": `Monad, ${speaker}. Emergency separation maneuver. Stand clear.`
     };
-    queueNarratedEntry({ kind: "status", channel: "scout-net", speaker, text: phrases[record.posture] || `Monad, ${speaker}. New posture set. Out.`, station: "bridge" });
+    queueNarratedEntry({
+      kind: "status", channel: "scout-net", speaker,
+      text: phrases[record.posture] || `Monad, ${speaker}. I’m adjusting posture.`, station: "bridge",
+      topic: `scout-posture:${record.vessel_id}:${record.posture}`,
+      intent: record.posture === "emergency-separation" ? "warn and deconflict" : "coordinate posture",
+      audience: "Monad", editorialReason: "accepted scout decision changed operational posture",
+      urgency: record.posture === "emergency-separation" ? 1 : undefined,
+      interruptible: record.posture === "emergency-separation"
+    });
   });
 }
 
@@ -812,13 +857,7 @@ function diffCanonEvents(events) {
   const fresh = events.filter((event) => canonEventCursor(event) > lastCanonEventSeq);
   if (!fresh.length) return;
   lastCanonEventSeq = Math.max(lastCanonEventSeq, ...fresh.map(canonEventCursor));
-  queueNarratedEntry({
-    kind: "status",
-    channel: "fleet-comms",
-    speaker: "Bridge",
-    text: `Canon ledger advanced by ${fresh.length} change${fresh.length === 1 ? "" : "s"}.`,
-    station: "bridge"
-  });
+  suppressRadioEvent("canon-ledger-telemetry", `canon:${lastCanonEventSeq}`);
 }
 
 function vesselById(id) {
@@ -846,14 +885,7 @@ function diffVesselEvents(events) {
   fresh.forEach((event) => {
     switch (event.type) {
       case "route_replaced": {
-        const name = vesselDisplayName(event.vessel_id);
-        queueNarratedEntry({
-          kind: "status",
-          channel: "fleet-comms",
-          speaker: "Bridge",
-          text: `Bridge, ${name} route updated; ${event.remaining_leg_count} leg${event.remaining_leg_count === 1 ? "" : "s"} remain.`,
-          station: "bridge"
-        });
+        suppressRadioEvent("routine-route-telemetry", `route:${event.vessel_id}`);
         break;
       }
       case "route_completed": {
@@ -872,14 +904,7 @@ function diffVesselEvents(events) {
         if (vessel?.kind === "scout") {
           break;
         }
-        const name = vesselDisplayName(event.vessel_id);
-        queueNarratedEntry({
-          kind: "status",
-          channel: "fleet-comms",
-          speaker: "Bridge",
-          text: `Bridge, ${name} route complete and vessel on station.`,
-          station: "bridge"
-        });
+        suppressRadioEvent("routine-route-telemetry", `route-complete:${event.vessel_id}`);
         break;
       }
       case "waypoint_reached": {
@@ -889,25 +914,11 @@ function diffVesselEvents(events) {
         break;
       }
       case "holding": {
-        const name = vesselDisplayName(event.vessel_id);
-        queueNarratedEntry({
-          kind: "status",
-          channel: "fleet-comms",
-          speaker: "Bridge",
-          text: `Bridge, ${name} is holding station.`,
-          station: "bridge"
-        });
+        suppressRadioEvent("routine-holding-telemetry", `holding:${event.vessel_id}`);
         break;
       }
       case "escort_station_changed": {
-        const label = ESCORT_MODE_LABELS[event.new_mode] || event.new_mode;
-        queueNarratedEntry({
-          kind: "status",
-          channel: "fleet-comms",
-          speaker: "Bridge",
-          text: `Bridge, escorts shifting to ${label}.`,
-          station: "bridge"
-        });
+        suppressRadioEvent("duplicate-escort-telemetry", `escort-station:${event.new_mode}`);
         break;
       }
       case "fuel_status_changed": {
@@ -918,8 +929,10 @@ function diffVesselEvents(events) {
           kind: "fuel",
           channel: "fleet-comms",
           speaker: "Engineering",
-          text: `Engineering reports ${name} at ${percent} percent fuel margin, ${recommendation}.`,
-          station: "engineering"
+          text: `Monad, Engineering. ${name} is at ${percent} percent fuel margin; ${recommendation}.`,
+          station: "engineering", topic: `fuel:${event.vessel_id}:${event.new_severity}`,
+          intent: "recommend fuel action", audience: "Monad",
+          editorialReason: "fuel severity crossed an operational threshold"
         });
         break;
       }
@@ -1150,7 +1163,8 @@ function deriveOverallRadioState() {
 function updateDiagSummary() {
   if (!diagSummaryLine) return;
   const loop = state.powered && liveMode ? "ACTIVE" : "IDLE";
-  diagSummaryLine.textContent = `RADIO ${deriveOverallRadioState()} — CONTENT ${loop} — AUDIO PATH ${pathSummaryLabel()}`;
+  const suppressed = [...editorialSuppressions.values()].reduce((total, count) => total + count, 0);
+  diagSummaryLine.textContent = `RADIO ${deriveOverallRadioState()} — CONTENT ${loop} — EDITORIAL ${suppressed} SUPPRESSED — AUDIO PATH ${pathSummaryLabel()}`;
 }
 
 function updateDiagnostics() {
@@ -1554,13 +1568,16 @@ function statusLineFor(vessel) {
 }
 
 function queueLiveEntry(entry) {
-  const queued = normalizeQueuedEntry(entry);
+  const editorial = editorializeEntry(entry);
+  if (!passesEditorialGate(editorial)) return false;
+  const queued = normalizeQueuedEntry(editorial);
   queued.threadId = queued.threadId || state.nextThreadId++;
   recordThreadState(queued, "pending");
   liveQueue.push(queued);
   lastAcceptedEntry = queued;
   updateDiagnostics();
   window.setTimeout(livePump, 0);
+  return true;
 }
 
 function stationCanObserve(entry, station) {
@@ -1579,7 +1596,9 @@ async function pollMissionRadio() {
       heardMissionDedupeKeys.add(item.dedupe_key);
       queueLiveEntry({ kind: "watch", channel: item.channel, speaker: "Mission Briefing", text: item.text,
         sourceAuthority: "human", source: "mission-record", urgency: item.priority === "urgent" ? 0.9 : 0.45,
-        relevance: 0.8, authority: 1, expiresAfterMs: 300000, interruptible: true, station: "bridge" });
+        relevance: 0.8, authority: 1, expiresAfterMs: 300000, interruptible: true, station: "bridge",
+        topic: `mission:${item.dedupe_key}`, intent: "brief the fleet", audience: "fleet watch",
+        editorialReason: "human-approved mission record marked radio eligible" });
     });
   } catch (error) {
     // Optional read-only projection: FleetCore radio remains independent.
@@ -1600,17 +1619,7 @@ function diffVesselStates(vessels) {
     const previous = lastVesselStatus.get(vessel.id);
     lastVesselStatus.set(vessel.id, vessel.status);
     if (seeding || previous === vessel.status) return;
-    const line = statusLineFor(vessel);
-    if (!line) return;
-    const channel = VESSEL_CHANNEL[vessel.kind] || "fleet-comms";
-    const name = speakerNameFor(vessel);
-    queueLiveEntry({
-      kind: "status",
-      channel,
-      speaker: name,
-      text: `${name}, ${line}`,
-      station: channel === "traffic" ? "traffic" : "bridge"
-    });
+    suppressRadioEvent("routine-vessel-status", `vessel-status:${vessel.id}:${vessel.status}`);
   });
 }
 
@@ -1634,8 +1643,12 @@ function diffFuelLevels(vessels) {
       kind: "fuel",
       channel: "fleet-comms",
       speaker: "Engineering",
-      text: `Engineering reports ${name} at ${percent} percent fuel margin, ${recommendation}.`,
-      station: "engineering"
+      text: `Monad, Engineering. ${name} is at ${percent} percent fuel margin; ${recommendation}.`,
+      station: "engineering",
+      topic: `fuel:${vessel.id}:${severity}`,
+      intent: "recommend fuel action",
+      audience: "Monad",
+      editorialReason: "fuel severity crossed an operational threshold"
     });
   });
 }
@@ -1662,9 +1675,13 @@ function diffEscortMode(escortMode) {
   queueLiveEntry({
     kind: "status",
     channel: "fleet-comms",
-    speaker: "Bridge",
-    text: `Bridge, escorts shifting to ${label}.`,
-    station: "bridge"
+    speaker: "Monad Actual",
+    text: `Scout group, Monad. Shift to ${label}.`,
+    station: "bridge",
+    topic: `escort-mode:${escortMode}`,
+    intent: "order formation change",
+    audience: "scout group",
+    editorialReason: "fleet escort posture changed"
   });
 }
 
@@ -1690,7 +1707,12 @@ function diffWatchEvents(watchEvents) {
       channel: "fleet-comms",
       speaker: "Watch Officer",
       text: event.message,
-      station: "bridge"
+      station: "bridge",
+      topic: `human-watch:${event.id || event.sequence || event.message}`,
+      intent: "inform the fleet watch",
+      audience: "fleet watch",
+      editorialReason: "human-authored watch message",
+      sourceAuthority: "human"
     });
   });
   lastWatchEventCount = events.length;
@@ -1700,7 +1722,7 @@ function applyLiveSnapshot(snapshot) {
   lastSnapshotVessels = snapshot.vessels || [];
   snapshotNarrationBudget = MAX_CONTENT_LINES_PER_SNAPSHOT;
   if (firstOperationalSnapshot) {
-    queueBaselineOperationalWatch(snapshot);
+    suppressRadioEvent("baseline-telemetry", "initial-operational-snapshot");
     initializeOperationalCursors(snapshot);
     firstOperationalSnapshot = false;
   }
