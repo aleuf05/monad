@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-07-16T21:05:03.455533+00:00",
+  "fetched_at": "2026-07-16T22:45:01.674426+00:00",
   "items": [
+    {
+      "title": "White House says ICE traffic stops will continue after deadly shootings",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5896396/ice-traffic-stops-shootings",
+      "pubDate": "Thu, 16 Jul 2026 17:31:23 -0400"
+    },
+    {
+      "title": "Flood sirens blare in southcentral Texas as rivers reach perilous heights",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5896458/flood-sirens-texas-rivers-reach-dangerous-heights",
+      "pubDate": "Thu, 16 Jul 2026 17:30:03 -0400"
+    },
     {
       "title": "After years of false claims on voting, Trump to give an address on election integrity",
       "link": "https://www.npr.org/2026/07/16/nx-s1-5896448/trump-election-address",
@@ -32,16 +42,6 @@
       "title": "Zelenskyy fires Ukraine's tech-savvy defense minister in government reshuffle",
       "link": "https://www.npr.org/2026/07/16/g-s1-133920/ukraine-defense-minister-fired",
       "pubDate": "Thu, 16 Jul 2026 07:33:11 -0400"
-    },
-    {
-      "title": "The political risks from war in Iran. And, ICE's use of force is rising, report finds",
-      "link": "https://www.npr.org/2026/07/16/g-s1-133918/up-first-newsletter-iran-us-trump-jay-clayton-ice-use-of-force",
-      "pubDate": "Thu, 16 Jul 2026 07:29:01 -0400"
-    },
-    {
-      "title": "Oil companies are making billions. In the U.S., calls to tax their windfall are growing",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5845818/oil-prices-windfall-tax-iran-war",
-      "pubDate": "Thu, 16 Jul 2026 05:01:00 -0400"
     }
   ]
 }
