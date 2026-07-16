@@ -8,4 +8,4 @@
 6. **Acceptance criteria** — Live UI exposes both tiers, exact estimate/cost/cache state, explicit Generate and artifact player; scripts pass syntax/drift checks.
 7. **Tests / rollback** — JS syntax, drift, live markers and commissioned API smoke checks. Revert Studio files.
 8. **Assigned actor** — Codex.
-9. **Evidence and completion state** — Executing; privileged commissioning and live verification pending.
+9. **Evidence and completion state** — Verification pending. Frontend implementation, syntax, drift and live static markers are complete. Privileged service/Caddy commissioning, backend key presence, one generated artifact, cache-hit proof and live audio playback remain outstanding.
