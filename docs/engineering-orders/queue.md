@@ -4,23 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## CMDDECK-SYNC-01 — Resync command-deck.html with index.html
-
-- Status: queued
-- Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 1
-- Objective: `docs/deployment.md` requires `web/command-deck.html` be kept
-  an identical mirror of `web/index.html` (distinct `<title>` only) so old
-  bookmarked URLs keep working. It has drifted -- missing 3 links added to
-  `index.html` since (`ops.html`, Cognition Graph, Living Captain).
-  Resync it. BRIDGE-RETIRE-01 already landed (`web/bridge.html` retired,
-  Bridge links now point to `toys/bridge/`) — `command-deck.html`'s
-  footer link was updated as part of that commit, so no separate action
-  needed here for that part.
-- Scope: `web/command-deck.html` only.
-- Exclusions: no content changes to `web/index.html` itself.
-- Done evidence: diffing the two files' link sets shows zero difference
-  (same check used to find this drift in the first place).
-
 ## WATCHMAN-01 — Flesh out Watchman's missing checks
 
 - Status: queued
