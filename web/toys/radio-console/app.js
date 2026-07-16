@@ -4,8 +4,10 @@
 // purpose: no scripted fallback. connectFleetCoreLive() runs on load and
 // keeps retrying with backoff until fleetcore-serve's snapshots start
 // arriving; only then does it enter live mode and start speaking, driven
-// by real state changes (a vessel's status transition, a
-// RecordWatchEvent message) -- never a random timer. While disconnected,
+// by real state changes from the live snapshot stream and retained event
+// tail (vessel status changes, vessel_events, captain controls, escort
+// intents, agent decisions, canon ledger updates, and explicit
+// RecordWatchEvent messages) -- never a random timer. While disconnected,
 // the console stays visibly "Offline -- reconnecting", never silent
 // scripted chatter standing in for real data. ?fleetcoreServer= overrides
 // the server URL if needed.
@@ -234,9 +236,16 @@ let lastSnapshotVessels = []; // most recent snapshot's vessels, for on-demand s
 let lastWatchEventCount = null; // null until the first live snapshot seeds it
 let lastFuelSeverity = null; // Map<vesselId, "routine"|"elevated"|"critical">, null until seeded
 let lastEscortMode = null; // null until the first live snapshot seeds it
+let lastVesselEventSeq = null; // null until the first live snapshot seeds it
+let lastCanonEventSeq = null; // null until the first live snapshot seeds it
+let lastCaptainControlSignatures = null; // Map<vesselId, signature>, null until seeded
+let lastEscortIntentSignatures = null; // Map<decisionId, signature>, null until seeded
+let lastAgentDecisionCount = null; // null until seeded
+let firstOperationalSnapshot = true;
 const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
+const MAX_CONTENT_LINES_PER_SNAPSHOT = 6;
 const VESSEL_CHANNEL = { flagship: "fleet-comms", scout: "fleet-comms", "passive-traffic": "traffic" };
 const STATUS_LINES = {
   underway: "underway, course {course}, speed {speed} knots.",
@@ -522,6 +531,323 @@ function stationMemoryLine(station) {
   return latest.signature === stationReportSignature(station) ? "NO CHANGE SINCE LAST REPORT" : "";
 }
 
+function truncated(value, limit = 88) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return text.length <= limit ? text : `${text.slice(0, Math.max(0, limit - 1)).trimEnd()}…`;
+}
+
+function countWhere(items, predicate) {
+  return (items || []).reduce((count, item) => count + (predicate(item) ? 1 : 0), 0);
+}
+
+function snapshotCounts(snapshot) {
+  const vessels = snapshot.vessels || [];
+  return {
+    moving: countWhere(vessels, (vessel) => vessel.status === "underway" || vessel.status === "transiting"),
+    holding: countWhere(vessels, (vessel) => vessel.status === "holding" || vessel.status === "paused"),
+    activeScouts: countWhere(vessels, (vessel) => vessel.kind === "scout"),
+    traffic: countWhere(vessels, (vessel) => vessel.kind === "passive-traffic"),
+    elevatedFuel: countWhere(vessels, (vessel) => fuelSeverity(vessel.fuel_fraction) === "elevated"),
+    criticalFuel: countWhere(vessels, (vessel) => fuelSeverity(vessel.fuel_fraction) === "critical"),
+    routineFuel: countWhere(vessels, (vessel) => fuelSeverity(vessel.fuel_fraction) === "routine"),
+    openControls: countWhere(snapshot.captain_controls || [], (control) => control.enabled),
+    disabledControls: countWhere(snapshot.captain_controls || [], (control) => !control.enabled),
+    pendingIntents: (snapshot.escort_intents || []).filter((intent) => intent.executed_tick == null).length,
+    completedIntents: (snapshot.escort_intents || []).filter((intent) => intent.executed_tick != null).length
+  };
+}
+
+function queueNarratedEntry(entry) {
+  if (snapshotNarrationBudget <= 0) return false;
+  snapshotNarrationBudget -= 1;
+  queueLiveEntry(entry);
+  return true;
+}
+
+function captainControlSignature(control) {
+  return [
+    control.captain_id,
+    control.vessel_id,
+    control.role,
+    control.enabled ? "enabled" : "disabled",
+    control.runtime_status,
+    control.provider,
+    control.status_message,
+    control.last_report_tick ?? ""
+  ].join("|");
+}
+
+function escortIntentSignature(intent) {
+  return [
+    intent.decision_id,
+    intent.captain_id,
+    intent.vessel_id,
+    intent.posture,
+    intent.target_contact_id || "",
+    intent.objective,
+    intent.assessment,
+    intent.reconsider_at_tick,
+    intent.accepted_tick,
+    intent.executed_tick ?? "",
+    intent.consequence ?? ""
+  ].join("|");
+}
+
+function canonEventCursor(event) {
+  return typeof event?.fleet_event_sequence === "number" ? event.fleet_event_sequence : -1;
+}
+
+function vesselEventCursor(event) {
+  return typeof event?.event_seq === "number" ? event.event_seq : -1;
+}
+
+function initializeOperationalCursors(snapshot) {
+  lastVesselEventSeq = (snapshot.vessel_events || []).reduce((max, event) => Math.max(max, vesselEventCursor(event)), -1);
+  lastCanonEventSeq = (snapshot.canon_events || []).reduce((max, event) => Math.max(max, canonEventCursor(event)), -1);
+  lastCaptainControlSignatures = new Map((snapshot.captain_controls || []).map((control) => [control.vessel_id, captainControlSignature(control)]));
+  lastEscortIntentSignatures = new Map((snapshot.escort_intents || []).map((intent) => [intent.decision_id, escortIntentSignature(intent)]));
+  lastAgentDecisionCount = (snapshot.agent_decisions || []).length;
+}
+
+function queueBaselineOperationalWatch(snapshot) {
+  const counts = snapshotCounts(snapshot);
+  const escortLabel = ESCORT_MODE_LABELS[snapshot.escort_mode] || snapshot.escort_mode || "unknown";
+  queueNarratedEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Bridge, live watch established. ${counts.moving} vessel${counts.moving === 1 ? "" : "s"} moving, ${counts.holding} holding, escort mode ${escortLabel}.`,
+    station: "bridge"
+  });
+
+  if (counts.criticalFuel > 0 || counts.elevatedFuel > 0 || counts.routineFuel > 0) {
+    const fuelText = counts.criticalFuel > 0
+      ? `${counts.criticalFuel} critical and ${counts.elevatedFuel} elevated fuel margin${counts.criticalFuel + counts.elevatedFuel === 1 ? "" : "s"}`
+      : counts.elevatedFuel > 0
+        ? `${counts.elevatedFuel} elevated fuel margin${counts.elevatedFuel === 1 ? "" : "s"}`
+        : `${counts.routineFuel} routine fuel margin${counts.routineFuel === 1 ? "" : "s"}`;
+    queueNarratedEntry({
+      kind: "status",
+      channel: "fleet-comms",
+      speaker: "Engineering",
+      text: `Engineering, ${fuelText}; margins are being watched.`,
+      station: "engineering"
+    });
+  } else {
+    queueNarratedEntry({
+      kind: "status",
+      channel: "fleet-comms",
+      speaker: "Engineering",
+      text: "Engineering, all tracked fuel margins routine.",
+      station: "engineering"
+    });
+  }
+
+  if (counts.traffic > 0) {
+    queueNarratedEntry({
+      kind: "status",
+      channel: "traffic",
+      speaker: "Traffic",
+      text: `Traffic, ${counts.traffic} contact${counts.traffic === 1 ? "" : "s"} on screen and ${counts.moving} moving targets under watch.`,
+      station: "traffic"
+    });
+  } else {
+    queueNarratedEntry({
+      kind: "status",
+      channel: "traffic",
+      speaker: "Traffic",
+      text: "Traffic, screen clear.",
+      station: "traffic"
+    });
+  }
+
+  if (counts.pendingIntents > 0 || counts.disabledControls > 0) {
+    const requestBits = [];
+    if (counts.pendingIntents > 0) requestBits.push(`${counts.pendingIntents} escort request${counts.pendingIntents === 1 ? "" : "s"} pending review`);
+    if (counts.disabledControls > 0) requestBits.push(`${counts.disabledControls} captain control${counts.disabledControls === 1 ? "" : "s"} disabled`);
+    queueNarratedEntry({
+      kind: "status",
+      channel: "fleet-comms",
+      speaker: "Bridge",
+      text: `Bridge, ${requestBits.join("; ")}.`,
+      station: "bridge"
+    });
+  }
+}
+
+function diffCaptainControls(controls) {
+  if (!Array.isArray(controls)) return;
+  if (lastCaptainControlSignatures === null) return;
+  controls.forEach((control) => {
+    const signature = captainControlSignature(control);
+    const previous = lastCaptainControlSignatures.get(control.vessel_id);
+    if (previous === signature) return;
+    lastCaptainControlSignatures.set(control.vessel_id, signature);
+    queueNarratedEntry({
+      kind: "status",
+      channel: "fleet-comms",
+      speaker: "Bridge",
+      text: `${control.captain_id} on ${control.vessel_id} is now ${control.runtime_status.toLowerCase()}${control.enabled ? "" : " and disabled"}.`,
+      station: "bridge"
+    });
+  });
+}
+
+function diffEscortIntents(intents) {
+  if (!Array.isArray(intents)) return;
+  if (lastEscortIntentSignatures === null) return;
+  intents.forEach((intent) => {
+    const signature = escortIntentSignature(intent);
+    const previous = lastEscortIntentSignatures.get(intent.decision_id);
+    if (previous === signature) return;
+    lastEscortIntentSignatures.set(intent.decision_id, signature);
+    const posture = String(intent.posture || "").replace(/_/g, " ").toLowerCase();
+    const objective = truncated(intent.objective, 96) || "unrecorded objective";
+    const station = intent.posture === "InvestigateContact" ? "traffic" : "bridge";
+    const text = intent.executed_tick == null
+      ? `Bridge, ${intent.captain_id} requests ${posture} for ${intent.vessel_id}: ${objective}; awaiting decision.`
+      : `Bridge, ${intent.captain_id}'s ${posture} request for ${intent.vessel_id} has been executed.`;
+    queueNarratedEntry({
+      kind: "status",
+      channel: "fleet-comms",
+      speaker: "Bridge",
+      text,
+      station
+    });
+  });
+}
+
+function diffAgentDecisions(records) {
+  if (!Array.isArray(records)) return;
+  if (lastAgentDecisionCount === null) return;
+  if (records.length <= lastAgentDecisionCount) return;
+  records.slice(lastAgentDecisionCount).forEach((record) => {
+    const posture = String(record.posture || "").replace(/_/g, " ").toLowerCase();
+    const outcome = String(record.outcome || "").toLowerCase();
+    const shortResult = truncated(record.result, 108);
+    queueNarratedEntry({
+      kind: "watch",
+      channel: "fleet-comms",
+      speaker: "Bridge",
+      text: `Decision ${outcome} for ${record.captain_id} on ${record.vessel_id}: ${posture}${shortResult ? ` — ${shortResult}` : ""}.`,
+      station: "bridge"
+    });
+  });
+  lastAgentDecisionCount = records.length;
+}
+
+function diffCanonEvents(events) {
+  if (!Array.isArray(events)) return;
+  if (lastCanonEventSeq === null) return;
+  const fresh = events.filter((event) => canonEventCursor(event) > lastCanonEventSeq);
+  if (!fresh.length) return;
+  lastCanonEventSeq = Math.max(lastCanonEventSeq, ...fresh.map(canonEventCursor));
+  queueNarratedEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Canon ledger advanced by ${fresh.length} change${fresh.length === 1 ? "" : "s"}.`,
+    station: "bridge"
+  });
+}
+
+function vesselById(id) {
+  return (lastSnapshotVessels || []).find((vessel) => vessel.id === id) || null;
+}
+
+function vesselDisplayName(id) {
+  const vessel = vesselById(id);
+  if (!vessel) return id;
+  return speakerNameFor(vessel);
+}
+
+function diffVesselEvents(events) {
+  if (!Array.isArray(events)) return;
+  if (lastVesselEventSeq === null) return;
+  const fresh = events
+    .filter((event) => vesselEventCursor(event) > lastVesselEventSeq)
+    .sort((a, b) => vesselEventCursor(a) - vesselEventCursor(b));
+  if (!fresh.length) return;
+  lastVesselEventSeq = Math.max(lastVesselEventSeq, ...fresh.map(vesselEventCursor));
+
+  fresh.forEach((event) => {
+    switch (event.type) {
+      case "route_replaced": {
+        const name = vesselDisplayName(event.vessel_id);
+        queueNarratedEntry({
+          kind: "status",
+          channel: "fleet-comms",
+          speaker: "Bridge",
+          text: `Bridge, ${name} route updated; ${event.remaining_leg_count} leg${event.remaining_leg_count === 1 ? "" : "s"} remain.`,
+          station: "bridge"
+        });
+        break;
+      }
+      case "route_completed": {
+        const name = vesselDisplayName(event.vessel_id);
+        queueNarratedEntry({
+          kind: "status",
+          channel: "fleet-comms",
+          speaker: "Bridge",
+          text: `Bridge, ${name} route complete and vessel on station.`,
+          station: "bridge"
+        });
+        break;
+      }
+      case "waypoint_reached": {
+        const name = vesselDisplayName(event.vessel_id);
+        const station = vesselById(event.vessel_id)?.kind === "passive-traffic" ? "traffic" : "bridge";
+        queueNarratedEntry({
+          kind: "status",
+          channel: station === "traffic" ? "traffic" : "fleet-comms",
+          speaker: station === "traffic" ? "Traffic" : "Bridge",
+          text: `${station === "traffic" ? "Traffic" : "Bridge"}, ${name} cleared a waypoint; ${event.remaining_leg_count} leg${event.remaining_leg_count === 1 ? "" : "s"} remain.`,
+          station
+        });
+        break;
+      }
+      case "holding": {
+        const name = vesselDisplayName(event.vessel_id);
+        queueNarratedEntry({
+          kind: "status",
+          channel: "fleet-comms",
+          speaker: "Bridge",
+          text: `Bridge, ${name} is holding station.`,
+          station: "bridge"
+        });
+        break;
+      }
+      case "escort_station_changed": {
+        const label = ESCORT_MODE_LABELS[event.new_mode] || event.new_mode;
+        queueNarratedEntry({
+          kind: "status",
+          channel: "fleet-comms",
+          speaker: "Bridge",
+          text: `Bridge, escorts shifting to ${label}.`,
+          station: "bridge"
+        });
+        break;
+      }
+      case "fuel_status_changed": {
+        const name = vesselDisplayName(event.vessel_id);
+        const recommendation = event.new_severity === "critical" ? "recommend holding" : "monitoring consumption";
+        const percent = Math.round((event.fuel_fraction || 0) * 100);
+        queueNarratedEntry({
+          kind: "fuel",
+          channel: "fleet-comms",
+          speaker: "Engineering",
+          text: `Engineering reports ${name} at ${percent} percent fuel margin, ${recommendation}.`,
+          station: "engineering"
+        });
+        break;
+      }
+      default:
+        break;
+    }
+  });
+}
+
 function recordThreadState(entry, nextState) {
   entry.threadState = nextState;
   entry.threadUpdatedAt = Date.now();
@@ -774,9 +1100,20 @@ function diffWatchEvents(watchEvents) {
 
 function applyLiveSnapshot(snapshot) {
   lastSnapshotVessels = snapshot.vessels || [];
+  snapshotNarrationBudget = MAX_CONTENT_LINES_PER_SNAPSHOT;
+  if (firstOperationalSnapshot) {
+    queueBaselineOperationalWatch(snapshot);
+    initializeOperationalCursors(snapshot);
+    firstOperationalSnapshot = false;
+  }
   diffWatchEvents(snapshot.watch_events);
   diffVesselStates(snapshot.vessels || []);
   diffFuelLevels(snapshot.vessels || []);
+  diffCaptainControls(snapshot.captain_controls || []);
+  diffEscortIntents(snapshot.escort_intents || []);
+  diffAgentDecisions(snapshot.agent_decisions || []);
+  diffCanonEvents(snapshot.canon_events || []);
+  diffVesselEvents(snapshot.vessel_events || []);
   diffEscortMode(snapshot.escort_mode);
   updateRadioStateIndicator();
 }
