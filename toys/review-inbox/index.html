@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monad Review Inbox</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B1220'/%3E%3Cpath d='M8 10h16v14H8z' fill='none' stroke='%234FD1C5' stroke-width='2'/%3E%3Cpath d='M8 10l8 7 8-7' fill='none' stroke='%234FD1C5' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 24px 100px; }
+  .monad-home-link{position:fixed;top:10px;left:10px;z-index:9999;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:#9BB0C8;background:rgba(11,18,32,.85);border:1px solid rgba(79,209,197,.35);border-radius:4px;padding:5px 10px;text-decoration:none;transition:color .15s ease,border-color .15s ease}
+  .monad-home-link:hover{color:#4FD1C5;border-color:#4FD1C5}
+  header { padding: 44px 0 24px; border-bottom: 1px solid #1E2C42; margin-bottom: 24px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; color: #4FD1C5; text-transform: uppercase; }
+  h1 { font-family: 'Oswald', sans-serif; font-size: 30px; letter-spacing: 0.1em; font-weight: 700; margin: 8px 0 10px; }
+  .subtitle { font-size: 13px; color: #9BB0C8; line-height: 1.6; max-width: 72ch; }
+  .boundary-note { margin-top: 16px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.7; }
+  .boundary-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
+  .summary-strip { display: flex; flex-wrap: wrap; gap: 20px; padding: 14px 0; font-size: 11px; color: #6B7C93; }
+  .summary-strip .val { color: #4FD1C5; }
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-btn { background: #111A2B; border: 1px solid #1E2C42; color: #9BB0C8; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.04em; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; }
+  .filter-btn.is-active { border-color: #4FD1C5; color: #4FD1C5; }
+  .card { background: #111A2B; border: 1px solid #1E2C42; border-left: 3px solid #4FD1C5; border-radius: 6px; padding: 16px 18px; margin-bottom: 12px; }
+  .card.status-accepted { border-left-color: #4FD1C5; }
+  .card.status-pending { border-left-color: #E8A33D; }
+  .card.status-rejected { border-left-color: #E05252; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .card-summary { font-size: 13px; color: #DCE6F2; max-width: 62ch; }
+  .card-badges { display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+  .badge { font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; border: 1px solid #1E2C42; color: #9BB0C8; }
+  .badge.source-world-intake { border-color: #4FD1C544; color: #4FD1C5; }
+  .badge.source-mission-bus { border-color: #E8A33D44; color: #E8A33D; }
+  .badge.status-pending { border-color: #E8A33D44; color: #E8A33D; }
+  .badge.status-accepted { border-color: #4FD1C544; color: #4FD1C5; }
+  .badge.status-rejected { border-color: #E0525244; color: #E05252; }
+  .card-meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 16px; font-size: 11px; color: #6B7C93; margin-top: 10px; }
+  .card-meta dt { display: inline; }
+  .card-meta dd { display: inline; color: #9BB0C8; margin-left: 4px; }
+  .card-conflicts { margin-top: 8px; font-size: 11px; color: #E05252; }
+  .decide-link { display: inline-block; margin-top: 10px; font-size: 11px; color: #4FD1C5; text-decoration: none; border: 1px solid #4FD1C544; padding: 4px 10px; border-radius: 3px; }
+  .decide-link:hover { border-color: #4FD1C5; }
+  .empty-state { color: #6B7C93; font-size: 12px; padding: 20px 0; }
+</style>
+</head>
+<body>
+<a class="monad-home-link" href="../../index.html">⚓ Fleet Monad</a>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Monad / GLUE-05 · new: review inbox v0.1</p>
+    <h1>REVIEW INBOX</h1>
+    <p class="subtitle">One feed for every pending human-review card across the fleet — World Intake's canon proposals and Mission Bus's mission reviews, normalized into the same shape and shown side by side.</p>
+    <div class="boundary-note">
+      This page is read-only aggregation, not a decision surface. Accepting, rejecting, or deferring a card still happens in the system that owns it — each card below links to where that actually happens. See <code>docs/architecture/human-review-inbox-v0.1.md</code> (GLUE-05) and <code>docs/engineering-orders/review-inbox-v0.1.md</code> for why the decision path deliberately isn't unified yet.
+    </div>
+  </header>
+
+  <div class="summary-strip" id="summaryStrip">Loading…</div>
+
+  <div class="filter-bar" id="filterBar"></div>
+
+  <div id="cardList"></div>
+</div>
+
+<script>
+(function () {
+  var STALE_AFTER_MS = 20 * 60 * 1000;
+  var allCards = [];
+  var activeFilter = "pending";
+
+  function fmtAge(iso) {
+    if (!iso) return "—";
+    var ms = Date.now() - new Date(iso).getTime();
+    if (!(ms >= 0)) return "—";
+    var hours = ms / 3600000;
+    if (hours < 1) return Math.round(ms / 60000) + "m ago";
+    if (hours < 48) return hours.toFixed(1) + "h ago";
+    return (hours / 24).toFixed(1) + "d ago";
+  }
+
+  function renderCard(card) {
+    var el = document.createElement("div");
+    el.className = "card status-" + (card.status || "pending");
+    var evidence = (card.evidence_refs || []).join(", ") || "none";
+    var conflicts = card.conflicts && card.conflicts.length
+      ? '<div class="card-conflicts">Conflicts: ' + card.conflicts.length + '</div>'
+      : "";
+    el.innerHTML =
+      '<div class="card-top">' +
+        '<div class="card-summary">' + (card.summary || "(no summary)") + '</div>' +
+        '<div class="card-badges">' +
+          '<span class="badge source-' + card.source_system + '">' + card.source_system.replace("-", " ") + '</span>' +
+          '<span class="badge status-' + card.status + '">' + card.status + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<dl class="card-meta">' +
+        '<div><dt>Type</dt><dd>' + (card.artifact_type || "—") + '</dd></div>' +
+        '<div><dt>Requires</dt><dd>' + (card.required_authority || "—") + '</dd></div>' +
+        '<div><dt>Evidence</dt><dd>' + evidence + '</dd></div>' +
+        '<div><dt>Created</dt><dd>' + fmtAge(card.created_at) + '</dd></div>' +
+      '</dl>' +
+      conflicts +
+      (card.decide_at ? '<a class="decide-link" href="' + card.decide_at + '">Decide at source →</a>' : '');
+    return el;
+  }
+
+  function applyFilter() {
+    var list = document.getElementById("cardList");
+    list.innerHTML = "";
+    var filtered = activeFilter === "all" ? allCards : allCards.filter(function (c) { return c.status === activeFilter; });
+    if (!filtered.length) {
+      var empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.textContent = "No cards match this filter.";
+      list.appendChild(empty);
+      return;
+    }
+    filtered.forEach(function (card) { list.appendChild(renderCard(card)); });
+
+    document.querySelectorAll(".filter-btn").forEach(function (btn) {
+      btn.classList.toggle("is-active", btn.dataset.filter === activeFilter);
+    });
+  }
+
+  function buildFilterBar() {
+    var statuses = ["pending", "all"].concat(
+      Array.from(new Set(allCards.map(function (c) { return c.status; }))).filter(function (s) { return s !== "pending"; })
+    );
+    var bar = document.getElementById("filterBar");
+    bar.innerHTML = "";
+    statuses.forEach(function (status) {
+      var btn = document.createElement("button");
+      btn.className = "filter-btn";
+      btn.dataset.filter = status;
+      btn.textContent = status + " (" + (status === "all" ? allCards.length : allCards.filter(function (c) { return c.status === status; }).length) + ")";
+      btn.addEventListener("click", function () { activeFilter = status; applyFilter(); });
+      bar.appendChild(btn);
+    });
+  }
+
+  fetch("../../data/review-inbox.json", { cache: "no-store" })
+    .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
+    .then(function (data) {
+      allCards = data.cards || [];
+      var ageMs = Date.now() - new Date(data.generated_at).getTime();
+      var stale = !(ageMs >= 0) || ageMs > STALE_AFTER_MS;
+      var summary = document.getElementById("summaryStrip");
+      summary.innerHTML =
+        '<span>PENDING: <span class="val">' + data.pending_count + '</span></span>' +
+        '<span>TOTAL: <span class="val">' + allCards.length + '</span></span>' +
+        '<span>WORLD INTAKE: <span class="val">' + data.sources.world_intake.card_count + '</span></span>' +
+        '<span>MISSION BUS: <span class="val">' + data.sources.mission_bus.card_count + '</span></span>' +
+        '<span>' + (stale ? 'FEED STALE' : 'checked ' + fmtAge(data.generated_at)) + '</span>';
+      buildFilterBar();
+      applyFilter();
+    })
+    .catch(function (err) {
+      document.getElementById("summaryStrip").textContent = "Feed unreachable: " + err.message;
+    });
+})();
+</script>
+</body>
+</html>

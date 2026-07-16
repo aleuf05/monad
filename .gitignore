@@ -27,6 +27,7 @@ data/voice-engine/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/watch-officer-fetch.log
+logs/review-inbox-fetch.log
 logs/lan-web-server.log
 logs/bridge-station-2.1-server.log
 logs/bridge-station-3.0-server.log

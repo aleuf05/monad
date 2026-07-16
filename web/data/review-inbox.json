@@ -1,0 +1,1950 @@
+{
+  "schema_version": "monad.reviewInbox.v0.1",
+  "generated_at": "2026-07-16T23:20:49.369842Z",
+  "pending_count": 39,
+  "sources": {
+    "world_intake": {
+      "card_count": 39,
+      "error": null
+    },
+    "mission_bus": {
+      "card_count": 1,
+      "error": null
+    }
+  },
+  "cards": [
+    {
+      "artifact_id": "artifact.cognition.kraken.verdict-01",
+      "artifact_type": "recommendation-candidate",
+      "conflicts": [],
+      "created_at": "2026-07-16T19:43:41.841670+00:00",
+      "decision_artifact_id": "artifact.review.kraken.decision-01",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "fleetcore_mutation": false,
+      "mission_id": "mission.kraken-inquiry-001",
+      "proposed_data": {
+        "fleetcore_mutation": false,
+        "mode": "stub",
+        "recommendation": "Continue passive observation, maintain separation, and escalate only on new verified evidence.",
+        "unknowns": [
+          "identity",
+          "intent"
+        ]
+      },
+      "requested_action": "accept-recommendation-candidate",
+      "required_authority": "human-command",
+      "review_id": "review.cognition.kraken.verdict-01",
+      "revision": 1,
+      "schema_version": "monad.review.v0.1",
+      "status": "accepted",
+      "summary": "Continue passive observation, maintain separation, and escalate only on new verified evidence.",
+      "supersedes_review_id": null,
+      "source_system": "mission-bus",
+      "decide_at": "../agent-ops/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_6103e8d54111ba39af41e2fb",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_6103e8d54111ba39af41e2fb",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Commander Claude reports nine recruits for proposed Deck 7 duty.",
+      "proposed_data": {
+        "assertion_id": "ast_6103e8d54111ba39af41e2fb",
+        "subject": "Chief Claude",
+        "proposed_change": {
+          "operation": "alias_reference",
+          "value": {
+            "alias": "Commander Claude",
+            "possible_canonical": "Claude"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Commander Claude reports nine recruits for proposed Deck 7 duty.",
+        "confidence": 0.7,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "alias_reference"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_6103e8d54111ba39af41e2fb"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_fd37ba291394eb2e203fcc6d",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_fd37ba291394eb2e203fcc6d",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+      "proposed_data": {
+        "assertion_id": "ast_fd37ba291394eb2e203fcc6d",
+        "subject": "Ada",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Reactor Analyst"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_fd37ba291394eb2e203fcc6d"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_36bc41d030aeadc78df163da",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_36bc41d030aeadc78df163da",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+      "proposed_data": {
+        "assertion_id": "ast_36bc41d030aeadc78df163da",
+        "subject": "Ada",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Diagnostics"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_36bc41d030aeadc78df163da"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_cd5abd2827e3f33e99e675ac",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_cd5abd2827e3f33e99e675ac",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+      "proposed_data": {
+        "assertion_id": "ast_cd5abd2827e3f33e99e675ac",
+        "subject": "Ada",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "radiation immunity",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Ada: assign role Reactor Analyst; station Deck 7 Diagnostics; claims radiation immunity.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_cd5abd2827e3f33e99e675ac"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_c10e9f9055ffc00ae40b59f0",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_c10e9f9055ffc00ae40b59f0",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+      "proposed_data": {
+        "assertion_id": "ast_c10e9f9055ffc00ae40b59f0",
+        "subject": "Bex",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Bex"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_c10e9f9055ffc00ae40b59f0"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_0b120ff71363fc4e69aa70d8",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_0b120ff71363fc4e69aa70d8",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+      "proposed_data": {
+        "assertion_id": "ast_0b120ff71363fc4e69aa70d8",
+        "subject": "Bex",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Coolant Technician"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_0b120ff71363fc4e69aa70d8"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_6a80fc59e7ef1a46fc4d2b25",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_6a80fc59e7ef1a46fc4d2b25",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+      "proposed_data": {
+        "assertion_id": "ast_6a80fc59e7ef1a46fc4d2b25",
+        "subject": "Bex",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Coolant Control"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_6a80fc59e7ef1a46fc4d2b25"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_d2e4937ba3b8377322d279b4",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_d2e4937ba3b8377322d279b4",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+      "proposed_data": {
+        "assertion_id": "ast_d2e4937ba3b8377322d279b4",
+        "subject": "Bex",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "expert coolant repair",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Bex: assign role Coolant Technician; station Deck 7 Coolant Control; claims expert coolant repair.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_d2e4937ba3b8377322d279b4"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_9915766df49c8133295a5994",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_9915766df49c8133295a5994",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+      "proposed_data": {
+        "assertion_id": "ast_9915766df49c8133295a5994",
+        "subject": "Cyra",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Cyra"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_9915766df49c8133295a5994"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_6585340a5639cf6224910ef8",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_6585340a5639cf6224910ef8",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [
+        {
+          "id": "con_1fcde671613c0f6f511f11df",
+          "assertion_id": "ast_6585340a5639cf6224910ef8",
+          "code": "duplicate_exclusive_assignment",
+          "material": 1,
+          "detail": "Reactor Operator also proposed for Gio"
+        }
+      ],
+      "summary": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+      "proposed_data": {
+        "assertion_id": "ast_6585340a5639cf6224910ef8",
+        "subject": "Cyra",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Reactor Operator"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [
+          {
+            "id": "con_1fcde671613c0f6f511f11df",
+            "assertion_id": "ast_6585340a5639cf6224910ef8",
+            "code": "duplicate_exclusive_assignment",
+            "material": 1,
+            "detail": "Reactor Operator also proposed for Gio"
+          }
+        ],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_6585340a5639cf6224910ef8"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_798a6b199b9cd19c889c80d8",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_798a6b199b9cd19c889c80d8",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+      "proposed_data": {
+        "assertion_id": "ast_798a6b199b9cd19c889c80d8",
+        "subject": "Cyra",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Reactor Console"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_798a6b199b9cd19c889c80d8"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_19c8f3eaee10c106c6003696",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_19c8f3eaee10c106c6003696",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+      "proposed_data": {
+        "assertion_id": "ast_19c8f3eaee10c106c6003696",
+        "subject": "Cyra",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "certified reactor operation",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Cyra: assign role Reactor Operator; station Deck 7 Reactor Console; claims certified reactor operation.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_19c8f3eaee10c106c6003696"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_43f83263ed6d63edee01e91b",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_43f83263ed6d63edee01e91b",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+      "proposed_data": {
+        "assertion_id": "ast_43f83263ed6d63edee01e91b",
+        "subject": "Dax",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Dax"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_43f83263ed6d63edee01e91b"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_aa95039a81d9cbc16ed1a621",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_aa95039a81d9cbc16ed1a621",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+      "proposed_data": {
+        "assertion_id": "ast_aa95039a81d9cbc16ed1a621",
+        "subject": "Dax",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Safety Officer"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_aa95039a81d9cbc16ed1a621"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_cc1863a404b43b5d17515f58",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_cc1863a404b43b5d17515f58",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+      "proposed_data": {
+        "assertion_id": "ast_cc1863a404b43b5d17515f58",
+        "subject": "Dax",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Safety Desk"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_cc1863a404b43b5d17515f58"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_cd7a7d1234a5c539c12b77a7",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_cd7a7d1234a5c539c12b77a7",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+      "proposed_data": {
+        "assertion_id": "ast_cd7a7d1234a5c539c12b77a7",
+        "subject": "Dax",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "emergency medicine",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Dax: assign role Safety Officer; station Deck 7 Safety Desk; claims emergency medicine.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_cd7a7d1234a5c539c12b77a7"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_97d1266c2f9e5b04fd45b7d9",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_97d1266c2f9e5b04fd45b7d9",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+      "proposed_data": {
+        "assertion_id": "ast_97d1266c2f9e5b04fd45b7d9",
+        "subject": "Eno",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Eno"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_97d1266c2f9e5b04fd45b7d9"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_6fbafca3c262c0b42273eaf7",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_6fbafca3c262c0b42273eaf7",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+      "proposed_data": {
+        "assertion_id": "ast_6fbafca3c262c0b42273eaf7",
+        "subject": "Eno",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Power Engineer"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_6fbafca3c262c0b42273eaf7"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_4db8afc47a291261ae4008cd",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_4db8afc47a291261ae4008cd",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+      "proposed_data": {
+        "assertion_id": "ast_4db8afc47a291261ae4008cd",
+        "subject": "Eno",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Power Distribution"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_4db8afc47a291261ae4008cd"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_e949f8eece80bfa743735bf6",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_e949f8eece80bfa743735bf6",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+      "proposed_data": {
+        "assertion_id": "ast_e949f8eece80bfa743735bf6",
+        "subject": "Eno",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "grid synchronization",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Eno: assign role Power Engineer; station Deck 7 Power Distribution; claims grid synchronization.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_e949f8eece80bfa743735bf6"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_c299e8701b2e1a344c00c92c",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_c299e8701b2e1a344c00c92c",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+      "proposed_data": {
+        "assertion_id": "ast_c299e8701b2e1a344c00c92c",
+        "subject": "Fia",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Fia"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_c299e8701b2e1a344c00c92c"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_10b8444d7f08c3dd94412a39",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_10b8444d7f08c3dd94412a39",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+      "proposed_data": {
+        "assertion_id": "ast_10b8444d7f08c3dd94412a39",
+        "subject": "Fia",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Watch Officer"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_10b8444d7f08c3dd94412a39"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_4be1fb1d3c0c5e16ae7a97b2",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_4be1fb1d3c0c5e16ae7a97b2",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+      "proposed_data": {
+        "assertion_id": "ast_4be1fb1d3c0c5e16ae7a97b2",
+        "subject": "Fia",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Watch"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_4be1fb1d3c0c5e16ae7a97b2"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_9e462c1e66fed528f5c3dfa0",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_9e462c1e66fed528f5c3dfa0",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+      "proposed_data": {
+        "assertion_id": "ast_9e462c1e66fed528f5c3dfa0",
+        "subject": "Fia",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "twelve years watch experience",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Fia: assign role Watch Officer; station Deck 7 Watch; claims twelve years watch experience.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_9e462c1e66fed528f5c3dfa0"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_4ad019219dfd7c79c7175b24",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_4ad019219dfd7c79c7175b24",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+      "proposed_data": {
+        "assertion_id": "ast_4ad019219dfd7c79c7175b24",
+        "subject": "Gio",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Gio"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_4ad019219dfd7c79c7175b24"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_7a18bc977ec7d1171579062d",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_7a18bc977ec7d1171579062d",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [
+        {
+          "id": "con_bc6cd623bc8333516533365b",
+          "assertion_id": "ast_7a18bc977ec7d1171579062d",
+          "code": "duplicate_exclusive_assignment",
+          "material": 1,
+          "detail": "Reactor Operator also proposed for Cyra"
+        }
+      ],
+      "summary": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+      "proposed_data": {
+        "assertion_id": "ast_7a18bc977ec7d1171579062d",
+        "subject": "Gio",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Reactor Operator"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [
+          {
+            "id": "con_bc6cd623bc8333516533365b",
+            "assertion_id": "ast_7a18bc977ec7d1171579062d",
+            "code": "duplicate_exclusive_assignment",
+            "material": 1,
+            "detail": "Reactor Operator also proposed for Cyra"
+          }
+        ],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_7a18bc977ec7d1171579062d"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_37729d94a3f373ffcaf939f4",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_37729d94a3f373ffcaf939f4",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+      "proposed_data": {
+        "assertion_id": "ast_37729d94a3f373ffcaf939f4",
+        "subject": "Gio",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Reactor Console"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_37729d94a3f373ffcaf939f4"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_b7dfcf175bd721ddb8d749e9",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_b7dfcf175bd721ddb8d749e9",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+      "proposed_data": {
+        "assertion_id": "ast_b7dfcf175bd721ddb8d749e9",
+        "subject": "Gio",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "plasma containment",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Gio: assign role Reactor Operator; station Deck 7 Reactor Console; claims plasma containment.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_b7dfcf175bd721ddb8d749e9"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_d4ecc2380f0f2c067a032c85",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_d4ecc2380f0f2c067a032c85",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+      "proposed_data": {
+        "assertion_id": "ast_d4ecc2380f0f2c067a032c85",
+        "subject": "Hale",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Hale"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_d4ecc2380f0f2c067a032c85"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_3435aa92c56e1513b1964459",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_3435aa92c56e1513b1964459",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+      "proposed_data": {
+        "assertion_id": "ast_3435aa92c56e1513b1964459",
+        "subject": "Hale",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Dosimetry Technician"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_3435aa92c56e1513b1964459"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_17c2196ddab95ad8edfdebc3",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_17c2196ddab95ad8edfdebc3",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+      "proposed_data": {
+        "assertion_id": "ast_17c2196ddab95ad8edfdebc3",
+        "subject": "Hale",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Dosimetry"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_17c2196ddab95ad8edfdebc3"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_81a669d1f5c979a231f3239f",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_81a669d1f5c979a231f3239f",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+      "proposed_data": {
+        "assertion_id": "ast_81a669d1f5c979a231f3239f",
+        "subject": "Hale",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "radiation mapping",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Hale: assign role Dosimetry Technician; station Deck 7 Dosimetry; claims radiation mapping.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_81a669d1f5c979a231f3239f"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_6d3103429c3a22f2e470254d",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_6d3103429c3a22f2e470254d",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+      "proposed_data": {
+        "assertion_id": "ast_6d3103429c3a22f2e470254d",
+        "subject": "Vance",
+        "proposed_change": {
+          "operation": "propose_entity",
+          "value": {
+            "kind": "crew",
+            "name": "Vance"
+          }
+        },
+        "assertion_class": "identity",
+        "supporting_source_excerpt": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "propose_entity"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_6d3103429c3a22f2e470254d"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_a14babf4bbbbe6ec767d9eeb",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_a14babf4bbbbe6ec767d9eeb",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+      "proposed_data": {
+        "assertion_id": "ast_a14babf4bbbbe6ec767d9eeb",
+        "subject": "Vance",
+        "proposed_change": {
+          "operation": "assign_role",
+          "value": "Scram Officer"
+        },
+        "assertion_class": "assignment",
+        "supporting_source_excerpt": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_role"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_a14babf4bbbbe6ec767d9eeb"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_868a96a7b7956e4111599a1f",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_868a96a7b7956e4111599a1f",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+      "proposed_data": {
+        "assertion_id": "ast_868a96a7b7956e4111599a1f",
+        "subject": "Vance",
+        "proposed_change": {
+          "operation": "assign_station",
+          "value": "Deck 7 Scram Console"
+        },
+        "assertion_class": "location",
+        "supporting_source_excerpt": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+        "confidence": 0.98,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "assign_station"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_868a96a7b7956e4111599a1f"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_277bbf807b48654073802744",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_277bbf807b48654073802744",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+      "proposed_data": {
+        "assertion_id": "ast_277bbf807b48654073802744",
+        "subject": "Vance",
+        "proposed_change": {
+          "operation": "attach_capability",
+          "value": {
+            "capability": "scram qualification",
+            "verification": "unverified"
+          }
+        },
+        "assertion_class": "claim",
+        "supporting_source_excerpt": "Recruit Vance: assign role Scram Officer; station Deck 7 Scram Console; claims scram qualification.",
+        "confidence": 0.75,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "attach_capability"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_277bbf807b48654073802744"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_be1f908be565c2319b2d3ddf",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_be1f908be565c2319b2d3ddf",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "Request Captain authorization to start the reactor. Vance requests scram authority.",
+      "proposed_data": {
+        "assertion_id": "ast_be1f908be565c2319b2d3ddf",
+        "subject": "reactor",
+        "proposed_change": {
+          "operation": "authorization_request",
+          "value": {
+            "action": "reactor_start",
+            "status": "pending"
+          }
+        },
+        "assertion_class": "request",
+        "supporting_source_excerpt": "Request Captain authorization to start the reactor. Vance requests scram authority.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": true,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "authorization_request"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_be1f908be565c2319b2d3ddf"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_79e6d070478bd186724e88b7",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_79e6d070478bd186724e88b7",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [
+        {
+          "id": "con_9fb642bc564efea2a4a4e98f",
+          "assertion_id": "ast_79e6d070478bd186724e88b7",
+          "code": "explicit_authority_required",
+          "material": 1,
+          "detail": "permissions are never inferred and require individual Captain approval"
+        }
+      ],
+      "summary": "Request Captain authorization to start the reactor. Vance requests scram authority.",
+      "proposed_data": {
+        "assertion_id": "ast_79e6d070478bd186724e88b7",
+        "subject": "Vance",
+        "proposed_change": {
+          "operation": "request_permission",
+          "value": {
+            "permission": "scram_authority",
+            "status": "pending"
+          }
+        },
+        "assertion_class": "permission",
+        "supporting_source_excerpt": "Request Captain authorization to start the reactor. Vance requests scram authority.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [
+          {
+            "id": "con_9fb642bc564efea2a4a4e98f",
+            "assertion_id": "ast_79e6d070478bd186724e88b7",
+            "code": "explicit_authority_required",
+            "material": 1,
+            "detail": "permissions are never inferred and require individual Captain approval"
+          }
+        ],
+        "requires_individual_approval": true,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "request_permission"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_79e6d070478bd186724e88b7"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    },
+    {
+      "schema_version": "monad.review.v0.1",
+      "review_id": "review.world-intake.ast_2e818f7e138bf56c43ae47a9",
+      "mission_id": null,
+      "artifact_id": "artifact.world-intake.ast_2e818f7e138bf56c43ae47a9",
+      "artifact_type": "fleetcore-command-proposal",
+      "revision": 1,
+      "status": "pending",
+      "requested_action": "accept-fleetcore-command",
+      "required_authority": "human-command",
+      "evidence_refs": [
+        "src_d93f35da05397263a7464f0e"
+      ],
+      "conflicts": [],
+      "summary": "The crew are nine bright sparks, ready to make the old ship sing.",
+      "proposed_data": {
+        "assertion_id": "ast_2e818f7e138bf56c43ae47a9",
+        "subject": null,
+        "proposed_change": {
+          "operation": "narrative_flavor",
+          "value": "The crew are nine bright sparks, ready to make the old ship sing."
+        },
+        "assertion_class": "flavor",
+        "supporting_source_excerpt": "The crew are nine bright sparks, ready to make the old ship sing.",
+        "confidence": 0.99,
+        "existing_canonical_state": null,
+        "conflicts": [],
+        "requires_individual_approval": false,
+        "proposed_fleetcore_command": {
+          "type": "apply-canon-change",
+          "command_id": "assigned-after-adjudication",
+          "change": "narrative_flavor"
+        },
+        "provenance": {
+          "source_id": "src_d93f35da05397263a7464f0e",
+          "source_hash": "d93f35da05397263a7464f0e82b6913001b9255616ba4d033a7e7a8d03d17b1d",
+          "author": "Monad",
+          "source_timestamp": "2026-07-14T04:40:47.633072+00:00",
+          "assertion_id": "ast_2e818f7e138bf56c43ae47a9"
+        }
+      },
+      "created_at": "2026-07-14T04:40:47.633072+00:00",
+      "supersedes_review_id": null,
+      "source_system": "world-intake",
+      "decide_at": "../world-intake/"
+    }
+  ]
+}

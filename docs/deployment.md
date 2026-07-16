@@ -133,6 +133,24 @@ log) and rewriting the public status file. No systemd unit installed by this
 work -- that's the Lieutenant's privileged step whenever it's wanted, same
 deferral as NPR's still-uninstalled timer.
 
+### Review Inbox
+
+**2026-07-16.** `tools/review-inbox/review_inbox.py` (see
+`docs/engineering-orders/review-inbox-v0.1.md`; design: GLUE-05,
+`docs/architecture/human-review-inbox-v0.1.md`) is the read-side half of
+unifying World Intake's and Mission Bus's separate human-review flows into
+one shared `ReviewCard` feed. It normalizes World Intake's native
+`/proposals?status=pending` cards into GLUE-05's `ReviewCard` shape and
+merges them with Mission Bus's `web/data/mission-reviews.json` (which
+already emitted that shape natively), writing the combined result to
+`web/data/review-inbox.json`. `toys/review-inbox/`'s public page renders
+every card with a "Decide at source" link back to whichever system actually
+owns that card's write path -- this is deliberately read-only aggregation,
+not a new decision endpoint; GLUE-05 itself says canon adjudication POSTs
+must keep going through World Intake's own compile/commit/receipt chain.
+Same non-privileged cron pattern as Watch Officer and NPR: a user crontab
+entry (no `sudo`) regenerates the feed every 10 minutes.
+
 ### Watchbook is intentionally not public
 
 Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches (`../../logs/captains/...`). Deploying it as-is would publish the full captain/admiral watch log history — including internal ops/infra logs — to the public site. That has not been done. The public site's own Ship's Log page (`web/logs.html` / `web/assets/js/logs.js`) is the intentional, separate public-facing equivalent, and is what Bridge Station's Watchbook tab links out to instead of embedding Watchbook.

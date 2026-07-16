@@ -54,7 +54,9 @@ Net: **4 toys → 1**, no feature dropped, one authoritative "Bridge" instead of
 
 ## Phase 3 — Named but not scoped (design exists, no code)
 
-**World Intake's adjudication flow + Mission Bus's `review()`** are the same conceptual pattern (a human must explicitly approve/reject/edit before something becomes accepted) implemented twice. `GLUE-05` (`docs/architecture/human-review-inbox-v0.1.md`) already designed the generalization — a shared review-card contract both would consume — specifically to prevent this. Not built yet. Bigger than Phase 1, more architecturally significant than Phase 2's UI merge; worth its own decision rather than folding into either phase above.
+**World Intake's adjudication flow + Mission Bus's `review()`** are the same conceptual pattern (a human must explicitly approve/reject/edit before something becomes accepted) implemented twice. `GLUE-05` (`docs/architecture/human-review-inbox-v0.1.md`) already designed the generalization — a shared review-card contract both would consume — specifically to prevent this.
+
+**Read-side done, 2026-07-16 (`docs/engineering-orders/review-inbox-v0.1.md`).** `tools/review-inbox/review_inbox.py` normalizes World Intake's proposals into GLUE-05's `ReviewCard` shape and merges them with Mission Bus's `web/data/mission-reviews.json` (which, investigation found, already emitted that shape natively) into one feed, rendered at `toys/review-inbox/`. Deliberately does **not** unify the write side — GLUE-05 itself says canon adjudication POSTs must keep going through World Intake's own compile/commit/receipt chain, so accept/reject/defer/edit/regenerate actions, optimistic-concurrency revision checks, and a real `POST /mission-review-api/decisions` endpoint all remain undone by design, not oversight. That's the actual architecturally significant remainder if this gets picked up again.
 
 ## What's explicitly *not* on this list
 
