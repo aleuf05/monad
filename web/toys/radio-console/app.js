@@ -202,6 +202,10 @@ const speakingIndicatorEl = document.querySelector("#speakingIndicator");
 const signalCanvas = document.querySelector("#signalMeter");
 const newswireLogEl = document.querySelector("#newswireLog");
 const newswireUpdatedEl = document.querySelector("#newswireUpdated");
+const newswireTopicEl = document.querySelector("#newswireTopic");
+const newswireTopicTitleEl = document.querySelector("#newswireTopicTitle");
+const newswireTopicTimeEl = document.querySelector("#newswireTopicTime");
+const newswireTopicLinkEl = document.querySelector("#newswireTopicLink");
 const signalCtx = signalCanvas.getContext("2d");
 
 const state = {
@@ -1268,15 +1272,32 @@ function renderNewswire(payload) {
     hour: "2-digit",
     minute: "2-digit"
   });
-  newswireLogEl.innerHTML = payload.items
-    .map((item) => {
-      const time = item.pubDate ? new Date(item.pubDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-      return (
-        `<li><a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>` +
-        `<span class="timestamp">${time}</span></li>`
-      );
-    })
-    .join("");
+  newswireLogEl.replaceChildren();
+  const selectTopic = (item, row) => {
+    newswireLogEl.querySelectorAll("li").forEach((entry) => entry.classList.remove("is-selected"));
+    row.classList.add("is-selected");
+    newswireTopicTitleEl.textContent = item.title;
+    newswireTopicTimeEl.textContent = item.pubDate
+      ? `NPR · ${new Date(item.pubDate).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
+      : "NPR News Headlines";
+    newswireTopicLinkEl.href = item.link;
+    newswireTopicEl.hidden = false;
+  };
+  payload.items.forEach((item, index) => {
+    const row = document.createElement("li");
+    const button = document.createElement("button");
+    const timestamp = document.createElement("span");
+    button.type = "button";
+    button.textContent = item.title;
+    timestamp.className = "timestamp";
+    timestamp.textContent = item.pubDate
+      ? new Date(item.pubDate).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "";
+    button.addEventListener("click", () => selectTopic(item, row));
+    row.append(button, timestamp);
+    newswireLogEl.appendChild(row);
+    if (index === 0) selectTopic(item, row);
+  });
 }
 
 async function fetchNewswire() {

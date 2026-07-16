@@ -91,15 +91,24 @@
 
       <section class="newswire-panel" aria-label="NPR Newswire">
         <div class="newswire-header">
-          <p class="label">Newswire</p>
+          <p class="label"><span class="new-badge">New</span> Newswire Topic</p>
           <p class="newswire-attribution">NPR News Headlines &mdash; <span id="newswireUpdated">not yet fetched</span></p>
         </div>
+        <article id="newswireTopic" class="newswire-topic" hidden>
+          <p class="topic-kicker">Lead topic</p>
+          <h2 id="newswireTopicTitle">Select a headline</h2>
+          <div class="topic-footer">
+            <span id="newswireTopicTime">NPR News Headlines</span>
+            <a id="newswireTopicLink" href="https://www.npr.org/sections/news/" target="_blank" rel="noopener noreferrer">Open NPR report</a>
+          </div>
+        </article>
+        <p class="newswire-instruction">Select a headline to retune the topic.</p>
         <ul id="newswireLog" class="newswire-log">
           <li class="empty-note">Power on to receive the wire.</li>
         </ul>
       </section>
     </main>
 
-    <script src="app.js?v=1"></script>
+    <script src="app.js?v=2"></script>
   </body>
 </html>
