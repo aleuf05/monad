@@ -33,17 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-06 — Define artifact registry and projections
-
-- Status: claimed:codex@2026-07-16T18:02:00Z
-- Source: missing-glue architecture review
-- Depends on: GLUE-01, GLUE-02
-- Objective: specify a registry that references existing mission reports,
-  legends, images, GLBs, model outputs, screenshots, and Chronicle proposals
-  without relocating or duplicating them.
-- Done evidence: manifest schema plus projection rules for Agent Ops, Bridge,
-  Radio, World Intake, Chronicle, and reports.
-
 ## GLUE-07 — Produce one end-to-end pilot execution packet
 
 - Status: queued
