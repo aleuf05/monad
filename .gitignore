@@ -23,6 +23,7 @@ data/living-fleet/
 data/living-captain/
 data/world-intake.sqlite3*
 data/mission-record/
+data/voice-engine/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/lan-web-server.log
