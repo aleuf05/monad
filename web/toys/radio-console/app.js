@@ -322,6 +322,9 @@ let firstOperationalSnapshot = true;
 let lastCaptainActionSequence = null;
 let captainPollTimer = null;
 const CAPTAIN_POLL_MS = 10000;
+let missionRadioPollTimer = null;
+const MISSION_RADIO_POLL_MS = 30000;
+const heardMissionDedupeKeys = new Set();
 const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
@@ -1580,6 +1583,24 @@ function stationCanObserve(entry, station) {
   return entry.station === station;
 }
 
+async function pollMissionRadio() {
+  if (!state.powered) return;
+  try {
+    const response = await fetch("../../data/mission-radio.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const projection = await response.json();
+    (projection.items || []).filter((item) => item.radio_eligible === true).forEach((item) => {
+      if (heardMissionDedupeKeys.has(item.dedupe_key)) return;
+      heardMissionDedupeKeys.add(item.dedupe_key);
+      queueLiveEntry({ kind: "watch", channel: item.channel, speaker: "Mission Briefing", text: item.text,
+        sourceAuthority: "human", source: "mission-record", urgency: item.priority === "urgent" ? 0.9 : 0.45,
+        relevance: 0.8, authority: 1, expiresAfterMs: 300000, interruptible: true, station: "bridge" });
+    });
+  } catch (error) {
+    // Optional read-only projection: FleetCore radio remains independent.
+  }
+}
+
 function speakerNameFor(vessel) {
   // MONAD refers to itself as "Monad Actual" in dialogue, everyone else
   // by their title-case name.
@@ -2180,6 +2201,9 @@ function setPowered(powered) {
     pollLivingCaptain();
     clearInterval(captainPollTimer);
     captainPollTimer = window.setInterval(pollLivingCaptain, CAPTAIN_POLL_MS);
+    pollMissionRadio();
+    clearInterval(missionRadioPollTimer);
+    missionRadioPollTimer = window.setInterval(pollMissionRadio, MISSION_RADIO_POLL_MS);
   } else {
     clearSpeechTimeout();
     clearCurrentTransmission();
@@ -2190,6 +2214,8 @@ function setPowered(powered) {
     newswireRefreshTimer = null;
     clearInterval(captainPollTimer);
     captainPollTimer = null;
+    clearInterval(missionRadioPollTimer);
+    missionRadioPollTimer = null;
     resetAudioPath();
   }
   updateDiagnostics();
