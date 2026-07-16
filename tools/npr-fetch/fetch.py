@@ -82,6 +82,18 @@ def fetch_headlines() -> int:
         print(f"npr-headlines fetch failed: {error}", file=sys.stderr)
         return 1
 
+    # Do not rewrite the tracked live snapshot merely to advance fetched_at.
+    # The 15-minute cron otherwise dirties Git even when NPR's actual items
+    # are unchanged, which also invalidates commit-pinned commissioning work.
+    if HEADLINES_OUTPUT_PATH.exists():
+        try:
+            existing = json.loads(HEADLINES_OUTPUT_PATH.read_text())
+            if existing.get("items") == items:
+                print(f"headlines unchanged; kept {HEADLINES_OUTPUT_PATH}")
+                return 0
+        except (OSError, json.JSONDecodeError):
+            pass
+
     payload = {
         "source": "NPR News Headlines",
         "source_url": "https://www.npr.org/sections/news/",
