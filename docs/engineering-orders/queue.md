@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-03 — Inventory and map component adapters
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T17:45:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01
 - Objective: map each existing component's real inputs/outputs onto the shared
