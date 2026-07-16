@@ -9,6 +9,16 @@ WorkingDirectory=/home/cgl/dev/monad
 ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/libfive/serve.py
 Restart=on-failure
 RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=tmpfs
+ReadOnlyPaths=/opt/monad /usr/local/bin/monad-libfive-export /home/cgl/dev/monad
+ReadWritePaths=/home/cgl/dev/monad/web/assets/libfive
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
 
 [Install]
 WantedBy=multi-user.target

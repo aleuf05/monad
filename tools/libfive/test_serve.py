@@ -12,4 +12,7 @@ class T(unittest.TestCase):
    s.subprocess.run=lambda *a,**k:R()
    try: self.assertEqual(s.status()['models'][0]['name'],'one')
    finally: s.MANIFEST=old_manifest; s.subprocess.run=old_run
+ def test_native_source_requires_standard_extension(self):
+  with self.assertRaisesRegex(ValueError,r'\.io'):
+   s.generate({'source':'(sphere 10)','source_filename':'shape.txt','name':'shape'})
 if __name__=='__main__': unittest.main()
