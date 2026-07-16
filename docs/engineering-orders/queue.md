@@ -33,18 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-05 — Generalize the human-review inbox
-
-- Status: claimed:codex@2026-07-16T17:56:00Z
-- Source: missing-glue architecture review
-- Depends on: GLUE-01, GLUE-02
-- Objective: design a common review-card contract based on World Intake for
-  cognition recommendations, command proposals, legend candidates, Chronicle
-  proposals, and generated assets.
-- Done evidence: review states, edit/regenerate/accept/reject semantics,
-  authority rules, provenance display requirements, and mapping to current
-  World Intake UI/API.
-
 ## GLUE-06 — Define artifact registry and projections
 
 - Status: queued
