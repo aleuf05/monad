@@ -125,7 +125,7 @@ NPR's feed only grants CORS to `apps.npr.org`, so the browser can't fetch it dir
 
 Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches (`../../logs/captains/...`). Deploying it as-is would publish the full captain/admiral watch log history — including internal ops/infra logs — to the public site. That has not been done. The public site's own Ship's Log page (`web/logs.html` / `web/assets/js/logs.js`) is the intentional, separate public-facing equivalent, and is what Bridge Station's Watchbook tab links out to instead of embedding Watchbook.
 
-Note also that `web/bridge.html` is a separate, older, hand-built public "Bridge" page (different codebase, reads `web/bridge-state.json`) and is not related to `web/toys/bridge/`. Both are linked from `web/command-deck.html` under different labels ("Bridge" vs. "Bridge Station"). `web/index.html` is no longer that homepage — see below.
+`web/bridge.html` (a separate, older, hand-built public "Bridge" page, distinct from `web/toys/bridge/`) was retired 2026-07-16 (`BRIDGE-RETIRE-01`, `docs/architecture/component-consolidation-master-plan-v0.1.md`): its data source, `web/bridge-state.json`, had gone stale (last written a week prior, pre-dating FleetCore's live WebSocket feed) and was silently showing frozen fleet state with no indication it wasn't live. Every "Bridge" link across the site (`index.html`, `command-deck.html`, `logs.html`, `fleet.html`) now points to `toys/bridge/` ("Bridge Station"), which covers the same need with genuinely live data.
 
 ## Site Root Is the Front Door — Links to Every Toy
 
