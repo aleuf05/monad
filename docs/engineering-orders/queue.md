@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-05 — Generalize the human-review inbox
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T17:56:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01, GLUE-02
 - Objective: design a common review-card contract based on World Intake for
