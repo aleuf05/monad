@@ -370,6 +370,202 @@ body.is-embedded #signalMeter {
   font-style: italic;
 }
 
+.diagnostics-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--panel);
+  padding: 1rem 1.1rem;
+}
+
+.diagnostics-header {
+  margin-bottom: 0.85rem;
+}
+
+/* Packet's required composite line: RADIO {state} — CONTENT {loop} —
+   AUDIO PATH {status}. Deliberately the most visually prominent thing in
+   this panel -- it's the one-glance answer to "is this actually working,"
+   not just "is it connected." */
+.diag-summary {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--signal);
+}
+
+.diag-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(12rem, 1fr));
+  gap: 1rem;
+}
+
+.diag-block {
+  border: 1px solid var(--steel-2);
+  border-radius: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(19, 28, 32, 0.5);
+}
+
+.diag-block-title {
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.diag-fields {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.diag-fields > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.diag-fields dt {
+  font-size: 0.74rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.diag-fields dd {
+  margin: 0;
+  font-size: 0.82rem;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 12rem;
+}
+
+.audio-path-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+}
+
+.audio-path-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--steel-2);
+  flex-shrink: 0;
+}
+
+/* Four real states, not two -- "pending" (not attempted this
+   transmission/test) is distinct from "unverified" (attempted, but this
+   console has no way to independently confirm it, e.g. speech synthesis
+   output never passes through an analyser -- see app.js's speak()). Never
+   collapse "unverified" into "ok": that's exactly the "connected is not
+   the same as heard" distinction the packet exists to enforce. */
+.stage-ok .stage-dot {
+  background: var(--signal);
+}
+
+.stage-fail .stage-dot {
+  background: var(--danger);
+}
+
+.stage-unverified .stage-dot {
+  background: var(--amber);
+}
+
+.stage-ok {
+  color: var(--signal);
+}
+
+.stage-fail {
+  color: var(--danger);
+}
+
+.stage-unverified {
+  color: var(--amber);
+}
+
+.diag-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.diag-buttons .console-button {
+  font-size: 0.78rem;
+  padding: 0.4rem 0.7rem;
+}
+
+.diag-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.35rem;
+  max-height: 8rem;
+  overflow-y: auto;
+  font-size: 0.78rem;
+}
+
+.diag-log li {
+  border-left: 2px solid var(--steel-2);
+  padding: 0.15rem 0 0.15rem 0.6rem;
+}
+
+.diag-log li.log-fail {
+  border-left-color: var(--danger);
+  color: var(--danger);
+}
+
+.diag-log li.log-ok {
+  border-left-color: var(--signal);
+}
+
+#outputDeviceSelect {
+  max-width: 10rem;
+  background: var(--bridge-deep);
+  color: var(--text);
+  border: 1px solid var(--steel-2);
+  border-radius: 0.3rem;
+  font-size: 0.78rem;
+  padding: 0.15rem 0.3rem;
+}
+
+#outputLevelMeter {
+  width: 5rem;
+  height: 0.7rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 620px) {
+  .diag-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+body.is-embedded .diagnostics-panel {
+  padding: 0.6rem 0.75rem;
+}
+
+body.is-embedded .diag-grid {
+  grid-template-columns: 1fr;
+}
+
 .newswire-panel {
   border: 1px solid var(--line);
   border-radius: 0.75rem;

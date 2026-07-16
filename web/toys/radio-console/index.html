@@ -89,6 +89,66 @@
         </article>
       </section>
 
+      <section class="diagnostics-panel" aria-label="Radio diagnostics">
+        <div class="diagnostics-header">
+          <p class="label">Diagnostics</p>
+          <p id="diagSummaryLine" class="diag-summary">RADIO IDLE — CONTENT IDLE — AUDIO PATH UNVERIFIED</p>
+        </div>
+
+        <div class="diag-grid">
+          <div class="diag-block">
+            <p class="diag-block-title">Content Queue</p>
+            <dl class="diag-fields">
+              <div><dt>Queued</dt><dd id="diagQueuedCount">0</dd></div>
+              <div><dt>Current</dt><dd id="diagCurrentMessage">—</dd></div>
+              <div><dt>Last accepted</dt><dd id="diagLastAccepted">—</dd></div>
+              <div><dt>Content loop</dt><dd id="diagLoopState">Idle</dd></div>
+            </dl>
+          </div>
+
+          <div class="diag-block">
+            <p class="diag-block-title">Audio Path Status</p>
+            <ol class="audio-path-list" id="audioPathList">
+              <li data-stage="synthesisRequested" class="stage-pending"><span class="stage-dot"></span>Synthesis requested</li>
+              <li data-stage="audioGenerated" class="stage-pending"><span class="stage-dot"></span>Audio generated</li>
+              <li data-stage="streamDelivered" class="stage-pending"><span class="stage-dot"></span>Stream delivered</li>
+              <li data-stage="playbackStarted" class="stage-pending"><span class="stage-dot"></span>Playback started</li>
+              <li data-stage="audibleVerified" class="stage-pending"><span class="stage-dot"></span>Audible output verified</li>
+            </ol>
+          </div>
+
+          <div class="diag-block">
+            <p class="diag-block-title">Test Controls</p>
+            <div class="diag-buttons">
+              <button id="testToneButton" class="console-button secondary" type="button">Play Test Tone</button>
+              <button id="testMessageButton" class="console-button secondary" type="button">Inject Test Message</button>
+              <button id="stopPlaybackButton" class="console-button secondary" type="button">Stop Playback</button>
+            </div>
+            <ul id="diagLog" class="diag-log">
+              <li class="empty-note">No diagnostic actions run yet.</li>
+            </ul>
+          </div>
+
+          <div class="diag-block">
+            <p class="diag-block-title">Output</p>
+            <dl class="diag-fields">
+              <div>
+                <dt>Output device</dt>
+                <dd><select id="outputDeviceSelect"><option value="">System default</option></select></dd>
+              </div>
+              <div>
+                <dt>Level (measured)</dt>
+                <dd><meter id="outputLevelMeter" min="0" max="1" value="0"></meter> <span id="outputLevelReadout">0%</span></dd>
+              </div>
+              <div>
+                <dt>Current source</dt>
+                <dd id="diagSourceTag">—</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
       <section class="newswire-panel" aria-label="NPR Newswire">
         <div class="newswire-header">
           <p class="label"><span class="new-badge">New</span> Newswire Topic</p>
@@ -109,6 +169,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=2"></script>
+    <script src="app.js?v=3"></script>
   </body>
 </html>

@@ -185,6 +185,7 @@ function updateRadioStateIndicator() {
     stationMemoryLine: stationMemoryLine(state.selectedStation)
   };
   radioStateEl.textContent = buildStatusLine(factors);
+  updateDiagnostics();
 }
 
 const powerButton = document.querySelector("#powerButton");
@@ -208,6 +209,23 @@ const newswireTopicTimeEl = document.querySelector("#newswireTopicTime");
 const newswireTopicLinkEl = document.querySelector("#newswireTopicLink");
 const signalCtx = signalCanvas.getContext("2d");
 
+// --- Diagnostics DOM refs (Captain's packet, 2026-07-16: "connected is not
+// the same as heard") ---
+const diagSummaryLine = document.querySelector("#diagSummaryLine");
+const diagQueuedCountEl = document.querySelector("#diagQueuedCount");
+const diagCurrentMessageEl = document.querySelector("#diagCurrentMessage");
+const diagLastAcceptedEl = document.querySelector("#diagLastAccepted");
+const diagLoopStateEl = document.querySelector("#diagLoopState");
+const diagSourceTagEl = document.querySelector("#diagSourceTag");
+const audioPathListEl = document.querySelector("#audioPathList");
+const diagLogEl = document.querySelector("#diagLog");
+const testToneButton = document.querySelector("#testToneButton");
+const testMessageButton = document.querySelector("#testMessageButton");
+const stopPlaybackButton = document.querySelector("#stopPlaybackButton");
+const outputDeviceSelect = document.querySelector("#outputDeviceSelect");
+const outputLevelMeterEl = document.querySelector("#outputLevelMeter");
+const outputLevelReadoutEl = document.querySelector("#outputLevelReadout");
+
 const state = {
   powered: false,
   muted: false,
@@ -228,6 +246,24 @@ let audioContext = null;
 let masterGain = null;
 let staticGain = null;
 let noiseBuffer = null;
+let analyserNode = null;
+let analyserData = null;
+let activeTestTone = null;
+// Only ever set true by a *measured* audible test tone pass (see
+// runTestTone()) -- never by a transmission simply completing. Speech
+// synthesis output never passes through the analyser (browsers don't
+// route SpeechSynthesis through the Web Audio graph), so a spoken
+// transmission finishing proves the browser *attempted* to speak, not that
+// anything audible came out. This is the deliberate "connected is not the
+// same as heard" line from the Captain's packet -- overall radio state
+// stays UNVERIFIED until a real measurement backs it up.
+let audioConfirmedThisSession = false;
+let lastAudioFault = null;
+let lastAcceptedEntry = null;
+const diagLogEntries = [];
+const AUDIO_PATH_STAGES = ["synthesisRequested", "audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"];
+const audioPathState = {};
+AUDIO_PATH_STAGES.forEach((stage) => { audioPathState[stage] = { status: "pending", detail: "" }; });
 
 let liveMode = false;
 let liveSocket = null;
@@ -387,6 +423,7 @@ function appendTranscript(entry) {
     `<span class="channel-tag">${CHANNEL_LABELS[entry.channel]}</span>` +
     `<span class="channel-tag">${stationLabelFor(entry.station)}</span>` +
     `<span class="channel-tag">${entry.threadState || "transit"}</span>` +
+    `<span class="channel-tag">${(entry.source || "unknown").toUpperCase()}</span>` +
     `<span class="speaker">${entry.speaker}</span>${entry.text}` +
     `<span class="timestamp">${time}</span>`;
   entry.transcriptNode = item;
@@ -433,7 +470,15 @@ function normalizeQueuedEntry(entry) {
     interruptible: entry.interruptible ?? profile.interruptible,
     queuedAt: entry.queuedAt ?? Date.now(),
     score: entry.score ?? null,
-    station: entry.station || stationForEntry(entry)
+    station: entry.station || stationForEntry(entry),
+    // Source Identification (packet §6): every entry is one of Simulated
+    // (diagnostic test injection), Generated (reserved -- this console has
+    // no LLM-generation content path, by design), Live (real FleetCore
+    // state), or Unknown. Defaults to "live" since every existing content
+    // path (diffVesselStates, diffFuelLevels, diffCanonEvents, etc.) is
+    // real FleetCore state; only the diagnostics test injector overrides
+    // this to "simulated".
+    source: entry.source || "live"
   };
 }
 
@@ -894,12 +939,21 @@ function interruptCurrentTransmission() {
 }
 
 function speak(entry) {
+  setAudioPathStage("synthesisRequested", "ok");
   // No SpeechSynthesis at all, muted, or no voices installed (common on
   // minimal Linux desktops and headless/sandboxed environments) all fall
   // back to the same timed visual cue -- a silent console that never shows
   // "Transmitting..." reads as broken, not quiet.
   const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
   if (!window.speechSynthesis || state.muted || !voices.length) {
+    // Muted is an operator choice, not a defect -- the remaining stages
+    // are "unverified" (nothing to measure, but nothing is broken either).
+    // No SpeechSynthesis / no voices is a real capability gap: those
+    // stages are marked "fail" since audio genuinely cannot be produced.
+    const reason = state.muted ? "muted" : (!window.speechSynthesis ? "no SpeechSynthesis API in this browser" : "no TTS voices installed");
+    const status = state.muted ? "unverified" : "fail";
+    ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => setAudioPathStage(stage, status, reason));
+    if (status === "fail") lastAudioFault = reason;
     setSpeaking(true);
     clearSpeechTimeout();
     speechTimeoutTimer = window.setTimeout(() => {
@@ -914,11 +968,31 @@ function speak(entry) {
   utterance.volume = volumeToLinear();
   utterance.rate = 1.05;
   utterance.pitch = 0.95;
-  utterance.onstart = () => setSpeaking(true);
+  utterance.onstart = () => {
+    setSpeaking(true);
+    // onstart is the only lifecycle signal the Web Speech API exposes --
+    // there's no separate "buffer generated" / "handed to OS" event, so
+    // audioGenerated/streamDelivered/playbackStarted all key off it
+    // honestly rather than inventing false granularity.
+    setAudioPathStage("audioGenerated", "ok");
+    setAudioPathStage("streamDelivered", "ok");
+    setAudioPathStage("playbackStarted", "ok");
+    // Deliberately NOT "ok": SpeechSynthesis output is never routed through
+    // the Web Audio graph, so this console has no analyser tap on it and
+    // genuinely cannot measure whether sound left the speakers. onstart
+    // firing proves the browser *attempted* playback, not that anything
+    // was heard -- see AUDIO_PATH_STAGES' doc comment.
+    setAudioPathStage("audibleVerified", "unverified", "browser speech output cannot be independently measured by this console (see Play Test Tone for a measured check)");
+  };
   utterance.onend = () => {
     completeTransmission(entry);
   };
-  utterance.onerror = () => {
+  utterance.onerror = (event) => {
+    const detail = `speechSynthesis error: ${event && event.error ? event.error : "unknown"}`;
+    ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => {
+      if (audioPathState[stage].status === "pending") setAudioPathStage(stage, "fail", detail);
+    });
+    lastAudioFault = detail;
     completeTransmission(entry, "completed");
   };
   // Safety net: if onstart/onend never fire at all (observed in some
@@ -927,17 +1001,315 @@ function speak(entry) {
   clearSpeechTimeout();
   speechTimeoutTimer = window.setTimeout(() => {
     speechTimeoutTimer = null;
+    if (audioPathState.audioGenerated.status === "pending") {
+      const detail = "onstart never fired within the expected window";
+      ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => setAudioPathStage(stage, "fail", detail));
+      lastAudioFault = detail;
+    }
     completeTransmission(entry);
   }, estimatedSpeakingMs(entry.text) + 2000);
   window.speechSynthesis.speak(utterance);
 }
+
+// --- Diagnostics: Audio Path Status, Content Queue, Test Controls, Output ---
+// (Captain's packet, RADIO CONSOLE — ESSENTIAL FEATURE PACKET, 2026-07-16.
+// Operating rule: "Connected is not the same as heard.")
+
+function setAudioPathStage(stage, status, detail) {
+  audioPathState[stage] = { status, detail: detail || "" };
+  renderAudioPath();
+  updateDiagnostics();
+}
+
+function resetAudioPath() {
+  AUDIO_PATH_STAGES.forEach((stage) => { audioPathState[stage] = { status: "pending", detail: "" }; });
+  lastAudioFault = null;
+  renderAudioPath();
+  updateDiagnostics();
+}
+
+function renderAudioPath() {
+  if (!audioPathListEl) return;
+  AUDIO_PATH_STAGES.forEach((stage) => {
+    const li = audioPathListEl.querySelector(`[data-stage="${stage}"]`);
+    if (!li) return;
+    const entry = audioPathState[stage];
+    li.classList.remove("stage-pending", "stage-ok", "stage-fail", "stage-unverified");
+    li.classList.add(`stage-${entry.status}`);
+    li.title = entry.detail || "";
+  });
+}
+
+// Real, measured level -- taps masterGain (everything routed to the
+// speakers except SpeechSynthesis output, which browsers never expose to
+// Web Audio; see speak()'s onstart handler). This is what makes "audible
+// output verified" for the test tone an actual measurement rather than a
+// claim, per packet §3/§4.
+function ensureAnalyser() {
+  if (!audioContext || analyserNode) return;
+  analyserNode = audioContext.createAnalyser();
+  analyserNode.fftSize = 256;
+  analyserData = new Uint8Array(analyserNode.frequencyBinCount);
+  masterGain.connect(analyserNode);
+}
+
+function currentLevel() {
+  if (!analyserNode) return 0;
+  analyserNode.getByteTimeDomainData(analyserData);
+  let sumSquares = 0;
+  for (let i = 0; i < analyserData.length; i += 1) {
+    const norm = (analyserData[i] - 128) / 128;
+    sumSquares += norm * norm;
+  }
+  return Math.sqrt(sumSquares / analyserData.length);
+}
+
+function logDiag(action, result, detail) {
+  diagLogEntries.push({ at: Date.now(), action, result, detail: detail || "" });
+  while (diagLogEntries.length > 30) diagLogEntries.shift();
+  renderDiagLog();
+}
+
+function renderDiagLog() {
+  if (!diagLogEl) return;
+  if (!diagLogEntries.length) {
+    diagLogEl.innerHTML = `<li class="empty-note">No diagnostic actions run yet.</li>`;
+    return;
+  }
+  diagLogEl.innerHTML = diagLogEntries
+    .map((entry) => {
+      const time = new Date(entry.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const cls = entry.result === "fail" ? "log-fail" : entry.result === "ok" || entry.result === "pass" || entry.result === "accepted" ? "log-ok" : "";
+      return `<li class="${cls}"><span class="timestamp">${time}</span> ${entry.action}: ${entry.result}${entry.detail ? ` — ${entry.detail}` : ""}</li>`;
+    })
+    .join("");
+}
+
+function pathSummaryLabel() {
+  if (AUDIO_PATH_STAGES.some((stage) => audioPathState[stage].status === "fail")) return "FAULT";
+  if (audioPathState.audibleVerified.status === "ok") return "VERIFIED";
+  return "UNVERIFIED";
+}
+
+// Overall Radio State (packet §1) -- deliberately conservative. "LIVE" is
+// only ever reached via a measured-audible test tone pass this session
+// (see runTestTone()), never merely because content is flowing. A
+// transmission completing proves the browser attempted speech, not that
+// anything was heard.
+function deriveOverallRadioState() {
+  if (!state.powered) return "IDLE";
+  if (!liveMode) return "FAULT";
+  if (lastAudioFault) return "FAULT";
+  if (audioConfirmedThisSession) return "LIVE";
+  return "UNVERIFIED";
+}
+
+function updateDiagSummary() {
+  if (!diagSummaryLine) return;
+  const loop = state.powered && liveMode ? "ACTIVE" : "IDLE";
+  diagSummaryLine.textContent = `RADIO ${deriveOverallRadioState()} — CONTENT ${loop} — AUDIO PATH ${pathSummaryLabel()}`;
+}
+
+function updateDiagnostics() {
+  if (diagQueuedCountEl) diagQueuedCountEl.textContent = String(liveQueue.length);
+  if (diagCurrentMessageEl) {
+    diagCurrentMessageEl.textContent = state.currentTransmission
+      ? `${state.currentTransmission.speaker}: ${state.currentTransmission.text}`
+      : "—";
+  }
+  if (diagLastAcceptedEl) {
+    diagLastAcceptedEl.textContent = lastAcceptedEntry
+      ? `${lastAcceptedEntry.speaker} (${lastAcceptedEntry.source})`
+      : "—";
+  }
+  if (diagLoopStateEl) diagLoopStateEl.textContent = state.powered && liveMode ? "Active" : "Idle";
+  if (diagSourceTagEl) {
+    diagSourceTagEl.textContent = state.currentTransmission
+      ? (state.currentTransmission.source || "unknown")
+      : "—";
+  }
+  updateDiagSummary();
+}
+
+// --- Test Controls (packet §4) ---
+// Every control here must produce a logged, reviewable result -- see
+// logDiag() calls below. None of these three simulate success; each one
+// drives the exact same speak()/audio-path machinery real content uses.
+
+function runTestTone() {
+  if (activeTestTone) return; // already running, ignore a double-click
+  initAudio();
+  if (!audioContext) {
+    logDiag("test_tone", "fail", "Web Audio unavailable in this browser.");
+    return;
+  }
+  if (audioContext.state === "suspended") audioContext.resume();
+  ensureAnalyser();
+  resetAudioPath();
+  setAudioPathStage("synthesisRequested", "ok");
+  // Claim the same "currently speaking" slot livePump() already respects
+  // (state.speaking + currentTransmissionScore), scored higher than
+  // anything real content can reach -- otherwise, in a world this
+  // chatty, a real transmission firing mid-measurement calls
+  // transmitEntry() -> resetAudioPath() and silently overwrites the
+  // test tone's result before the 400ms sample window even finishes.
+  // Also explicitly interrupt whatever might already be mid-flight: a
+  // real transmission's own speechTimeoutTimer keeps ticking regardless
+  // of who "owns" state.speaking, and completeTransmission() clears
+  // state.speaking/currentTransmissionScore unconditionally when it
+  // fires -- without this, that pre-existing timer firing mid-test
+  // silently releases this lock out from under the test tone. The
+  // permanent diagLog entry below would still be correct either way, but
+  // the live Audio Path Status panel would show something else's result
+  // instead of this test's. Released in sample()'s completion branch below.
+  interruptCurrentTransmission();
+  setSpeaking(true);
+  state.currentTransmissionScore = Infinity;
+  const osc = audioContext.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = 440;
+  const toneGain = audioContext.createGain();
+  toneGain.gain.value = 0.25;
+  osc.connect(toneGain);
+  toneGain.connect(masterGain);
+  setAudioPathStage("audioGenerated", "ok");
+  const now = audioContext.currentTime;
+  osc.start(now);
+  activeTestTone = osc;
+  setAudioPathStage("streamDelivered", "ok");
+  setAudioPathStage("playbackStarted", "ok");
+
+  let peak = 0;
+  let samples = 0;
+  const startedAt = performance.now();
+  const NOISE_FLOOR = 0.02;
+  const SAMPLE_WINDOW_MS = 400;
+  function sample() {
+    peak = Math.max(peak, currentLevel());
+    samples += 1;
+    if (performance.now() - startedAt < SAMPLE_WINDOW_MS) {
+      window.requestAnimationFrame(sample);
+      return;
+    }
+    try { osc.stop(); } catch (error) { /* already stopped */ }
+    activeTestTone = null;
+    const audible = peak > NOISE_FLOOR;
+    const detail = `measured peak RMS ${peak.toFixed(3)} over ${samples} samples (noise floor ${NOISE_FLOOR})`;
+    setAudioPathStage("audibleVerified", audible ? "ok" : "fail", detail);
+    if (audible) {
+      audioConfirmedThisSession = true;
+      lastAudioFault = null;
+    } else {
+      lastAudioFault = "test tone produced no measurable signal";
+    }
+    logDiag("test_tone", audible ? "pass" : "fail", detail);
+    updateDiagSummary();
+    // Hold the slot a little longer than the measurement itself so the
+    // completed result is actually visible to a human before real content
+    // (which in an active world can resume within milliseconds of the
+    // slot opening) overwrites it via the next transmitEntry()'s
+    // resetAudioPath(). The diagLog entry above is permanent regardless;
+    // this hold is only about the live Audio Path Status panel.
+    window.setTimeout(() => {
+      setSpeaking(false);
+      state.currentTransmissionScore = -Infinity;
+      window.setTimeout(livePump, 0);
+    }, 1800);
+  }
+  window.requestAnimationFrame(sample);
+}
+
+function runTestMessage() {
+  if (!state.powered) {
+    logDiag("inject_test_message", "fail", "Radio is powered off.");
+    return;
+  }
+  const entry = {
+    kind: "watch",
+    channel: "fleet-comms",
+    speaker: "Diagnostics",
+    // sourceAuthority "human" matches the existing RecordWatchEvent
+    // precedent (TRANSMISSION_PROFILES.watch) -- a deliberate operator
+    // action, not routine chatter, so it isn't silently dropped by
+    // radio_silence/quiet_watch the way ordinary status entries are.
+    sourceAuthority: "human",
+    text: "This is a Radio Console diagnostic test message.",
+    station: "bridge",
+    source: "simulated"
+  };
+  queueLiveEntry(entry);
+  logDiag("inject_test_message", "accepted", "Queued for transmission through the real content pipeline.");
+}
+
+function runStopPlayback() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  if (activeTestTone) {
+    try { activeTestTone.stop(); } catch (error) { /* already stopped */ }
+    activeTestTone = null;
+  }
+  interruptCurrentTransmission();
+  logDiag("stop_playback", "ok", "Playback stopped.");
+  updateDiagnostics();
+}
+
+// --- Output Controls: device selection (packet §5) ---
+// Best-effort: AudioContext.setSinkId is a newer, Chromium-first API, and
+// even where supported it can only route the Web Audio graph (the static
+// bed, squelch, and test tone) -- SpeechSynthesis output has no device-
+// selection API in any browser. Both constraints are surfaced honestly
+// rather than pretending device selection covers all audio on the page.
+async function populateOutputDevices() {
+  if (!outputDeviceSelect) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    outputDeviceSelect.innerHTML = `<option value="">Not supported in this browser</option>`;
+    outputDeviceSelect.disabled = true;
+    return;
+  }
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const outputs = devices.filter((device) => device.kind === "audiooutput");
+    if (!outputs.length) return; // keep the "System default" placeholder
+    outputDeviceSelect.innerHTML =
+      `<option value="">System default</option>` +
+      outputs.map((device) => `<option value="${device.deviceId}">${device.label || "Output device"}</option>`).join("");
+    if (typeof AudioContext !== "undefined" && !AudioContext.prototype.setSinkId) {
+      outputDeviceSelect.title = "This browser can list output devices but cannot route audio to a non-default one (AudioContext.setSinkId unsupported). Selection will have no effect.";
+    }
+  } catch (error) {
+    // Real failure (not every browser grants this without a prior
+    // getUserMedia permission) -- leave the default option in place rather
+    // than claiming a device list that isn't real.
+  }
+}
+
+if (outputDeviceSelect) {
+  outputDeviceSelect.addEventListener("change", async () => {
+    const deviceId = outputDeviceSelect.value;
+    if (!audioContext || typeof audioContext.setSinkId !== "function") {
+      logDiag("select_output_device", "fail", "AudioContext.setSinkId unsupported in this browser -- device selection has no effect here.");
+      return;
+    }
+    try {
+      await audioContext.setSinkId(deviceId || "default");
+      logDiag("select_output_device", "ok", deviceId ? `Routed Web Audio output to ${outputDeviceSelect.selectedOptions[0]?.textContent}` : "Routed to system default.");
+    } catch (error) {
+      logDiag("select_output_device", "fail", String(error));
+    }
+  });
+}
+
+if (testToneButton) testToneButton.addEventListener("click", runTestTone);
+if (testMessageButton) testMessageButton.addEventListener("click", runTestMessage);
+if (stopPlaybackButton) stopPlaybackButton.addEventListener("click", runStopPlayback);
 
 function transmitEntry(entry) {
   state.currentTransmission = entry;
   state.currentTransmissionScore = entry.score ?? scoreTransmission(entry);
   recordThreadState(entry, "acked");
   appendTranscript(entry);
+  resetAudioPath();
   speak(entry);
+  updateDiagnostics();
 }
 
 // --- Live mode: event-driven transmissions from a real fleetcore-serve ---
@@ -984,6 +1356,8 @@ function queueLiveEntry(entry) {
   queued.threadId = queued.threadId || state.nextThreadId++;
   recordThreadState(queued, "pending");
   liveQueue.push(queued);
+  lastAcceptedEntry = queued;
+  updateDiagnostics();
   window.setTimeout(livePump, 0);
 }
 
@@ -1260,6 +1634,16 @@ function drawSignalMeter() {
     signalCtx.globalAlpha = state.powered ? 0.85 : 0.25;
     signalCtx.fillRect(i * barWidth + 1, height - barHeight, barWidth - 2, barHeight);
   }
+  // Output Controls' "current audio level meter" (packet §5) -- kept
+  // deliberately separate from the decorative bars above. This is a real
+  // AnalyserNode reading of the Web Audio graph (static bed, squelch, test
+  // tone), never randomized, and never boosted just because state.speaking
+  // is true: it only rises when this console can actually prove signal is
+  // present. It reads near-zero during ordinary speech, honestly, because
+  // SpeechSynthesis output doesn't pass through this analyser at all.
+  const measured = currentLevel();
+  if (outputLevelMeterEl) outputLevelMeterEl.value = measured;
+  if (outputLevelReadoutEl) outputLevelReadoutEl.textContent = `${Math.round(measured * 100)}%`;
   state.animationFrame = window.requestAnimationFrame(drawSignalMeter);
 }
 
@@ -1320,6 +1704,7 @@ function setPowered(powered) {
   if (powered) {
     initAudio();
     if (audioContext && audioContext.state === "suspended") audioContext.resume();
+    ensureAnalyser();
     applyVolume();
     // No scripted schedule to start -- transmissions only ever come from
     // the live FleetCore queue (see enterLiveMode()/livePump()). If not
@@ -1335,7 +1720,9 @@ function setPowered(powered) {
     setSpeaking(false);
     clearInterval(newswireRefreshTimer);
     newswireRefreshTimer = null;
+    resetAudioPath();
   }
+  updateDiagnostics();
 }
 
 powerButton.addEventListener("click", () => setPowered(!state.powered));
@@ -1401,6 +1788,11 @@ try {
 updateChannelCount();
 updateStationScope();
 updateRadioStateIndicator();
+resetAudioPath();
+populateOutputDevices();
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+  navigator.mediaDevices.addEventListener("devicechange", populateOutputDevices);
+}
 drawSignalMeter();
 
 // Live is the default now (Admiral's call, 2026-07-11), matching Fleet
