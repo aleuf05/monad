@@ -1,0 +1,11 @@
+# Radio Traffic Evaluation 0.1
+
+1. **Originating intent** — The Lieutenant requested a two-bot queue for reshaping Fleet Radio from event narration into believable traffic.
+2. **Verified starting state** — Existing diagnostics expose queued content and thread state, but no repeatable fixture measures narration suppression, topic duplication, audience/intent completeness or traffic reduction across a live window.
+3. **Objective / problem** — Independently prove whether Bot 1's editorial gate changes the audible experience without hiding urgent or human-authored traffic.
+4. **Scope and exclusions** — Bot 2 owns new files under `tools/radio-traffic-eval/` plus its evidence report under `docs/reports/`. Build deterministic event fixtures and a source/live measurement script; score transmissions, suppressions/reasons, topic depth and metadata completeness. Do not edit Radio Console source/live files, voice code, queue logic or Bot 1's packet.
+5. **Constraints / authority** — Evaluation may begin concurrently using the acceptance contract in `RADIO-EDITORIAL-GATE-0.1.md`; final evidence must run against Bot 1's committed implementation. No API calls, generated speech or invented live claims.
+6. **Acceptance criteria** — Fixtures cover twenty scout route completions, canon change, captain runtime change, routine holding, accepted posture, duplicate posture, critical fuel, emergency separation, escort order and human watch note. Pass requires >=80% fewer routine transmissions than the recorded/current path; zero canon/runtime/routine-route narration; 100% aired metadata completeness; no topic beyond two utterances; emergencies and human messages preserved; a 60-second live observation and exact commit SHA recorded.
+7. **Tests / rollback** — Evaluator self-tests with known pass/fail fixtures, then Radio source/live drift and live observation. Remove evaluator/report commit to roll back; it does not modify runtime behavior.
+8. **Assigned actor** — Bot 2, unclaimed. Fixture construction may run in parallel; final verification waits for Bot 1's commit SHA.
+9. **Evidence and completion state** — Authorized and ready to claim. Findings belong in `docs/reports/`, not `queue.md`.
