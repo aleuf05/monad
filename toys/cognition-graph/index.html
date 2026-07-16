@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrument: The Cognition Graph — Corps of Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#e7e4db;
+    --ink-dim:#8b93a1;
+    --hull:#14171c;
+    --panel:#1b1f26;
+    --panel-line:#2a2f38;
+    --navy:#243a52;
+    --lantern:#e8a94c;
+    --lantern-dim:#6b5230;
+    --red:#c4634c;
+    --green:#7a9e7e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(232,169,76,0.06), transparent),
+      var(--hull);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:28px 18px 80px;}
+  .back-link{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    color:var(--ink-dim);text-decoration:none;margin-bottom:18px;letter-spacing:.05em;
+  }
+  .back-link:hover{color:var(--lantern);}
+
+  /* header */
+  header{border-bottom:1px solid var(--panel-line);padding-bottom:20px;margin-bottom:20px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--lantern);text-transform:uppercase;}
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(26px,5vw,38px);
+    margin:6px 0 8px;
+    letter-spacing:-.01em;
+  }
+  .sub{color:var(--ink-dim);font-size:14.5px;max-width:62ch;line-height:1.55;}
+  .question-under-test{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;color:var(--ink-dim);
+    margin-top:14px;letter-spacing:.04em;
+  }
+
+  /* mock mode banner */
+  .mock-banner{
+    background:rgba(232,169,76,.08);border:1px solid var(--lantern-dim);
+    border-radius:3px;padding:12px 16px;margin-bottom:14px;
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--lantern);
+    line-height:1.6;
+  }
+  .mock-banner.is-live{
+    background:rgba(122,158,126,.08);border-color:var(--green);color:var(--green);
+  }
+  .mock-banner b{color:var(--ink);}
+
+  .key-panel{
+    background:var(--panel);border:1px solid var(--panel-line);border-radius:3px;
+    padding:16px 18px;margin-bottom:34px;
+  }
+  .key-panel-label{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-dim);margin-bottom:6px;
+  }
+  .key-panel-desc{font-size:12.5px;color:var(--ink-dim);line-height:1.55;margin-bottom:12px;max-width:60ch;}
+  .key-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .key-row input{
+    flex:1;min-width:220px;background:var(--hull);border:1px solid var(--panel-line);
+    color:var(--ink);border-radius:2px;padding:9px 12px;
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  }
+  .key-row input:focus{outline:none;border-color:var(--lantern-dim);}
+  .key-row button{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;
+    text-transform:uppercase;padding:9px 14px;border-radius:2px;cursor:pointer;border:1px solid;
+  }
+  .key-save{background:var(--lantern);color:#1a1305;border-color:var(--lantern);font-weight:600;}
+  .key-save:hover{filter:brightness(1.08);}
+  .key-clear{background:transparent;color:var(--ink-dim);border-color:var(--panel-line);}
+  .key-clear:hover{border-color:var(--red);color:var(--red);}
+  .key-status{margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);}
+  .key-status.live{color:var(--green);}
+
+  /* intake */
+  .intake{
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:3px;
+    padding:20px;
+    margin-bottom:34px;
+  }
+  .intake-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:10px;display:flex;justify-content:space-between;
+  }
+  textarea{
+    width:100%;background:var(--hull);border:1px solid var(--panel-line);
+    color:var(--ink);border-radius:2px;padding:12px 14px;
+    font-family:'Fraunces',serif;font-size:16px;line-height:1.5;
+    resize:vertical;min-height:64px;
+  }
+  textarea:focus{outline:none;border-color:var(--lantern-dim);}
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+  .preset-btn{
+    background:transparent;border:1px solid var(--panel-line);color:var(--ink-dim);
+    font-family:'IBM Plex Mono',monospace;font-size:11px;padding:6px 10px;border-radius:20px;
+    cursor:pointer;transition:.15s;
+  }
+  .preset-btn:hover{border-color:var(--lantern-dim);color:var(--ink);}
+  .run-row{display:flex;align-items:center;gap:14px;margin-top:16px;}
+  .run-btn{
+    background:var(--lantern);color:#1a1305;border:none;
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12.5px;
+    letter-spacing:.06em;text-transform:uppercase;
+    padding:11px 20px;border-radius:2px;cursor:pointer;transition:.15s;
+  }
+  .run-btn:hover{filter:brightness(1.08);}
+  .run-btn:disabled{background:var(--panel-line);color:var(--ink-dim);cursor:not-allowed;}
+  .run-status{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-dim);}
+
+  /* graph */
+  .graph-title{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-dim);margin-bottom:14px;
+    display:none;
+  }
+  .graph-wrap{position:relative;display:none;margin-bottom:10px;}
+  svg.lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  svg.lines path{
+    fill:none;stroke:var(--panel-line);stroke-width:1;
+    transition:stroke .4s;
+  }
+  svg.lines path.live{stroke:var(--lantern-dim);}
+  svg.lines path.done{stroke:var(--lantern);}
+
+  .row-frame{display:flex;justify-content:center;margin-bottom:56px;position:relative;z-index:1;}
+  .row-gen{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:56px;position:relative;z-index:1;}
+  .row-synth{display:flex;justify-content:center;position:relative;z-index:1;}
+
+  .node{
+    background:var(--panel);border:1px solid var(--panel-line);border-radius:3px;
+    padding:12px 13px;transition:.3s;
+  }
+  .node.wide{max-width:420px;width:100%;}
+  .node.narrow{width:180px;}
+  .node .role{
+    font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--ink-dim);display:flex;align-items:center;gap:6px;
+  }
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--panel-line);flex-shrink:0;transition:.3s;}
+  .node.live .dot{background:var(--lantern);animation:pulse 1.1s infinite;}
+  .node.done .dot{background:var(--green);animation:none;}
+  .node.err .dot{background:var(--red);animation:none;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+  .node.live{border-color:var(--lantern-dim);}
+  .node.done{border-color:var(--panel-line);}
+  .node-body{font-size:13px;line-height:1.5;margin-top:8px;color:var(--ink);min-height:14px;}
+  .node-body .thinking{color:var(--ink-dim);font-style:italic;font-size:12.5px;}
+  .scores{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+  .score{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--ink-dim);}
+  .score b{color:var(--lantern);font-weight:500;}
+  .rationale{font-size:11.5px;color:var(--ink-dim);margin-top:6px;line-height:1.45;}
+
+  /* verdict */
+  .verdict-panel{
+    display:none;background:var(--panel);border:1px solid var(--panel-line);
+    border-radius:3px;padding:22px;margin-top:8px;
+  }
+  .verdict-badge{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:.08em;padding:5px 11px;border-radius:20px;text-transform:uppercase;
+    margin-bottom:14px;border:1px solid;
+  }
+  .verdict-badge.win{color:var(--green);border-color:var(--green);background:rgba(122,158,126,.08);}
+  .verdict-badge.no{color:var(--red);border-color:var(--red);background:rgba(196,99,76,.08);}
+  .verdict-badge.inc{color:var(--lantern);border-color:var(--lantern);background:rgba(232,169,76,.08);}
+  .verdict-panel h3{font-family:'Fraunces',serif;font-weight:500;font-size:19px;margin:0 0 6px;}
+  .verdict-field{margin-top:14px;}
+  .verdict-field .fl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:4px;}
+  .verdict-field p{margin:0;font-size:14px;line-height:1.6;}
+  .caveat{
+    margin-top:20px;padding-top:16px;border-top:1px solid var(--panel-line);
+    font-size:11.5px;color:var(--ink-dim);line-height:1.55;
+  }
+
+  /* log */
+  .log{
+    display:none;margin-top:34px;border-top:1px dashed var(--panel-line);padding-top:16px;
+  }
+  .log-title{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px;}
+  .log-line{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);line-height:1.7;}
+  .log-line span{color:var(--lantern);}
+
+  @media (max-width:720px){
+    .row-gen{grid-template-columns:1fr 1fr;}
+    .node.narrow{width:auto;}
+  }
+  @media (max-width:480px){
+    .row-gen{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back-link" href="../../index.html">&larr; Command Deck</a>
+
+  <header>
+    <div class="eyebrow">Corps of Research · Instrument Log</div>
+    <h1>The Cognition Graph</h1>
+    <p class="sub">Frontier Question Five, run live: can a small graph of differently-instructed model roles discover a genuinely better research question than the one it's handed — not just a more confident-sounding one? Enter a vague or ambitious question below. The graph will decompose it, propose four competing sharpened formulations, then an independent pass will judge whether any of them actually outperform the original.</p>
+  </header>
+
+  <div class="mock-banner" id="modeBanner"></div>
+
+  <div class="key-panel">
+    <div class="key-panel-label">Live Mode — Your API Key</div>
+    <div class="key-panel-desc">
+      Paste your own Anthropic API key (from console.anthropic.com → Settings → API Keys) to run
+      this instrument for real. The key is saved only in <b>this browser's local storage</b> — it
+      is never written into the page's code, never sent to me, and never leaves your browser
+      except in direct calls to <code>api.anthropic.com</code>. Clearing it below (or opening this
+      page in a different browser) removes it. No key set → the instrument runs in simulated mode.
+    </div>
+    <div class="key-row">
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-...">
+      <button class="key-save" id="saveKeyBtn">Save Key</button>
+      <button class="key-clear" id="clearKeyBtn">Clear Key</button>
+    </div>
+    <div class="key-status" id="keyStatus"></div>
+  </div>
+
+  <div class="intake">
+    <div class="intake-label"><span>Frontier Question Intake</span><span>Assignment 06</span></div>
+    <textarea id="question" placeholder="e.g. The galaxy becomes a mind.">The galaxy becomes a mind.</textarea>
+    <div class="presets">
+      <button class="preset-btn" data-q="The galaxy becomes a mind.">The galaxy becomes a mind.</button>
+      <button class="preset-btn" data-q="Architecture is the bottleneck.">Architecture is the bottleneck.</button>
+      <button class="preset-btn" data-q="We need a machine that automates research-engine generation.">Automate research-engine generation.</button>
+      <button class="preset-btn" data-q="The Kraken may be a singleton cognitive entity.">The Kraken may be a singleton entity.</button>
+    </div>
+    <div class="run-row">
+      <button class="run-btn" id="runBtn">Run Cognition Graph</button>
+      <span class="run-status" id="status"></span>
+    </div>
+  </div>
+
+  <div class="graph-title" id="graphTitle">Live Instrument — Concept Graph</div>
+  <div class="graph-wrap" id="graphWrap">
+    <svg class="lines" id="lines"></svg>
+
+    <div class="row-frame">
+      <div class="node wide" id="node-frame">
+        <div class="role"><span class="dot"></span>Question Framer</div>
+        <div class="node-body"></div>
+      </div>
+    </div>
+
+    <div class="row-gen">
+      <div class="node narrow" id="node-systems">
+        <div class="role"><span class="dot"></span>Systems Thinker</div>
+        <div class="node-body"></div>
+      </div>
+      <div class="node narrow" id="node-skeptic">
+        <div class="role"><span class="dot"></span>Skeptic</div>
+        <div class="node-body"></div>
+      </div>
+      <div class="node narrow" id="node-domain">
+        <div class="role"><span class="dot"></span>Domain Researcher</div>
+        <div class="node-body"></div>
+      </div>
+      <div class="node narrow" id="node-alt">
+        <div class="role"><span class="dot"></span>Alt-Theory Gen.</div>
+        <div class="node-body"></div>
+      </div>
+    </div>
+
+    <div class="row-synth">
+      <div class="node wide" id="node-synth">
+        <div class="role"><span class="dot"></span>Independent Verifier</div>
+        <div class="node-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdict-panel" id="verdictPanel"></div>
+
+  <div class="log" id="logWrap">
+    <div class="log-title">Run Log</div>
+    <div id="logLines"></div>
+  </div>
+
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const questionEl = $('question');
+const runBtn = $('runBtn');
+const statusEl = $('status');
+const graphWrap = $('graphWrap');
+const graphTitle = $('graphTitle');
+const logWrap = $('logWrap');
+const logLines = $('logLines');
+const verdictPanel = $('verdictPanel');
+const svg = $('lines');
+
+// ---------------------------------------------------------------------
+// Live mode is driven entirely by whether a key is saved in this
+// browser's localStorage (see the "Live Mode" panel above). The key is
+// never embedded in this file's source, so nothing here is a secret
+// visible to other visitors of the public site -- each visitor supplies
+// their own key, kept only in their own browser. No key saved => every
+// node runs mockGenerate() (deterministic simulation) instead of a real
+// API call.
+// ---------------------------------------------------------------------
+const STORAGE_KEY = 'cognitionGraphAnthropicKey';
+const apiKeyInput = $('apiKeyInput');
+const saveKeyBtn = $('saveKeyBtn');
+const clearKeyBtn = $('clearKeyBtn');
+const keyStatus = $('keyStatus');
+const modeBanner = $('modeBanner');
+
+function getStoredKey(){
+  try{ return localStorage.getItem(STORAGE_KEY) || ''; }catch(e){ return ''; }
+}
+function setStoredKey(k){
+  try{ if(k) localStorage.setItem(STORAGE_KEY, k); else localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+function isLive(){ return !!getStoredKey(); }
+
+function maskKey(k){
+  if(k.length <= 10) return '••••••••';
+  return k.slice(0,7) + '…' + k.slice(-4);
+}
+
+function refreshKeyUI(){
+  const k = getStoredKey();
+  if(k){
+    keyStatus.textContent = `Saved: ${maskKey(k)} — running LIVE against the Anthropic API.`;
+    keyStatus.className = 'key-status live';
+    apiKeyInput.value = '';
+    apiKeyInput.placeholder = 'key saved — paste a new one to replace it';
+    modeBanner.className = 'mock-banner is-live';
+    modeBanner.innerHTML = `<b>LIVE MODE.</b> Using the API key saved in this browser. Every run below makes 6 real calls to Claude and will spend a small amount of API credit.`;
+  }else{
+    keyStatus.textContent = 'No key saved — instrument runs in simulated mode.';
+    keyStatus.className = 'key-status';
+    apiKeyInput.placeholder = 'sk-ant-...';
+    modeBanner.className = 'mock-banner';
+    modeBanner.innerHTML = `<b>MOCK MODE.</b> No API key saved in this browser yet — every node below is a deterministic simulation, not a real Claude call. Paste a key in the panel above to switch to a live run.`;
+  }
+}
+
+saveKeyBtn.addEventListener('click', ()=>{
+  const v = apiKeyInput.value.trim();
+  if(!v) return;
+  setStoredKey(v);
+  refreshKeyUI();
+});
+clearKeyBtn.addEventListener('click', ()=>{
+  setStoredKey('');
+  refreshKeyUI();
+});
+
+refreshKeyUI();
+
+document.querySelectorAll('.preset-btn').forEach(b=>{
+  b.addEventListener('click', ()=>{ questionEl.value = b.dataset.q; });
+});
+
+function log(msg){
+  const t = new Date().toLocaleTimeString();
+  const el = document.createElement('div');
+  el.className = 'log-line';
+  el.innerHTML = `<span>${t}</span>  ${msg}`;
+  logLines.appendChild(el);
+}
+
+function setNodeState(id, state){
+  const n = $(id);
+  n.classList.remove('live','done','err');
+  if(state) n.classList.add(state);
+}
+
+function setNodeBody(id, html){
+  $(id).querySelector('.node-body').innerHTML = html;
+}
+
+function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))|0; } return Math.abs(h); }
+function pick(arr, seed){ return arr[seed % arr.length]; }
+function scoreNear(seed, base){ return Math.max(1, Math.min(10, base + (seed % 3) - 1)); }
+
+const DOMAIN_FIELDS = [
+  ['galaxy', 'astrobiology and SETI search methodology'],
+  ['mind', 'cognitive science and theory of mind'],
+  ['architecture', 'software architecture and systems design research'],
+  ['bottleneck', 'queueing theory and constraint analysis'],
+  ['research-engine', 'meta-science / science-of-science'],
+  ['automate', 'automation and control theory'],
+  ['kraken', 'behavioral ecology and swarm cognition'],
+  ['singleton', 'distributed systems theory'],
+];
+const ALT_LENSES = ['information theory','evolutionary game theory','thermodynamics','semiotics','ecology','control theory','network topology'];
+
+function domainField(q){
+  const lower = q.toLowerCase();
+  const match = DOMAIN_FIELDS.find(([kw]) => lower.includes(kw));
+  return match ? match[1] : 'network science';
+}
+
+function extractTerm(q){
+  const words = q.replace(/[^\w\s-]/g,'').split(/\s+/).filter(w=>w.length>4);
+  return words.length ? words[hashStr(q) % words.length] : 'the claim';
+}
+
+async function mockGenerate(role, q, seedSalt){
+  const seed = hashStr(q + seedSalt);
+  await delay(650 + (seed % 500));
+
+  if(role === 'frame'){
+    const term = extractTerm(q);
+    return {
+      subquestions: [
+        `What would falsify "${q}" rather than merely support it?`,
+        `What is the smallest measurable unit hidden inside "${q}"?`,
+        `Which parts of "${q}" are metaphor, and which are literal, checkable claims?`,
+        `What existing observation or dataset already bears on this, unexamined?`,
+        `Who or what would need to be wrong for "${q}" to hold?`
+      ],
+      key_terms: [term, pick(['mechanism','scale','boundary','agency'], seed)],
+      why_hard_to_research: `As stated, "${q}" bundles a testable mechanism with an untestable frame, so it can't be falsified until the two are pulled apart.`
+    };
+  }
+
+  if(role === 'node-systems'){
+    return {
+      formulation: `Model "${q}" as a set of interacting subsystems with feedback loops, then ask: which single loop, if cut, changes the outcome the most?`,
+      rationale: `Reframing around loop structure turns an unbounded claim into a specific, testable intervention point.`,
+      testability: scoreNear(seed, 7),
+      novelty: scoreNear(seed, 5),
+      discriminating_power: scoreNear(seed, 7)
+    };
+  }
+
+  if(role === 'node-skeptic'){
+    const term = extractTerm(q);
+    return {
+      formulation: `Assume the opposite of "${q}" and design the fastest, cheapest experiment that would embarrass this run if the opposite held for "${term}".`,
+      rationale: `Attacks the unstated assumption that "${term}" is even the right unit of analysis.`,
+      testability: scoreNear(seed, 8),
+      novelty: scoreNear(seed, 6),
+      discriminating_power: scoreNear(seed, 8)
+    };
+  }
+
+  if(role === 'node-domain'){
+    const field = domainField(q);
+    return {
+      formulation: `Reframe "${q}" using the tools and instruments already established in ${field} — what would this claim look like as a hypothesis that field already knows how to test?`,
+      rationale: `${field} already has instrumentation for problems shaped like this one; borrowing it avoids inventing a method from scratch.`,
+      testability: scoreNear(seed, 8),
+      novelty: scoreNear(seed, 4),
+      discriminating_power: scoreNear(seed, 6)
+    };
+  }
+
+  if(role === 'node-alt'){
+    const lens = pick(ALT_LENSES, seed);
+    return {
+      formulation: `Set aside the obvious reading of "${q}" and ask what it means under a ${lens} lens instead — what changes if the same claim is restated in ${lens} terms?`,
+      rationale: `${lens} is rarely the first lens reached for here, which is exactly why it might surface a formulation the others miss.`,
+      testability: scoreNear(seed, 5),
+      novelty: scoreNear(seed, 9),
+      discriminating_power: scoreNear(seed, 6)
+    };
+  }
+
+  if(role === 'verify'){
+    const verdicts = ['GRAPH OUTPERFORMED INPUT', 'NO CLEAR IMPROVEMENT', 'INCONCLUSIVE'];
+    const verdict = pick(verdicts, seed);
+    const winnerRoles = ['Skeptic','Systems Thinker','Domain Researcher','Alternative-Theory Generator'];
+    const winnerRole = verdict === 'NO CLEAR IMPROVEMENT' ? null : pick(winnerRoles, seed >> 2);
+    return {
+      winner_role: winnerRole,
+      winning_formulation: winnerRole ? `(simulated) the ${winnerRole} formulation above` : null,
+      verdict,
+      justification: verdict === 'NO CLEAR IMPROVEMENT'
+        ? `All four formulations restate "${q}" with more confident phrasing but none narrow it to something falsifiable that the original didn't already imply.`
+        : `The ${winnerRole} formulation is the only one that specifies what observation would change the answer, which the original question does not.`,
+      proving_observation: `Running this same graph across dozens of original questions and having a human judge blind to which formulation came from the graph score testability/novelty would confirm this wasn't a one-off.`,
+      self_deception_check: `A single simulated run scored by the same process that generated it is not independent evidence — this is mock output standing in for a real judge call.`
+    };
+  }
+}
+
+async function callModel(role, system, user, q, seedSalt){
+  const key = getStoredKey();
+  if(!key){
+    return mockGenerate(role, q, seedSalt);
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model:'claude-sonnet-5',
+      max_tokens:1000,
+      system,
+      messages:[{role:'user', content:user}]
+    })
+  });
+  if(!res.ok) throw new Error('API error '+res.status);
+  const data = await res.json();
+  const text = (data.content||[]).map(b=>b.text||'').join('\n');
+  const clean = text.replace(/```json|```/g,'').trim();
+  return JSON.parse(clean);
+}
+
+function drawLines(){
+  const wrapRect = graphWrap.getBoundingClientRect();
+  const frame = $('node-frame').getBoundingClientRect();
+  const synth = $('node-synth').getBoundingClientRect();
+  const gens = ['node-systems','node-skeptic','node-domain','node-alt'].map(id=>$(id).getBoundingClientRect());
+
+  svg.setAttribute('viewBox', `0 0 ${wrapRect.width} ${wrapRect.height}`);
+  svg.innerHTML = '';
+
+  const fx = frame.left - wrapRect.left + frame.width/2;
+  const fy = frame.bottom - wrapRect.top;
+  const sx = synth.left - wrapRect.left + synth.width/2;
+  const sy = synth.top - wrapRect.top;
+
+  gens.forEach((g,i)=>{
+    const gx = g.left - wrapRect.left + g.width/2;
+    const gyTop = g.top - wrapRect.top;
+    const gyBot = g.bottom - wrapRect.top;
+
+    const p1 = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p1.setAttribute('d', `M${fx},${fy} C${fx},${fy+30} ${gx},${gyTop-30} ${gx},${gyTop}`);
+    p1.setAttribute('id', `line-f-${i}`);
+    svg.appendChild(p1);
+
+    const p2 = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p2.setAttribute('d', `M${gx},${gyBot} C${gx},${gyBot+30} ${sx},${sy-30} ${sx},${sy}`);
+    p2.setAttribute('id', `line-s-${i}`);
+    svg.appendChild(p2);
+  });
+}
+
+function lineState(prefix, cls){
+  for(let i=0;i<4;i++){
+    const el = document.getElementById(prefix+'-'+i);
+    if(el){ el.classList.remove('live','done'); if(cls) el.classList.add(cls); }
+  }
+}
+
+const GEN_ROLES = [
+  {
+    id:'node-systems',
+    role:'Systems Thinker',
+    system:`You are the Systems Thinker node in a Monad cognition-graph experiment. Given an original frontier question and a framer's decomposition, propose ONE sharpened, researchable formulation that reframes the question in terms of structure, relationships, and feedback loops rather than the original's language. Respond ONLY with JSON, no markdown: {"formulation":"...", "rationale":"one sentence on why this framing is testable", "testability":1-10, "novelty":1-10, "discriminating_power":1-10}`
+  },
+  {
+    id:'node-skeptic',
+    role:'Skeptic',
+    system:`You are the Skeptic node in a Monad cognition-graph experiment. Given an original frontier question and a framer's decomposition, identify the single weakest unstated assumption in the original question, then propose ONE formulation designed to falsify that assumption as fast as possible. Respond ONLY with JSON, no markdown: {"formulation":"...", "rationale":"one sentence naming the assumption under attack", "testability":1-10, "novelty":1-10, "discriminating_power":1-10}`
+  },
+  {
+    id:'node-domain',
+    role:'Domain Researcher',
+    system:`You are the Domain Researcher node in a Monad cognition-graph experiment. Given an original frontier question and a framer's decomposition, ground the question in the most relevant existing research field or established methodology, then propose ONE formulation that could be studied using that field's existing tools. Respond ONLY with JSON, no markdown: {"formulation":"...", "rationale":"one sentence naming the field and why it applies", "testability":1-10, "novelty":1-10, "discriminating_power":1-10}`
+  },
+  {
+    id:'node-alt',
+    role:'Alternative-Theory Generator',
+    system:`You are the Alternative-Theory Generator node in a Monad cognition-graph experiment. Given an original frontier question and a framer's decomposition, propose ONE formulation using a genuinely different theoretical lens than the obvious one (avoid the first framing anyone would reach for). Respond ONLY with JSON, no markdown: {"formulation":"...", "rationale":"one sentence on why this lens is under-used here", "testability":1-10, "novelty":1-10, "discriminating_power":1-10}`
+  }
+];
+
+async function run(){
+  const q = questionEl.value.trim();
+  if(!q) return;
+
+  runBtn.disabled = true;
+  statusEl.textContent = 'Assembling graph…';
+  graphWrap.style.display = 'block';
+  graphTitle.style.display = 'block';
+  logWrap.style.display = 'block';
+  verdictPanel.style.display = 'none';
+  logLines.innerHTML = '';
+
+  ['node-frame','node-systems','node-skeptic','node-domain','node-alt','node-synth'].forEach(id=>{
+    setNodeState(id, null);
+    setNodeBody(id, '');
+  });
+
+  requestAnimationFrame(drawLines);
+  log(`Question intake: "${q}"${isLive() ? ' (live mode)' : ' (mock mode)'}`);
+
+  try{
+    // Stage 1: Framer
+    setNodeState('node-frame','live');
+    setNodeBody('node-frame','<span class="thinking">decomposing…</span>');
+    lineState('line-f','live');
+    statusEl.textContent = 'Stage 1 — framing…';
+
+    const frame = await callModel(
+      'frame',
+      `You are the Question Framer node in a Monad cognition-graph experiment. Given a frontier question, extract (1) 3-5 hidden subquestions embedded inside it, (2) 2-4 key terms that need definition before research can begin, (3) one honest sentence on why the original question, stated as-is, is hard to research directly. Respond ONLY with JSON, no markdown: {"subquestions":["..."], "key_terms":["..."], "why_hard_to_research":"..."}`,
+      `Original question: "${q}"`,
+      q, 'frame'
+    );
+
+    setNodeState('node-frame','done');
+    setNodeBody('node-frame', `
+      <div style="margin-bottom:6px;"><b>Why it's hard as-is:</b> ${escapeHtml(frame.why_hard_to_research)}</div>
+      <div style="margin-bottom:4px;color:var(--ink-dim);font-size:11.5px;">Hidden subquestions:</div>
+      <ul style="margin:0 0 4px 18px;padding:0;font-size:12.5px;">${frame.subquestions.map(s=>`<li>${escapeHtml(s)}</li>`).join('')}</ul>
+      <div style="color:var(--ink-dim);font-size:11.5px;">Key terms: ${frame.key_terms.map(escapeHtml).join(', ')}</div>
+    `);
+    lineState('line-f','done');
+    log(`Framer done — ${frame.subquestions.length} subquestions extracted.`);
+
+    // Stage 2: 4 generators in parallel
+    statusEl.textContent = 'Stage 2 — generating competing formulations…';
+    GEN_ROLES.forEach(r=>{
+      setNodeState(r.id,'live');
+      setNodeBody(r.id, '<span class="thinking">formulating…</span>');
+    });
+    lineState('line-s','live');
+
+    const context = `Original question: "${q}"\n\nFramer's decomposition:\nSubquestions: ${frame.subquestions.join('; ')}\nKey terms: ${frame.key_terms.join(', ')}\nWhy hard to research as-is: ${frame.why_hard_to_research}`;
+
+    const results = await Promise.all(GEN_ROLES.map(async (r,i)=>{
+      try{
+        const out = await callModel(r.id, r.system, context, q, r.id);
+        setNodeState(r.id,'done');
+        setNodeBody(r.id, `
+          <div style="font-size:12.5px;">${escapeHtml(out.formulation)}</div>
+          <div class="rationale">${escapeHtml(out.rationale)}</div>
+          <div class="scores">
+            <span class="score">test <b>${out.testability}</b></span>
+            <span class="score">novel <b>${out.novelty}</b></span>
+            <span class="score">disc <b>${out.discriminating_power}</b></span>
+          </div>
+        `);
+        log(`${r.role} → "${truncate(out.formulation, 70)}"`);
+        return {role:r.role, ...out};
+      }catch(e){
+        setNodeState(r.id,'err');
+        setNodeBody(r.id, '<span style="color:var(--red);">node failed</span>');
+        log(`${r.role} — FAILED (${e.message})`);
+        return {role:r.role, formulation:null, error:e.message};
+      }
+    }));
+
+    lineState('line-s','done');
+
+    // Stage 3: Synthesizer / Independent Verifier
+    statusEl.textContent = 'Stage 3 — independent verification…';
+    setNodeState('node-synth','live');
+    setNodeBody('node-synth','<span class="thinking">judging…</span>');
+
+    const validResults = results.filter(r=>r.formulation);
+    const synthContext = `Original question: "${q}"\n\nFramer's decomposition: ${JSON.stringify(frame)}\n\nCompeting formulations proposed by the graph:\n${validResults.map(r=>`- [${r.role}] "${r.formulation}" (rationale: ${r.rationale}; self-scored testability=${r.testability}, novelty=${r.novelty}, discriminating_power=${r.discriminating_power})`).join('\n')}`;
+
+    const verdict = await callModel(
+      'verify',
+      `You are the Independent Verifier in a Monad cognition-graph experiment. You are checking a specific research claim: "a small graph of differently-instructed model roles can discover a genuinely better research question than the one it started with." Do not simply pick the most confident-sounding formulation — check whether it is actually more testable, more discriminating between competing explanations, and still preserves the ambition of the original, or whether the graph just produced expensive agreement. Respond ONLY with JSON, no markdown: {"winner_role": "role name or null", "winning_formulation": "text or null", "verdict": "GRAPH OUTPERFORMED INPUT" | "NO CLEAR IMPROVEMENT" | "INCONCLUSIVE", "justification": "2-3 sentences", "proving_observation": "what evidence, if collected later, would confirm this was a real improvement and not just polish", "self_deception_check": "one sentence on how this judgment itself could be fooling itself"}`,
+      synthContext,
+      q, 'verify'
+    );
+
+    setNodeState('node-synth','done');
+    setNodeBody('node-synth', `<div style="font-size:12.5px;">Verdict rendered below.</div>`);
+    log(`Verifier verdict: ${verdict.verdict}`);
+
+    renderVerdict(q, verdict);
+    statusEl.textContent = 'Run complete.' + (isLive() ? '' : ' (simulated — not a real model run)');
+
+  }catch(e){
+    statusEl.textContent = 'Run failed: ' + e.message;
+    log(`RUN FAILED — ${e.message}`);
+  }finally{
+    runBtn.disabled = false;
+  }
+}
+
+function renderVerdict(q, v){
+  let badgeClass = 'inc', badgeText = 'Inconclusive';
+  if(v.verdict === 'GRAPH OUTPERFORMED INPUT'){ badgeClass='win'; badgeText='Graph Outperformed Input'; }
+  else if(v.verdict === 'NO CLEAR IMPROVEMENT'){ badgeClass='no'; badgeText='No Clear Improvement'; }
+
+  verdictPanel.innerHTML = `
+    <span class="verdict-badge ${badgeClass}">${badgeText}</span>
+    <h3>${v.winning_formulation ? escapeHtml(v.winning_formulation) : 'No formulation judged superior'}</h3>
+    ${v.winner_role ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-dim);">— proposed by ${escapeHtml(v.winner_role)}</div>` : ''}
+    <div class="verdict-field">
+      <div class="fl">Justification</div>
+      <p>${escapeHtml(v.justification)}</p>
+    </div>
+    <div class="verdict-field">
+      <div class="fl">What would prove this run wasn't just noise</div>
+      <p>${escapeHtml(v.proving_observation)}</p>
+    </div>
+    <div class="verdict-field">
+      <div class="fl">Risk of self-deception</div>
+      <p>${escapeHtml(v.self_deception_check)}</p>
+    </div>
+    <div class="caveat">
+      Instrument note: ${isLive() ? 'this Verifier is itself an LLM call, not a truly independent adversarial reviewer.' : 'this run used simulated node output, not a live model call — see the mode banner above.'} Per Venn's Phase 7 doctrine, a single toy run like this is evidence, not proof. Treat one run as one data point. A real answer to Frontier Question Six needs this run repeated across many original questions, with a human or separately-sourced judge scoring outcomes blind to which formulation came from the graph.
+    </div>
+  `;
+  verdictPanel.style.display = 'block';
+}
+
+function escapeHtml(s){
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function truncate(s,n){ return s.length>n ? s.slice(0,n)+'…' : s; }
+
+runBtn.addEventListener('click', run);
+window.addEventListener('resize', ()=>{ if(graphWrap.style.display==='block') requestAnimationFrame(drawLines); });
+</script>
+</body>
+</html>

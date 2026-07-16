@@ -34,18 +34,61 @@
         </article>
 
         <aside class="side-panel">
+          <section class="drop-panel" id="dropZone" tabindex="0" aria-label="File drop zone">
+            <h2>Dropper</h2>
+            <p class="drop-title">Drop an image or .glb here</p>
+            <p class="drop-hint">PNG, JPEG, WEBP generate a new asset. GLB files are cataloged directly.</p>
+            <p class="drop-hint">You can also choose a file below.</p>
+          </section>
+
+          <section class="staged-panel" id="stagedPanel" hidden>
+            <h2>Staged File</h2>
+            <div class="staged-preview" id="stagedPreview"></div>
+            <dl class="staged-meta">
+              <div>
+                <dt>Name</dt>
+                <dd id="stagedName">—</dd>
+              </div>
+              <div>
+                <dt>Type</dt>
+                <dd id="stagedType">—</dd>
+              </div>
+              <div>
+                <dt>Size</dt>
+                <dd id="stagedSize">—</dd>
+              </div>
+            </dl>
+            <button id="clearStagedButton" type="button" class="secondary-button">Clear staged file</button>
+          </section>
+
           <section class="upload-panel">
-            <h2>Generate or Catalog</h2>
+            <h2>Upload File</h2>
             <form id="uploadForm">
               <input id="uploadInput" type="file" accept="image/png,image/jpeg,image/webp,model/gltf-binary,.glb">
               <input id="uploadNameInput" type="text" placeholder="Output name (optional)" autocomplete="off">
               <button id="uploadButton" type="submit">Upload</button>
             </form>
             <p id="uploadStatus" class="upload-status"></p>
+            <div id="progressPanel" class="progress-panel" hidden>
+              <div class="progress-head">
+                <span id="progressLabel">Idle</span>
+                <span id="progressElapsed">0.0s</span>
+              </div>
+              <progress id="progressBar" value="0" max="100"></progress>
+            </div>
+          </section>
+
+          <section class="upload-panel">
+            <h2>Tips</h2>
+            <ul class="tips-list">
+              <li>Drag an image to generate a new GLB.</li>
+              <li>Drag a .glb to catalog an already-built model.</li>
+              <li>Select a catalog item to open it in the viewer.</li>
+            </ul>
           </section>
 
           <section class="model-list-panel">
-            <h2>Cataloged Models</h2>
+            <h2>Output Viewer</h2>
             <ul id="modelList" class="model-list"></ul>
             <p id="noModelsNote" class="empty-note" hidden>
               None yet. Run <code>tools/img2asset/image_to_asset.py</code>, or upload above, to add one &mdash; it lands here automatically.
@@ -65,6 +108,14 @@
               <div>
                 <dt>Created</dt>
                 <dd id="detailCreated">&mdash;</dd>
+              </div>
+              <div>
+                <dt>Output</dt>
+                <dd id="detailOutput">&mdash;</dd>
+              </div>
+              <div>
+                <dt>Download</dt>
+                <dd><a id="detailDownload" href="#" download>Open file</a></dd>
               </div>
             </dl>
           </section>
