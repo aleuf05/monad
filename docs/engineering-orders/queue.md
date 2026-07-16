@@ -4,26 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## WATCHMAN-01 — Flesh out Watchman's missing checks
-
-- Status: claimed:claude@2026-07-16T23:05:00Z
-- Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 1
-- Objective: `watchman.py` implements 2 of the 8 checks its own role
-  implies (disk usage, Qdrant health). Add process monitoring and
-  endpoint/health checks for the other 5 live services not currently
-  covered: `fleetcore-serve`, `world-intake`, `living-fleet-memory`,
-  `living-captain-status`, `living-fleet`. Add stale-service and
-  failed-restart detection if time permits within this packet's scope.
-- Scope: `watchman.py` only. Extend `heartbeat()`'s output shape
-  additively -- do not remove or rename existing fields (`disk`, Qdrant
-  health) that other things may already read.
-- Exclusions: no changes to how Watchman is run (systemd unit, restart
-  policy) -- that's infrastructure, routes through cmd.sh if it's ever
-  needed, not this packet.
-- Done evidence: each new check verified against the real running
-  services on this host (not mocked), heartbeat log shows the new fields
-  populated with real values.
-
 ## BRIDGE3-CONSOLIDATE-01 — Fold Bridge, FleetCore Live, and FleetCore Control into Bridge Station 3.0
 
 - Status: queued
