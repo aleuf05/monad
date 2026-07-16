@@ -11,6 +11,26 @@ Each entry records UTC time, hostname, system uptime when available, the
 current Git commit, repository path, disk capacity, and local Qdrant health.
 Watchman reads repository state but writes only to its own log directory.
 
+Watchman also checks the five other live services under `services`, each via
+its systemd unit (`ActiveState`/`SubState`/`NRestarts`, read-only via
+`systemctl show`) plus a real HTTP GET against its own API where one exists:
+
+| key                      | unit                                | http check         |
+| ------------------------ | ------------------------------------ | ------------------- |
+| `fleetcore_serve`        | `fleetcore-serve.service`            | `GET /snapshot`     |
+| `world_intake`           | `world-intake.service`               | `GET /proposals`    |
+| `living_fleet_memory`    | `living-fleet-memory.service`        | `GET /captains/summary` |
+| `living_captain_status`  | `living-captain-status.service`      | `GET /status`       |
+| `living_fleet`           | `living-fleet.service`               | none — background loop, checked instead by staleness of `data/living-fleet/runtime.json`'s `last_cycle_at` (flagged `stale` past `MONAD_LIVING_FLEET_STALE_SECONDS`, default 60s) |
+
+A service's `process.state` is `warning` if the unit has restarted at least
+once since it was last (re)started (`restarts` > 0) even while currently
+running, `failed` if systemd reports the unit failed, and `unknown` if
+`systemctl` itself couldn't be queried. Health check URLs are overridable via
+`MONAD_FLEETCORE_HEALTH_URL`, `MONAD_WORLD_INTAKE_HEALTH_URL`,
+`MONAD_LIVING_FLEET_MEMORY_HEALTH_URL`, and
+`MONAD_LIVING_CAPTAIN_STATUS_HEALTH_URL`.
+
 ## Granite Installation
 
 The service file assumes the Granite account is `cgl` and the repository is
