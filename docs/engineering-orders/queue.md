@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-01 — Define shared mission and evidence contracts
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T17:23:00Z
 - Source: Lieutenant request, 2026-07-16; missing-glue architecture review
 - Objective: specify `MissionEnvelope`, `EvidenceRef`, and `ArtifactResult`
   schemas, including identifiers, lifecycle states, evidence classifications,
