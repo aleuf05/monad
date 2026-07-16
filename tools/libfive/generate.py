@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse,hashlib,json,os,subprocess,tempfile
+import argparse,hashlib,json,os,re,subprocess,tempfile
 from datetime import datetime,timezone
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]; OUT=ROOT/'web/assets/libfive'; MANIFEST=OUT/'manifest.json'; DEFAULT_EXPORTER=Path('/usr/local/bin/monad-libfive-export')
+NAME_RE=re.compile(r'^[a-z0-9][a-z0-9-]{0,47}$')
+def validate(shape,args):
+ if shape not in {'sphere','box','torus'}: raise ValueError('unsupported primitive')
+ if not NAME_RE.fullmatch(args.name): raise ValueError('name must be 1-48 lowercase letters, numbers, or hyphens')
+ radius=float(args.radius); size=float(args.size); minor=float(args.minor)
+ if not 1<=radius<=100: raise ValueError('radius must be between 1 and 100')
+ if not 1<=size<=200: raise ValueError('size must be between 1 and 200')
+ if not 0.5<=minor<=50: raise ValueError('minor radius must be between 0.5 and 50')
+ if shape=='torus' and minor>=radius: raise ValueError('torus minor radius must be smaller than radius')
 def scheme(shape,args):
+ validate(shape,args)
  r=float(args.radius); size=float(args.size); minor=float(args.minor)
  if shape=='sphere': expr=f'(sphere {r})'; bound=r*1.25
  elif shape=='box': expr=f'(box [-{size/2} -{size/2} -{size/2}] [{size/2} {size/2} {size/2}])'; bound=size*.75
