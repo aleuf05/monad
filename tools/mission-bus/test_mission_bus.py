@@ -47,4 +47,16 @@ class T(unittest.TestCase):
   m.create(kraken); self.assertEqual(kraken.status(),'created')
   ids=[e['event_id'] for e in kraken.events()]+[e['event_id'] for e in other.events()]
   self.assertEqual(len(ids),len(set(ids)))  # no cross-mission event_id collision
+ def test_registry_is_deterministic_and_excludes_superseded_revision(self):
+  old=m.snapshot; m.snapshot=lambda u:{'tick':42,'watch_events':[]}
+  try: m.execute(self.r,'x')
+  finally: m.snapshot=old
+  m.review(self.r,'edit','lieutenant.cgl','human-command','sharpen','edit-registry','Maintain separation.',1)
+  path=Path(self.d.name)/'registry.json'
+  first=m.build_registry(self.r,path); encoded=path.read_bytes()
+  second=m.build_registry(self.r,path)
+  self.assertEqual(first,second); self.assertEqual(encoded,path.read_bytes())
+  ids={item['artifact_id'] for item in first['artifacts']}
+  self.assertNotIn(f'artifact.cognition.{self.r.mission_id}.verdict-01',ids)
+  self.assertIn(f'artifact.cognition.{self.r.mission_id}.verdict-02',ids)
 if __name__=='__main__': unittest.main()

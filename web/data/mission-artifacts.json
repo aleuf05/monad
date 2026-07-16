@@ -1,0 +1,122 @@
+{
+  "artifacts": [
+    {
+      "accepted_at": null,
+      "artifact_id": "artifact.cognition.kraken.hypothesis-1",
+      "artifact_type": "hypothesis",
+      "classification": "generated-candidate",
+      "component": "stub-cognition",
+      "content_sha256": null,
+      "created_at": "2026-07-16T19:43:41.821557+00:00",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "locator": {
+        "kind": "mission-record",
+        "value": "missionevent.kraken.hypothesis-1"
+      },
+      "media_type": "application/json",
+      "mission_id": "mission.kraken-inquiry-001",
+      "schema_version": "monad.registry.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null,
+      "title": "Cognition hypothesis",
+      "visibility": "public"
+    },
+    {
+      "accepted_at": null,
+      "artifact_id": "artifact.cognition.kraken.hypothesis-2",
+      "artifact_type": "hypothesis",
+      "classification": "generated-candidate",
+      "component": "stub-cognition",
+      "content_sha256": null,
+      "created_at": "2026-07-16T19:43:41.828309+00:00",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "locator": {
+        "kind": "mission-record",
+        "value": "missionevent.kraken.hypothesis-2"
+      },
+      "media_type": "application/json",
+      "mission_id": "mission.kraken-inquiry-001",
+      "schema_version": "monad.registry.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null,
+      "title": "Cognition hypothesis",
+      "visibility": "public"
+    },
+    {
+      "accepted_at": null,
+      "artifact_id": "artifact.cognition.kraken.hypothesis-3",
+      "artifact_type": "hypothesis",
+      "classification": "generated-candidate",
+      "component": "stub-cognition",
+      "content_sha256": null,
+      "created_at": "2026-07-16T19:43:41.834838+00:00",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "locator": {
+        "kind": "mission-record",
+        "value": "missionevent.kraken.hypothesis-3"
+      },
+      "media_type": "application/json",
+      "mission_id": "mission.kraken-inquiry-001",
+      "schema_version": "monad.registry.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null,
+      "title": "Cognition hypothesis",
+      "visibility": "public"
+    },
+    {
+      "accepted_at": null,
+      "artifact_id": "artifact.cognition.kraken.verdict-01",
+      "artifact_type": "recommendation-candidate",
+      "classification": "generated-candidate",
+      "component": "stub-cognition",
+      "content_sha256": null,
+      "created_at": "2026-07-16T19:43:41.841670+00:00",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "locator": {
+        "kind": "mission-record",
+        "value": "missionevent.kraken.verdict"
+      },
+      "media_type": "application/json",
+      "mission_id": "mission.kraken-inquiry-001",
+      "schema_version": "monad.registry.v0.1",
+      "status": "review-required",
+      "supersedes_artifact_id": null,
+      "title": "Cognition recommendation",
+      "visibility": "public"
+    },
+    {
+      "accepted_at": "2026-07-16T19:43:41.986057+00:00",
+      "artifact_id": "artifact.review.kraken.decision-01",
+      "artifact_type": "review-decision",
+      "classification": "human-command",
+      "component": "human-review",
+      "content_sha256": null,
+      "created_at": "2026-07-16T19:43:41.986057+00:00",
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "locator": {
+        "kind": "mission-record",
+        "value": "missionevent.decision.kraken.001"
+      },
+      "media_type": "application/json",
+      "mission_id": "mission.kraken-inquiry-001",
+      "schema_version": "monad.registry.v0.1",
+      "status": "accepted",
+      "supersedes_artifact_id": null,
+      "title": "Human review decision",
+      "visibility": "public"
+    }
+  ],
+  "generated_at": "2026-07-16T19:43:42.001588+00:00",
+  "schema_version": "monad.registry-index.v0.1",
+  "source_record_cursor": 10
+}

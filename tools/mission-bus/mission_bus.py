@@ -14,7 +14,7 @@ import argparse, hashlib, json, sqlite3, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'
+ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'
 KRAKEN_MID='mission.kraken-inquiry-001'; KRAKEN_CID='run.kraken-inquiry-001'
 KRAKEN_OBJECTIVE='What does the verified evidence justify about contact K-1?'
 TERMINAL={'completed','rejected','cancelled','failed'}
@@ -86,12 +86,46 @@ def project(r,path=OUT,objective=KRAKEN_OBJECTIVE):
  ev=r.events(); arts=[x['payload'] for x in ev if x['event_type']=='artifact_recorded']; evidence=[x['payload'] for x in ev if x['event_type']=='evidence_cited']; decision=next((a for a in reversed(arts) if a['artifact_type']=='review-decision'),None)
  out={'schema_version':'monad.projection.v0.1','audience':'agent-ops','generated_at':now(),'source_record_cursor':ev[-1]['seq'] if ev else 0,'mission':{'mission_id':r.mission_id,'objective':objective,'status':r.status(),'fleetcore_mutation':False},'evidence':evidence,'findings':[a for a in arts if a['artifact_type']=='hypothesis'],'recommendation':next((a for a in arts if a['artifact_type']=='recommendation-candidate'),None),'decision':decision}
  path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp'); tmp.write_text(json.dumps(out,indent=2,sort_keys=True)); tmp.replace(path); return out
+REGISTRY_TYPES={
+ 'hypothesis':('generated-candidate','Cognition hypothesis'),
+ 'recommendation-candidate':('generated-candidate','Cognition recommendation'),
+ 'review-decision':('human-command','Human review decision'),
+}
+def build_registry(r,path=REGISTRY_OUT):
+ """Build the public artifact index from recorded events, never directories."""
+ events=r.events(); artifacts=[]; superseded={
+  event['payload'].get('supersedes_artifact_id') for event in events
+  if event['event_type']=='artifact_recorded'
+ }
+ for event in events:
+  if event['event_type']!='artifact_recorded': continue
+  artifact=event['payload']; artifact_type=artifact.get('artifact_type')
+  if artifact_type not in REGISTRY_TYPES: raise Error(f'unknown registry artifact type: {artifact_type}')
+  if artifact.get('visibility','public')!='public': continue
+  if artifact.get('artifact_id') in superseded: continue
+  classification,title=REGISTRY_TYPES[artifact_type]
+  artifacts.append({
+   'schema_version':'monad.registry.v0.1','artifact_id':artifact['artifact_id'],
+   'mission_id':artifact['mission_id'],'artifact_type':artifact_type,
+   'status':artifact['status'],'classification':classification,
+   'title':artifact.get('title') or title,
+   'locator':{'kind':'mission-record','value':event['event_id']},
+   'content_sha256':None,'media_type':'application/json',
+   'component':artifact['component'],'created_at':artifact['created_at'],
+   'accepted_at':artifact['created_at'] if artifact['status']=='accepted' else None,
+   'evidence_refs':artifact.get('evidence_refs',[]),
+   'supersedes_artifact_id':artifact.get('supersedes_artifact_id'),
+   'visibility':'public',
+  })
+ artifacts.sort(key=lambda item:item['artifact_id'])
+ out={'schema_version':'monad.registry-index.v0.1','generated_at':events[-1]['recorded_at'] if events else None,'source_record_cursor':events[-1]['seq'] if events else 0,'artifacts':artifacts}
+ path.parent.mkdir(parents=True,exist_ok=True); encoded=json.dumps(out,indent=2,sort_keys=True)+'\n'; tmp=path.with_suffix('.tmp'); tmp.write_text(encoded); tmp.replace(path); return out
 def main():
  p=argparse.ArgumentParser(); p.add_argument('--db',type=Path,default=DEFAULT_DB)
  p.add_argument('--fleetcore-url',default='http://127.0.0.1:4771')
  p.add_argument('--mission-id',default=KRAKEN_MID); p.add_argument('--correlation-id',default=KRAKEN_CID); p.add_argument('--objective',default=KRAKEN_OBJECTIVE)
  sub=p.add_subparsers(dest='cmd',required=True)
- for x in ('create','execute','inspect','project'): sub.add_parser(x)
+ for x in ('create','execute','inspect','project','registry'): sub.add_parser(x)
  for x in ('pause','cancel','resume'):
   z=sub.add_parser(x); z.add_argument('--reason',required=True)
  q=sub.add_parser('review'); q.add_argument('action',choices=['accept','reject','edit']); q.add_argument('--reviewer',required=True); q.add_argument('--authority',required=True); q.add_argument('--reason',required=True); q.add_argument('--decision-id',default='decision.kraken.001'); q.add_argument('--amended'); q.add_argument('--revision',type=int,default=1)
@@ -104,6 +138,7 @@ def main():
   elif a.cmd=='cancel': transition(r,'cancelled',a.reason,a.objective)
   elif a.cmd=='resume': transition(r,'running',a.reason,a.objective)
   if a.cmd=='project': result=project(r,OUT,a.objective)
+  elif a.cmd=='registry': result=build_registry(r,REGISTRY_OUT)
   else: result={'status':r.status(),'events':r.events()}
  except Error as e: p.error(str(e))
  print(json.dumps(result,indent=2,default=str)); return 0
