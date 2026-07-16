@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-07 — Produce one end-to-end pilot execution packet
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T18:08:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01 through GLUE-06
 - Objective: convert the approved glue designs into one bounded implementation
