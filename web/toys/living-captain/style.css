@@ -28,6 +28,13 @@ h3 { margin:0; font-size:1.3rem; }
 dl { display:grid; gap:.75rem; margin:0; }
 dt { color:var(--muted); font-size:.64rem; text-transform:uppercase; letter-spacing:.1em; }
 dd { margin:.2rem 0 0; line-height:1.4; font-size:.86rem; overflow-wrap:anywhere; }
+.voice-panel { padding:1rem 1.25rem; }
+.voice-controls { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; margin-top:.6rem; }
+.voice-button { border:1px solid var(--signal); background:rgba(138,215,193,.12); color:var(--signal); border-radius:.4rem; padding:.5rem .9rem; font:inherit; cursor:pointer; transition:background .15s ease; }
+.voice-button:hover { background:rgba(138,215,193,.22); }
+.voice-toggle { display:flex; align-items:center; gap:.45rem; font-size:.8rem; color:var(--muted); cursor:pointer; }
+.voice-status { margin:.6rem 0 0; color:var(--muted); font-size:.75rem; }
+.voice-status.is-reading { color:var(--amber); }
 .memory-panel { padding:1rem 1.25rem; }
 .budget-row { margin-top:.4rem; }
 .trait-bar { display:grid; grid-template-columns:6.5rem 1fr 5rem; gap:.5rem; align-items:center; font-size:.7rem; color:var(--muted); }

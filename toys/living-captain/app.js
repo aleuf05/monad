@@ -3,6 +3,98 @@ const POLL_INTERVAL_MS = 10000;
 
 const el = (id) => document.getElementById(id);
 
+// --- Voice: on-demand read + opt-in auto-announce on a genuinely new
+// observation (never continuous -- Living Captain's own spend boundary
+// means there is rarely anything new to say; see the voice-panel's own
+// copy in index.html). Self-contained rather than sharing Radio
+// Console's speech code: separate deployable toy, small enough that a
+// shared module isn't worth the coupling. ---
+let lastStatusData = null;
+let captainUtterance = null;
+let autoAnnounceArmed = false;
+let hasSeededObserveCount = false;
+let lastSeenObserveCount = null;
+
+function buildStatusSentence(data) {
+  const identity = data.identity || {};
+  const sight = data.last_observed || {};
+  const spend = data.spend || {};
+  const actions = data.recent_actions || [];
+  const latest = actions.length ? actions[actions.length - 1] : null;
+  const parts = [`Captain's report. ${identity.captain_id || "Unidentified captain"}.`];
+  if (sight.fleetcore_tick != null) {
+    parts.push(`Last observed FleetCore at tick ${sight.fleetcore_tick}, event sequence ${sight.fleetcore_event_sequence}.`);
+    if (sight.world_intake_pending_count != null) {
+      parts.push(`${sight.world_intake_pending_count} World Intake proposal${sight.world_intake_pending_count === 1 ? "" : "s"} pending.`);
+    }
+  } else {
+    parts.push("No observation recorded yet.");
+  }
+  if (spend.observe_limit != null) {
+    const remaining = Math.max(0, spend.observe_limit - (spend.observe_count ?? 0));
+    parts.push(`Observe budget: ${remaining} of ${spend.observe_limit} remaining.`);
+  }
+  if (latest) parts.push(`Most recent action: ${latest.summary}`);
+  return parts.join(" ");
+}
+
+function stopCaptainVoice() {
+  if (captainUtterance && window.speechSynthesis) window.speechSynthesis.cancel();
+  captainUtterance = null;
+  el("readStatusButton").textContent = "Read Status";
+  const status = el("voiceStatus");
+  status.textContent = autoAnnounceArmed ? "Auto-announce armed; voice idle." : "Voice idle.";
+  status.classList.remove("is-reading");
+}
+
+function speakCaptainStatus(data, prefix) {
+  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+    el("voiceStatus").textContent = "Voice unavailable in this browser.";
+    return false;
+  }
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices.length) {
+    // No installed TTS voices (common on minimal Linux/headless/sandboxed
+    // environments -- same condition Radio Console's speak() handles).
+    // Without this, speechSynthesis.speak() just silently does nothing:
+    // onstart never fires, the button stays stuck on "Read Status" forever
+    // with zero feedback that anything was even attempted.
+    el("voiceStatus").textContent = "No TTS voices installed in this browser -- nothing to read aloud.";
+    return false;
+  }
+  const utterance = new SpeechSynthesisUtterance(`${prefix}${buildStatusSentence(data)}`);
+  utterance.voice = voices.find((v) => /^en(-|_)/i.test(v.lang) && /natural|enhanced|premium/i.test(v.name))
+    || voices.find((v) => /^en(-|_)/i.test(v.lang))
+    || null;
+  utterance.rate = 0.96;
+  utterance.onstart = () => {
+    el("readStatusButton").textContent = "Stop Reading";
+    const status = el("voiceStatus");
+    status.textContent = `Reading captain's report${utterance.voice ? ` · ${utterance.voice.name}` : ""}`;
+    status.classList.add("is-reading");
+  };
+  utterance.onend = stopCaptainVoice;
+  utterance.onerror = stopCaptainVoice;
+  captainUtterance = utterance;
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function handleReadStatusClick() {
+  if (captainUtterance) return stopCaptainVoice();
+  speakCaptainStatus(lastStatusData || {}, "");
+}
+
+function handleAutoAnnounceToggle() {
+  autoAnnounceArmed = el("autoAnnounceToggle").checked;
+  if (!captainUtterance) {
+    el("voiceStatus").textContent = autoAnnounceArmed ? "Auto-announce armed; voice idle." : "Voice idle.";
+  }
+}
+
+el("readStatusButton").addEventListener("click", handleReadStatusClick);
+el("autoAnnounceToggle").addEventListener("change", handleAutoAnnounceToggle);
+
 function setLink(ok, label) {
   el("liveDot").classList.toggle("is-live", ok);
   el("liveDot").classList.toggle("is-error", !ok);
@@ -92,6 +184,23 @@ async function refresh() {
     renderSpend(data.spend ?? {});
     renderCustody(data.custody_manifest);
     renderActions(data.recent_actions ?? [], data.action_log_length);
+
+    lastStatusData = data;
+    // observe_count rising is the one real signal a genuinely new
+    // observation happened -- Living Captain's spend boundary means this
+    // is rare (default limit 1 per restart), by design, not a bug in this
+    // check. Seeded silently on first load so arming auto-announce (or
+    // just opening the page) never speaks whatever was already there.
+    const observeCount = data.spend?.observe_count ?? null;
+    if (observeCount !== null) {
+      if (!hasSeededObserveCount) {
+        hasSeededObserveCount = true;
+        lastSeenObserveCount = observeCount;
+      } else if (autoAnnounceArmed && observeCount !== lastSeenObserveCount && !captainUtterance) {
+        lastSeenObserveCount = observeCount;
+        speakCaptainStatus(data, "New observation. ");
+      }
+    }
 
     setLink(true, "Connected");
     showFeedback("", false);

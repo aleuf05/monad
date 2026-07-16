@@ -40,6 +40,23 @@
         <div class="captain-grid" id="sightGrid"></div>
       </section>
 
+      <section class="voice-panel" aria-label="Captain's voice">
+        <div class="section-heading">
+          <div><p class="eyebrow">Voice</p><h2>Captain's Report</h2></div>
+          <p>Spoken via this browser's text-to-speech, separate from any fleet radio. Auto-announce only
+            speaks when a genuinely new observation lands -- rare by design, since Living Captain is
+            spend-limited to one observe call per restart.</p>
+        </div>
+        <div class="voice-controls">
+          <button id="readStatusButton" class="voice-button" type="button">Read Status</button>
+          <label class="voice-toggle">
+            <input type="checkbox" id="autoAnnounceToggle">
+            Auto-announce new observations
+          </label>
+        </div>
+        <p id="voiceStatus" class="voice-status">Voice idle.</p>
+      </section>
+
       <section class="memory-panel">
         <div class="section-heading">
           <div><p class="eyebrow">Spend Boundary</p><h2>Observe Budget</h2></div>
