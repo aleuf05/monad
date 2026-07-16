@@ -217,6 +217,15 @@ let newswireUtterance = null;
 let nprChannelActive = false;
 let lastAnnouncedHourKey = null; // "Thu Jul 16 2026 17" -- date-qualified so a session spanning midnight doesn't collide on hour number alone
 const NPR_HOUR_CHIME_CHECK_MS = 20000;
+// Semi-live: the underlying feed only actually refreshes every
+// NEWSWIRE_REFRESH_MS (5 min, server-side fetch is every 15 min on top of
+// that) -- there is no real-time NPR push to be honest about. "Semi-live"
+// here means: whenever a fetch (the regular 5-minute timer, not just the
+// top-of-hour chime) reveals a genuinely new lead headline, announce it
+// once, bounded by that real refresh cadence rather than invented.
+let lastAnnouncedHeadlineLink = null;
+let hasSeededNewswire = false;
+let suppressAutoNewswireAnnounce = false;
 
 // --- Diagnostics DOM refs (Captain's packet, 2026-07-16: "connected is not
 // the same as heard") ---
@@ -304,6 +313,18 @@ const LIVE_PUMP_INTERVAL_MS = 700;
 const MAX_CONTENT_LINES_PER_SNAPSHOT = 6;
 const ROUTINE_AUTONOMY_REPORT_INTERVAL_MS = 60 * 1000;
 let lastRoutineAutonomyReportAt = 0;
+// Scout route_completed (measured live: ~2/s, all scouts, pure escort
+// station-keeping noise -- see the route_completed case below) is fully
+// suppressed per-event, same as waypoint_reached. But full silence on
+// scout activity reads as dead air, not quiet -- this rolls suppressed
+// events up into one periodic Bridge line instead of zero lines, same
+// batching shape as ROUTINE_AUTONOMY_REPORT_INTERVAL_MS above. Shorter
+// interval than that one (45s vs 60s) since this is meant to feel present,
+// not buried.
+const SCOUT_ROUTE_REPORT_INTERVAL_MS = 45 * 1000;
+let lastScoutRouteReportAt = 0;
+let suppressedScoutRouteCount = 0;
+const suppressedScoutRouteVessels = new Set();
 const VESSEL_CHANNEL = { flagship: "fleet-comms", scout: "fleet-comms", "passive-traffic": "traffic" };
 const STATUS_LINES = {
   underway: "underway, course {course}, speed {speed} knots.",
@@ -793,6 +814,27 @@ function vesselDisplayName(id) {
   return speakerNameFor(vessel);
 }
 
+// Rolls up suppressed scout route_completed events (see that case in
+// diffVesselEvents) into one periodic line, so cutting the per-event spam
+// doesn't read as scouts going silent -- "reasonable traffic," not zero.
+function maybeReportScoutRouteActivity() {
+  const now = Date.now();
+  if (now - lastScoutRouteReportAt < SCOUT_ROUTE_REPORT_INTERVAL_MS) return;
+  lastScoutRouteReportAt = now;
+  const count = suppressedScoutRouteCount;
+  const vesselCount = suppressedScoutRouteVessels.size;
+  suppressedScoutRouteCount = 0;
+  suppressedScoutRouteVessels.clear();
+  if (count === 0) return;
+  queueNarratedEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Bridge, scouts continuing station-keeping; ${count} adjustment${count === 1 ? "" : "s"} across ${vesselCount} scout${vesselCount === 1 ? "" : "s"} in the last watch.`,
+    station: "bridge"
+  });
+}
+
 function diffVesselEvents(events) {
   if (!Array.isArray(events)) return;
   if (lastVesselEventSeq === null) return;
@@ -828,7 +870,12 @@ function diffVesselEvents(events) {
         // postural changes; flagship and passive-traffic route
         // completions (genuinely occasional) are unaffected.
         const vessel = vesselById(event.vessel_id);
-        if (vessel?.kind === "scout") break;
+        if (vessel?.kind === "scout") {
+          suppressedScoutRouteCount += 1;
+          suppressedScoutRouteVessels.add(event.vessel_id);
+          maybeReportScoutRouteActivity();
+          break;
+        }
         const name = vesselDisplayName(event.vessel_id);
         queueNarratedEntry({
           kind: "status",
@@ -1842,6 +1889,18 @@ function renderNewswire(payload) {
     newswireLogEl.appendChild(row);
     if (index === 0) selectTopic(item, row);
   });
+
+  const newestLink = payload.items[0].link;
+  if (!hasSeededNewswire) {
+    // First render this session (or first since power-on) just seeds the
+    // tracker -- arming the NPR channel must never trigger an immediate
+    // read of whatever headline happened to already be on top.
+    hasSeededNewswire = true;
+    lastAnnouncedHeadlineLink = newestLink;
+  } else if (nprChannelActive && !suppressAutoNewswireAnnounce && newestLink !== lastAnnouncedHeadlineLink) {
+    lastAnnouncedHeadlineLink = newestLink;
+    speakNewswireHeadline("NPR update.");
+  }
 }
 
 function stopNewswireSpeech() {
@@ -1910,7 +1969,7 @@ async function fetchNewswire() {
 function updateNprAutoStatus() {
   if (!nprAutoStatusEl) return;
   if (!nprChannelActive) {
-    nprAutoStatusEl.textContent = "Auto top-of-hour: off — enable via the NPR chip above";
+    nprAutoStatusEl.textContent = "Auto: off — enable via the NPR chip above";
     nprAutoStatusEl.classList.remove("is-armed");
     return;
   }
@@ -1918,7 +1977,7 @@ function updateNprAutoStatus() {
   const next = new Date(now);
   next.setHours(now.getHours() + 1, 0, 0, 0);
   const nextLabel = next.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  nprAutoStatusEl.textContent = `Auto top-of-hour: armed — next chime ${nextLabel}`;
+  nprAutoStatusEl.textContent = `Auto: armed — top-of-hour chime ${nextLabel}, plus new headlines as the feed refreshes`;
   nprAutoStatusEl.classList.add("is-armed");
 }
 
@@ -1937,11 +1996,18 @@ async function playTopOfHourChime() {
   // not whatever was cached (possibly up to NEWSWIRE_REFRESH_MS stale) or
   // whatever the operator last manually selected -- "top of the hour
   // news" means the news as of now, same convention a real station uses.
+  // Suppressed so this forced fetch doesn't also trigger the semi-live
+  // "new headline arrived" path in renderNewswire() -- this function
+  // speaks unconditionally below regardless of whether the link actually
+  // changed, so that path would otherwise double-speak the same headline.
+  suppressAutoNewswireAnnounce = true;
   await fetchNewswire();
+  suppressAutoNewswireAnnounce = false;
+  if (selectedNewswireItem) lastAnnouncedHeadlineLink = selectedNewswireItem.link;
   const spoke = speakNewswireHeadline("Top of the hour. NPR News.");
   if (spoke && nprAutoStatusEl) {
     const label = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    nprAutoStatusEl.textContent = `Auto top-of-hour: armed — last chime ${label}`;
+    nprAutoStatusEl.textContent = `Auto: armed — last top-of-hour chime ${label}`;
     nprAutoStatusEl.classList.add("is-armed");
   }
 }
