@@ -70,6 +70,29 @@ class T(unittest.TestCase):
   self.assertEqual(decided['pending_count'],0); self.assertEqual(decided['cards'][0]['status'],'accepted')
   verdict=next(x['payload'] for x in self.r.events() if x['event_type']=='artifact_recorded' and x['payload']['artifact_type']=='recommendation-candidate')
   self.assertEqual(verdict['status'],'review-required')
+ def test_review_requires_engineering_comms_valid_message(self):
+  # Real second validation layer, not decoration: review()'s own
+  # signature never checked that `reason` is non-empty (only the CLI's
+  # --reason required=True did) -- engineering-comms' schema does, and
+  # must reject before anything is appended to the Mission Record.
+  old=m.snapshot; m.snapshot=lambda u:{'tick':42,'watch_events':[]}
+  try: m.execute(self.r,'x')
+  finally: m.snapshot=old
+  audit_path=Path(self.d.name)/'engcomms-audit.jsonl'
+  old_audit=m.ENGCOMMS_AUDIT_OUT; m.ENGCOMMS_AUDIT_OUT=audit_path
+  try:
+   with self.assertRaisesRegex(m.Error,'engineering-comms validation'):
+    m.review(self.r,'accept','lieutenant.cgl','human-command','','d-empty')
+   self.assertEqual(self.r.status(),'review-required')  # rejected before any mutation
+   self.assertEqual(m._engcomms.read_record(audit_path),[])  # nothing recorded for the rejected message
+   m.review(self.r,'accept','lieutenant.cgl','human-command','proportionate, matches evidence','d-valid')
+   self.assertEqual(self.r.status(),'completed')
+   record=m._engcomms.read_record(audit_path)
+   self.assertEqual(len(record),1)
+   self.assertEqual(record[0]['message']['authority'],'lieutenant')
+   self.assertEqual(record[0]['message']['body'],'proportionate, matches evidence')
+   self.assertEqual(record[0]['destination'],'status-log')
+  finally: m.ENGCOMMS_AUDIT_OUT=old_audit
  def test_radio_projection_excludes_unreviewed_candidates(self):
   old=m.snapshot; m.snapshot=lambda u:{'tick':42,'watch_events':[]}
   try: m.execute(self.r,'x')

@@ -10,11 +10,34 @@ original Kraken-only script -- KRAKEN_MID/KRAKEN_CID/KRAKEN_OBJECTIVE below
 are exactly the values the hardcoded constants used to be.
 """
 from __future__ import annotations
-import argparse, hashlib, json, sqlite3, urllib.request
+import argparse, hashlib, importlib.util, json, sqlite3, sys, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+# tools/engineering-comms/schema.py is a real, tested message validator/
+# router (17/17 tests) that sat completely unused by anything else in this
+# repo -- confirmed by grep before wiring it in here. Its vocabulary
+# (command/question/status/escalation/human types; lieutenant/captain/
+# admiral/engineering/unspecified authority) genuinely differs from
+# GLUE-01's mission/evidence/artifact schemas, so this isn't a drop-in
+# replacement for anything -- it's an independent second validation +
+# traceable-record layer specifically for the one place a human makes a
+# real decision (review()), which is exactly the kind of message this
+# schema exists to validate.
+_ENGCOMMS_SPEC = importlib.util.spec_from_file_location(
+    'engineering_comms_schema', Path(__file__).resolve().parents[1] / 'engineering-comms' / 'schema.py'
+)
+_engcomms = importlib.util.module_from_spec(_ENGCOMMS_SPEC)
+# @dataclass (used in schema.py) resolves its own type hints via
+# sys.modules[cls.__module__] at class-definition time -- a module loaded
+# via spec_from_file_location isn't in sys.modules unless registered here
+# first, or exec_module() below raises AttributeError deep inside the
+# dataclasses stdlib (confirmed live: this broke without the line below).
+sys.modules[_ENGCOMMS_SPEC.name] = _engcomms
+_ENGCOMMS_SPEC.loader.exec_module(_engcomms)
+
 ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'; REVIEW_OUT=ROOT/'web/data/mission-reviews.json'; RADIO_OUT=ROOT/'web/data/mission-radio.json'
+ENGCOMMS_AUDIT_OUT=ROOT/'data/mission-record/engineering-comms-audit.jsonl'
 KRAKEN_MID='mission.kraken-inquiry-001'; KRAKEN_CID='run.kraken-inquiry-001'
 KRAKEN_OBJECTIVE='What does the verified evidence justify about contact K-1?'
 TERMINAL={'completed','rejected','cancelled','failed'}
@@ -70,10 +93,34 @@ def transition(r,status,reason,objective=KRAKEN_OBJECTIVE):
  current=r.status(); allowed={('created','paused'),('running','paused'),('blocked','running'),('paused','running')}
  if not (status=='cancelled' and current not in TERMINAL) and (current,status) not in allowed: raise Error(f'cannot transition {current} to {status}')
  payload=envelope(r,status,objective); payload['data']={'reason':reason}; r.append('status_changed',payload,stable('missionevent.transition',{'mission_id':r.mission_id,'from':current,'to':status,'reason':reason}))
+def _engcomms_authority_for(reviewer):
+ # Mission Bus's own authority vocabulary (GLUE-01: human-command/operator/
+ # component/unknown) and engineering-comms' (lieutenant/captain/admiral/
+ # engineering/unspecified) are genuinely different taxonomies -- this maps
+ # the reviewer's identity string to the closest engineering-comms role
+ # rather than pretending 'human-command' has a 1:1 equivalent.
+ lowered=(reviewer or '').lower()
+ for name in ('lieutenant','captain','admiral','engineering'):
+  if lowered.startswith(name): return name
+ return 'unspecified'
 def review(r,action,reviewer,authority,reason,decision_id,amended=None,revision=1):
  if r.status()!='review-required': raise Error('mission is not review-required')
  if authority!='human-command': raise Error('human-command authority required')
  if action not in {'accept','reject','edit'}: raise Error('action must be accept, reject, or edit')
+ # Independent validation + traceable-record layer (see the engcomms
+ # import comment above): every human review decision must also be a
+ # well-formed engineering-comms message, or it's rejected here before
+ # anything is appended to the Mission Record. This is a real second
+ # check, not decoration -- review()'s own signature doesn't otherwise
+ # enforce that `reason` is non-empty when called directly (only the CLI's
+ # --reason required=True did), and this closes that gap.
+ try:
+  _engcomms.process(
+   _engcomms.EngineeringMessage(type='status', authority=_engcomms_authority_for(reviewer), body=reason),
+   ENGCOMMS_AUDIT_OUT,
+  )
+ except _engcomms.ValidationError as e:
+  raise Error(f'review decision failed engineering-comms validation: {e.reason}') from e
  verdicts=[x['payload'] for x in r.events() if x['event_type']=='artifact_recorded' and x['payload'].get('artifact_type')=='recommendation-candidate']; current_revision=len(verdicts)
  if revision!=current_revision: raise Error(f'stale review revision {revision}; current is {current_revision}')
  if action=='edit':
