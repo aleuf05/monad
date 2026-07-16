@@ -53,6 +53,24 @@ class LegendPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(legend_pipeline.PipelineError, "completed successful"):
                 legend_pipeline.assemble_evidence(path)
 
+    def test_validated_candidate_wraps_as_review_required_artifact(self):
+        prepared = legend_pipeline.prepare(MISSION)
+        candidate = {
+            "title": "The Quacken at the Strait",
+            "mythology": "The watch remembers a shadow that answered patience with forty thousand quacks.",
+            "classification": "fleet-lore",
+            "source_ids": [prepared["evidence_bundle"]["source_id"]],
+        }
+        validated = legend_pipeline.validate_candidate(prepared["evidence_bundle"], prepared["fact"], candidate)
+        artifact = legend_pipeline.artifact_result(validated, "quacken-transit-002")
+        self.assertEqual(artifact["status"], "review-required")
+        self.assertTrue(artifact["requires_review"])
+        self.assertEqual(artifact["artifact_type"], "fleet-lore")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "artifact.json"
+            legend_pipeline.write_atomic(path, artifact)
+            self.assertEqual(json.loads(path.read_text())["artifact_id"], artifact["artifact_id"])
+
 
 if __name__ == "__main__":
     unittest.main()

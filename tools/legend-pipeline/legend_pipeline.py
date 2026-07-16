@@ -9,6 +9,7 @@ import json
 import os
 import urllib.error
 import urllib.request
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -199,7 +200,9 @@ def generate(bundle: dict[str, Any], fact: dict[str, Any], gen_request: dict[str
         + "\n".join(f"- {rule}" for rule in gen_request["rules"])
     )
     candidate = call_gemini(system_prompt, user_prompt, api_key)
-    return validate_candidate(bundle, fact, candidate)
+    result = validate_candidate(bundle, fact, candidate)
+    result["provider_receipt"] = {"provider": "gemini", "model": GEMINI_MODEL}
+    return result
 
 
 def validate_candidate(bundle: dict[str, Any], fact: dict[str, Any], candidate: dict[str, Any]) -> dict[str, Any]:
@@ -240,6 +243,37 @@ def prepare(path: Path) -> dict[str, Any]:
     return {"evidence_bundle": bundle, "fact": fact, "generation_request": generation_request(bundle, fact)}
 
 
+def artifact_result(result: dict[str, Any], mission_id: str) -> dict[str, Any]:
+    """Wrap a validated candidate for Mission Record review; never approve it."""
+    candidate = result["candidate"]
+    digest = hashlib.sha256(json.dumps(candidate, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    return {
+        "schema_version": "monad.artifact.v0.1",
+        "artifact_id": f"artifact.legend.{mission_id}.{digest[:16]}",
+        "mission_id": f"mission.{mission_id}" if not mission_id.startswith("mission.") else mission_id,
+        "correlation_id": result["request_id"],
+        "component": "legend-pipeline",
+        "artifact_type": "fleet-lore",
+        "status": "review-required",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "input_refs": candidate["source_ids"],
+        "evidence_refs": candidate["source_ids"],
+        "requires_review": True,
+        "review_authority": "human-command",
+        "supersedes_artifact_id": None,
+        "visibility": "public",
+        "content_sha256": digest,
+        "data": result,
+    }
+
+
+def write_atomic(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    temporary.replace(path)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -248,8 +282,10 @@ def main() -> int:
     validate_parser = subparsers.add_parser("validate")
     validate_parser.add_argument("mission", type=Path)
     validate_parser.add_argument("candidate", type=Path)
+    validate_parser.add_argument("--artifact-output", type=Path)
     generate_parser = subparsers.add_parser("generate", help="prepare, call Gemini, and validate in one step")
     generate_parser.add_argument("mission", type=Path)
+    generate_parser.add_argument("--artifact-output", type=Path)
     args = parser.parse_args()
     try:
         result = prepare(args.mission)
@@ -260,6 +296,10 @@ def main() -> int:
             if not api_key:
                 parser.error("generate requires the GEMINI_API_KEY environment variable")
             result = generate(result["evidence_bundle"], result["fact"], result["generation_request"], api_key)
+        if getattr(args, "artifact_output", None):
+            mission_id = prepare(args.mission)["evidence_bundle"]["mission"]["mission_id"]
+            result = artifact_result(result, mission_id)
+            write_atomic(args.artifact_output, result)
     except PipelineError as error:
         parser.error(str(error))
     print(json.dumps(result, indent=2, sort_keys=True))
