@@ -15,7 +15,8 @@ const CHANNEL_LABELS = {
   "fleet-comms": "Fleet Comms",
   weather: "Weather",
   traffic: "Traffic",
-  captain: "Captain"
+  captain: "Captain",
+  "scout-net": "Scout Net"
 };
 
 const SQUELCH_DURATION_S = 0.12;
@@ -254,7 +255,7 @@ const qualityVerdictEl = document.querySelector("#qualityVerdict");
 const state = {
   powered: false,
   muted: false,
-  activeChannels: new Set(["fleet-comms", "weather", "traffic", "captain"]),
+  activeChannels: new Set(["fleet-comms", "weather", "traffic", "captain", "scout-net"]),
   selectedStation: "bridge",
   speaking: false,
   voiceForSpeaker: new Map(),
@@ -315,20 +316,9 @@ const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
 const MAX_CONTENT_LINES_PER_SNAPSHOT = 6;
-const ROUTINE_AUTONOMY_REPORT_INTERVAL_MS = 60 * 1000;
-let lastRoutineAutonomyReportAt = 0;
-// Scout route_completed (measured live: ~2/s, all scouts, pure escort
-// station-keeping noise -- see the route_completed case below) is fully
-// suppressed per-event, same as waypoint_reached. But full silence on
-// scout activity reads as dead air, not quiet -- this rolls suppressed
-// events up into one periodic Bridge line instead of zero lines, same
-// batching shape as ROUTINE_AUTONOMY_REPORT_INTERVAL_MS above. Shorter
-// interval than that one (45s vs 60s) since this is meant to feel present,
-// not buried.
-const SCOUT_ROUTE_REPORT_INTERVAL_MS = 45 * 1000;
-let lastScoutRouteReportAt = 0;
-let suppressedScoutRouteCount = 0;
-const suppressedScoutRouteVessels = new Set();
+const lastSpokenScoutPosture = new Map();
+// Scout route/waypoint station-keeping noise stays visual-only. Scout Net
+// speaks posture changes, not control-loop motion events.
 const VESSEL_CHANNEL = { flagship: "fleet-comms", scout: "fleet-comms", "passive-traffic": "traffic" };
 const STATUS_LINES = {
   underway: "underway, course {course}, speed {speed} knots.",
@@ -728,6 +718,9 @@ function initializeOperationalCursors(snapshot) {
   lastCaptainControlSignatures = new Map((snapshot.captain_controls || []).map((control) => [control.vessel_id, captainControlSignature(control)]));
   lastEscortIntentSignatures = new Map((snapshot.escort_intents || []).map((intent) => [intent.decision_id, escortIntentSignature(intent)]));
   lastAgentDecisionCount = (snapshot.agent_decisions || []).length;
+  (snapshot.agent_decisions || []).forEach((record) => {
+    if (record.vessel_id && record.posture) lastSpokenScoutPosture.set(record.vessel_id, record.posture);
+  });
 }
 
 function queueBaselineOperationalWatch(snapshot) {
@@ -786,19 +779,8 @@ function diffEscortIntents(intents) {
     const previous = lastEscortIntentSignatures.get(intent.decision_id);
     if (previous === signature) return;
     lastEscortIntentSignatures.set(intent.decision_id, signature);
-    const posture = String(intent.posture || "").replace(/_/g, " ").toLowerCase();
-    const objective = truncated(intent.objective, 96) || "unrecorded objective";
-    const station = intent.posture === "InvestigateContact" ? "traffic" : "bridge";
-    const text = intent.executed_tick == null
-      ? `Bridge, ${intent.captain_id} requests ${posture} for ${intent.vessel_id}: ${objective}; awaiting decision.`
-      : `Bridge, ${intent.captain_id}'s ${posture} request for ${intent.vessel_id} has been executed.`;
-    queueNarratedEntry({
-      kind: "status",
-      channel: "fleet-comms",
-      speaker: "Bridge",
-      text,
-      station
-    });
+    // Intent lifecycle remains visible in Agent Ops. The corresponding
+    // accepted posture change is the one concise Scout Net transmission.
   });
 }
 
@@ -808,16 +790,22 @@ function diffAgentDecisions(records) {
   if (records.length <= lastAgentDecisionCount) return;
   const fresh = records.slice(lastAgentDecisionCount);
   lastAgentDecisionCount = records.length;
-  const now = Date.now();
-  if (now - lastRoutineAutonomyReportAt < ROUTINE_AUTONOMY_REPORT_INTERVAL_MS) return;
-  lastRoutineAutonomyReportAt = now;
-  const vessels = new Set(fresh.map((record) => record.vessel_id).filter(Boolean));
-  queueNarratedEntry({
-    kind: "status",
-    channel: "fleet-comms",
-    speaker: "Bridge",
-    text: `Bridge, ${fresh.length} routine captain decision${fresh.length === 1 ? "" : "s"} logged across ${vessels.size} scout${vessels.size === 1 ? "" : "s"}; no voice action required.`,
-    station: "bridge"
+  const latestByVessel = new Map();
+  fresh.forEach((record) => latestByVessel.set(record.vessel_id, record));
+  latestByVessel.forEach((record) => {
+    if (record.outcome !== "accepted" || lastSpokenScoutPosture.get(record.vessel_id) === record.posture) return;
+    lastSpokenScoutPosture.set(record.vessel_id, record.posture);
+    const speaker = vesselDisplayName(record.vessel_id);
+    const phrases = {
+      "investigate-contact": `Monad, ${speaker}. Contact in sight; holding observation stand-off. Out.`,
+      "widen-flank": `Monad, ${speaker}. Moving to the wide flank. Out.`,
+      "cover-rear": `Monad, ${speaker}. Taking rear guard. Out.`,
+      "advance-screen": `Monad, ${speaker}. Advancing the screen. Out.`,
+      "recover-formation": `Monad, ${speaker}. Rejoining formation. Out.`,
+      "hold-station": `Monad, ${speaker}. Holding station. Out.`,
+      "emergency-separation": `Monad, ${speaker}. Emergency separation maneuver. Stand clear.`
+    };
+    queueNarratedEntry({ kind: "status", channel: "scout-net", speaker, text: phrases[record.posture] || `Monad, ${speaker}. New posture set. Out.`, station: "bridge" });
   });
 }
 
@@ -849,24 +837,6 @@ function vesselDisplayName(id) {
 // Rolls up suppressed scout route_completed events (see that case in
 // diffVesselEvents) into one periodic line, so cutting the per-event spam
 // doesn't read as scouts going silent -- "reasonable traffic," not zero.
-function maybeReportScoutRouteActivity() {
-  const now = Date.now();
-  if (now - lastScoutRouteReportAt < SCOUT_ROUTE_REPORT_INTERVAL_MS) return;
-  lastScoutRouteReportAt = now;
-  const count = suppressedScoutRouteCount;
-  const vesselCount = suppressedScoutRouteVessels.size;
-  suppressedScoutRouteCount = 0;
-  suppressedScoutRouteVessels.clear();
-  if (count === 0) return;
-  queueNarratedEntry({
-    kind: "status",
-    channel: "fleet-comms",
-    speaker: "Bridge",
-    text: `Bridge, scouts continuing station-keeping; ${count} adjustment${count === 1 ? "" : "s"} across ${vesselCount} scout${vesselCount === 1 ? "" : "s"} in the last watch.`,
-    station: "bridge"
-  });
-}
-
 function diffVesselEvents(events) {
   if (!Array.isArray(events)) return;
   if (lastVesselEventSeq === null) return;
@@ -903,9 +873,6 @@ function diffVesselEvents(events) {
         // completions (genuinely occasional) are unaffected.
         const vessel = vesselById(event.vessel_id);
         if (vessel?.kind === "scout") {
-          suppressedScoutRouteCount += 1;
-          suppressedScoutRouteVessels.add(event.vessel_id);
-          maybeReportScoutRouteActivity();
           break;
         }
         const name = vesselDisplayName(event.vessel_id);
