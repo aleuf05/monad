@@ -7,5 +7,5 @@
 5. **Constraints / authority** — Evaluation may begin concurrently using the acceptance contract in `RADIO-EDITORIAL-GATE-0.1.md`; final evidence must run against Bot 1's committed implementation. No API calls, generated speech or invented live claims.
 6. **Acceptance criteria** — Fixtures cover twenty scout route completions, canon change, captain runtime change, routine holding, accepted posture, duplicate posture, critical fuel, emergency separation, escort order and human watch note. Pass requires >=80% fewer routine transmissions than the recorded/current path; zero canon/runtime/routine-route narration; 100% aired metadata completeness; no topic beyond two utterances; emergencies and human messages preserved; a 60-second live observation and exact commit SHA recorded.
 7. **Tests / rollback** — Evaluator self-tests with known pass/fail fixtures, then Radio source/live drift and live observation. Remove evaluator/report commit to roll back; it does not modify runtime behavior.
-8. **Assigned actor** — Bot 2, unclaimed. Fixture construction may run in parallel; final verification waits for Bot 1's commit SHA.
-9. **Evidence and completion state** — Authorized and ready to claim. Findings belong in `docs/reports/`, not `queue.md`.
+8. **Assigned actor** — Claude as Bot 2, claimed 2026-07-16T23:45:00Z. Fixture construction runs now, in parallel with Bot 1; final verification waits for Bot 1's commit SHA.
+9. **Evidence and completion state** — Claimed, building fixtures now.
