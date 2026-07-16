@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-07-16T20:15:02.201422+00:00",
+  "fetched_at": "2026-07-16T21:05:03.455533+00:00",
   "items": [
+    {
+      "title": "After years of false claims on voting, Trump to give an address on election integrity",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5896448/trump-election-address",
+      "pubDate": "Thu, 16 Jul 2026 16:50:26 -0400"
+    },
     {
       "title": "Why Orthodox Jews are opposing the new daylight saving bill in Congress",
       "link": "https://www.npr.org/2026/07/16/g-s1-133961/why-orthodox-jews-are-opposing-the-new-daylight-saving-bill-in-congress",
@@ -37,11 +42,6 @@
       "title": "Oil companies are making billions. In the U.S., calls to tax their windfall are growing",
       "link": "https://www.npr.org/2026/07/16/nx-s1-5845818/oil-prices-windfall-tax-iran-war",
       "pubDate": "Thu, 16 Jul 2026 05:01:00 -0400"
-    },
-    {
-      "title": "'Gossip' had godly origins. Here's how it gained its sinful reputation",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5884780/gossip-word-origins-etymology",
-      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
     }
   ]
 }
