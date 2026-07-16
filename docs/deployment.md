@@ -118,6 +118,21 @@ NPR's feed only grants CORS to `apps.npr.org`, so the browser can't fetch it dir
 
 **Current fetch schedule is a temporary bridge, not the final mechanism**: a user crontab entry (`crontab -l`, no sudo — added directly since this doesn't require privileged access) runs the fetch every 15 minutes. The proper systemd timer (`scripts/npr-headlines-fetch.service` / `.timer`, matching every other scheduled job in this repo, e.g. `living-fleet-memory-reflect.timer`) is written and ready but not yet installed — that's a privileged step (see `scripts/install-npr-headlines.sh`, which also removes the temporary cron entry once the timer takes over). Until someone with sudo runs that install script, the cron entry is what's actually keeping the feed live — check `crontab -l` before assuming the timer is what's running.
 
+### Watch Officer
+
+**2026-07-16.** `tools/watch-officer/watch_officer.py` (see
+`docs/engineering-orders/watch-officer-v0.1.md`) is a read-only observer over
+the fleet/narrative layer -- vessel state from `fleetcore-serve`'s
+`/snapshot`, World Intake's pending-review backlog, Mission Bus's
+projections. It writes `web/data/watch-officer-status.json` every run, which
+`toys/watch-officer/`'s public page reads client-side. Same non-privileged
+cron pattern as NPR above: a user crontab entry (no `sudo`) runs
+`watch_officer.py --once` every 10 minutes, appending to
+`logs/agents/watch-officer/` (gitignored, matching every other agent runtime
+log) and rewriting the public status file. No systemd unit installed by this
+work -- that's the Lieutenant's privileged step whenever it's wanted, same
+deferral as NPR's still-uninstalled timer.
+
 ### Watchbook is intentionally not public
 
 Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches (`../../logs/captains/...`). Deploying it as-is would publish the full captain/admiral watch log history — including internal ops/infra logs — to the public site. That has not been done. The public site's own Ship's Log page (`web/logs.html` / `web/assets/js/logs.js`) is the intentional, separate public-facing equivalent, and is what Bridge Station's Watchbook tab links out to instead of embedding Watchbook.

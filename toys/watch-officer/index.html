@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monad Watch Officer</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230B1220'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%23E8A33D' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23E8A33D'/%3E%3C/svg%3E">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 24px 24px 100px; }
+  .monad-home-link{position:fixed;top:10px;left:10px;z-index:9999;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:#9BB0C8;background:rgba(11,18,32,.85);border:1px solid rgba(79,209,197,.35);border-radius:4px;padding:5px 10px;text-decoration:none;transition:color .15s ease,border-color .15s ease}
+  .monad-home-link:hover{color:#4FD1C5;border-color:#4FD1C5}
+  header { padding: 44px 0 24px; border-bottom: 1px solid #1E2C42; margin-bottom: 24px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.14em; color: #E8A33D; text-transform: uppercase; }
+  h1 { font-family: 'Oswald', sans-serif; font-size: 30px; letter-spacing: 0.1em; font-weight: 700; margin: 8px 0 10px; }
+  .subtitle { font-size: 13px; color: #9BB0C8; line-height: 1.6; max-width: 68ch; }
+  .link-state { display: flex; align-items: center; gap: 8px; margin-top: 16px; font-size: 12px; color: #6B7C93; }
+  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #6B7C93; flex-shrink: 0; }
+  .live-dot.is-live { background: #4FD1C5; }
+  .live-dot.is-red { background: #E05252; }
+  .live-dot.is-amber { background: #E8A33D; }
+  .section { margin-bottom: 28px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; color: #DCE6F2; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .card { background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 14px 16px; }
+  .card .label { font-size: 10px; letter-spacing: 0.08em; color: #6B7C93; text-transform: uppercase; margin-bottom: 6px; }
+  .card .value { font-size: 20px; font-family: 'Oswald', sans-serif; color: #DCE6F2; }
+  .card .value.warn { color: #E8A33D; }
+  .card .value.crit { color: #E05252; }
+  .status-breakdown { font-size: 11px; color: #9BB0C8; margin-top: 6px; }
+  .notes-list { list-style: none; }
+  .notes-list li { background: #111A2B; border: 1px solid #1E2C42; border-left: 3px solid #4FD1C5; border-radius: 4px; padding: 10px 14px; margin-bottom: 8px; font-size: 12.5px; color: #DCE6F2; }
+  .notes-list li.is-warn { border-left-color: #E8A33D; }
+  .notes-list li.is-nominal { border-left-color: #4FD1C5; color: #9BB0C8; }
+  .boundary-note { margin-top: 30px; padding: 14px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.7; }
+  .boundary-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
+</style>
+</head>
+<body>
+<a class="monad-home-link" href="../../index.html">⚓ Fleet Monad</a>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Monad / Autonomous Fleet · new: watch officer v0.1</p>
+    <h1>WATCH OFFICER</h1>
+    <p class="subtitle">A read-only observer over the fleet and narrative layer — vessel state, the World Intake review backlog, and Mission Bus's projections. No command authority, no canon mutation. Watchman watches infrastructure; this watches the fleet.</p>
+    <div class="link-state">
+      <span id="liveDot" class="live-dot"></span>
+      <span id="linkStatus">Checking…</span>
+    </div>
+  </header>
+
+  <div class="section">
+    <h2>Fleet</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Vessels</div>
+        <div class="value" id="vesselCount">—</div>
+        <div class="status-breakdown" id="vesselBreakdown"></div>
+      </div>
+      <div class="card">
+        <div class="label">Clock</div>
+        <div class="value" id="clockState">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>World Intake Review Queue</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Pending Proposals</div>
+        <div class="value" id="pendingCount">—</div>
+      </div>
+      <div class="card">
+        <div class="label">Oldest Pending</div>
+        <div class="value" id="oldestAge">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Mission Bus</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="label">Mission</div>
+        <div class="value" id="missionId" style="font-size: 13px;">—</div>
+        <div class="status-breakdown" id="missionStatus"></div>
+      </div>
+      <div class="card">
+        <div class="label">Pending Reviews</div>
+        <div class="value" id="pendingReviews">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Notes</h2>
+    <ul class="notes-list" id="notesList"></ul>
+  </div>
+
+  <div class="boundary-note">
+    Watch Officer never sends a command and never mutates canon — it only reads <code>fleetcore-serve</code>'s snapshot, <code>world-intake</code>'s pending queue, and Mission Bus's own projection files, on a 10-minute cycle. See <code>docs/engineering-orders/watch-officer-v0.1.md</code> for the full scope and what's deliberately deferred.
+  </div>
+</div>
+
+<script>
+(function () {
+  var STALE_AFTER_MS = 20 * 60 * 1000; // 2x the 10-minute observation cycle
+  var liveDot = document.getElementById("liveDot");
+  var linkStatus = document.getElementById("linkStatus");
+
+  function setLink(text, cls) {
+    linkStatus.textContent = text;
+    liveDot.className = "live-dot " + cls;
+  }
+
+  function fmtHours(h) {
+    if (h === null || h === undefined) return "—";
+    if (h < 1) return Math.round(h * 60) + "m";
+    return h.toFixed(1) + "h";
+  }
+
+  fetch("../../data/watch-officer-status.json", { cache: "no-store" })
+    .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
+    .then(function (data) {
+      var ageMs = Date.now() - new Date(data.checked_at).getTime();
+      if (!(ageMs >= 0) || ageMs > STALE_AFTER_MS) {
+        setLink("Observation feed is stale — last checked " + data.checked_at, "is-red");
+      } else {
+        var ageMin = Math.round(ageMs / 60000);
+        setLink("Live — checked " + (ageMin < 1 ? "just now" : ageMin + "m ago"), "is-live");
+      }
+
+      document.getElementById("vesselCount").textContent = data.fleet.vessel_count ?? "—";
+      var breakdown = data.fleet.vessels_by_status || {};
+      document.getElementById("vesselBreakdown").textContent = Object.keys(breakdown).length
+        ? Object.entries(breakdown).map(function (kv) { return kv[0] + ": " + kv[1]; }).join(" · ")
+        : "no data";
+      document.getElementById("clockState").textContent = data.fleet.clock_state || "—";
+
+      var pendingEl = document.getElementById("pendingCount");
+      pendingEl.textContent = data.world_intake.pending_count ?? "—";
+      pendingEl.className = "value" + (data.world_intake.pending_count >= 10 ? " warn" : "");
+
+      var ageEl = document.getElementById("oldestAge");
+      ageEl.textContent = fmtHours(data.world_intake.oldest_pending_age_hours);
+      ageEl.className = "value" + (data.world_intake.oldest_pending_age_hours >= 24 ? " warn" : "");
+
+      document.getElementById("missionId").textContent = data.mission.mission_id || "—";
+      document.getElementById("missionStatus").textContent = data.mission.status ? ("status: " + data.mission.status) : "";
+      document.getElementById("pendingReviews").textContent = data.mission.pending_reviews ?? "—";
+
+      var notesList = document.getElementById("notesList");
+      notesList.innerHTML = "";
+      (data.notes || []).forEach(function (note) {
+        var li = document.createElement("li");
+        li.textContent = note;
+        li.className = note === "Nothing flagged." ? "is-nominal" : "is-warn";
+        notesList.appendChild(li);
+      });
+    })
+    .catch(function () {
+      setLink("Status feed unreachable.", "is-red");
+    });
+})();
+</script>
+</body>
+</html>
