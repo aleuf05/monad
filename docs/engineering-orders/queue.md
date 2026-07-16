@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-04 — Design Mission Coordinator lifecycle
 
-- Status: queued
+- Status: claimed:codex@2026-07-16T17:49:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01, GLUE-02, GLUE-03
 - Objective: specify create, inspect, execute, pause/cancel, resume, timeout,
