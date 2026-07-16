@@ -444,6 +444,42 @@ body.is-embedded #signalMeter {
   max-width: 12rem;
 }
 
+.diag-block-wide {
+  grid-column: 1 / -1;
+}
+
+/* Audio Quality Test's five fields read better as a row of pairs than
+   the single-column key/value stack the narrower blocks use. */
+.diag-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.diag-fields-grid > div {
+  justify-content: space-between;
+}
+
+.diag-fields-grid dd {
+  max-width: none;
+  white-space: normal;
+}
+
+.quality-pass {
+  color: var(--signal);
+  font-weight: 600;
+}
+
+.quality-degraded {
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.quality-fail {
+  color: var(--danger);
+  font-weight: 600;
+}
+
 .audio-path-list {
   list-style: none;
   margin: 0;
@@ -633,6 +669,32 @@ body.is-embedded .diag-grid {
 
 .topic-footer a {
   color: var(--signal);
+}
+
+.topic-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.topic-actions button {
+  border: 1px solid var(--signal);
+  border-radius: 999px;
+  background: rgba(138, 215, 193, 0.12);
+  color: var(--signal);
+  padding: 0.25rem 0.65rem;
+  cursor: pointer;
+}
+
+.newswire-voice-status {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.newswire-voice-status.is-reading {
+  color: var(--amber);
 }
 
 .newswire-log {

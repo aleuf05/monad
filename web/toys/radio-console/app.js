@@ -207,7 +207,11 @@ const newswireTopicEl = document.querySelector("#newswireTopic");
 const newswireTopicTitleEl = document.querySelector("#newswireTopicTitle");
 const newswireTopicTimeEl = document.querySelector("#newswireTopicTime");
 const newswireTopicLinkEl = document.querySelector("#newswireTopicLink");
+const newswireReadButton = document.querySelector("#newswireReadButton");
+const newswireVoiceStatusEl = document.querySelector("#newswireVoiceStatus");
 const signalCtx = signalCanvas.getContext("2d");
+let selectedNewswireItem = null;
+let newswireUtterance = null;
 
 // --- Diagnostics DOM refs (Captain's packet, 2026-07-16: "connected is not
 // the same as heard") ---
@@ -225,6 +229,12 @@ const stopPlaybackButton = document.querySelector("#stopPlaybackButton");
 const outputDeviceSelect = document.querySelector("#outputDeviceSelect");
 const outputLevelMeterEl = document.querySelector("#outputLevelMeter");
 const outputLevelReadoutEl = document.querySelector("#outputLevelReadout");
+const qualityTestButton = document.querySelector("#qualityTestButton");
+const qualityFreqEl = document.querySelector("#qualityFreq");
+const qualitySnrEl = document.querySelector("#qualitySnr");
+const qualityDropoutsEl = document.querySelector("#qualityDropouts");
+const qualityLatencyEl = document.querySelector("#qualityLatency");
+const qualityVerdictEl = document.querySelector("#qualityVerdict");
 
 const state = {
   powered: false,
@@ -1658,6 +1668,7 @@ function renderNewswire(payload) {
   });
   newswireLogEl.replaceChildren();
   const selectTopic = (item, row) => {
+    stopNewswireSpeech();
     newswireLogEl.querySelectorAll("li").forEach((entry) => entry.classList.remove("is-selected"));
     row.classList.add("is-selected");
     newswireTopicTitleEl.textContent = item.title;
@@ -1665,6 +1676,7 @@ function renderNewswire(payload) {
       ? `NPR · ${new Date(item.pubDate).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
       : "NPR News Headlines";
     newswireTopicLinkEl.href = item.link;
+    selectedNewswireItem = item;
     newswireTopicEl.hidden = false;
   };
   payload.items.forEach((item, index) => {
@@ -1683,6 +1695,41 @@ function renderNewswire(payload) {
     if (index === 0) selectTopic(item, row);
   });
 }
+
+function stopNewswireSpeech() {
+  if (newswireUtterance && window.speechSynthesis) window.speechSynthesis.cancel();
+  newswireUtterance = null;
+  newswireReadButton.textContent = "Read NPR headline";
+  newswireVoiceStatusEl.textContent = "News voice idle · separate from fleet radio";
+  newswireVoiceStatusEl.classList.remove("is-reading");
+}
+
+function readSelectedNewswireHeadline() {
+  if (newswireUtterance) return stopNewswireSpeech();
+  if (!selectedNewswireItem || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+    newswireVoiceStatusEl.textContent = "News voice unavailable in this browser";
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(`From NPR News Headlines. ${selectedNewswireItem.title}`);
+  const voices = window.speechSynthesis.getVoices();
+  utterance.voice = voices.find((voice) => /^en(-|_)/i.test(voice.lang) && /natural|enhanced|premium/i.test(voice.name))
+    || voices.find((voice) => /^en(-|_)/i.test(voice.lang))
+    || null;
+  utterance.rate = 0.96;
+  utterance.pitch = 1;
+  utterance.volume = volumeToLinear();
+  utterance.onstart = () => {
+    newswireReadButton.textContent = "Stop NPR reading";
+    newswireVoiceStatusEl.textContent = `Reading NPR headline${utterance.voice ? ` · ${utterance.voice.name}` : ""}`;
+    newswireVoiceStatusEl.classList.add("is-reading");
+  };
+  utterance.onend = stopNewswireSpeech;
+  utterance.onerror = stopNewswireSpeech;
+  newswireUtterance = utterance;
+  window.speechSynthesis.speak(utterance);
+}
+
+newswireReadButton.addEventListener("click", readSelectedNewswireHeadline);
 
 async function fetchNewswire() {
   try {

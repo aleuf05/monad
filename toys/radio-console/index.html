@@ -129,6 +129,20 @@
             </ul>
           </div>
 
+          <div class="diag-block diag-block-wide">
+            <p class="diag-block-title">Audio Quality Test</p>
+            <div class="diag-buttons">
+              <button id="qualityTestButton" class="console-button secondary" type="button">Run Quality Test</button>
+            </div>
+            <dl class="diag-fields diag-fields-grid">
+              <div><dt>Peak frequency</dt><dd id="qualityFreq">—</dd></div>
+              <div><dt>Signal-to-noise</dt><dd id="qualitySnr">—</dd></div>
+              <div><dt>Dropouts</dt><dd id="qualityDropouts">—</dd></div>
+              <div><dt>Startup latency</dt><dd id="qualityLatency">—</dd></div>
+              <div><dt>Verdict</dt><dd id="qualityVerdict">—</dd></div>
+            </dl>
+          </div>
+
           <div class="diag-block">
             <p class="diag-block-title">Output</p>
             <dl class="diag-fields">
@@ -159,8 +173,12 @@
           <h2 id="newswireTopicTitle">Select a headline</h2>
           <div class="topic-footer">
             <span id="newswireTopicTime">NPR News Headlines</span>
-            <a id="newswireTopicLink" href="https://www.npr.org/sections/news/" target="_blank" rel="noopener noreferrer">Open NPR report</a>
+            <div class="topic-actions">
+              <button id="newswireReadButton" type="button">Read NPR headline</button>
+              <a id="newswireTopicLink" href="https://www.npr.org/sections/news/" target="_blank" rel="noopener noreferrer">Open NPR report</a>
+            </div>
           </div>
+          <p id="newswireVoiceStatus" class="newswire-voice-status">News voice idle · separate from fleet radio</p>
         </article>
         <p class="newswire-instruction">Select a headline to retune the topic.</p>
         <ul id="newswireLog" class="newswire-log">
@@ -169,6 +187,6 @@
       </section>
     </main>
 
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>

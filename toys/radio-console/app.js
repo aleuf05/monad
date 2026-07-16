@@ -207,7 +207,11 @@ const newswireTopicEl = document.querySelector("#newswireTopic");
 const newswireTopicTitleEl = document.querySelector("#newswireTopicTitle");
 const newswireTopicTimeEl = document.querySelector("#newswireTopicTime");
 const newswireTopicLinkEl = document.querySelector("#newswireTopicLink");
+const newswireReadButton = document.querySelector("#newswireReadButton");
+const newswireVoiceStatusEl = document.querySelector("#newswireVoiceStatus");
 const signalCtx = signalCanvas.getContext("2d");
+let selectedNewswireItem = null;
+let newswireUtterance = null;
 
 // --- Diagnostics DOM refs (Captain's packet, 2026-07-16: "connected is not
 // the same as heard") ---
@@ -225,6 +229,12 @@ const stopPlaybackButton = document.querySelector("#stopPlaybackButton");
 const outputDeviceSelect = document.querySelector("#outputDeviceSelect");
 const outputLevelMeterEl = document.querySelector("#outputLevelMeter");
 const outputLevelReadoutEl = document.querySelector("#outputLevelReadout");
+const qualityTestButton = document.querySelector("#qualityTestButton");
+const qualityFreqEl = document.querySelector("#qualityFreq");
+const qualitySnrEl = document.querySelector("#qualitySnr");
+const qualityDropoutsEl = document.querySelector("#qualityDropouts");
+const qualityLatencyEl = document.querySelector("#qualityLatency");
+const qualityVerdictEl = document.querySelector("#qualityVerdict");
 
 const state = {
   powered: false,
@@ -1219,6 +1229,161 @@ function runTestTone() {
   window.requestAnimationFrame(sample);
 }
 
+// --- Audio Quality Test ---
+// Play Test Tone (above) proves *presence* -- any measurable signal at
+// all. This proves *quality*: is the measured signal actually the tone
+// requested (frequency-domain peak within tolerance of 440Hz, not some
+// other artifact), how far above the noise floor is it (SNR in dB, not
+// just "above a fixed threshold"), does it hold steady for the duration
+// (dropout count), and how long after start() does it become measurable
+// (startup latency). All four are read directly off the AnalyserNode --
+// none are estimated or simulated.
+const QUALITY_TEST_FREQUENCY_HZ = 440;
+const QUALITY_TEST_DURATION_MS = 600;
+const QUALITY_NOISE_SAMPLE_MS = 150;
+
+function rafDelay() {
+  return new Promise((resolve) => window.requestAnimationFrame(resolve));
+}
+
+async function runQualityTest() {
+  if (activeTestTone || qualityTestButton.disabled) return;
+  initAudio();
+  if (!audioContext) {
+    logDiag("quality_test", "fail", "Web Audio unavailable in this browser.");
+    return;
+  }
+  if (audioContext.state === "suspended") await audioContext.resume();
+  ensureAnalyser();
+
+  qualityTestButton.disabled = true;
+  qualityTestButton.textContent = "Testing…";
+  resetAudioPath();
+  setAudioPathStage("synthesisRequested", "ok");
+  interruptCurrentTransmission(); // see runTestTone()'s comment: cancels any pending real-transmission timer, not just the current one
+  setSpeaking(true);
+  state.currentTransmissionScore = Infinity;
+
+  // 1. Noise floor -- measured with nothing intentionally playing, so SNR
+  // below is relative to this console's own real ambient level, not a
+  // hardcoded guess.
+  let noiseSum = 0;
+  let noiseSamples = 0;
+  const noiseStart = performance.now();
+  while (performance.now() - noiseStart < QUALITY_NOISE_SAMPLE_MS) {
+    noiseSum += currentLevel();
+    noiseSamples += 1;
+    await rafDelay();
+  }
+  const noiseFloor = noiseSamples ? noiseSum / noiseSamples : 0;
+  const threshold = Math.max(noiseFloor * 3, 0.02);
+
+  // 2. Play the known-frequency tone.
+  const osc = audioContext.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = QUALITY_TEST_FREQUENCY_HZ;
+  const toneGain = audioContext.createGain();
+  toneGain.gain.value = 0.25;
+  osc.connect(toneGain);
+  toneGain.connect(masterGain);
+  setAudioPathStage("audioGenerated", "ok");
+  const startedAt = performance.now();
+  osc.start(audioContext.currentTime);
+  activeTestTone = osc;
+  setAudioPathStage("streamDelivered", "ok");
+
+  // 3. Sample RMS level (presence/SNR/dropouts/latency) and FFT peak bin
+  // (frequency accuracy) together for the test duration.
+  const freqData = new Uint8Array(analyserNode.frequencyBinCount);
+  const binHz = audioContext.sampleRate / analyserNode.fftSize;
+  let latencyMs = null;
+  let peakLevel = 0;
+  let wasAboveThreshold = false;
+  let dropouts = 0;
+  let peakFreqHz = null;
+  let peakFreqMagnitude = 0;
+  let playbackStartedMarked = false;
+
+  while (performance.now() - startedAt < QUALITY_TEST_DURATION_MS) {
+    const level = currentLevel();
+    if (!playbackStartedMarked && level > threshold) {
+      setAudioPathStage("playbackStarted", "ok");
+      playbackStartedMarked = true;
+    }
+    if (latencyMs === null && level > threshold) {
+      latencyMs = performance.now() - startedAt;
+    }
+    if (level > peakLevel) peakLevel = level;
+    // A dropout is the signal falling back near the noise floor *after*
+    // it was already established above threshold -- a real underrun/gap,
+    // not just the ramp-up before the tone starts.
+    if (wasAboveThreshold && level < threshold * 0.3) dropouts += 1;
+    if (level > threshold) wasAboveThreshold = true;
+
+    analyserNode.getByteFrequencyData(freqData);
+    let maxBin = 0;
+    let maxMagnitude = 0;
+    for (let i = 1; i < freqData.length; i += 1) {
+      if (freqData[i] > maxMagnitude) {
+        maxMagnitude = freqData[i];
+        maxBin = i;
+      }
+    }
+    if (maxMagnitude > peakFreqMagnitude) {
+      peakFreqMagnitude = maxMagnitude;
+      peakFreqHz = maxBin * binHz;
+    }
+    await rafDelay();
+  }
+
+  try { osc.stop(); } catch (error) { /* already stopped */ }
+  activeTestTone = null;
+  if (!playbackStartedMarked) setAudioPathStage("playbackStarted", "fail", "signal never exceeded threshold");
+
+  const audible = peakLevel > threshold;
+  const snrDb = noiseFloor > 0.0001 ? 20 * Math.log10(peakLevel / noiseFloor) : (audible ? 60 : 0);
+  const freqErrorHz = peakFreqHz !== null ? Math.abs(peakFreqHz - QUALITY_TEST_FREQUENCY_HZ) : null;
+  // Tolerance is 2 FFT bins, not a fixed Hz value -- bin width depends on
+  // this device's actual sample rate / fftSize, so a fixed tolerance
+  // would be either too strict or too loose depending on hardware.
+  const freqOk = freqErrorHz !== null && freqErrorHz <= binHz * 2;
+
+  let verdict = "FAIL";
+  if (audible && freqOk && dropouts === 0 && snrDb >= 10) verdict = "PASS";
+  else if (audible) verdict = "DEGRADED";
+
+  qualityFreqEl.textContent = peakFreqHz !== null
+    ? `${Math.round(peakFreqHz)} Hz (target ${QUALITY_TEST_FREQUENCY_HZ} Hz, ${freqOk ? "within tolerance" : `off by ${Math.round(freqErrorHz)} Hz`})`
+    : "no signal detected";
+  qualitySnrEl.textContent = audible ? `${snrDb.toFixed(1)} dB (noise floor ${noiseFloor.toFixed(4)})` : "n/a — no signal above noise floor";
+  qualityDropoutsEl.textContent = String(dropouts);
+  qualityLatencyEl.textContent = latencyMs !== null ? `${latencyMs.toFixed(0)} ms` : "signal never detected";
+  qualityVerdictEl.textContent = verdict;
+  qualityVerdictEl.className = verdict === "PASS" ? "quality-pass" : verdict === "DEGRADED" ? "quality-degraded" : "quality-fail";
+
+  const detail = `peak ${peakFreqHz !== null ? Math.round(peakFreqHz) : "?"}Hz (target ${QUALITY_TEST_FREQUENCY_HZ}Hz), SNR ${snrDb.toFixed(1)}dB, ${dropouts} dropout${dropouts === 1 ? "" : "s"}, latency ${latencyMs !== null ? `${latencyMs.toFixed(0)}ms` : "n/a"}`;
+  logDiag("quality_test", verdict === "PASS" ? "pass" : verdict === "DEGRADED" ? "degraded" : "fail", detail);
+  setAudioPathStage("audibleVerified", audible ? "ok" : "fail", detail);
+  if (verdict === "PASS") {
+    audioConfirmedThisSession = true;
+    lastAudioFault = null;
+  } else if (verdict === "FAIL") {
+    lastAudioFault = `quality test failed: ${detail}`;
+  }
+  updateDiagSummary();
+
+  qualityTestButton.disabled = false;
+  qualityTestButton.textContent = "Run Quality Test";
+
+  // Same reasoning as runTestTone()'s hold: give a human a moment to
+  // actually see the result before real content reclaims the slot.
+  window.setTimeout(() => {
+    setSpeaking(false);
+    state.currentTransmissionScore = -Infinity;
+    window.setTimeout(livePump, 0);
+  }, 1800);
+}
+
 function runTestMessage() {
   if (!state.powered) {
     logDiag("inject_test_message", "fail", "Radio is powered off.");
@@ -1658,6 +1823,7 @@ function renderNewswire(payload) {
   });
   newswireLogEl.replaceChildren();
   const selectTopic = (item, row) => {
+    stopNewswireSpeech();
     newswireLogEl.querySelectorAll("li").forEach((entry) => entry.classList.remove("is-selected"));
     row.classList.add("is-selected");
     newswireTopicTitleEl.textContent = item.title;
@@ -1665,6 +1831,7 @@ function renderNewswire(payload) {
       ? `NPR · ${new Date(item.pubDate).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}`
       : "NPR News Headlines";
     newswireTopicLinkEl.href = item.link;
+    selectedNewswireItem = item;
     newswireTopicEl.hidden = false;
   };
   payload.items.forEach((item, index) => {
@@ -1683,6 +1850,41 @@ function renderNewswire(payload) {
     if (index === 0) selectTopic(item, row);
   });
 }
+
+function stopNewswireSpeech() {
+  if (newswireUtterance && window.speechSynthesis) window.speechSynthesis.cancel();
+  newswireUtterance = null;
+  newswireReadButton.textContent = "Read NPR headline";
+  newswireVoiceStatusEl.textContent = "News voice idle · separate from fleet radio";
+  newswireVoiceStatusEl.classList.remove("is-reading");
+}
+
+function readSelectedNewswireHeadline() {
+  if (newswireUtterance) return stopNewswireSpeech();
+  if (!selectedNewswireItem || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+    newswireVoiceStatusEl.textContent = "News voice unavailable in this browser";
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(`From NPR News Headlines. ${selectedNewswireItem.title}`);
+  const voices = window.speechSynthesis.getVoices();
+  utterance.voice = voices.find((voice) => /^en(-|_)/i.test(voice.lang) && /natural|enhanced|premium/i.test(voice.name))
+    || voices.find((voice) => /^en(-|_)/i.test(voice.lang))
+    || null;
+  utterance.rate = 0.96;
+  utterance.pitch = 1;
+  utterance.volume = volumeToLinear();
+  utterance.onstart = () => {
+    newswireReadButton.textContent = "Stop NPR reading";
+    newswireVoiceStatusEl.textContent = `Reading NPR headline${utterance.voice ? ` · ${utterance.voice.name}` : ""}`;
+    newswireVoiceStatusEl.classList.add("is-reading");
+  };
+  utterance.onend = stopNewswireSpeech;
+  utterance.onerror = stopNewswireSpeech;
+  newswireUtterance = utterance;
+  window.speechSynthesis.speak(utterance);
+}
+
+newswireReadButton.addEventListener("click", readSelectedNewswireHeadline);
 
 async function fetchNewswire() {
   try {
