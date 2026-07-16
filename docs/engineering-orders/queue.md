@@ -35,7 +35,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## GLUE-02 — Specify append-only Mission Record
 
-- Status: queued
+- Status: claimed:claude@2026-07-16T17:40:00Z
 - Source: missing-glue architecture review
 - Depends on: GLUE-01
 - Objective: define the single durable inquiry/mission record, append events,
