@@ -43,11 +43,20 @@ dd { margin:.2rem 0 0; line-height:1.4; font-size:.86rem; overflow-wrap:anywhere
 .captain-card footer span { color:var(--muted); font-size:.7rem; }
 .captain-card footer button { font-size:.76rem; padding:.45rem .6rem; }
 .history-panel { padding:1rem; }
+.mission-inquiry { border:1px solid var(--amber); background:linear-gradient(135deg,rgba(216,180,106,.1),rgba(13,21,24,.94)); padding:1rem 1.25rem; box-shadow:0 0 24px rgba(216,180,106,.08); }
+.mission-inquiry .new-badge { margin-left:0; margin-right:.4rem; }
+.no-mutation { color:var(--signal); font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; }
+.inquiry-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+.inquiry-grid>div { border-left:3px solid var(--signal); padding-left:.8rem; }
+.inquiry-grid h3 { font-size:.82rem; color:var(--amber); text-transform:uppercase; letter-spacing:.08em; }
+.inquiry-grid p { font-size:.82rem; line-height:1.45; }
+.inquiry-grid small { display:block; color:var(--muted); margin-top:.25rem; }
 .table-wrap { overflow:auto; }
 table { width:100%; border-collapse:collapse; font-size:.8rem; }
 th,td { padding:.65rem; border-top:1px solid var(--line); text-align:left; vertical-align:top; }
 th { color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spacing:.1em; }
 @media(max-width:900px){ .captain-grid{grid-template-columns:1fr;} }
+@media(max-width:900px){ .inquiry-grid{grid-template-columns:1fr;} }
 @media(max-width:600px){ .hero,.section-heading{display:grid;} .control-bar button{margin-left:0;width:100%;} }
 
 .memory-panel { border:1px solid var(--line); background:rgba(13,21,24,.9); padding:1rem 1.25rem; }

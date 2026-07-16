@@ -64,9 +64,9 @@
    - Preserve the pilot SQLite file under `archive/missions/kraken-inquiry-001/` as execution evidence; do not delete recorded history.
    - No FleetCore rollback is required because the packet must not mutate FleetCore.
 
-8. **Assigned actor** — Unassigned until execution is explicitly authorized. One actor owns the packet; other sessions must not edit its files without handoff. No privileged actor is required.
+8. **Assigned actor** — Codex, authorized by the Lieutenant on 2026-07-16. One actor owns the packet; other sessions must not edit its files without handoff. No privileged actor is required.
 
-9. **Evidence and completion state** — Drafted, dependency-complete, and ready for Command review/authorization. Execution has not begun. Required design evidence:
+9. **Evidence and completion state** — Verified complete and recorded. The live read-only inquiry recorded one FleetCore evidence reference, three stub-labeled competing findings, a review-required recommendation, and the Lieutenant-authorized human-command acceptance; the Mission Record reached `completed` at sequence 10 with no command receipt. Two lifecycle/immutability tests pass; Agent Ops JavaScript syntax and source/live drift checks pass. Live HTTPS exposes all six required markers and `/data/mission-ops.json` reports `completed`, three findings, and `accept`. Required design evidence:
    - `docs/architecture/mission-evidence-contracts-v0.1.md`
    - `docs/architecture/mission-record-v0.1.md`
    - `docs/reports/2026-07-16-component-adapter-inventory.md`

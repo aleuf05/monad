@@ -1,0 +1,165 @@
+{
+  "audience": "agent-ops",
+  "decision": {
+    "artifact_id": "artifact.review.kraken.decision-01",
+    "artifact_type": "review-decision",
+    "component": "human-review",
+    "correlation_id": "run.kraken-inquiry-001",
+    "created_at": "2026-07-16T19:43:41.986057+00:00",
+    "data": {
+      "action": "accept",
+      "decided_by": {
+        "authority": "human-command",
+        "id": "lieutenant.cgl"
+      },
+      "decision_id": "decision.kraken.001",
+      "fleetcore_mutation": false,
+      "reason": "Authorized pilot; recommendation is proportionate to verified evidence."
+    },
+    "evidence_refs": [
+      "evidence.fleetcore.kraken-watch"
+    ],
+    "input_refs": [
+      "artifact.cognition.kraken.verdict-01"
+    ],
+    "mission_id": "mission.kraken-inquiry-001",
+    "requires_review": false,
+    "review_authority": "human-command",
+    "schema_version": "monad.artifact.v0.1",
+    "status": "accepted",
+    "supersedes_artifact_id": null
+  },
+  "evidence": [
+    {
+      "claim": "Kraken watch active. Contact K-1 (KRAKEN) under observation, unidentified. Hold course, maneuvering speed. Continuous sonar tracking, no active pinging unless contact closes aggressively. Weapons cold. Comms listen/record only. Do not mistake the unknown for the hostile; do not mistake restraint for weakness.",
+      "classification": "verified-state",
+      "content_sha256": null,
+      "evidence_id": "evidence.fleetcore.kraken-watch",
+      "locator": {
+        "kind": "api",
+        "value": "/fleetcore-ws/snapshot#watch_events[K-1]"
+      },
+      "observed_at": "2026-07-16T19:43:41.813428+00:00",
+      "producer": "fleetcore-reader",
+      "recorded_at": "2026-07-16T19:43:41.813449+00:00",
+      "schema_version": "monad.evidence.v0.1",
+      "source_id": "snapshot.tick.300090",
+      "source_system": "fleetcore",
+      "supersedes_evidence_id": null
+    }
+  ],
+  "findings": [
+    {
+      "artifact_id": "artifact.cognition.kraken.hypothesis-1",
+      "artifact_type": "hypothesis",
+      "component": "stub-cognition",
+      "correlation_id": "run.kraken-inquiry-001",
+      "created_at": "2026-07-16T19:43:41.821557+00:00",
+      "data": {
+        "counterevidence": "No confirmed identity or intent.",
+        "finding": "Identity remains unknown; current evidence does not establish hostility.",
+        "mode": "stub",
+        "name": "unknown-non-hostile"
+      },
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "input_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "mission_id": "mission.kraken-inquiry-001",
+      "requires_review": false,
+      "review_authority": "human-command",
+      "schema_version": "monad.artifact.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null
+    },
+    {
+      "artifact_id": "artifact.cognition.kraken.hypothesis-2",
+      "artifact_type": "hypothesis",
+      "component": "stub-cognition",
+      "correlation_id": "run.kraken-inquiry-001",
+      "created_at": "2026-07-16T19:43:41.828309+00:00",
+      "data": {
+        "counterevidence": "Approach and observation are compatible with benign explanations.",
+        "finding": "The contact may be observing the formation.",
+        "mode": "stub",
+        "name": "surveillance-risk"
+      },
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "input_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "mission_id": "mission.kraken-inquiry-001",
+      "requires_review": false,
+      "review_authority": "human-command",
+      "schema_version": "monad.artifact.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null
+    },
+    {
+      "artifact_id": "artifact.cognition.kraken.hypothesis-3",
+      "artifact_type": "hypothesis",
+      "component": "stub-cognition",
+      "correlation_id": "run.kraken-inquiry-001",
+      "created_at": "2026-07-16T19:43:41.834838+00:00",
+      "data": {
+        "counterevidence": "No hostile behavior is currently verified.",
+        "finding": "The contact could become a threat if it closes aggressively or demonstrates hostile behavior.",
+        "mode": "stub",
+        "name": "potential-threat"
+      },
+      "evidence_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "input_refs": [
+        "evidence.fleetcore.kraken-watch"
+      ],
+      "mission_id": "mission.kraken-inquiry-001",
+      "requires_review": false,
+      "review_authority": "human-command",
+      "schema_version": "monad.artifact.v0.1",
+      "status": "candidate-ready",
+      "supersedes_artifact_id": null
+    }
+  ],
+  "generated_at": "2026-07-16T19:43:42.131450+00:00",
+  "mission": {
+    "fleetcore_mutation": false,
+    "mission_id": "mission.kraken-inquiry-001",
+    "objective": "What does the verified evidence justify about contact K-1?",
+    "status": "completed"
+  },
+  "recommendation": {
+    "artifact_id": "artifact.cognition.kraken.verdict-01",
+    "artifact_type": "recommendation-candidate",
+    "component": "stub-cognition",
+    "correlation_id": "run.kraken-inquiry-001",
+    "created_at": "2026-07-16T19:43:41.841670+00:00",
+    "data": {
+      "fleetcore_mutation": false,
+      "mode": "stub",
+      "recommendation": "Continue passive observation, maintain separation, and escalate only on new verified evidence.",
+      "unknowns": [
+        "identity",
+        "intent"
+      ]
+    },
+    "evidence_refs": [
+      "evidence.fleetcore.kraken-watch"
+    ],
+    "input_refs": [
+      "evidence.fleetcore.kraken-watch"
+    ],
+    "mission_id": "mission.kraken-inquiry-001",
+    "requires_review": true,
+    "review_authority": "human-command",
+    "schema_version": "monad.artifact.v0.1",
+    "status": "review-required",
+    "supersedes_artifact_id": null
+  },
+  "schema_version": "monad.projection.v0.1",
+  "source_record_cursor": 10
+}

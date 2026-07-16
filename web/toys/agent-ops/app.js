@@ -10,6 +10,11 @@ const feedback = document.querySelector("#feedback");
 const memoryGrid = document.querySelector("#memoryGrid");
 const fleetNarrative = document.querySelector("#fleetNarrative");
 const fleetNarrativeList = document.querySelector("#fleetNarrativeList");
+const inquiryQuestion = document.querySelector("#inquiryQuestion");
+const inquiryStatus = document.querySelector("#inquiryStatus");
+const inquiryEvidence = document.querySelector("#inquiryEvidence");
+const inquiryFindings = document.querySelector("#inquiryFindings");
+const inquiryDecision = document.querySelector("#inquiryDecision");
 
 const state = { socket: null, authority: false, snapshot: null, reconnectTimer: null };
 
@@ -202,6 +207,27 @@ async function refreshMemory() {
 
 refreshMemory();
 setInterval(refreshMemory, 8000);
+
+async function refreshInquiry() {
+  try {
+    const response = await fetch("../../data/mission-ops.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`status ${response.status}`);
+    const data = await response.json();
+    inquiryQuestion.textContent = data.mission.objective;
+    inquiryStatus.textContent = title(data.mission.status);
+    inquiryEvidence.innerHTML = (data.evidence || []).map((item) => `<p><strong>${escapeHtml(title(item.classification))}</strong><br>${escapeHtml(item.claim)}</p>`).join("") || "No evidence recorded.";
+    inquiryFindings.innerHTML = (data.findings || []).map((item) => `<p><strong>${escapeHtml(title(item.data.name))}</strong><br>${escapeHtml(item.data.finding)}<small>Counterevidence: ${escapeHtml(item.data.counterevidence)}</small></p>`).join("") || "No findings recorded.";
+    const decision = data.decision?.data;
+    inquiryDecision.innerHTML = decision
+      ? `<p><strong>${escapeHtml(title(decision.action))}</strong> by ${escapeHtml(decision.decided_by.id)}</p><p>${escapeHtml(decision.reason)}</p>`
+      : `<p>Human review required.</p><p>${escapeHtml(data.recommendation?.data?.recommendation || "")}</p>`;
+  } catch (error) {
+    inquiryStatus.textContent = "Unavailable";
+    inquiryEvidence.textContent = `Mission projection unavailable (${error.message}).`;
+  }
+}
+refreshInquiry();
+setInterval(refreshInquiry, 10000);
 
 fleetPauseButton.addEventListener("click", () => {
   send({ type: "set-agent-fleet-paused", paused: !state.snapshot.agent_fleet_paused });
