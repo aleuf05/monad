@@ -6,7 +6,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## BRIDGE-RETIRE-01 — Retire stale web/bridge.html
 
-- Status: queued
+- Status: claimed:claude@2026-07-16T22:10:00Z
 - Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 1
 - Objective: `web/bridge.html` reads `web/bridge-state.json`, confirmed
   stale (last written 2026-07-09, a week old as of this packet). Pre-dates
