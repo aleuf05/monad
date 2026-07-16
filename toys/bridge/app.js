@@ -19,6 +19,33 @@
   const stationTabs = Array.from(document.querySelectorAll("[data-station]"));
   const stationPanels = Array.from(document.querySelectorAll("[data-station-panel]"));
   const liveInstruments = Array.from(document.querySelectorAll("[data-live-instrument]"));
+  const bridgeMissionObjective = document.querySelector("#bridgeMissionObjective");
+  const bridgeMissionStatus = document.querySelector("#bridgeMissionStatus");
+  const bridgeEvidenceCount = document.querySelector("#bridgeEvidenceCount");
+  const bridgePendingReviews = document.querySelector("#bridgePendingReviews");
+
+  async function refreshMissionRail() {
+    try {
+      const [missionResponse, reviewResponse] = await Promise.all([
+        fetch("../../data/mission-ops.json", { cache: "no-store" }),
+        fetch("../../data/mission-reviews.json", { cache: "no-store" })
+      ]);
+      if (!missionResponse.ok || !reviewResponse.ok) throw new Error("projection unavailable");
+      const mission = await missionResponse.json();
+      const reviews = await reviewResponse.json();
+      bridgeMissionObjective.textContent = mission.mission.objective;
+      bridgeMissionStatus.textContent = mission.mission.status.replaceAll("-", " ");
+      bridgeEvidenceCount.textContent = String((mission.evidence || []).filter((item) => item.classification === "verified-state").length);
+      bridgePendingReviews.textContent = String(reviews.pending_count || 0);
+    } catch (error) {
+      bridgeMissionObjective.textContent = "Mission projection unavailable.";
+      bridgeMissionStatus.textContent = "degraded";
+      bridgeEvidenceCount.textContent = "—";
+      bridgePendingReviews.textContent = "—";
+    }
+  }
+  refreshMissionRail();
+  window.setInterval(refreshMissionRail, 10000);
 
   const stationLabels = {
     console: "Live Console",

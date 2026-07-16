@@ -97,6 +97,18 @@
         </section>
 
         <aside class="side-rail" aria-label="Bridge state and engineering">
+          <article class="instrument mission-rail">
+            <header class="instrument-header">
+              <div><p class="eyebrow">New · Mission Record</p><h2>Active Mission</h2></div>
+              <a href="../agent-ops/">Open Agent Ops</a>
+            </header>
+            <p id="bridgeMissionObjective">Loading mission projection…</p>
+            <dl class="status-list">
+              <div><dt>Lifecycle</dt><dd id="bridgeMissionStatus">—</dd></div>
+              <div><dt>Verified Evidence</dt><dd id="bridgeEvidenceCount">—</dd></div>
+              <div><dt>Human Actions</dt><dd id="bridgePendingReviews">—</dd></div>
+            </dl>
+          </article>
           <article class="instrument engineering-panel">
             <header class="instrument-header">
               <div>
@@ -187,6 +199,6 @@
       </section>
     </main>
     <script src="../shared/fleet-state.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
