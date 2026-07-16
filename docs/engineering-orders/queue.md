@@ -6,7 +6,7 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 
 ## BRIDGE3-CONSOLIDATE-01 — Fold Bridge, FleetCore Live, and FleetCore Control into Bridge Station 3.0
 
-- Status: queued
+- Status: claimed:claude@2026-07-16T23:45:00Z
 - Source: `docs/architecture/component-consolidation-master-plan-v0.1.md`, Phase 2
 - Objective: four toys currently overlap on "look at or command
   FleetCore" (`toys/bridge/`, `toys/bridge-station-3.0/`,
