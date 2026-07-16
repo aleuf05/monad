@@ -43,7 +43,7 @@
       <section class="voice-panel" aria-label="Captain's voice">
         <div class="section-heading">
           <div><p class="eyebrow">Voice</p><h2>Captain's Report</h2></div>
-          <p>Spoken via this browser's text-to-speech, separate from any fleet radio. Auto-announce only
+          <p>Spoken through Monad's provider-neutral voice engine, separate from any fleet radio. Auto-announce only
             speaks when a genuinely new observation lands -- rare by design, since Living Captain is
             spend-limited to one observe call per restart.</p>
         </div>
@@ -54,7 +54,7 @@
             Auto-announce new observations
           </label>
         </div>
-        <p id="voiceStatus" class="voice-status">Voice idle.</p>
+        <p id="voiceStatus" class="voice-status">Voice idle · Browser Speech</p>
       </section>
 
       <section class="memory-panel">
@@ -86,6 +86,7 @@
         </div>
       </section>
     </main>
-    <script src="app.js"></script>
+    <script src="../shared/voice.js"></script>
+    <script src="app.js?v=2"></script>
   </body>
 </html>

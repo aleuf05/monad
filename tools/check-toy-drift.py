@@ -32,6 +32,7 @@ SOURCE_ONLY_NAMES = {
     "package.json",
     "package-lock.json",
     "test_vessel_events_cursor.js",
+    "test_voice.js",
     "vite.config.js",
 }
 SOURCE_ONLY_PATHS = {"periscope/assets/source/scout-sprite-chromakey.png"}

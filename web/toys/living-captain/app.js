@@ -10,7 +10,7 @@ const el = (id) => document.getElementById(id);
 // Console's speech code: separate deployable toy, small enough that a
 // shared module isn't worth the coupling. ---
 let lastStatusData = null;
-let captainUtterance = null;
+let captainVoiceHandle = null;
 let autoAnnounceArmed = false;
 let hasSeededObserveCount = false;
 let lastSeenObserveCount = null;
@@ -39,8 +39,8 @@ function buildStatusSentence(data) {
 }
 
 function stopCaptainVoice() {
-  if (captainUtterance && window.speechSynthesis) window.speechSynthesis.cancel();
-  captainUtterance = null;
+  captainVoiceHandle?.stop();
+  captainVoiceHandle = null;
   el("readStatusButton").textContent = "Read Status";
   const status = el("voiceStatus");
   status.textContent = autoAnnounceArmed ? "Auto-announce armed; voice idle." : "Voice idle.";
@@ -48,46 +48,29 @@ function stopCaptainVoice() {
 }
 
 function speakCaptainStatus(data, prefix) {
-  if (!window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
-    el("voiceStatus").textContent = "Voice unavailable in this browser.";
-    return false;
-  }
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) {
-    // No installed TTS voices (common on minimal Linux/headless/sandboxed
-    // environments -- same condition Radio Console's speak() handles).
-    // Without this, speechSynthesis.speak() just silently does nothing:
-    // onstart never fires, the button stays stuck on "Read Status" forever
-    // with zero feedback that anything was even attempted.
-    el("voiceStatus").textContent = "No TTS voices installed in this browser -- nothing to read aloud.";
-    return false;
-  }
-  const utterance = new SpeechSynthesisUtterance(`${prefix}${buildStatusSentence(data)}`);
-  utterance.voice = voices.find((v) => /^en(-|_)/i.test(v.lang) && /natural|enhanced|premium/i.test(v.name))
-    || voices.find((v) => /^en(-|_)/i.test(v.lang))
-    || null;
-  utterance.rate = 0.96;
-  utterance.onstart = () => {
+  MonadVoice.setProfile({ speaker: "captain.monad", provider_id: "browser-speechsynthesis", rate: 0.96, pitch: 1, volume: 1 });
+  MonadVoice.speak("captain.monad", `${prefix}${buildStatusSentence(data)}`).then(({ handle, fallback_used }) => {
+    captainVoiceHandle = handle;
+    handle.onstart = () => {
     el("readStatusButton").textContent = "Stop Reading";
     const status = el("voiceStatus");
-    status.textContent = `Reading captain's report${utterance.voice ? ` · ${utterance.voice.name}` : ""}`;
+    status.textContent = `Reading captain's report · ${handle.provider_label}${handle.voice_label ? ` · ${handle.voice_label}` : ""}${fallback_used ? " · fallback" : ""}`;
     status.classList.add("is-reading");
-  };
-  utterance.onend = stopCaptainVoice;
-  utterance.onerror = stopCaptainVoice;
-  captainUtterance = utterance;
-  window.speechSynthesis.speak(utterance);
+    };
+    handle.onend = stopCaptainVoice;
+    handle.onerror = stopCaptainVoice;
+  }).catch((error) => { el("voiceStatus").textContent = error.message; });
   return true;
 }
 
 function handleReadStatusClick() {
-  if (captainUtterance) return stopCaptainVoice();
+  if (captainVoiceHandle) return stopCaptainVoice();
   speakCaptainStatus(lastStatusData || {}, "");
 }
 
 function handleAutoAnnounceToggle() {
   autoAnnounceArmed = el("autoAnnounceToggle").checked;
-  if (!captainUtterance) {
+  if (!captainVoiceHandle) {
     el("voiceStatus").textContent = autoAnnounceArmed ? "Auto-announce armed; voice idle." : "Voice idle.";
   }
 }
