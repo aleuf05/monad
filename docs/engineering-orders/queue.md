@@ -33,18 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-01 — Define shared mission and evidence contracts
-
-- Status: claimed:codex@2026-07-16T17:23:00Z
-- Source: Lieutenant request, 2026-07-16; missing-glue architecture review
-- Objective: specify `MissionEnvelope`, `EvidenceRef`, and `ArtifactResult`
-  schemas, including identifiers, lifecycle states, evidence classifications,
-  provenance, correction semantics, and compatibility with existing tools.
-- Exclusions: no runtime implementation or FleetCore schema mutation.
-- Done evidence: reviewed design under `docs/architecture/` with example
-  payloads mapped to Cognition Graph, Mission Director, World Intake, Living
-  Fleet, and Legend Pipeline.
-
 ## GLUE-02 — Specify append-only Mission Record
 
 - Status: queued
