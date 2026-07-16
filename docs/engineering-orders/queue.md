@@ -33,18 +33,6 @@ git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
   Track B's own acceptance criteria explicitly allows a stub graph in
   place of a finished Track A.
 
-## GLUE-02 — Specify append-only Mission Record
-
-- Status: claimed:claude@2026-07-16T17:40:00Z
-- Source: missing-glue architecture review
-- Depends on: GLUE-01
-- Objective: define the single durable inquiry/mission record, append events,
-  restart behavior, correction handling, indexing needs, and boundaries against
-  FleetCore's authoritative world/event history.
-- Exclusions: no database or service implementation.
-- Done evidence: architecture decision with storage choice, event schema,
-  replay example, failure modes, and an implementation packet outline.
-
 ## GLUE-03 — Inventory and map component adapters
 
 - Status: queued
