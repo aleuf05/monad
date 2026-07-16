@@ -70,4 +70,14 @@ class T(unittest.TestCase):
   self.assertEqual(decided['pending_count'],0); self.assertEqual(decided['cards'][0]['status'],'accepted')
   verdict=next(x['payload'] for x in self.r.events() if x['event_type']=='artifact_recorded' and x['payload']['artifact_type']=='recommendation-candidate')
   self.assertEqual(verdict['status'],'review-required')
+ def test_radio_projection_excludes_unreviewed_candidates(self):
+  old=m.snapshot; m.snapshot=lambda u:{'tick':42,'watch_events':[]}
+  try: m.execute(self.r,'x')
+  finally: m.snapshot=old
+  self.assertEqual(m.build_radio(self.r,Path(self.d.name)/'radio.json')['items'],[])
+  m.review(self.r,'accept','lieutenant.cgl','human-command','proportionate','radio-decision')
+  projection=m.build_radio(self.r,Path(self.d.name)/'radio.json')
+  self.assertEqual(len(projection['items']),1)
+  self.assertTrue(projection['items'][0]['radio_eligible'])
+  self.assertEqual(projection['items'][0]['classification'],'accepted-briefing')
 if __name__=='__main__': unittest.main()

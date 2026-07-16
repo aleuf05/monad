@@ -14,7 +14,7 @@ import argparse, hashlib, json, sqlite3, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'; REVIEW_OUT=ROOT/'web/data/mission-reviews.json'
+ROOT=Path(__file__).resolve().parents[2]; DEFAULT_DB=ROOT/'data/mission-record/mission-record.sqlite3'; OUT=ROOT/'web/data/mission-ops.json'; REGISTRY_OUT=ROOT/'web/data/mission-artifacts.json'; REVIEW_OUT=ROOT/'web/data/mission-reviews.json'; RADIO_OUT=ROOT/'web/data/mission-radio.json'
 KRAKEN_MID='mission.kraken-inquiry-001'; KRAKEN_CID='run.kraken-inquiry-001'
 KRAKEN_OBJECTIVE='What does the verified evidence justify about contact K-1?'
 TERMINAL={'completed','rejected','cancelled','failed'}
@@ -134,12 +134,27 @@ def build_reviews(r,path=REVIEW_OUT):
  cards.sort(key=lambda card:card['review_id'])
  out={'schema_version':'monad.review-index.v0.1','generated_at':events[-1]['recorded_at'] if events else None,'source_record_cursor':events[-1]['seq'] if events else 0,'pending_count':sum(card['status']=='pending' for card in cards),'cards':cards}
  path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp'); tmp.write_text(json.dumps(out,indent=2,sort_keys=True)+'\n'); tmp.replace(path); return out
+def build_radio(r,path=RADIO_OUT):
+ """Emit only human-accepted mission briefings; never candidates or lore."""
+ events=r.events(); artifacts=[event['payload'] for event in events if event['event_type']=='artifact_recorded']
+ by_id={artifact['artifact_id']:artifact for artifact in artifacts}; items=[]
+ for decision in artifacts:
+  if decision.get('artifact_type')!='review-decision' or decision.get('data',{}).get('action')!='accept': continue
+  for ref in decision.get('input_refs',[]):
+   source=by_id.get(ref)
+   if not source or source.get('artifact_type')!='recommendation-candidate': continue
+   text=source.get('data',{}).get('recommendation')
+   if not text: continue
+   items.append({'schema_version':'monad.radio-item.v0.1','mission_id':source['mission_id'],'artifact_id':source['artifact_id'],'classification':'accepted-briefing','channel':'fleet-comms','priority':'normal','expires_at':None,'dedupe_key':'mission-radio.'+decision['artifact_id'],'text':text,'decision_artifact_id':decision['artifact_id'],'radio_eligible':True})
+ items.sort(key=lambda item:item['dedupe_key'])
+ out={'schema_version':'monad.radio-projection.v0.1','generated_at':events[-1]['recorded_at'] if events else None,'source_record_cursor':events[-1]['seq'] if events else 0,'items':items}
+ path.parent.mkdir(parents=True,exist_ok=True); tmp=path.with_suffix('.tmp'); tmp.write_text(json.dumps(out,indent=2,sort_keys=True)+'\n'); tmp.replace(path); return out
 def main():
  p=argparse.ArgumentParser(); p.add_argument('--db',type=Path,default=DEFAULT_DB)
  p.add_argument('--fleetcore-url',default='http://127.0.0.1:4771')
  p.add_argument('--mission-id',default=KRAKEN_MID); p.add_argument('--correlation-id',default=KRAKEN_CID); p.add_argument('--objective',default=KRAKEN_OBJECTIVE)
  sub=p.add_subparsers(dest='cmd',required=True)
- for x in ('create','execute','inspect','project','registry','reviews'): sub.add_parser(x)
+ for x in ('create','execute','inspect','project','registry','reviews','radio'): sub.add_parser(x)
  for x in ('pause','cancel','resume'):
   z=sub.add_parser(x); z.add_argument('--reason',required=True)
  q=sub.add_parser('review'); q.add_argument('action',choices=['accept','reject','edit']); q.add_argument('--reviewer',required=True); q.add_argument('--authority',required=True); q.add_argument('--reason',required=True); q.add_argument('--decision-id',default='decision.kraken.001'); q.add_argument('--amended'); q.add_argument('--revision',type=int,default=1)
@@ -154,6 +169,7 @@ def main():
   if a.cmd=='project': result=project(r,OUT,a.objective)
   elif a.cmd=='registry': result=build_registry(r,REGISTRY_OUT)
   elif a.cmd=='reviews': result=build_reviews(r,REVIEW_OUT)
+  elif a.cmd=='radio': result=build_radio(r,RADIO_OUT)
   else: result={'status':r.status(),'events':r.events()}
  except Error as e: p.error(str(e))
  print(json.dumps(result,indent=2,default=str)); return 0

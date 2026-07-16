@@ -12,6 +12,7 @@ python3 tools/mission-bus/mission_bus.py review accept \
 python3 tools/mission-bus/mission_bus.py project
 python3 tools/mission-bus/mission_bus.py registry
 python3 tools/mission-bus/mission_bus.py reviews
+python3 tools/mission-bus/mission_bus.py radio
 ```
 
 The SQLite Mission Record is runtime state under `data/mission-record/`. The
@@ -22,3 +23,6 @@ JSON artifacts, excludes superseded revisions, and fails closed on unknown
 artifact types.
 The read-only review-card projection is `web/data/mission-reviews.json`. It
 joins candidates to immutable decision artifacts without rewriting either.
+The bounded Radio feed is `web/data/mission-radio.json`; it excludes generated
+candidates and emits a recommendation only after a separate human-command
+acceptance artifact exists.

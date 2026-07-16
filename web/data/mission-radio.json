@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-07-16T19:43:42.001588+00:00",
+  "items": [
+    {
+      "artifact_id": "artifact.cognition.kraken.verdict-01",
+      "channel": "fleet-comms",
+      "classification": "accepted-briefing",
+      "decision_artifact_id": "artifact.review.kraken.decision-01",
+      "dedupe_key": "mission-radio.artifact.review.kraken.decision-01",
+      "expires_at": null,
+      "mission_id": "mission.kraken-inquiry-001",
+      "priority": "normal",
+      "radio_eligible": true,
+      "schema_version": "monad.radio-item.v0.1",
+      "text": "Continue passive observation, maintain separation, and escalate only on new verified evidence."
+    }
+  ],
+  "schema_version": "monad.radio-projection.v0.1",
+  "source_record_cursor": 10
+}
