@@ -1,0 +1,670 @@
+{
+  "source": "NPR Podcasts",
+  "fetched_at": "2026-07-16T20:29:33.918578+00:00",
+  "shows": [
+    {
+      "title": "NPR News Now",
+      "show_link": "https://www.npr.org/podcasts/500005/npr-news-now",
+      "feed_url": "https://feeds.npr.org/500005/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2023/01/24/npr-news-now_tile_sq-2334a5fd44563fa94cdcdb27384b0f05987c2d15.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "NPR News: 07-16-2026 4PM EDT",
+          "pubDate": "Thu, 16 Jul 2026 20:11:36 +0000",
+          "link": "",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-500005/npr.simplecastaudio.com/368f8510-314e-46f1-8d26-5b87ed6ab6eb/episodes/f7e478f2-b664-4178-951d-7a9ac2ab5edf/audio/128/default.mp3?awCollectionId=368f8510-314e-46f1-8d26-5b87ed6ab6eb&awEpisodeId=f7e478f2-b664-4178-951d-7a9ac2ab5edf&feed=O9WlY7a5&t=podcast&e=nx-s1-20260716-1600-long&p=500005&d=280&size=4481821",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 280
+        },
+        {
+          "title": "NPR News: 07-16-2026 3PM EDT",
+          "pubDate": "Thu, 16 Jul 2026 19:11:52 +0000",
+          "link": "",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-500005/npr.simplecastaudio.com/368f8510-314e-46f1-8d26-5b87ed6ab6eb/episodes/df013e2d-2cac-421b-9f26-0fe0ff9a591a/audio/128/default.mp3?awCollectionId=368f8510-314e-46f1-8d26-5b87ed6ab6eb&awEpisodeId=df013e2d-2cac-421b-9f26-0fe0ff9a591a&feed=O9WlY7a5&t=podcast&e=nx-s1-20260716-1500-long&p=500005&d=280&size=4480566",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 280
+        },
+        {
+          "title": "NPR News: 07-16-2026 2PM EDT",
+          "pubDate": "Thu, 16 Jul 2026 18:12:49 +0000",
+          "link": "",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-500005/npr.simplecastaudio.com/368f8510-314e-46f1-8d26-5b87ed6ab6eb/episodes/c0f70789-95bc-4527-921f-e764268cf354/audio/128/default.mp3?awCollectionId=368f8510-314e-46f1-8d26-5b87ed6ab6eb&awEpisodeId=c0f70789-95bc-4527-921f-e764268cf354&feed=O9WlY7a5&t=podcast&e=nx-s1-20260716-1400-long&p=500005&d=280&size=4481821",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 280
+        },
+        {
+          "title": "NPR News: Trailer",
+          "pubDate": "Thu, 30 Nov 2023 20:30:51 +0000",
+          "link": "",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-500005/ondemand.npr.org/anon.npr-mp3/npr/specials/2023/11/20231130_specials_db02f9c3-bb6f-4bdb-8121-4773a3192a82.mp3?p=500005&e=nsv2-1701376198544-s1-trailer&d=34&t=podcast&size=555094",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 300
+        }
+      ],
+      "show_id": "npr-news-now"
+    },
+    {
+      "title": "Up First from NPR",
+      "show_link": "https://www.npr.org/podcasts/510318/up-first",
+      "feed_url": "https://feeds.npr.org/510318/podcast.xml",
+      "image": "https://npr.brightspotcdn.com/dims3/default/strip/false/crop/3000x3000+0+0/resize/1400/quality/66/format/jpg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2Fe0%2F7a%2Ffe9d16a44fbf9dd2d9932ffe799b%2F510318.png",
+      "episodes": [
+        {
+          "title": "Blanche Confirmation Hearing, Iran War And Midterm Politics, Clayton ODNI Hearing",
+          "pubDate": "Thu, 16 Jul 2026 10:01:08 +0000",
+          "link": "https://www.npr.org/2026/07/16/nx-s1-5895902/blanche-confirmation-hearing-iran-war-and-midterm-politics-clayton-odni-hearing",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/34f19b10-290f-468b-bacf-b4ccb8951f7f/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=34f19b10-290f-468b-bacf-b4ccb8951f7f&feed=HMwRVgVt&t=podcast&e=nx-s1-5895902&p=510318&d=837&size=13399397",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 837
+        },
+        {
+          "title": "Blanche Confirmation Hearing, US and Strait of Hormuz, ICE Vehicle Stops",
+          "pubDate": "Wed, 15 Jul 2026 10:02:39 +0000",
+          "link": "https://www.npr.org/2026/07/15/nx-s1-5894590/blanche-confirmation-hearing-us-and-strait-of-hormuz-ice-vehicle-stops",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/e6df44bf-601f-4f02-8e92-d4adb8863d84/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=e6df44bf-601f-4f02-8e92-d4adb8863d84&feed=HMwRVgVt&t=podcast&e=nx-s1-5894590&p=510318&d=801&size=12830973",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 801
+        },
+        {
+          "title": "Memorandum Of Misunderstanding, Fatal ICE Shooting, Paramount Merger Suit",
+          "pubDate": "Tue, 14 Jul 2026 10:30:19 +0000",
+          "link": "https://www.npr.org/2026/07/14/nx-s1-5892528/memorandum-of-misunderstanding-fatal-ice-shooting-paramount-merger-suit",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/d30bfa1c-3f3d-422a-bfb9-dbfb2e3a7ba0/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=d30bfa1c-3f3d-422a-bfb9-dbfb2e3a7ba0&feed=HMwRVgVt&t=podcast&e=nx-s1-5892528&p=510318&d=777&size=12445196",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 777
+        },
+        {
+          "title": "US and Iran Trade Attacks Again, Sen. Lindsay Graham Dies, Congress Returns",
+          "pubDate": "Mon, 13 Jul 2026 10:14:12 +0000",
+          "link": "https://www.npr.org/2026/07/13/nx-s1-5891495/us-and-iran-trade-attacks-again-sen-lindsay-graham-dies-congress-returns",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/804daf80-e43b-429e-b53e-b170921d0ad2/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=804daf80-e43b-429e-b53e-b170921d0ad2&feed=HMwRVgVt&t=podcast&e=nx-s1-5891495&p=510318&d=738&size=11811571",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 738
+        },
+        {
+          "title": "Should we worry about the end of the world?",
+          "pubDate": "Sun, 12 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/12/nx-s1-5886121/should-we-worry-about-the-end-of-the-world",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/a05cb214-01b4-4481-91ea-5870ca9b0ed6/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=a05cb214-01b4-4481-91ea-5870ca9b0ed6&feed=HMwRVgVt&t=podcast&e=nx-s1-5886121&p=510318&d=1131&size=18098137",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1131
+        },
+        {
+          "title": "Election Betting on Prediction Markets, Special Education, Breastmilk Storage",
+          "pubDate": "Sat, 11 Jul 2026 12:28:02 +0000",
+          "link": "https://www.npr.org/2026/07/11/nx-s1-5888589/election-betting-on-prediction-markets-special-education-breastmilk-storage",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/94a26ae7-6987-48b9-b327-083f0f8ea932/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=94a26ae7-6987-48b9-b327-083f0f8ea932&feed=HMwRVgVt&t=podcast&e=nx-s1-5888589&p=510318&d=832&size=13320404",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 832
+        },
+        {
+          "title": "Iran and US Pause Fighting Again, TPS Work Permits, July 4th Teen Death Investigation",
+          "pubDate": "Fri, 10 Jul 2026 10:19:41 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5888146/iran-and-us-pause-fighting-again-tps-work-permits-july-4th-teen-death-investigation",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/17923009-5487-4721-8711-ed0047dff00f/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=17923009-5487-4721-8711-ed0047dff00f&feed=HMwRVgVt&t=podcast&e=nx-s1-5888146&p=510318&d=852&size=13639725",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 852
+        },
+        {
+          "title": "Trump's Whiplash Foreign Policy, Iran War Escalates, Graham Platner Drops Out",
+          "pubDate": "Thu, 09 Jul 2026 09:52:35 +0000",
+          "link": "https://www.npr.org/2026/07/09/nx-s1-5887062/trumps-whiplash-foreign-policy-iran-war-escalates-graham-platner-drops-out",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/6d0db6cf-dcf0-40d0-830f-e3bcf47c68c1/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=6d0db6cf-dcf0-40d0-830f-e3bcf47c68c1&feed=HMwRVgVt&t=podcast&e=nx-s1-5887062&p=510318&d=737&size=11798613",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 737
+        },
+        {
+          "title": "Iran Ceasefire Over, Platner Replacements Emerge, Olympic Committee Lifts Russia Ban",
+          "pubDate": "Wed, 08 Jul 2026 10:22:18 +0000",
+          "link": "https://www.npr.org/2026/07/08/nx-s1-5885544/iran-ceasefire-over-platner-replacements-emerge-olympic-committee-lifts-russia-ban",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/0d6eefa2-197f-4b23-bded-435f5ecf7f22/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=0d6eefa2-197f-4b23-bded-435f5ecf7f22&feed=HMwRVgVt&t=podcast&e=nx-s1-5885544&p=510318&d=753&size=12053987",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 753
+        },
+        {
+          "title": "Platner Pressured To Drop Out, NATO Summit In Turkey, US Out Of World Cup",
+          "pubDate": "Tue, 07 Jul 2026 09:46:42 +0000",
+          "link": "https://www.npr.org/2026/07/07/nx-s1-5884550/platner-pressured-to-drop-out-nato-summit-in-turkey-us-out-of-world-cup",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510318/npr.simplecastaudio.com/d52bee4a-b10a-40f8-9417-45064e6b8632/episodes/52ac1d6d-c30c-482d-892b-8c20164d7369/audio/128/default.mp3?awCollectionId=d52bee4a-b10a-40f8-9417-45064e6b8632&awEpisodeId=52ac1d6d-c30c-482d-892b-8c20164d7369&feed=HMwRVgVt&t=podcast&e=nx-s1-5884550&p=510318&d=857&size=13729167",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 857
+        }
+      ],
+      "show_id": "up-first"
+    },
+    {
+      "title": "Planet Money",
+      "show_link": "https://www.npr.org/podcasts/510289/planet-money",
+      "feed_url": "https://feeds.npr.org/510289/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2022/10/24/pm_new_tile_2022_sq-e543deddd0a46a98be481b46e6a72efa6b52236f.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Building things and breaking things in China (Summer School World Tour)",
+          "pubDate": "Wed, 15 Jul 2026 07:30:00 +0000",
+          "link": "https://www.npr.org/2026/07/15/nx-s1-5889516/summer-school-china-engineering-state-china-central-planning",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/7dda0db1-b7e8-490c-b09a-f22fdeb30a87/episodes/1de32e6d-70dd-45f6-818e-6a6bcf11f827/audio/128/default.mp3?awCollectionId=7dda0db1-b7e8-490c-b09a-f22fdeb30a87&awEpisodeId=1de32e6d-70dd-45f6-818e-6a6bcf11f827&feed=1e5vv9pg&t=podcast&e=nx-s1-5889516&p=510289&d=2321&size=37148718",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2321
+        },
+        {
+          "title": "Seven allegedly fake Chanel bags vs The RealReal",
+          "pubDate": "Fri, 10 Jul 2026 21:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5879253/chanel-realreal-secondhand-luxury-market",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/a5a22e7a-4cac-46c1-b29b-d5dbebba9027/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=a5a22e7a-4cac-46c1-b29b-d5dbebba9027&feed=hvWWWzRv&t=podcast&e=nx-s1-5879253&p=510289&d=1538&size=24619555",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1538
+        },
+        {
+          "title": "Our mission: Find the world\u2019s best economic ideas (Summer School World Tour)",
+          "pubDate": "Wed, 08 Jul 2026 07:30:00 +0000",
+          "link": "https://www.npr.org/2026/07/08/nx-s1-5877869/summer-school-australia-new-zealand-inflation-speculators",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510362/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/4586ba03-099f-4572-bec4-373256ae6223/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=4586ba03-099f-4572-bec4-373256ae6223&feed=hvWWWzRv&t=podcast&e=nx-s1-5884062&p=510362&d=2232&size=35715535",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2232
+        },
+        {
+          "title": "How to win a penalty shootout (with game theory)",
+          "pubDate": "Fri, 03 Jul 2026 21:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/03/nx-s1-5879357/world-cup-penalty-kick-game-theory",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/2ad4a8bb-a39b-40f0-b138-a6e6887c5f6a/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=2ad4a8bb-a39b-40f0-b138-a6e6887c5f6a&feed=hvWWWzRv&t=podcast&e=nx-s1-5879357&p=510289&d=1077&size=17233799",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1077
+        },
+        {
+          "title": "Can the Trump administration make college cheaper?",
+          "pubDate": "Wed, 01 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/01/nx-s1-5876467/student-loans-debt-bennett-hypothesis-tuition",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/95999483-ef36-4387-be6a-ef88b29d13d3/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=95999483-ef36-4387-be6a-ef88b29d13d3&feed=hvWWWzRv&t=podcast&e=nx-s1-5876467&p=510289&d=1719&size=27517684",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1719
+        },
+        {
+          "title": "We almost had a smartphone in the 90s. Why did it fail?",
+          "pubDate": "Fri, 26 Jun 2026 21:30:00 +0000",
+          "link": "https://www.npr.org/2026/06/26/nx-s1-5872785/general-magic-sony-magiclink-constraints",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/02fbe49b-b2a1-482a-b9ed-71c5b2405bb3/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=02fbe49b-b2a1-482a-b9ed-71c5b2405bb3&feed=hvWWWzRv&t=podcast&e=nx-s1-5872785&p=510289&d=1612&size=25804051",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1612
+        },
+        {
+          "title": "Before Kalshi and Polymarket there was the Iowa Electronic Markets",
+          "pubDate": "Wed, 24 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/24/nx-s1-5868659/history-prediction-market-forecasting-betting-economics",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/7fa3ac9c-373b-4536-9ed9-8d3b136cbba7/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=7fa3ac9c-373b-4536-9ed9-8d3b136cbba7&feed=hvWWWzRv&t=podcast&e=nx-s1-5868659&p=510289&d=1377&size=22039910",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1377
+        },
+        {
+          "title": "The real horror of \u2018Alien\u2019 and how it explains why we\u2019re not paid enough",
+          "pubDate": "Fri, 19 Jun 2026 21:30:00 +0000",
+          "link": "https://www.npr.org/2026/06/19/nx-s1-5863604/alien-monopsony-wages-inequality",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/89a6664a-233d-403c-a56e-7d28a357e64e/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=89a6664a-233d-403c-a56e-7d28a357e64e&feed=hvWWWzRv&t=podcast&e=nx-s1-5863604&p=510289&d=1950&size=31211607",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1950
+        },
+        {
+          "title": "Can computer hackers get inside your mind?",
+          "pubDate": "Wed, 17 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/17/nx-s1-5859441/computer-malware-security-iran-stuxnet-fast16",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/90de8e2e-0f97-48f2-95d3-caee255b1414/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=90de8e2e-0f97-48f2-95d3-caee255b1414&feed=hvWWWzRv&t=podcast&e=nx-s1-5859441&p=510289&d=1782&size=28518278",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1782
+        },
+        {
+          "title": "It\u2019s my tree. Why can\u2019t I cut it down?",
+          "pubDate": "Fri, 12 Jun 2026 22:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/12/nx-s1-5856509/property-rights-zoning-laws-trees-portland-oregon",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510289/npr.simplecastaudio.com/43b5acee-463e-4612-95ad-d2596d9dd337/episodes/4f5c11ea-4513-45e7-b3d2-daa362e5bdfb/audio/128/default.mp3?awCollectionId=43b5acee-463e-4612-95ad-d2596d9dd337&awEpisodeId=4f5c11ea-4513-45e7-b3d2-daa362e5bdfb&feed=hvWWWzRv&t=podcast&e=nx-s1-5856509&p=510289&d=1515&size=24250915",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1515
+        }
+      ],
+      "show_id": "planet-money"
+    },
+    {
+      "title": "The Indicator from Planet Money",
+      "show_link": "https://www.npr.org/podcasts/510325/the-indicator-from-planet-money",
+      "feed_url": "https://feeds.npr.org/510325/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2024/03/25/the-indicator_2024_sq-121249a297878ab2327b321c997ab870300ec659.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Why the Pope wants to disarm AI",
+          "pubDate": "Thu, 16 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/16/nx-s1-5895130/why-the-pope-wants-to-disarm-ai",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/e2819203-8c4e-4d85-a327-da1624bbf47b/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=e2819203-8c4e-4d85-a327-da1624bbf47b&feed=IFy3imsg&t=podcast&e=nx-s1-5895130&p=510325&d=488&size=7814252",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 488
+        },
+        {
+          "title": "Why your neighbor might be paying less for their car",
+          "pubDate": "Wed, 15 Jul 2026 07:00:02 +0000",
+          "link": "https://www.npr.org/2026/07/15/nx-s1-5893745/less-oil-more-soybeans-and-car-junk-fees",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/bd23e5d4-7937-47fb-ac52-b92a52948651/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=bd23e5d4-7937-47fb-ac52-b92a52948651&feed=IFy3imsg&t=podcast&e=nx-s1-5893745&p=510325&d=537&size=8600015",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 537
+        },
+        {
+          "title": "Can the internet survive AI summaries?",
+          "pubDate": "Tue, 14 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/14/nx-s1-5891958/can-the-internet-survive-ai-summaries",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/1ff87e35-cd6e-48c5-8aed-e90928a7f480/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=1ff87e35-cd6e-48c5-8aed-e90928a7f480&feed=IFy3imsg&t=podcast&e=nx-s1-5891958&p=510325&d=597&size=9561739",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 597
+        },
+        {
+          "title": "Young people aren\u2019t paying their car loans. We can help.",
+          "pubDate": "Mon, 13 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/13/nx-s1-5891491/young-people-arent-paying-their-car-loans-we-can-help",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/513f4cbf-d2e2-4f21-b8c7-cb7cd14eaf6f/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=513f4cbf-d2e2-4f21-b8c7-cb7cd14eaf6f&feed=IFy3imsg&t=podcast&e=nx-s1-5891491&p=510325&d=553&size=8852044",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 553
+        },
+        {
+          "title": "SK Hynix to the moon, Gen-Z to their rooms, and Connecticut tax reform looms",
+          "pubDate": "Fri, 10 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5887680/sk-hynix-to-the-moon-gen-z-to-their-rooms-and-connecticut-tax-reform-looms",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/3287a992-1c46-4b55-8742-378ee51bf8cb/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=3287a992-1c46-4b55-8742-378ee51bf8cb&feed=IFy3imsg&t=podcast&e=nx-s1-5887680&p=510325&d=532&size=8517259",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 532
+        },
+        {
+          "title": "Why Google fell behind in the AI race",
+          "pubDate": "Thu, 09 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/09/nx-s1-5885026/why-google-fell-behind-in-the-ai-race",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/621b3b1b-914d-4477-8923-d99d932ec36a/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=621b3b1b-914d-4477-8923-d99d932ec36a&feed=IFy3imsg&t=podcast&e=nx-s1-5885026&p=510325&d=567&size=9076071",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 567
+        },
+        {
+          "title": "Cracking down on egg prices",
+          "pubDate": "Wed, 08 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/08/nx-s1-5884996/cracking-down-on-egg-prices",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/a5eeb457-2b63-499f-bc64-cf9e00cf27bf/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=a5eeb457-2b63-499f-bc64-cf9e00cf27bf&feed=IFy3imsg&t=podcast&e=nx-s1-5884996&p=510325&d=593&size=9500718",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 593
+        },
+        {
+          "title": "We're in a renter's market (believe it or not)",
+          "pubDate": "Tue, 07 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/07/nx-s1-5884037/were-in-a-renters-market-believe-it-or-not",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/17b19868-de74-4b49-91ae-5b7c348954cf/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=17b19868-de74-4b49-91ae-5b7c348954cf&feed=IFy3imsg&t=podcast&e=nx-s1-5884037&p=510325&d=569&size=9119957",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 569
+        },
+        {
+          "title": "Why the US is losing the drone war",
+          "pubDate": "Mon, 06 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/06/nx-s1-5883604/why-the-us-is-losing-the-drone-war",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/fe99dd42-b676-467a-a970-323bdf909cb5/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=fe99dd42-b676-467a-a970-323bdf909cb5&feed=IFy3imsg&t=podcast&e=nx-s1-5883604&p=510325&d=540&size=8644736",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 540
+        },
+        {
+          "title": "Obama's new Presidential Center and his tricky relationship with the South Side",
+          "pubDate": "Fri, 03 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/03/nx-s1-5877728/obamas-new-presidential-center-and-his-tricky-relationship-with-the-south-side",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510325/npr.simplecastaudio.com/0a4e8d3b-fe23-4948-9e39-20fcf16f9331/episodes/2366d734-4c7a-43be-94ed-54b009ec1cea/audio/128/default.mp3?awCollectionId=0a4e8d3b-fe23-4948-9e39-20fcf16f9331&awEpisodeId=2366d734-4c7a-43be-94ed-54b009ec1cea&feed=IFy3imsg&t=podcast&e=nx-s1-5877728&p=510325&d=2071&size=33148429",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2071
+        }
+      ],
+      "show_id": "the-indicator"
+    },
+    {
+      "title": "Fresh Air",
+      "show_link": "https://www.npr.org/podcasts/381444908/fresh-air",
+      "feed_url": "https://feeds.npr.org/381444908/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2022/09/23/fresh-air_tile_npr-network-01_sq-9b42f217746df08ce5a26c500024dd979ff94178.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Apache Chef Nephi Craig says cooking saved his life",
+          "pubDate": "Thu, 16 Jul 2026 19:16:58 +0000",
+          "link": "https://www.npr.org/2026/07/16/nx-s1-5896355/apache-chef-nephi-craig-says-cooking-saved-his-life",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/e9dd2176-290f-4cd4-86ec-a56544ca31b4/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=e9dd2176-290f-4cd4-86ec-a56544ca31b4&feed=jBsBZBHh&t=podcast&e=nx-s1-5896355&p=381444908&d=2736&size=43787163",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2736
+        },
+        {
+          "title": "Gold, secrets, never-ending meetings: Inside the Trump White House",
+          "pubDate": "Wed, 15 Jul 2026 18:51:35 +0000",
+          "link": "https://www.npr.org/2026/07/15/nx-s1-5894919/gold-secrets-never-ending-meetings-inside-the-trump-white-house",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/1aa2072e-5998-44e6-9803-61695e2deff4/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=1aa2072e-5998-44e6-9803-61695e2deff4&feed=jBsBZBHh&t=podcast&e=nx-s1-5894919&p=381444908&d=2742&size=43876607",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2742
+        },
+        {
+          "title": "Uncovering abuse inside America's largest ICE detention center",
+          "pubDate": "Tue, 14 Jul 2026 17:46:17 +0000",
+          "link": "https://www.npr.org/2026/07/14/nx-s1-5893645/uncovering-abuse-inside-americas-largest-ice-detention-center",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/b19fde62-6728-4869-add6-71705867b45a/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=b19fde62-6728-4869-add6-71705867b45a&feed=jBsBZBHh&t=podcast&e=nx-s1-5893645&p=381444908&d=2725&size=43608277",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2725
+        },
+        {
+          "title": "'The Invite' screenwriters Rashida Jones & Will McCormack",
+          "pubDate": "Mon, 13 Jul 2026 18:07:18 +0000",
+          "link": "https://www.npr.org/2026/07/13/nx-s1-5891774/the-invite-screenwriters-rashida-jones-will-mccormack",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/0934362a-7821-4204-881d-7690ad7652e3/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=0934362a-7821-4204-881d-7690ad7652e3&feed=jBsBZBHh&t=podcast&e=nx-s1-5891774&p=381444908&d=2737&size=43800537",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2737
+        },
+        {
+          "title": "Best Of: Record producer Peter Asher / Romance writer Kennedy Ryan",
+          "pubDate": "Sat, 11 Jul 2026 09:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/11/nx-s1-5888576/best-of-record-producer-peter-asher-romance-writer-kennedy-ryan",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/dec1170a-a713-4335-82dc-69f50f8aea3c/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=dec1170a-a713-4335-82dc-69f50f8aea3c&feed=jBsBZBHh&t=podcast&e=nx-s1-5888576&p=381444908&d=2949&size=47194366",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2949
+        },
+        {
+          "title": "Remembering musical theater historian Robert Kimball",
+          "pubDate": "Fri, 10 Jul 2026 17:56:06 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5888573/remembering-musical-theater-historian-robert-kimball",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/40133cdd-8c05-4c2b-b0ab-e6df43d5e123/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=40133cdd-8c05-4c2b-b0ab-e6df43d5e123&feed=jBsBZBHh&t=podcast&e=nx-s1-5888573&p=381444908&d=2816&size=45063610",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2816
+        },
+        {
+          "title": "Guitarist Lenny Kaye on Patti Smith, Nuggets, and his solo debut",
+          "pubDate": "Thu, 09 Jul 2026 18:58:54 +0000",
+          "link": "https://www.npr.org/2026/07/09/nx-s1-5887350/guitarist-lenny-kaye-on-patti-smith-nuggets-and-his-solo-debut",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/1ed06388-7576-4041-90fe-0e3d83980cb9/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=1ed06388-7576-4041-90fe-0e3d83980cb9&feed=jBsBZBHh&t=podcast&e=nx-s1-5887350&p=381444908&d=2717&size=43477037",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2717
+        },
+        {
+          "title": "A look at new barriers at the ballot box",
+          "pubDate": "Wed, 08 Jul 2026 19:01:12 +0000",
+          "link": "https://www.npr.org/2026/07/08/nx-s1-5886179/a-look-at-new-barriers-at-the-ballot-box",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/8fd5a6a9-b997-4aee-91e7-a9783b5f4980/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=8fd5a6a9-b997-4aee-91e7-a9783b5f4980&feed=jBsBZBHh&t=podcast&e=nx-s1-5886179&p=381444908&d=2774&size=44400309",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2774
+        },
+        {
+          "title": "Legendary record producer & manager Peter Asher",
+          "pubDate": "Tue, 07 Jul 2026 18:03:55 +0000",
+          "link": "https://www.npr.org/2026/07/07/nx-s1-5884856/legendary-record-producer-manager-peter-asher",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/f652baba-3796-4392-8007-d35138d622ec/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=f652baba-3796-4392-8007-d35138d622ec&feed=jBsBZBHh&t=podcast&e=nx-s1-5884856&p=381444908&d=2763&size=44218914",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2763
+        },
+        {
+          "title": "Writer Rachel Aviv explores the complexity of the mother-daughter bond",
+          "pubDate": "Mon, 06 Jul 2026 18:46:28 +0000",
+          "link": "https://www.npr.org/2026/07/06/nx-s1-5883925/writer-rachel-aviv-explores-the-complexity-of-the-mother-daughter-bond",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-381444908/npr.simplecastaudio.com/49850946-31c1-4953-8129-0d718420c400/episodes/3410577c-b36c-4790-aec6-b0a93aa373de/audio/128/default.mp3?awCollectionId=49850946-31c1-4953-8129-0d718420c400&awEpisodeId=3410577c-b36c-4790-aec6-b0a93aa373de&feed=jBsBZBHh&t=podcast&e=nx-s1-5883925&p=381444908&d=2750&size=44000740",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2750
+        }
+      ],
+      "show_id": "fresh-air"
+    },
+    {
+      "title": "Throughline",
+      "show_link": "https://www.npr.org/podcasts/510333/throughline",
+      "feed_url": "https://feeds.npr.org/510333/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2024/05/15/throughline_tile-art_sq-a59d7da2ea2bf97562aeec6440ddf837e8f7de65.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Route 66 and the quest to connect America",
+          "pubDate": "Thu, 16 Jul 2026 07:05:00 +0000",
+          "link": "https://www.npr.org/2026/07/16/nx-s1-5895140/route-66-and-the-quest-to-connect-america",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/2d107c89-1d5a-4fa8-a2e9-d3810de1b187/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=2d107c89-1d5a-4fa8-a2e9-d3810de1b187&feed=gvAZ3nqF&t=podcast&e=nx-s1-5895140&p=510333&d=3015&size=48250549",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3015
+        },
+        {
+          "title": "How wheelchairs, a river, and a spaceship challenged the status quo",
+          "pubDate": "Tue, 14 Jul 2026 07:05:01 +0000",
+          "link": "https://www.npr.org/2026/07/14/nx-s1-5892497/how-wheelchairs-a-river-and-a-spaceship-challenged-the-status-quo",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/8371d719-7598-4af5-b6e2-16c0d76485c7/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=8371d719-7598-4af5-b6e2-16c0d76485c7&feed=gvAZ3nqF&t=podcast&e=nx-s1-5892497&p=510333&d=1199&size=19194026",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1199
+        },
+        {
+          "title": "The ongoing battle over asylum in America",
+          "pubDate": "Thu, 09 Jul 2026 07:05:00 +0000",
+          "link": "https://www.npr.org/2026/07/09/nx-s1-5886313/the-ongoing-battle-over-asylum-in-america",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/0ea605a1-3da2-411a-8e52-3c9d587ad7c5/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=0ea605a1-3da2-411a-8e52-3c9d587ad7c5&feed=gvAZ3nqF&t=podcast&e=nx-s1-5886313&p=510333&d=3220&size=51524423",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3220
+        },
+        {
+          "title": "American history through song",
+          "pubDate": "Tue, 07 Jul 2026 04:05:00 +0000",
+          "link": "https://www.npr.org/2026/07/07/nx-s1-5884079/american-history-through-song",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/7083de21-a712-49e3-855a-b962fe34cfb8/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=7083de21-a712-49e3-855a-b962fe34cfb8&feed=gvAZ3nqF&t=podcast&e=nx-s1-5884079&p=510333&d=1338&size=21412554",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1338
+        },
+        {
+          "title": "The story of July 4th is messier than you remember",
+          "pubDate": "Thu, 02 Jul 2026 07:05:01 +0000",
+          "link": "https://www.npr.org/2026/07/02/nx-s1-5877813/the-story-of-july-4th-is-messier-than-you-remember",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/7bebe136-1977-46a1-a02b-9781341c7f3d/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=7bebe136-1977-46a1-a02b-9781341c7f3d&feed=gvAZ3nqF&t=podcast&e=nx-s1-5877813&p=510333&d=2059&size=32945302",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2059
+        },
+        {
+          "title": "The genius and murkiness of the Constitution",
+          "pubDate": "Tue, 30 Jun 2026 07:05:00 +0000",
+          "link": "https://www.npr.org/2026/06/30/nx-s1-5875451/the-genius-and-murkiness-of-the-constitution",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/d5ac0aa7-93ba-41b2-8b38-d2c4785b0eb0/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=d5ac0aa7-93ba-41b2-8b38-d2c4785b0eb0&feed=gvAZ3nqF&t=podcast&e=nx-s1-5875451&p=510333&d=1279&size=20475072",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 1279
+        },
+        {
+          "title": "From Hormuz to Suez: the chokepoints of global power",
+          "pubDate": "Thu, 25 Jun 2026 07:05:01 +0000",
+          "link": "https://www.npr.org/2026/06/25/nx-s1-5869752/from-hormuz-to-suez-the-chokepoints-of-global-power",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/826d61c4-38b5-4a99-9831-49dc2931a006/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=826d61c4-38b5-4a99-9831-49dc2931a006&feed=gvAZ3nqF&t=podcast&e=nx-s1-5869752&p=510333&d=3031&size=48496727",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3031
+        },
+        {
+          "title": "Prosperity gospel and the American dream",
+          "pubDate": "Tue, 23 Jun 2026 07:05:00 +0000",
+          "link": "https://www.npr.org/2026/06/23/nx-s1-5866803/prosperity-gospel-and-the-american-dream",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/1f448a41-a41d-4c15-b493-bb7f92584114/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=1f448a41-a41d-4c15-b493-bb7f92584114&feed=gvAZ3nqF&t=podcast&e=nx-s1-5866803&p=510333&d=925&size=14808798",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 925
+        },
+        {
+          "title": "How the Supreme Court claimed supreme power",
+          "pubDate": "Thu, 18 Jun 2026 07:10:00 +0000",
+          "link": "https://www.npr.org/2026/06/18/nx-s1-5861801/how-the-supreme-court-claimed-supreme-power",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/de9b4a14-8190-46c4-b0f1-d1290d92223a/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=de9b4a14-8190-46c4-b0f1-d1290d92223a&feed=gvAZ3nqF&t=podcast&e=nx-s1-5861801&p=510333&d=3238&size=51813651",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3238
+        },
+        {
+          "title": "Captain America and the nation's conscience",
+          "pubDate": "Tue, 16 Jun 2026 07:10:00 +0000",
+          "link": "https://www.npr.org/2026/06/16/nx-s1-5859452/captain-america-and-the-nations-conscience",
+          "audio_url": "https://tracking.swap.fm/track/XvDEoI11TR00olTUO8US/prfx.byspotify.com/e/play.podtrac.com/npr-510333/npr.simplecastaudio.com/923a8c19-6266-45f0-88de-3997479f3ca3/episodes/c81c6622-c2ba-4279-93ea-6d1a71cd28ba/audio/128/default.mp3?awCollectionId=923a8c19-6266-45f0-88de-3997479f3ca3&awEpisodeId=c81c6622-c2ba-4279-93ea-6d1a71cd28ba&feed=gvAZ3nqF&t=podcast&e=nx-s1-5859452&p=510333&d=781&size=12502919",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 781
+        }
+      ],
+      "show_id": "throughline"
+    },
+    {
+      "title": "TED Radio Hour",
+      "show_link": "https://www.npr.org/podcasts/510298/ted-radio-hour",
+      "feed_url": "https://feeds.npr.org/510298/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2022/09/23/ted-radio-hour_tile_npr-network-01_sq-3ca507bd2dfa5c26d7db5b41c2b981b24a8789fa.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Tracking what your body needs",
+          "pubDate": "Fri, 10 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5886183/tracking-what-your-body-needs",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/7dce206e-31b1-40a9-bd9a-557cd8027f75/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=7dce206e-31b1-40a9-bd9a-557cd8027f75&feed=gGUt_fS1&t=podcast&e=nx-s1-5886183&p=510298&d=3000&size=48013106",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3000
+        },
+        {
+          "title": "The state of fashion",
+          "pubDate": "Fri, 03 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/03/nx-s1-5876411/the-state-of-fashion",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/d98aa16f-0c33-4f87-8dee-a06df8491e25/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=d98aa16f-0c33-4f87-8dee-a06df8491e25&feed=gGUt_fS1&t=podcast&e=nx-s1-5876411&p=510298&d=3005&size=48087084",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3005
+        },
+        {
+          "title": "Are we using screens as a scapegoat for teen mental health?",
+          "pubDate": "Fri, 26 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/26/nx-s1-5871161/are-we-using-screens-as-a-scapegoat-for-teen-mental-health",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/889661b4-9ae5-4b2c-a918-551a25f3d697/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=889661b4-9ae5-4b2c-a918-551a25f3d697&feed=gGUt_fS1&t=podcast&e=nx-s1-5871161&p=510298&d=3010&size=48164406",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3010
+        },
+        {
+          "title": "Sports psychology for everyday life",
+          "pubDate": "Fri, 19 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/19/nx-s1-5861604/sports-psychology-for-everyday-life",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/480ef5db-df6e-432e-8931-6b5fe1e6446c/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=480ef5db-df6e-432e-8931-6b5fe1e6446c&feed=gGUt_fS1&t=podcast&e=nx-s1-5861604&p=510298&d=2990&size=47840906",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2990
+        },
+        {
+          "title": "How predictions took over our lives",
+          "pubDate": "Fri, 12 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/12/nx-s1-5855336/how-predictions-took-over-our-lives",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/03cb3c89-1cbf-429d-83d1-495de4a49ee4/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=03cb3c89-1cbf-429d-83d1-495de4a49ee4&feed=gGUt_fS1&t=podcast&e=nx-s1-5855336&p=510298&d=2992&size=47888135",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2992
+        },
+        {
+          "title": "The case for merging human bodies with machines",
+          "pubDate": "Fri, 05 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/05/nx-s1-5846941/the-case-for-merging-human-bodies-with-machines",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/f14af1ee-250e-4595-8695-5908ec2da609/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=f14af1ee-250e-4595-8695-5908ec2da609&feed=gGUt_fS1&t=podcast&e=nx-s1-5846941&p=510298&d=2992&size=47879777",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2992
+        },
+        {
+          "title": "Beyond the manosphere: Supporting boys and men in the real world",
+          "pubDate": "Fri, 29 May 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/05/29/nx-s1-5837553/beyond-the-manosphere-supporting-boys-and-men-in-the-real-world",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/4c767510-5eb9-469c-b57a-453af72271ac/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=4c767510-5eb9-469c-b57a-453af72271ac&feed=gGUt_fS1&t=podcast&e=nx-s1-5837553&p=510298&d=3056&size=48908374",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 3056
+        },
+        {
+          "title": "What we'll eat on a warmer planet",
+          "pubDate": "Fri, 22 May 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/05/22/nx-s1-5829898/what-well-eat-on-a-warmer-planet",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/c5937797-c689-4513-9804-6edcbf14ff60/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=c5937797-c689-4513-9804-6edcbf14ff60&feed=gGUt_fS1&t=podcast&e=nx-s1-5829898&p=510298&d=2992&size=47873925",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2992
+        },
+        {
+          "title": "How to feel alive in an exhausting world",
+          "pubDate": "Fri, 15 May 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/05/15/nx-s1-5821626/how-to-feel-alive-in-an-exhausting-world",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/6b7f9e76-bf8a-4962-af39-e2674e381bb1/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=6b7f9e76-bf8a-4962-af39-e2674e381bb1&feed=gGUt_fS1&t=podcast&e=nx-s1-5821626&p=510298&d=2995&size=47932440",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2995
+        },
+        {
+          "title": "How to mend a broken heart",
+          "pubDate": "Fri, 08 May 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/05/08/nx-s1-5815015/how-to-mend-a-broken-heart",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510298/npr.simplecastaudio.com/e19460b8-b905-4bd2-9062-cea3c0ab9405/episodes/94870ed3-3aa0-4472-9515-35c86000f590/audio/128/default.mp3?awCollectionId=e19460b8-b905-4bd2-9062-cea3c0ab9405&awEpisodeId=94870ed3-3aa0-4472-9515-35c86000f590&feed=gGUt_fS1&t=podcast&e=nx-s1-5815015&p=510298&d=2987&size=47802454",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 2987
+        }
+      ],
+      "show_id": "ted-radio-hour"
+    },
+    {
+      "title": "Short Wave",
+      "show_link": "https://www.npr.org/podcasts/510351/short-wave",
+      "feed_url": "https://feeds.npr.org/510351/podcast.xml",
+      "image": "https://media.npr.org/assets/img/2022/09/23/short-wave_tile_npr-network-01_sq-c268cdb6be92867b01c6ef7e65aed8d605525779.jpg?s=1400&c=66&f=jpg",
+      "episodes": [
+        {
+          "title": "Our favorite brains, including Einstein's stolen one",
+          "pubDate": "Wed, 15 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/15/nx-s1-5887478/social-brain-autism-research-neuroscience",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/41783631-c378-486b-a41e-58a4385ac83b/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=41783631-c378-486b-a41e-58a4385ac83b&feed=F0qJcgXZ&t=podcast&e=nx-s1-5887478&p=510351&d=832&size=13323747",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 832
+        },
+        {
+          "title": "What's this super-aging butterfly\u2019s longevity secret?",
+          "pubDate": "Tue, 14 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/14/nx-s1-5879494/butterfly-long-lifespan-pollen-heliconius",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/5bc4064c-8931-4cc2-93b1-cc7b6cb5c6aa/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=5bc4064c-8931-4cc2-93b1-cc7b6cb5c6aa&feed=F0qJcgXZ&t=podcast&e=nx-s1-5879494&p=510351&d=798&size=12782072",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 798
+        },
+        {
+          "title": "How should we decide who, or what, is conscious?",
+          "pubDate": "Mon, 13 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/13/nx-s1-5812660/brain-experience-consciousness-neuroscience",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/c5c05a80-fad9-4802-8456-ee703e18a946/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=c5c05a80-fad9-4802-8456-ee703e18a946&feed=F0qJcgXZ&t=podcast&e=nx-s1-5812660&p=510351&d=786&size=12581869",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 786
+        },
+        {
+          "title": "Plot twist: We're probably way undercounting insects on Earth",
+          "pubDate": "Fri, 10 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/10/nx-s1-5877431/world-insect-population-science",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/476b921f-66a2-49b6-bfb0-7b4bc99323eb/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=476b921f-66a2-49b6-bfb0-7b4bc99323eb&feed=F0qJcgXZ&t=podcast&e=nx-s1-5877431&p=510351&d=568&size=9090657",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 568
+        },
+        {
+          "title": "NASA's race against time to rescue a falling satellite",
+          "pubDate": "Wed, 08 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/08/nx-s1-5879365/nasa-swift-satellite-observatory-mission",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/107a0613-e856-4583-889e-e324435a7cbe/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=107a0613-e856-4583-889e-e324435a7cbe&feed=F0qJcgXZ&t=podcast&e=nx-s1-5879365&p=510351&d=687&size=11008670",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 687
+        },
+        {
+          "title": "Could this anti-aging dog pill lead to one for you too?",
+          "pubDate": "Tue, 07 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/07/nx-s1-5830039/dog-health-live-life-drug",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/34a58b33-12ff-47bb-aa8b-4ad9c8f1cefd/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=34a58b33-12ff-47bb-aa8b-4ad9c8f1cefd&feed=F0qJcgXZ&t=podcast&e=nx-s1-5830039&p=510351&d=683&size=10942215",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 683
+        },
+        {
+          "title": "Sky Uber? Air taxis could be here soon",
+          "pubDate": "Mon, 06 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/06/nx-s1-5821267/air-tech-flying-taxi-plane-helicopter",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/674b52c8-a114-43cc-8d69-016bc7093c52/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=674b52c8-a114-43cc-8d69-016bc7093c52&feed=F0qJcgXZ&t=podcast&e=nx-s1-5821267&p=510351&d=845&size=13533980",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 845
+        },
+        {
+          "title": "This July 4th, are you a thrill- or chill-seeker?",
+          "pubDate": "Fri, 03 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/03/nx-s1-5879300/july-4th-fireworks-thrill-chill-seeker",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/f97833fe-5ada-4520-8910-c141f2130f44/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=f97833fe-5ada-4520-8910-c141f2130f44&feed=F0qJcgXZ&t=podcast&e=nx-s1-5879300&p=510351&d=799&size=12790014",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 799
+        },
+        {
+          "title": "Is setting your trash on fire a good idea?",
+          "pubDate": "Wed, 01 Jul 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/07/01/nx-s1-5874794/trash-garbage-fire-energy-disposal",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/2184ceb0-7836-49b6-8a11-25ede68d15ff/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=2184ceb0-7836-49b6-8a11-25ede68d15ff&feed=F0qJcgXZ&t=podcast&e=nx-s1-5874794&p=510351&d=841&size=13462928",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 841
+        },
+        {
+          "title": "Ticks are a growing problem, no matter where you live",
+          "pubDate": "Tue, 30 Jun 2026 07:00:00 +0000",
+          "link": "https://www.npr.org/2026/06/30/nx-s1-5843195/tick-lyme-disease",
+          "audio_url": "https://prfx.byspotify.com/e/play.podtrac.com/npr-510351/npr.simplecastaudio.com/72da6803-9aa4-4e2e-a973-3bc436f0e9fa/episodes/c3501483-08c1-4b21-b2bd-ba29963c598d/audio/128/default.mp3?awCollectionId=72da6803-9aa4-4e2e-a973-3bc436f0e9fa&awEpisodeId=c3501483-08c1-4b21-b2bd-ba29963c598d&feed=F0qJcgXZ&t=podcast&e=nx-s1-5843195&p=510351&d=794&size=12711019",
+          "audio_type": "audio/mpeg",
+          "duration_seconds": 794
+        }
+      ],
+      "show_id": "short-wave"
+    }
+  ]
+}

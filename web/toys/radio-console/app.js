@@ -213,6 +213,16 @@ const newswireReadButton = document.querySelector("#newswireReadButton");
 const newswireVoiceStatusEl = document.querySelector("#newswireVoiceStatus");
 const nprChannelChip = document.querySelector("#nprChannelChip");
 const nprAutoStatusEl = document.querySelector("#nprAutoStatus");
+const podcastShowSelect = document.querySelector("#podcastShowSelect");
+const podcastSurpriseButton = document.querySelector("#podcastSurpriseButton");
+const podcastNowPlayingEl = document.querySelector("#podcastNowPlaying");
+const podcastNowPlayingShowEl = document.querySelector("#podcastNowPlayingShow");
+const podcastNowPlayingTitleEl = document.querySelector("#podcastNowPlayingTitle");
+const podcastAudioEl = document.querySelector("#podcastAudio");
+const podcastLatestEl = document.querySelector("#podcastLatest");
+const podcastOlderEl = document.querySelector(".podcast-older");
+const podcastOlderSummaryEl = document.querySelector("#podcastOlderSummary");
+const podcastOlderListEl = document.querySelector("#podcastOlderList");
 const signalCtx = signalCanvas.getContext("2d");
 let selectedNewswireItem = null;
 let newswireUtterance = null;
@@ -1957,6 +1967,131 @@ async function fetchNewswire() {
   }
 }
 
+// --- NPR Podcasts (tools/npr-podcasts/fetch.py -> web/data/npr-podcasts.json) ---
+// Same server-side-hop reasoning as NEWSWIRE_URL: NPR's feeds only grant
+// CORS to apps.npr.org. Real audio, streamed directly from NPR's own CDN
+// via the <audio> element's src -- never downloaded or re-hosted here.
+// Organizing principle (per direct instruction): newest episode per show
+// is always plainly visible; everything older lives inside a collapsed
+// <details> the operator has to deliberately open. Nothing here enqueues
+// into the fleet liveQueue/TRANSMISSION_PROFILES pipeline -- podcasts are
+// exactly as separate from fleet radio as the Newswire headlines are.
+const PODCASTS_URL = "/data/npr-podcasts.json";
+let podcastShows = [];
+
+async function fetchPodcasts() {
+  try {
+    const response = await fetch(`${PODCASTS_URL}?t=${Date.now()}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    podcastShows = Array.isArray(payload.shows) ? payload.shows : [];
+    renderPodcastShowOptions();
+    if (podcastShows.length) renderPodcastShow(podcastShows[0].show_id);
+  } catch (error) {
+    console.warn("Radio Console: podcast fetch failed", error);
+    podcastLatestEl.innerHTML = '<p class="empty-note">Could not reach the podcast list.</p>';
+  }
+}
+
+function renderPodcastShowOptions() {
+  podcastShowSelect.innerHTML = podcastShows
+    .map((show) => `<option value="${show.show_id}">${show.title}</option>`)
+    .join("");
+}
+
+function formatEpisodeDate(pubDate) {
+  const parsed = pubDate ? new Date(pubDate) : null;
+  return parsed && !Number.isNaN(parsed.getTime())
+    ? parsed.toLocaleString([], { dateStyle: "medium", timeStyle: "short" })
+    : "";
+}
+
+function formatDuration(seconds) {
+  if (!seconds) return "";
+  const minutes = Math.round(seconds / 60);
+  return `${minutes} min`;
+}
+
+function playPodcastEpisode(show, episode) {
+  podcastAudioEl.src = episode.audio_url;
+  podcastNowPlayingShowEl.textContent = show.title;
+  podcastNowPlayingTitleEl.textContent = episode.title;
+  podcastNowPlayingEl.hidden = false;
+  podcastAudioEl.play().catch((error) => {
+    // Real playback failure (e.g. no user-gesture credit, network error)
+    // -- surfaced, not swallowed silently, same discipline as the rest of
+    // this console's audio path.
+    console.warn("Radio Console: podcast playback failed", error);
+  });
+}
+
+function renderPodcastShow(showId) {
+  const show = podcastShows.find((s) => s.show_id === showId);
+  if (!show) return;
+  podcastShowSelect.value = showId;
+  const [latest, ...older] = show.episodes || [];
+
+  if (!latest) {
+    podcastLatestEl.innerHTML = '<p class="empty-note">No episodes available for this show.</p>';
+    podcastOlderEl.hidden = true;
+    return;
+  }
+
+  podcastLatestEl.innerHTML = `
+    <p class="podcast-latest-show">${show.title} &middot; Latest</p>
+    <p class="podcast-latest-title">${latest.title}</p>
+    <div class="podcast-latest-meta">
+      <span>${formatEpisodeDate(latest.pubDate)}${latest.duration_seconds ? ` &middot; ${formatDuration(latest.duration_seconds)}` : ""}</span>
+      <button type="button" id="podcastPlayLatestButton">Play</button>
+    </div>
+  `;
+  document.querySelector("#podcastPlayLatestButton").addEventListener("click", () => playPodcastEpisode(show, latest));
+
+  if (older.length) {
+    podcastOlderEl.hidden = false;
+    podcastOlderSummaryEl.textContent = `Older episodes (${older.length})`;
+    podcastOlderListEl.innerHTML = "";
+    older.forEach((episode) => {
+      const li = document.createElement("li");
+      const label = document.createElement("span");
+      label.textContent = episode.title;
+      const meta = document.createElement("span");
+      meta.className = "timestamp";
+      meta.textContent = formatEpisodeDate(episode.pubDate);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Play";
+      button.addEventListener("click", () => playPodcastEpisode(show, episode));
+      const left = document.createElement("span");
+      left.append(label, document.createElement("br"), meta);
+      li.append(left, button);
+      podcastOlderListEl.appendChild(li);
+    });
+  } else {
+    podcastOlderEl.hidden = true;
+  }
+}
+
+if (podcastShowSelect) {
+  podcastShowSelect.addEventListener("change", () => renderPodcastShow(podcastShowSelect.value));
+}
+
+if (podcastSurpriseButton) {
+  podcastSurpriseButton.addEventListener("click", () => {
+    // Genuinely random across the whole pool, not just the currently
+    // selected show -- "random podcast from a big bag of content," per
+    // direct instruction, weighting every fetched episode across every
+    // show equally rather than picking a show first (which would bias
+    // toward shows with fewer episodes).
+    const pool = [];
+    podcastShows.forEach((show) => (show.episodes || []).forEach((episode) => pool.push({ show, episode })));
+    if (!pool.length) return;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    renderPodcastShow(pick.show.show_id);
+    playPodcastEpisode(pick.show, pick.episode);
+  });
+}
+
 // --- NPR channel chip: opt-in top-of-hour auto-read ---
 // Off by default, same principle as NPR-HEADLINE-READER-1.0's "no
 // autoplay" -- this console never speaks news unattended unless the
@@ -2041,6 +2176,7 @@ function setPowered(powered) {
     fetchNewswire();
     clearInterval(newswireRefreshTimer);
     newswireRefreshTimer = window.setInterval(fetchNewswire, NEWSWIRE_REFRESH_MS);
+    if (!podcastShows.length) fetchPodcasts();
     pollLivingCaptain();
     clearInterval(captainPollTimer);
     captainPollTimer = window.setInterval(pollLivingCaptain, CAPTAIN_POLL_MS);
