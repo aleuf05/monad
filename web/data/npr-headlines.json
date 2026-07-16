@@ -1,10 +1,25 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-07-16T12:30:01.594113+00:00",
+  "fetched_at": "2026-07-16T20:15:02.201422+00:00",
   "items": [
     {
-      "title": "Trump wants to fence off the park closest to the White House, a popular protest spot",
+      "title": "Why Orthodox Jews are opposing the new daylight saving bill in Congress",
+      "link": "https://www.npr.org/2026/07/16/g-s1-133961/why-orthodox-jews-are-opposing-the-new-daylight-saving-bill-in-congress",
+      "pubDate": "Thu, 16 Jul 2026 13:24:31 -0400"
+    },
+    {
+      "title": "Officials probe whether White House teleprompter operator profited off Trump's words",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5896223/kalshi-trump-white-house-teleprompter-operator-bet",
+      "pubDate": "Thu, 16 Jul 2026 13:10:29 -0400"
+    },
+    {
+      "title": "Hong Kong official warns booksellers on security risks after raids",
+      "link": "https://www.npr.org/2026/07/16/g-s1-133931/hong-kong-official-warns-booksellers-on-security-risks-after-raids",
+      "pubDate": "Thu, 16 Jul 2026 09:31:33 -0400"
+    },
+    {
+      "title": "Trump wants a permanent fence around the D.C. park known for White House protests",
       "link": "https://www.npr.org/2026/07/16/nx-s1-5893465/dc-lafayette-square-park-permanent-fencing-proposal",
       "pubDate": "Thu, 16 Jul 2026 08:13:23 -0400"
     },
@@ -24,23 +39,8 @@
       "pubDate": "Thu, 16 Jul 2026 05:01:00 -0400"
     },
     {
-      "title": "DHS pledged body cams for all immigration agents. Months later, that hasn't happened",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5894825/body-cams-ice-shootings",
-      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Bike lanes and speed cameras disappear from the DOT's list of proven safety measures",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5893672/dot-bike-lanes-speed-cameras-safety-measures",
-      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
-    },
-    {
-      "title": "TrumpRx promised a supermarket for cheaper drugs but delivered a boutique",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5894947/trump-rx-medicine-drugs-health-care-pfizer-low-prices-gilead",
-      "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
-    },
-    {
-      "title": "No Asian team managed to go far this World Cup (again). What's holding them back?",
-      "link": "https://www.npr.org/2026/07/16/nx-s1-5884732/world-cup-asian-football-confederation-korea-japan",
+      "title": "'Gossip' had godly origins. Here's how it gained its sinful reputation",
+      "link": "https://www.npr.org/2026/07/16/nx-s1-5884780/gossip-word-origins-etymology",
       "pubDate": "Thu, 16 Jul 2026 05:00:00 -0400"
     }
   ]
