@@ -54,6 +54,30 @@
             Auto-announce new observations
           </label>
         </div>
+        <details class="performance-console" open>
+          <summary><strong>NEW · Shape performance</strong></summary>
+          <div class="performance-grid">
+            <label>Intent
+              <select id="performanceIntent">
+                <option value="auto">Use report context</option>
+                <option value="operational">Operational</option>
+                <option value="urgent">Urgent</option>
+                <option value="reassuring">Reassuring</option>
+                <option value="reflective">Reflective</option>
+                <option value="ceremonial">Ceremonial</option>
+                <option value="humorous">Humorous</option>
+              </select>
+            </label>
+            <label>Tension <output id="tensionValue">35</output><input id="tensionControl" type="range" min="0" max="100" value="35"></label>
+            <label>Warmth <output id="warmthValue">48</output><input id="warmthControl" type="range" min="0" max="100" value="48"></label>
+            <label>Energy <output id="energyValue">50</output><input id="energyControl" type="range" min="0" max="100" value="50"></label>
+            <label>Restraint <output id="restraintValue">70</output><input id="restraintControl" type="range" min="0" max="100" value="70"></label>
+          </div>
+          <div class="performance-actions">
+            <button id="previewPerformanceButton" class="voice-button" type="button">Preview Performance</button>
+            <button id="resetPerformanceButton" class="voice-button secondary" type="button">Return to Context</button>
+          </div>
+        </details>
         <p id="voiceStatus" class="voice-status">Voice idle · Browser Speech</p>
         <p id="performanceStatus" class="performance-status"><strong>NEW · Performance:</strong> awaiting first report</p>
       </section>
@@ -89,6 +113,6 @@
     </main>
     <script src="../shared/voice.js"></script>
     <script src="../shared/performance.js"></script>
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>

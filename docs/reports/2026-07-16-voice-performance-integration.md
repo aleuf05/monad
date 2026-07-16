@@ -14,6 +14,8 @@ The missing seam was between those systems: a temporary performance state that t
 
 Living Captain is the first experiment. A normal status is a measured operational report; a custody rejection or exhausted spend boundary becomes controlled urgency. Repeated reports carry prior state, and the page visibly shows the current performance label, tension, energy and reasons.
 
+The Living Captain page now also provides the first authoring surface: an intent selector, tension/warmth/energy/restraint controls, an audible preview, and a Return to Context action. Manual targets pass through the same bounded planner and remain visibly attributable as operator-directed.
+
 ## Missing primitives after this experiment
 
 - A shared adapter from Living Fleet's real identity/context bundle into a performance direction. The demo currently supplies a conservative local captain baseline because Living Captain's intentionally minimal status API does not expose Fleet memory.

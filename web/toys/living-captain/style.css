@@ -32,7 +32,16 @@ dd { margin:.2rem 0 0; line-height:1.4; font-size:.86rem; overflow-wrap:anywhere
 .voice-controls { display:flex; flex-wrap:wrap; align-items:center; gap:1rem; margin-top:.6rem; }
 .voice-button { border:1px solid var(--signal); background:rgba(138,215,193,.12); color:var(--signal); border-radius:.4rem; padding:.5rem .9rem; font:inherit; cursor:pointer; transition:background .15s ease; }
 .voice-button:hover { background:rgba(138,215,193,.22); }
+.voice-button.secondary { border-color:var(--line); color:var(--muted); background:transparent; }
 .voice-toggle { display:flex; align-items:center; gap:.45rem; font-size:.8rem; color:var(--muted); cursor:pointer; }
+.performance-console { margin-top:1rem; padding:.8rem; border:1px solid var(--line); background:rgba(6,9,11,.45); }
+.performance-console summary { cursor:pointer; color:var(--amber); font-size:.78rem; }
+.performance-grid { display:grid; grid-template-columns:repeat(5,minmax(7rem,1fr)); gap:.8rem; margin-top:.8rem; }
+.performance-grid label { display:grid; gap:.35rem; color:var(--muted); font-size:.68rem; text-transform:uppercase; letter-spacing:.06em; }
+.performance-grid select { width:100%; padding:.35rem; color:var(--text); background:var(--panel); border:1px solid var(--line); }
+.performance-grid output { float:right; color:var(--signal); }
+.performance-grid input { width:100%; accent-color:var(--signal); }
+.performance-actions { display:flex; gap:.6rem; margin-top:.8rem; }
 .voice-status { margin:.6rem 0 0; color:var(--muted); font-size:.75rem; }
 .voice-status.is-reading { color:var(--amber); }
 .performance-status { margin:.45rem 0 0; color:var(--signal); font: .7rem/1.4 "SFMono-Regular",Consolas,monospace; }
@@ -54,5 +63,5 @@ th { color:var(--muted); font-size:.65rem; text-transform:uppercase; letter-spac
 .kind-observation { color:var(--signal); }
 .kind-proposal_note { color:var(--amber); }
 .kind-custody_rejection,.kind-spend_exhausted { color:var(--danger); }
-@media(max-width:900px){ .captain-grid{grid-template-columns:1fr;} }
+@media(max-width:900px){ .captain-grid{grid-template-columns:1fr;} .performance-grid{grid-template-columns:repeat(2,1fr);} }
 @media(max-width:600px){ .hero,.section-heading{display:grid;} }

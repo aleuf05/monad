@@ -14,6 +14,13 @@ let captainVoiceHandle = null;
 let autoAnnounceArmed = false;
 let hasSeededObserveCount = false;
 let lastSeenObserveCount = null;
+let operatorControlsActive = false;
+const PERFORMANCE_AXES = ["tension", "warmth", "energy", "restraint"];
+
+function operatorPerformanceControls() {
+  if (!operatorControlsActive) return undefined;
+  return Object.fromEntries(PERFORMANCE_AXES.map((axis) => [axis, Number(el(`${axis}Control`).value) / 100]));
+}
 
 function buildStatusSentence(data) {
   const identity = data.identity || {};
@@ -50,12 +57,15 @@ function stopCaptainVoice() {
 function speakCaptainStatus(data, prefix) {
   const actions = data.recent_actions || [];
   const latest = actions.length ? actions[actions.length - 1] : null;
-  const intent = latest?.kind === "custody_rejection" || latest?.kind === "spend_exhausted" ? "urgent" : "operational";
+  const contextualIntent = latest?.kind === "custody_rejection" || latest?.kind === "spend_exhausted" ? "urgent" : "operational";
+  const selectedIntent = el("performanceIntent").value;
+  const intent = selectedIntent === "auto" ? contextualIntent : selectedIntent;
   const pressure = intent === "urgent" ? 0.75 : Math.min(0.5, (data.spend?.observe_count || 0) / Math.max(1, data.spend?.observe_limit || 1));
   const performance = MonadPerformance.plan("captain.monad", {
     character: { caution: 0.65, initiative: 0.45, humor: 0.2, trust: 0.55 },
     state: { pressure },
     intent,
+    controls: operatorPerformanceControls(),
     context: { audience: "lieutenant", setting: "private-status", latest_action_kind: latest?.kind || null }
   });
   MonadVoice.setProfile({ speaker: "captain.monad", provider_id: "browser-speechsynthesis", ...performance.voice });
@@ -88,6 +98,22 @@ function handleAutoAnnounceToggle() {
 
 el("readStatusButton").addEventListener("click", handleReadStatusClick);
 el("autoAnnounceToggle").addEventListener("change", handleAutoAnnounceToggle);
+PERFORMANCE_AXES.forEach((axis) => {
+  el(`${axis}Control`).addEventListener("input", (event) => {
+    operatorControlsActive = true;
+    el(`${axis}Value`).value = event.target.value;
+  });
+});
+el("previewPerformanceButton").addEventListener("click", () => {
+  if (captainVoiceHandle) stopCaptainVoice();
+  speakCaptainStatus(lastStatusData || {}, "Performance preview. ");
+});
+el("resetPerformanceButton").addEventListener("click", () => {
+  operatorControlsActive = false;
+  el("performanceIntent").value = "auto";
+  MonadPerformance.reset("captain.monad");
+  el("performanceStatus").textContent = "Context control restored · continuity reset";
+});
 
 function setLink(ok, label) {
   el("liveDot").classList.toggle("is-live", ok);

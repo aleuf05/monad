@@ -42,6 +42,9 @@
     target.tension = clamp(target.tension + pressure * 0.22);
     target.energy = clamp(target.energy + pressure * 0.12);
     target.restraint = clamp(target.restraint + pressure * 0.06);
+    AXES.forEach((axis) => {
+      if (direction.controls?.[axis] != null) target[axis] = clamp(number(direction.controls[axis], target[axis]));
+    });
 
     const previous = states.get(speaker);
     const elapsed = previous ? Math.max(0, nowMs - previous.at) : 0;
@@ -57,6 +60,7 @@
     const volume = clamp(0.84 + axes.energy * 0.16, 0.86, 1);
     const reasons = [`intent:${intentName}`];
     if (pressure >= 0.65) reasons.push("sustained-pressure");
+    if (direction.controls && AXES.some((axis) => direction.controls[axis] != null)) reasons.push("operator-directed");
     if (previous) reasons.push("carried-prior-state");
 
     return {

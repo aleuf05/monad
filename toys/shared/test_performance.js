@@ -15,4 +15,11 @@ assert(recovery.axes.tension < sustained.axes.tension, "reassurance begins gradu
 assert(recovery.axes.tension > recovery.target.tension, "recovery does not instantly erase tension");
 assert(recovery.voice.rate >= 0.88 && recovery.voice.rate <= 1.08, "delivery remains within anti-caricature bounds");
 assert.equal(MonadPerformance.inspect("captain.test").axes, recovery.axes);
+const directed = MonadPerformance.plan("captain.directed", {
+  character,
+  intent: "reflective",
+  controls: { warmth: 0.9, restraint: 0.8 }
+}, 1000);
+assert.equal(directed.target.warmth, 0.9, "operator direction overrides the intent target");
+assert(directed.reasons.includes("operator-directed"));
 console.log("voice performance tests passed");
