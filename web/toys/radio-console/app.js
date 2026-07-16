@@ -226,6 +226,7 @@ const podcastOlderListEl = document.querySelector("#podcastOlderList");
 const signalCtx = signalCanvas.getContext("2d");
 let selectedNewswireItem = null;
 let newswireUtterance = null;
+let activeVoiceHandle = null;
 let nprChannelActive = false;
 let lastAnnouncedHourKey = null; // "Thu Jul 16 2026 17" -- date-qualified so a session spanning midnight doesn't collide on hour number alone
 const NPR_HOUR_CHIME_CHECK_MS = 20000;
@@ -268,7 +269,6 @@ const state = {
   activeChannels: new Set(["fleet-comms", "weather", "traffic", "captain", "scout-net"]),
   selectedStation: "bridge",
   speaking: false,
-  voiceForSpeaker: new Map(),
   animationFrame: null,
   meterLevels: new Array(24).fill(0.08),
   currentTransmission: null,
@@ -378,22 +378,6 @@ function updateStationScope() {
   stationChips.forEach((chip) => {
     chip.classList.toggle("is-active", chip.dataset.station === state.selectedStation);
   });
-}
-
-function hashString(value) {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
-  }
-  return hash;
-}
-
-function pickVoiceFor(speaker) {
-  if (state.voiceForSpeaker.has(speaker)) return state.voiceForSpeaker.get(speaker);
-  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  const voice = voices.length ? voices[hashString(speaker) % voices.length] : null;
-  state.voiceForSpeaker.set(speaker, voice);
-  return voice;
 }
 
 function buildNoiseBuffer(context) {
@@ -978,27 +962,25 @@ function completeTransmission(entry, nextState = "completed") {
 }
 
 function interruptCurrentTransmission() {
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
+  activeVoiceHandle?.stop();
+  activeVoiceHandle = null;
   clearSpeechTimeout();
   clearCurrentTransmission();
   setSpeaking(false);
 }
 
-function speak(entry) {
+async function speak(entry) {
   setAudioPathStage("synthesisRequested", "ok");
   // No SpeechSynthesis at all, muted, or no voices installed (common on
   // minimal Linux desktops and headless/sandboxed environments) all fall
   // back to the same timed visual cue -- a silent console that never shows
   // "Transmitting..." reads as broken, not quiet.
-  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  if (!window.speechSynthesis || state.muted || !voices.length) {
+  if (!window.MonadVoice || state.muted) {
     // Muted is an operator choice, not a defect -- the remaining stages
     // are "unverified" (nothing to measure, but nothing is broken either).
     // No SpeechSynthesis / no voices is a real capability gap: those
     // stages are marked "fail" since audio genuinely cannot be produced.
-    const reason = state.muted ? "muted" : (!window.speechSynthesis ? "no SpeechSynthesis API in this browser" : "no TTS voices installed");
+    const reason = state.muted ? "muted" : "shared voice engine unavailable";
     const status = state.muted ? "unverified" : "fail";
     ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => setAudioPathStage(stage, status, reason));
     if (status === "fail") lastAudioFault = reason;
@@ -1010,13 +992,12 @@ function speak(entry) {
     }, estimatedSpeakingMs(entry.text));
     return;
   }
-  const utterance = new SpeechSynthesisUtterance(entry.text);
-  const voice = pickVoiceFor(entry.speaker);
-  if (voice) utterance.voice = voice;
-  utterance.volume = volumeToLinear();
-  utterance.rate = 1.05;
-  utterance.pitch = 0.95;
-  utterance.onstart = () => {
+  const speakerId = `radio.${String(entry.speaker || "unknown").toLowerCase().replace(/[^a-z0-9]+/g, ".")}`;
+  MonadVoice.setProfile({ speaker: speakerId, provider_id: "browser-speechsynthesis", rate: 1.05, pitch: 0.95, volume: volumeToLinear() });
+  try {
+    const { handle, fallback_used } = await MonadVoice.speak(speakerId, entry.text);
+    activeVoiceHandle = handle;
+    handle.onstart = () => {
     setSpeaking(true);
     // onstart is the only lifecycle signal the Web Speech API exposes --
     // there's no separate "buffer generated" / "handed to OS" event, so
@@ -1030,19 +1011,17 @@ function speak(entry) {
     // genuinely cannot measure whether sound left the speakers. onstart
     // firing proves the browser *attempted* playback, not that anything
     // was heard -- see AUDIO_PATH_STAGES' doc comment.
-    setAudioPathStage("audibleVerified", "unverified", "browser speech output cannot be independently measured by this console (see Play Test Tone for a measured check)");
-  };
-  utterance.onend = () => {
-    completeTransmission(entry);
-  };
-  utterance.onerror = (event) => {
-    const detail = `speechSynthesis error: ${event && event.error ? event.error : "unknown"}`;
+      setAudioPathStage("audibleVerified", "unverified", `${handle.provider_label}${fallback_used ? " fallback" : ""} output cannot be independently measured (use Play Test Tone)`);
+    };
+    handle.onend = () => { activeVoiceHandle = null; completeTransmission(entry); };
+    handle.onerror = (event) => {
+    const detail = `voice engine error: ${event && event.error ? event.error : "unknown"}`;
     ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => {
       if (audioPathState[stage].status === "pending") setAudioPathStage(stage, "fail", detail);
     });
     lastAudioFault = detail;
     completeTransmission(entry, "completed");
-  };
+    };
   // Safety net: if onstart/onend never fire at all (observed in some
   // sandboxed environments even when getVoices() reports voices), don't
   // leave the indicator stuck on "Transmitting..." forever.
@@ -1056,7 +1035,12 @@ function speak(entry) {
     }
     completeTransmission(entry);
   }, estimatedSpeakingMs(entry.text) + 2000);
-  window.speechSynthesis.speak(utterance);
+  } catch (error) {
+    const detail = error.message || "voice engine failed";
+    ["audioGenerated", "streamDelivered", "playbackStarted", "audibleVerified"].forEach((stage) => setAudioPathStage(stage, "fail", detail));
+    lastAudioFault = detail;
+    completeTransmission(entry);
+  }
 }
 
 // --- Diagnostics: Audio Path Status, Content Queue, Test Controls, Output ---
@@ -1457,7 +1441,8 @@ function runTestMessage() {
 }
 
 function runStopPlayback() {
-  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  activeVoiceHandle?.stop();
+  stopNewswireSpeech();
   if (activeTestTone) {
     try { activeTestTone.stop(); } catch (error) { /* already stopped */ }
     activeTestTone = null;
@@ -1934,7 +1919,7 @@ function renderNewswire(payload) {
 }
 
 function stopNewswireSpeech() {
-  if (newswireUtterance && window.speechSynthesis) window.speechSynthesis.cancel();
+  newswireUtterance?.stop();
   newswireUtterance = null;
   newswireReadButton.textContent = "Read NPR headline";
   newswireVoiceStatusEl.textContent = "News voice idle · separate from fleet radio";
@@ -1946,29 +1931,27 @@ function stopNewswireSpeech() {
 // the same voice-selection and speaking-state logic, differing only in
 // the spoken prefix. Keeping one implementation means a fix or voice
 // preference change can't accidentally apply to only one of the two.
-function speakNewswireHeadline(prefix) {
-  if (!selectedNewswireItem || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+async function speakNewswireHeadline(prefix) {
+  if (!selectedNewswireItem || !window.MonadVoice) {
     newswireVoiceStatusEl.textContent = "News voice unavailable in this browser";
     return false;
   }
-  const utterance = new SpeechSynthesisUtterance(`${prefix} ${selectedNewswireItem.title}`);
-  const voices = window.speechSynthesis.getVoices();
-  utterance.voice = voices.find((voice) => /^en(-|_)/i.test(voice.lang) && /natural|enhanced|premium/i.test(voice.name))
-    || voices.find((voice) => /^en(-|_)/i.test(voice.lang))
-    || null;
-  utterance.rate = 0.96;
-  utterance.pitch = 1;
-  utterance.volume = volumeToLinear();
-  utterance.onstart = () => {
+  MonadVoice.setProfile({ speaker: "radio.npr", provider_id: "browser-speechsynthesis", rate: 0.96, pitch: 1, volume: volumeToLinear() });
+  try {
+    const { handle } = await MonadVoice.speak("radio.npr", `${prefix} ${selectedNewswireItem.title}`);
+    handle.onstart = () => {
     newswireReadButton.textContent = "Stop NPR reading";
-    newswireVoiceStatusEl.textContent = `Reading NPR headline${utterance.voice ? ` · ${utterance.voice.name}` : ""}`;
+    newswireVoiceStatusEl.textContent = `Reading NPR headline${handle.voice_label ? ` · ${handle.voice_label}` : ""}`;
     newswireVoiceStatusEl.classList.add("is-reading");
   };
-  utterance.onend = stopNewswireSpeech;
-  utterance.onerror = stopNewswireSpeech;
-  newswireUtterance = utterance;
-  window.speechSynthesis.speak(utterance);
-  return true;
+    handle.onend = stopNewswireSpeech;
+    handle.onerror = stopNewswireSpeech;
+    newswireUtterance = handle;
+    return true;
+  } catch (error) {
+    newswireVoiceStatusEl.textContent = `News voice unavailable · ${error.message}`;
+    return false;
+  }
 }
 
 function readSelectedNewswireHeadline() {
@@ -2207,7 +2190,9 @@ function setPowered(powered) {
   } else {
     clearSpeechTimeout();
     clearCurrentTransmission();
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    activeVoiceHandle?.stop();
+    activeVoiceHandle = null;
+    stopNewswireSpeech();
     liveQueue.length = 0;
     setSpeaking(false);
     clearInterval(newswireRefreshTimer);
@@ -2262,10 +2247,6 @@ muteButton.addEventListener("click", () => {
   muteButton.setAttribute("aria-pressed", String(state.muted));
   applyVolume();
 });
-
-if (window.speechSynthesis) {
-  window.speechSynthesis.addEventListener("voiceschanged", () => state.voiceForSpeaker.clear());
-}
 
 // Bridge Station embeds this toy as one of three fixed-height Live Console
 // panels; this toy's own page also runs standalone at full page height.
