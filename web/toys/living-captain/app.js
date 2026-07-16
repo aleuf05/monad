@@ -179,7 +179,7 @@ async function refresh() {
       if (!hasSeededObserveCount) {
         hasSeededObserveCount = true;
         lastSeenObserveCount = observeCount;
-      } else if (autoAnnounceArmed && observeCount !== lastSeenObserveCount && !captainUtterance) {
+      } else if (autoAnnounceArmed && observeCount !== lastSeenObserveCount && !captainVoiceHandle) {
         lastSeenObserveCount = observeCount;
         speakCaptainStatus(data, "New observation. ");
       }
