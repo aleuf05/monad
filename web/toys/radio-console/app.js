@@ -296,6 +296,8 @@ const liveQueue = [];
 const LIVE_CONNECT_TIMEOUT_MS = 2500;
 const LIVE_PUMP_INTERVAL_MS = 700;
 const MAX_CONTENT_LINES_PER_SNAPSHOT = 6;
+const ROUTINE_AUTONOMY_REPORT_INTERVAL_MS = 60 * 1000;
+let lastRoutineAutonomyReportAt = 0;
 const VESSEL_CHANNEL = { flagship: "fleet-comms", scout: "fleet-comms", "passive-traffic": "traffic" };
 const STATUS_LINES = {
   underway: "underway, course {course}, speed {speed} knots.",
@@ -672,65 +674,29 @@ function initializeOperationalCursors(snapshot) {
 function queueBaselineOperationalWatch(snapshot) {
   const counts = snapshotCounts(snapshot);
   const escortLabel = ESCORT_MODE_LABELS[snapshot.escort_mode] || snapshot.escort_mode || "unknown";
+  const requestText = counts.pendingIntents > 0
+    ? `, ${counts.pendingIntents} escort request${counts.pendingIntents === 1 ? "" : "s"} pending`
+    : "";
   queueNarratedEntry({
     kind: "status",
     channel: "fleet-comms",
     speaker: "Bridge",
-    text: `Bridge, live watch established. ${counts.moving} vessel${counts.moving === 1 ? "" : "s"} moving, ${counts.holding} holding, escort mode ${escortLabel}.`,
+    text: `Bridge, live watch established. ${counts.moving} moving, ${counts.holding} holding, escort mode ${escortLabel}${requestText}.`,
     station: "bridge"
   });
 
-  if (counts.criticalFuel > 0 || counts.elevatedFuel > 0 || counts.routineFuel > 0) {
+  if (counts.criticalFuel > 0 || counts.elevatedFuel > 0) {
     const fuelText = counts.criticalFuel > 0
       ? `${counts.criticalFuel} critical and ${counts.elevatedFuel} elevated fuel margin${counts.criticalFuel + counts.elevatedFuel === 1 ? "" : "s"}`
       : counts.elevatedFuel > 0
         ? `${counts.elevatedFuel} elevated fuel margin${counts.elevatedFuel === 1 ? "" : "s"}`
-        : `${counts.routineFuel} routine fuel margin${counts.routineFuel === 1 ? "" : "s"}`;
+        : `${counts.elevatedFuel} elevated fuel margin${counts.elevatedFuel === 1 ? "" : "s"}`;
     queueNarratedEntry({
       kind: "status",
       channel: "fleet-comms",
       speaker: "Engineering",
       text: `Engineering, ${fuelText}; margins are being watched.`,
       station: "engineering"
-    });
-  } else {
-    queueNarratedEntry({
-      kind: "status",
-      channel: "fleet-comms",
-      speaker: "Engineering",
-      text: "Engineering, all tracked fuel margins routine.",
-      station: "engineering"
-    });
-  }
-
-  if (counts.traffic > 0) {
-    queueNarratedEntry({
-      kind: "status",
-      channel: "traffic",
-      speaker: "Traffic",
-      text: `Traffic, ${counts.traffic} contact${counts.traffic === 1 ? "" : "s"} on screen and ${counts.moving} moving targets under watch.`,
-      station: "traffic"
-    });
-  } else {
-    queueNarratedEntry({
-      kind: "status",
-      channel: "traffic",
-      speaker: "Traffic",
-      text: "Traffic, screen clear.",
-      station: "traffic"
-    });
-  }
-
-  if (counts.pendingIntents > 0 || counts.disabledControls > 0) {
-    const requestBits = [];
-    if (counts.pendingIntents > 0) requestBits.push(`${counts.pendingIntents} escort request${counts.pendingIntents === 1 ? "" : "s"} pending review`);
-    if (counts.disabledControls > 0) requestBits.push(`${counts.disabledControls} captain control${counts.disabledControls === 1 ? "" : "s"} disabled`);
-    queueNarratedEntry({
-      kind: "status",
-      channel: "fleet-comms",
-      speaker: "Bridge",
-      text: `Bridge, ${requestBits.join("; ")}.`,
-      station: "bridge"
     });
   }
 }
@@ -781,19 +747,19 @@ function diffAgentDecisions(records) {
   if (!Array.isArray(records)) return;
   if (lastAgentDecisionCount === null) return;
   if (records.length <= lastAgentDecisionCount) return;
-  records.slice(lastAgentDecisionCount).forEach((record) => {
-    const posture = String(record.posture || "").replace(/_/g, " ").toLowerCase();
-    const outcome = String(record.outcome || "").toLowerCase();
-    const shortResult = truncated(record.result, 108);
-    queueNarratedEntry({
-      kind: "watch",
-      channel: "fleet-comms",
-      speaker: "Bridge",
-      text: `Decision ${outcome} for ${record.captain_id} on ${record.vessel_id}: ${posture}${shortResult ? ` — ${shortResult}` : ""}.`,
-      station: "bridge"
-    });
-  });
+  const fresh = records.slice(lastAgentDecisionCount);
   lastAgentDecisionCount = records.length;
+  const now = Date.now();
+  if (now - lastRoutineAutonomyReportAt < ROUTINE_AUTONOMY_REPORT_INTERVAL_MS) return;
+  lastRoutineAutonomyReportAt = now;
+  const vessels = new Set(fresh.map((record) => record.vessel_id).filter(Boolean));
+  queueNarratedEntry({
+    kind: "status",
+    channel: "fleet-comms",
+    speaker: "Bridge",
+    text: `Bridge, ${fresh.length} routine captain decision${fresh.length === 1 ? "" : "s"} logged across ${vessels.size} scout${vessels.size === 1 ? "" : "s"}; no voice action required.`,
+    station: "bridge"
+  });
 }
 
 function diffCanonEvents(events) {
@@ -855,15 +821,9 @@ function diffVesselEvents(events) {
         break;
       }
       case "waypoint_reached": {
-        const name = vesselDisplayName(event.vessel_id);
-        const station = vesselById(event.vessel_id)?.kind === "passive-traffic" ? "traffic" : "bridge";
-        queueNarratedEntry({
-          kind: "status",
-          channel: station === "traffic" ? "traffic" : "fleet-comms",
-          speaker: station === "traffic" ? "Traffic" : "Bridge",
-          text: `${station === "traffic" ? "Traffic" : "Bridge"}, ${name} cleared a waypoint; ${event.remaining_leg_count} leg${event.remaining_leg_count === 1 ? "" : "s"} remain.`,
-          station
-        });
+        // Intermediate navigation progress remains visible in FleetCore
+        // instruments. Speaking every scout waypoint made routine autonomy
+        // dominate the radio; route completion still gets one final call.
         break;
       }
       case "holding": {
