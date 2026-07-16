@@ -223,6 +223,43 @@ export default function BridgeStation() {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [log]);
 
+  // Mission Record rail -- carried over from old Bridge's side rail
+  // (toys/bridge/app.js's refreshMissionRail()), dropped during the
+  // BRIDGE3-CONSOLIDATE-01 tab-fold since it wasn't in that packet's
+  // explicit scope. Persistent across every tab, same as the old rail was
+  // visible regardless of which station tab was active.
+  const [missionRail, setMissionRail] = useState({
+    objective: "Loading mission projection…", status: "—", evidenceCount: "—", pendingReviews: "—", degraded: false,
+  });
+  useEffect(() => {
+    let cancelled = false;
+    async function refreshMissionRail() {
+      try {
+        const [missionRes, reviewRes] = await Promise.all([
+          fetch("../../data/mission-ops.json", { cache: "no-store" }),
+          fetch("../../data/mission-reviews.json", { cache: "no-store" }),
+        ]);
+        if (!missionRes.ok || !reviewRes.ok) throw new Error("projection unavailable");
+        const mission = await missionRes.json();
+        const reviews = await reviewRes.json();
+        if (cancelled) return;
+        setMissionRail({
+          objective: mission.mission.objective,
+          status: mission.mission.status.replaceAll("-", " "),
+          evidenceCount: String((mission.evidence || []).filter((e) => e.classification === "verified-state").length),
+          pendingReviews: String(reviews.pending_count || 0),
+          degraded: false,
+        });
+      } catch {
+        if (cancelled) return;
+        setMissionRail({ objective: "Mission projection unavailable.", status: "degraded", evidenceCount: "—", pendingReviews: "—", degraded: true });
+      }
+    }
+    refreshMissionRail();
+    const id = setInterval(refreshMissionRail, 10000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
+
   const vessels = snapshot?.vessels || [];
   const flagship = vessels.find((v) => v.kind === "flagship") || null;
   const selected = vessels.find((v) => v.id === selectedId) || null;
@@ -567,6 +604,20 @@ export default function BridgeStation() {
           </button>
         ))}
       </nav>
+
+      {/* Mission Record rail — persistent across every tab */}
+      <div className="bs-mono" style={styles.missionRail}>
+        <span style={styles.missionRailLabel}>MISSION</span>
+        <span style={{ ...styles.missionRailObjective, color: missionRail.degraded ? "#6B7C93" : "#DCE6F2" }}>
+          {missionRail.objective}
+        </span>
+        <span style={{ ...styles.missionRailBadge, color: missionRail.degraded ? "#E05252" : "#4FD1C5", borderColor: missionRail.degraded ? "#E0525244" : "#4FD1C544" }}>
+          {missionRail.status}
+        </span>
+        <span style={styles.missionRailStat}>EVIDENCE {missionRail.evidenceCount}</span>
+        <span style={styles.missionRailStat}>REVIEWS {missionRail.pendingReviews}</span>
+        <a href="../agent-ops/" style={styles.missionRailLink}>Agent Ops →</a>
+      </div>
 
       {/* Main dual view */}
       <div className="bs-main" style={{ ...styles.main, display: activeTab === "bridge" ? "grid" : "none" }}>
@@ -997,6 +1048,16 @@ const styles = {
     display: "flex", gap: 2, background: "#0D1626", borderBottom: "1px solid #1E2C42", padding: "0 14px",
   },
   stationTabBtn: {},
+
+  missionRail: {
+    display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+    padding: "7px 14px", background: "#0D1626", borderBottom: "1px solid #1E2C42", fontSize: 11,
+  },
+  missionRailLabel: { color: "#6B7C93", letterSpacing: "0.1em", flexShrink: 0 },
+  missionRailObjective: { flex: "1 1 auto", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  missionRailBadge: { padding: "1px 7px", borderRadius: 3, border: "1px solid #4FD1C544", flexShrink: 0, textTransform: "uppercase" },
+  missionRailStat: { color: "#6B7C93", flexShrink: 0 },
+  missionRailLink: { color: "#4FD1C5", textDecoration: "none", flexShrink: 0 },
 
   controlPane: { padding: "16px", overflowY: "auto", flex: "1 1 auto", minHeight: 320 },
   controlWarn: { color: "#E8A33D", fontSize: 11, marginBottom: 10 },
