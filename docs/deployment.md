@@ -126,7 +126,9 @@ Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches
 
 ## Site Root Is the Front Door — Links to Every Toy
 
-`web/index.html` was briefly a redirect straight into `toys/bridge/` (see git history if that behavior is ever wanted back; `toys/bridge/` itself is since retired). It's the homepage again: mission/doctrine/fleet roster/Ship's Log content, plus sectioned card grids linking every deployed public toy — Radio Console, Bridge Station 3.0, Fleet Motion, Periscope Station, Reaction-Diffusion Painter, and the rest. `web/command-deck.html` is kept as an identical mirror (same content, distinct `<title>`) so the old URL still works — **update both together**, `web/index.html` is not the single source of truth here. Add a new card to both whenever a new toy gets deployed publicly.
+`web/index.html` was briefly a redirect straight into `toys/bridge/` (see git history if that behavior is ever wanted back; `toys/bridge/` itself is since retired). It's the homepage again: mission/doctrine/fleet roster/Ship's Log content, plus sectioned card grids linking every deployed public toy — Radio Console, Bridge Station 3.0, Fleet Motion, Periscope Station, Reaction-Diffusion Painter, and the rest. `web/command-deck.html` is kept as an identical mirror (same content, distinct `<title>`) so the old URL still works — `web/index.html` is the single source of truth, `command-deck.html` is generated from it, not hand-edited in parallel.
+
+**Don't hand-edit `web/command-deck.html`.** Edit `web/index.html`, then run `python3 tools/sync-command-deck.py --write` to regenerate the mirror. Manual copy-paste drifted twice in one session before this script existed (`BRIDGE-RETIRE-01`, `CMDDECK-SYNC-01` were both partly about cleaning up that drift) — `python3 tools/sync-command-deck.py` (no `--write`) checks the two files match and exits non-zero if they don't, so it's worth running as a habit alongside `tools/check-toy-drift.py` whenever `web/index.html` changes.
 
 ## FleetCore Live Backend
 
