@@ -130,6 +130,33 @@ Watchbook (`toys/watchbook/`) reads the actual `logs/` tree via relative fetches
 
 **Don't hand-edit `web/command-deck.html`.** Edit `web/index.html`, then run `python3 tools/sync-command-deck.py --write` to regenerate the mirror. Manual copy-paste drifted twice in one session before this script existed (`BRIDGE-RETIRE-01`, `CMDDECK-SYNC-01` were both partly about cleaning up that drift) — `python3 tools/sync-command-deck.py` (no `--write`) checks the two files match and exits non-zero if they don't, so it's worth running as a habit alongside `tools/check-toy-drift.py` whenever `web/index.html` changes.
 
+### Public Fleet Status — homepage badge is real, not decorative
+
+**2026-07-16.** The homepage's "FLEET STATUS: GREEN" badge used to be a
+hardcoded string in `web/index.html` -- it would have said GREEN through a
+real outage, since the page had no `<script>` tag at all. Fixed by having
+`watchman.py` (see `docs/watchman.md`; already running as
+`monad-watchman.service`, heartbeating every 5 minutes) write a small
+public summary, `web/data/fleet-status.json`
+(`derive_public_status()`/`write_public_status()`), every time it
+heartbeats -- reducing disk/Qdrant/all-5-services health into one
+`green`/`amber`/`red` verdict plus a plain-English `summary` of any
+non-nominal reasons. `red` wins over `amber` (e.g. disk low or any service
+process `failed`); `amber` covers restarts, degraded/unreachable endpoints,
+and stale background-loop state; anything else is `green`.
+
+`web/index.html`'s status strip fetches that file client-side on load and
+renders the real verdict plus a "checked Nm ago" freshness readout. If the
+fetch fails, or the file's `checked_at` is older than ~20 minutes (4x the
+heartbeat interval -- meaning Watchman itself may be down), it shows
+**UNKNOWN** rather than defaulting to green, so a broken status feed can't
+silently read as "all clear." `web/command-deck.html` carries the identical
+script via `tools/sync-command-deck.py`.
+
+This depends on nothing new being installed -- `monad-watchman.service`
+already existed and was already enabled; this only adds one more file
+write to the same heartbeat cycle it was already running.
+
 ## FleetCore Live Backend
 
 `web/toys/bridge-station-3.0/` (the sole remaining "look at or command FleetCore" toy — see `BRIDGE3-CONSOLIDATE-01` above) is a thin client with no simulation of its own — it needs a real `fleetcore-serve` process running and reachable, unlike most other public artifacts in this repo, which are fully self-contained static pages.

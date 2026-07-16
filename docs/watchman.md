@@ -9,7 +9,8 @@ logs/agents/watchman/YYYY/YYYY-MM-DD_watch.jsonl
 
 Each entry records UTC time, hostname, system uptime when available, the
 current Git commit, repository path, disk capacity, and local Qdrant health.
-Watchman reads repository state but writes only to its own log directory.
+Watchman reads repository state and writes its own log directory plus one
+public file (see "Public Fleet Status" below).
 
 Watchman also checks the five other live services under `services`, each via
 its systemd unit (`ActiveState`/`SubState`/`NRestarts`, read-only via
@@ -30,6 +31,16 @@ running, `failed` if systemd reports the unit failed, and `unknown` if
 `MONAD_FLEETCORE_HEALTH_URL`, `MONAD_WORLD_INTAKE_HEALTH_URL`,
 `MONAD_LIVING_FLEET_MEMORY_HEALTH_URL`, and
 `MONAD_LIVING_CAPTAIN_STATUS_HEALTH_URL`.
+
+## Public Fleet Status
+
+Every heartbeat, Watchman also writes `web/data/fleet-status.json` (via
+`derive_public_status()`/`write_public_status()`) -- a reduced
+`green`/`amber`/`red` verdict plus a `summary` string, `checked_at`
+timestamp, `hostname`, and `git_commit`. This is what
+`web/index.html`'s homepage status badge reads client-side; see
+`docs/deployment.md`'s "Public Fleet Status" section for the full
+red/amber/green derivation rules and the client-side staleness fallback.
 
 ## Granite Installation
 

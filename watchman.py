@@ -239,6 +239,73 @@ def services_status(root):
     }
 
 
+PUBLIC_STATUS_PATH = os.path.join("web", "data", "fleet-status.json")
+
+
+def derive_public_status(entry):
+    """Reduce a full heartbeat to the red/amber/green summary the public
+    homepage badge reads -- see web/index.html's status strip and
+    docs/deployment.md's "Public Fleet Status" section."""
+    red_reasons = []
+    amber_reasons = []
+
+    if entry["disk"]["state"] == "warning":
+        red_reasons.append("disk space low")
+    if entry["qdrant"]["state"] != "healthy":
+        amber_reasons.append("qdrant " + entry["qdrant"]["state"])
+
+    for key, service in entry["services"].items():
+        label = key.replace("_", "-")
+        process = service.get("process") or {}
+        if process.get("state") == "failed":
+            red_reasons.append(f"{label} failed")
+        elif process.get("state") == "warning":
+            amber_reasons.append(f"{label} restarted")
+        elif process.get("state") == "unknown":
+            amber_reasons.append(f"{label} state unknown")
+
+        http = service.get("http")
+        if http is not None and http["state"] != "healthy":
+            amber_reasons.append(f"{label} endpoint {http['state']}")
+
+        staleness = service.get("staleness")
+        if staleness is not None and staleness["state"] != "ok":
+            amber_reasons.append(f"{label} {staleness['state']}")
+
+    if red_reasons:
+        status = "red"
+    elif amber_reasons:
+        status = "amber"
+    else:
+        status = "green"
+
+    reasons = red_reasons + amber_reasons
+    summary = "All systems nominal." if not reasons else "; ".join(reasons)
+
+    return {
+        "schema_version": "monad.fleetStatus.v1",
+        "status": status,
+        "summary": summary,
+        "checked_at": entry["timestamp"],
+        "hostname": entry["hostname"],
+        "git_commit": entry["git_commit"],
+    }
+
+
+def write_public_status(root, entry):
+    status = derive_public_status(entry)
+    path = os.path.join(root, PUBLIC_STATUS_PATH)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8", newline="\n") as stream:
+        json.dump(status, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.replace(tmp_path, path)
+    return path
+
+
 def heartbeat(root):
     now = timestamp_utc()
     return now, {
@@ -282,10 +349,12 @@ def stand_watch(once=False):
     while True:
         now, entry = heartbeat(root)
         log_path = append_heartbeat(root, now, entry)
+        status_path = write_public_status(root, entry)
         print(
-            "{} heartbeat appended to {}".format(
+            "{} heartbeat appended to {} ({})".format(
                 entry["timestamp"],
                 os.path.relpath(log_path, root),
+                os.path.relpath(status_path, root),
             ),
             flush=True,
         )
