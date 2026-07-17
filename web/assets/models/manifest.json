@@ -1,33 +1,123 @@
 {
-  "schema_version": "monad.assetManifest.v1",
+  "schema_version": "monad.assetManifest.v2",
   "models": [
     {
       "name": "uss-rubber-ducky.glb",
       "glb_path": "web/assets/models/uss-rubber-ducky.glb",
       "source_image": "tools/img2asset/input/file_00000000de3c71f5861286605d47b6bd.png (via replicate tencent/hunyuan-3d-3.1)",
       "backend": "manual",
-      "created_at": "2026-07-12T21:31:27.060657+00:00"
+      "created_at": "2026-07-12T21:31:27.060657+00:00",
+      "version": 1,
+      "bounding_box": {
+        "min": [
+          -0.3785650134086609,
+          -0.6064450144767761,
+          -0.8758820295333862
+        ],
+        "max": [
+          0.3688099980354309,
+          0.3680639863014221,
+          0
+        ],
+        "dimensions": [
+          0.7473750114440918,
+          0.9745090007781982,
+          0.8758820295333862
+        ]
+      },
+      "orientation_warnings": [],
+      "declared_scale_meters": null,
+      "scale_declared_unknown": true,
+      "audited_at": "2026-07-17T02:17:40.916530+00:00"
     },
     {
       "name": "the-monad.glb",
       "glb_path": "web/assets/models/the-monad.glb",
       "source_image": "manual upload",
       "backend": "manual",
-      "created_at": "2026-07-12T23:06:00+00:00"
+      "created_at": "2026-07-12T23:06:00+00:00",
+      "version": 1,
+      "bounding_box": {
+        "min": [
+          -0.09574899822473526,
+          -0.5274189710617065,
+          -0.35708099603652954
+        ],
+        "max": [
+          0.09571900218725204,
+          0.6317780017852783,
+          0
+        ],
+        "dimensions": [
+          0.1914680004119873,
+          1.1591969728469849,
+          0.35708099603652954
+        ]
+      },
+      "orientation_warnings": [],
+      "declared_scale_meters": null,
+      "scale_declared_unknown": true,
+      "audited_at": "2026-07-17T02:17:40.916668+00:00"
     },
     {
       "name": "file_00000000a68c722f9cd29e1996dba4cf.glb",
       "glb_path": "web/assets/models/file_00000000a68c722f9cd29e1996dba4cf.glb",
       "source_image": "tools/img2asset/input/upload-1783899358-file_00000000a68c722f9cd29e1996dba4cf.png",
       "backend": "replicate",
-      "created_at": "2026-07-12T23:39:05.123852+00:00"
+      "created_at": "2026-07-12T23:39:05.123852+00:00",
+      "version": 1,
+      "bounding_box": {
+        "min": [
+          -0.3914889991283417,
+          -0.24414099752902985,
+          -0.7848060131072998
+        ],
+        "max": [
+          0.41837701201438904,
+          0.24559399485588074,
+          0
+        ],
+        "dimensions": [
+          0.8098660111427307,
+          0.4897349923849106,
+          0.7848060131072998
+        ]
+      },
+      "orientation_warnings": [
+        "largest dimension is on the X axis, not Y -- glTF's Y-up convention would expect height to dominate for an upright model (not necessarily wrong, e.g. for a horizontal vessel hull -- worth a human glance)"
+      ],
+      "declared_scale_meters": null,
+      "scale_declared_unknown": true,
+      "audited_at": "2026-07-17T02:17:40.916794+00:00"
     },
     {
       "name": "end-to-end-manual.glb",
       "glb_path": "web/assets/models/end-to-end-manual.glb",
       "source_image": "/home/cgl/dev/monad/tools/img2asset/input/upload-1783893115-monad_poster.png",
       "backend": "manual",
-      "created_at": "2026-07-15T21:44:00.502180+00:00"
+      "created_at": "2026-07-15T21:44:00.502180+00:00",
+      "version": 1,
+      "bounding_box": {
+        "min": [
+          -0.3785650134086609,
+          -0.6064450144767761,
+          -0.8758820295333862
+        ],
+        "max": [
+          0.3688099980354309,
+          0.3680639863014221,
+          0
+        ],
+        "dimensions": [
+          0.7473750114440918,
+          0.9745090007781982,
+          0.8758820295333862
+        ]
+      },
+      "orientation_warnings": [],
+      "declared_scale_meters": null,
+      "scale_declared_unknown": true,
+      "audited_at": "2026-07-17T02:17:40.916914+00:00"
     }
   ]
 }

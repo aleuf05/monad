@@ -15,6 +15,10 @@ const detailSource = document.querySelector("#detailSource");
 const detailBackend = document.querySelector("#detailBackend");
 const detailCreated = document.querySelector("#detailCreated");
 const detailOutput = document.querySelector("#detailOutput");
+const detailVersion = document.querySelector("#detailVersion");
+const detailScale = document.querySelector("#detailScale");
+const detailDimensions = document.querySelector("#detailDimensions");
+const detailWarnings = document.querySelector("#detailWarnings");
 const detailDownload = document.querySelector("#detailDownload");
 const stagedPanel = document.querySelector("#stagedPanel");
 const stagedPreview = document.querySelector("#stagedPreview");
@@ -61,6 +65,40 @@ function selectModel(entry, li) {
   detailBackend.textContent = entry.backend || "—";
   detailCreated.textContent = entry.created_at ? new Date(entry.created_at).toLocaleString() : "—";
   detailOutput.textContent = entry.glb_path || "—";
+  detailVersion.textContent = entry.version != null ? String(entry.version) : "—";
+
+  // GOLDEN HULL hardening (docs/architecture/golden-hull-asset-validation-v0.1.md):
+  // a generated/manual asset carries no inherent real-world scale, so this
+  // must be an explicit, visible field -- "not declared" and "declared
+  // unknown" are shown distinctly from each other and from a real number,
+  // never silently blank.
+  if (typeof entry.declared_scale_meters === "number") {
+    detailScale.textContent = `${entry.declared_scale_meters} m`;
+  } else if (entry.scale_declared_unknown) {
+    detailScale.textContent = "Unknown (explicitly acknowledged)";
+  } else {
+    detailScale.textContent = "Not declared";
+  }
+
+  if (entry.bounding_box && Array.isArray(entry.bounding_box.dimensions)) {
+    const [dx, dy, dz] = entry.bounding_box.dimensions;
+    detailDimensions.textContent = `${dx.toFixed(3)} × ${dy.toFixed(3)} × ${dz.toFixed(3)}`;
+  } else {
+    detailDimensions.textContent = "—";
+  }
+
+  const warnings = Array.isArray(entry.orientation_warnings) ? entry.orientation_warnings.slice() : [];
+  if (!(typeof entry.declared_scale_meters === "number") && !entry.scale_declared_unknown) {
+    warnings.push("Real-world scale was never declared for this asset -- its true size relative to the simulated fleet is unrecorded.");
+  }
+  if (warnings.length) {
+    detailWarnings.hidden = false;
+    detailWarnings.textContent = warnings.map((w) => `⚠ ${w}`).join("  ");
+  } else {
+    detailWarnings.hidden = true;
+    detailWarnings.textContent = "";
+  }
+
   detailDownload.href = `../../${entry.glb_path.replace(/^web\//, "")}`;
   detailDownload.download = entry.glb_path ? entry.glb_path.split("/").pop() : "output.glb";
 }
