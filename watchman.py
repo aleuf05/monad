@@ -302,6 +302,15 @@ def write_public_status(root, entry):
         stream.write("\n")
         stream.flush()
         os.fsync(stream.fileno())
+    # monad-watchman.service runs with UMask=0027 (see systemd/monad-watchman.service),
+    # a reasonable default for this service's own log directory but wrong
+    # for this one file: it's the public status source for web/index.html's
+    # homepage badge, served by Caddy as a different user, and needs to
+    # stay world-readable regardless of what umask the writing process
+    # happens to run under. Explicit chmod, not reliance on umask, is what
+    # makes that true unconditionally -- this silently 403'd every 5
+    # minutes since the feature shipped until this fix.
+    os.chmod(tmp_path, 0o664)
     os.replace(tmp_path, path)
     return path
 
