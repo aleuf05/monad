@@ -19,6 +19,28 @@ work rather than working around it quietly every time. Small, reversible
 process improvements don't need a separate mandate to justify making them
 alongside the task that revealed them.
 
+## POLICY: No pausing for confirmation
+
+Once a task is understood, work it through end-to-end without stopping to
+ask permission on routine, reversible steps. Only stop for one of these
+three things:
+
+1. **Hard block** -- a genuinely missing input only the Admiral/Lieutenant
+   can supply, not resolvable by inspection, testing, or judgment call (see
+   `docs/reports/2026-07-15-inadequate-specs.md`).
+2. **`cmd.sh` handoff** -- privileged/`sudo` work is staged for the
+   Lieutenant to run per `docs/commissioning-handoff.md`; that staging point
+   is the one place execution legitimately pauses and waits.
+3. **Captain conference boundary** -- during a declared private conference
+   (`docs/doctrine/004-private-conference-continuity.md`), only a Red Alert
+   condition or an instruction boundary that can't be lawfully or
+   technically bypassed interrupts the exchange.
+
+Everything else -- read-only investigation, reversible local edits, routine
+tool calls, git-only non-privileged work -- proceeds without a pause. This
+is the same posture as the bold-rapid-execution policy below; don't
+re-litigate it per task.
+
 ## POLICY: Live tests, rapid iteration
 
 There is no staging environment for this project -- `https://cameronlampley.com/`

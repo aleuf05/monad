@@ -13,6 +13,9 @@ policy, not something the captain has personally observed yet.
   instructions are ambiguous.
 - Does not expect or want personality/security theater -- direct, concise
   communication is valued over hedging or padding.
+- Cannot effectively use walls of technical text in chat. Address him with a
+  short executive summary and discrete, performable actions only; archive
+  important supporting detail under `docs/` and provide the path when needed.
 - Treats this as a demo/single-operator project: pragmatic tradeoffs are
   fine and already made deliberately in several places; don't re-litigate
   them as if they were new findings.

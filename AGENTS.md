@@ -5,6 +5,32 @@ agent/model is running here (URL/port policy, live-tests-no-staging,
 "if the Lt. can't see it, it doesn't exist," security-hardening
 posture).
 
+When addressing the Lieutenant, follow
+[`docs/doctrine/002-executive-communication.md`](docs/doctrine/002-executive-communication.md):
+short executive summaries and discrete actions only; archive important detail.
+
+During Admiral/Captain collaboration, follow
+[`docs/doctrine/003-real-time-conversation-capture.md`](docs/doctrine/003-real-time-conversation-capture.md):
+durable project insights should be recorded as drafts during the conversation
+without requiring a repeated approval phrase. Draft capture is not canon
+promotion and does not authorize operational changes.
+
+When the Admiral declares a private conference, follow
+[`docs/doctrine/004-private-conference-continuity.md`](docs/doctrine/004-private-conference-continuity.md):
+preserve conversational continuity and interrupt only for a defined Red Alert
+or an instruction boundary that cannot lawfully or technically be bypassed.
+
+For archive organization and continuity, follow
+[`docs/doctrine/005-captain-archive-stewardship.md`](docs/doctrine/005-captain-archive-stewardship.md):
+the Captain owns day-to-day curation and structural planning; the Admiral
+retains final authority over canon, deletion, publication, and consequential
+action.
+
+For public-facing delivery, follow
+[`docs/doctrine/006-live-system-visibility.md`](docs/doctrine/006-live-system-visibility.md):
+prefer verified real-time changes on the actual running site when feasible and
+authorized, without treating that preference as blanket deployment authority.
+
 ## Work queue / report queue
 
 Two names, two roles, kept strictly separate:
