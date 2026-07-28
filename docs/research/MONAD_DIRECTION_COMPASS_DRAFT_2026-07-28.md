@@ -221,3 +221,10 @@ The study is complete when recurring patterns are clear enough to answer:
 
 Do not average contradictory visitors into false consensus. Preserve distinct
 audiences or task types when they imply different beast-domains.
+
+## First-voyage structural audit
+
+The [`First Public Voyage Path Audit`](../verification/2026-07-28-first-voyage-path-audit.md)
+verified that the doctrinal voyage's components are live but are not connected
+as a discoverable sequence. This strengthens the case for testing visitor
+behavior before adding instruments or redesigning the hierarchy.
