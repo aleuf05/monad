@@ -24,6 +24,7 @@ data/living-captain/
 data/world-intake.sqlite3*
 data/mission-record/
 data/voice-engine/
+data/image-intake/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/watch-officer-fetch.log

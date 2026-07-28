@@ -1,0 +1,45 @@
+#!/data/data/com.termux/files/usr/bin/bash
+set -euo pipefail
+
+downloads="${MONAD_PHONE_DOWNLOADS:-$HOME/storage/downloads}"
+granite="${MONAD_GRANITE_HOST:-cgl@192.168.0.100}"
+repo="${MONAD_GRANITE_REPO:-/home/cgl/dev/monad}"
+
+if [[ ! -d "$downloads" ]]; then
+  echo "Downloads directory unavailable. Run: termux-setup-storage" >&2
+  exit 2
+fi
+
+shopt -s nullglob
+candidates=(
+  "$downloads"/*.png "$downloads"/*.PNG
+  "$downloads"/*.jpg "$downloads"/*.JPG
+  "$downloads"/*.jpeg "$downloads"/*.JPEG
+  "$downloads"/*.webp "$downloads"/*.WEBP
+)
+
+if (( ${#candidates[@]} == 0 )); then
+  echo "No PNG, JPEG, or WebP image found in $downloads" >&2
+  exit 2
+fi
+
+newest="${candidates[0]}"
+for candidate in "${candidates[@]:1}"; do
+  if [[ "$candidate" -nt "$newest" ]]; then
+    newest="$candidate"
+  fi
+done
+
+extension="${newest##*.}"
+extension="${extension,,}"
+[[ "$extension" == "jpeg" ]] && extension="jpg"
+remote_name="phone-$(date -u +%Y%m%dT%H%M%SZ)-$$.$extension"
+remote_incoming="$repo/data/image-intake/incoming"
+
+echo "Selected: $newest"
+ssh "$granite" "mkdir -p '$remote_incoming'"
+scp -- "$newest" "$granite:$remote_incoming/$remote_name"
+ssh "$granite" \
+  "python3 '$repo/tools/phone-image-intake/receive_image.py' --incoming-name '$remote_name'"
+
+echo "Image is aboard Granite, pending review. It is not public."
