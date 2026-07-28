@@ -25,6 +25,11 @@ cameronlampley.com {
 	handle_path /living-captain-api/* {
 		reverse_proxy 127.0.0.1:4774
 	}
+
+	handle_path /live-captain-chat-api/* {
+		reverse_proxy 127.0.0.1:4776
+	}
+
 	handle_path /libfive-api/* {
 		reverse_proxy 127.0.0.1:4787
 	}

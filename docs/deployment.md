@@ -385,3 +385,23 @@ card grid.
 API is GET-only and read-only by construction; the Captain's own
 outbound reads are custody-gated to exactly two URLs
 (`tools/living-captain/sight.py`'s manifest).
+
+### Live Captain Private Conference — Version 1
+
+The optional authenticated conversation path is deliberately separate from
+the public status service. `live-captain-web.service` runs
+`tools/living-captain/web_service.py` on loopback port 4776; Caddy proxies
+`/live-captain-chat-api/*` to it. The existing status API on 4774 remains
+independent, so Gemini or conference failure does not take the public
+instrument down.
+
+The service and terminal client share a single-owner conversation engine.
+Only one may hold the transcript/usage lock. Browser access requires the
+private conference password and a signed, expiring, HttpOnly session cookie.
+The Gemini key and password verifier remain in protected environment files
+outside Git.
+
+Commission with `scripts/install-live-captain-web.sh`. It stops before making
+changes if a terminal Captain is still active, runs the complete Living
+Captain test suite, validates Caddy, preserves the previous Caddyfile, installs
+the service, and verifies the loopback health endpoint.

@@ -23,6 +23,31 @@ Inside the client:
 - `/quit` shuts down cleanly.
 - `Ctrl-C` and end-of-file also shut down cleanly.
 
+The terminal and authenticated web service use the same `CaptainEngine` and
+take an exclusive lock on conversation state. If one interface owns the
+conversation, the other refuses to start rather than risking transcript or
+usage-ledger corruption.
+
+## Private Conference web service
+
+`web_service.py` binds only to `127.0.0.1:4776`. Caddy exposes its API at
+`/live-captain-chat-api/`, while the existing public read-only status service
+continues independently at `/living-captain-api/`.
+
+The browser must authenticate before transcript access or model requests.
+Authentication uses a password-derived scrypt verifier stored outside Git and
+a signed 12-hour `HttpOnly; Secure; SameSite=Strict` cookie. Cross-origin
+writes, oversized messages, concurrent inference, and repeated login attempts
+are rejected.
+
+Configure and commission through the reviewed operator handoff:
+
+```text
+scripts/install-live-captain-web.sh
+```
+
+The installer refuses to proceed while the terminal Captain is running.
+
 ## Local state
 
 Runtime state is under `data/living-captain/`, which is ignored by Git:

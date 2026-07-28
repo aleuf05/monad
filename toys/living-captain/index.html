@@ -31,6 +31,43 @@
       </section>
       <p id="feedback" class="feedback" role="status" hidden></p>
 
+      <section class="conference-panel" aria-labelledby="conferenceTitle">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Private Conference <span class="new-badge">New</span></p>
+            <h2 id="conferenceTitle">Speak with the Captain</h2>
+          </div>
+          <p>Optional, authenticated, and read-only. Conversation never grants shell, tool, or command authority.
+            If inference is unavailable, the public instruments remain operational and history remains preserved.</p>
+        </div>
+        <div class="conference-status">
+          <span id="conferenceDot" class="live-dot"></span>
+          <strong id="conferenceStatus">Checking private service&hellip;</strong>
+          <span id="conferenceProvider"></span>
+        </div>
+        <form id="conferenceLogin" class="conference-login" hidden>
+          <label for="conferencePassword">Conference password</label>
+          <div>
+            <input id="conferencePassword" type="password" autocomplete="current-password" minlength="12" required>
+            <button type="submit" class="voice-button">Enter Conference</button>
+          </div>
+        </form>
+        <div id="conferenceRoom" hidden>
+          <div id="conferenceMessages" class="conference-messages" aria-live="polite"></div>
+          <form id="conferenceComposer" class="conference-composer">
+            <label class="sr-only" for="conferenceMessage">Message to Captain</label>
+            <textarea id="conferenceMessage" maxlength="4000" rows="3"
+              placeholder="Ask the Captain&hellip;" required></textarea>
+            <div>
+              <span id="conferenceUsage">Usage unavailable</span>
+              <button id="conferenceSend" type="submit" class="voice-button">Send</button>
+              <button id="conferenceLogout" type="button" class="voice-button secondary">Leave</button>
+            </div>
+          </form>
+        </div>
+        <p id="conferenceFeedback" class="conference-feedback" role="status"></p>
+      </section>
+
       <section>
         <div class="section-heading">
           <div><p class="eyebrow">Sight</p><h2>Last Observed Fleet State</h2></div>
@@ -114,6 +151,6 @@
     <script src="../shared/voice.js"></script>
     <script src="../shared/characters.js"></script>
     <script src="../shared/performance.js"></script>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>

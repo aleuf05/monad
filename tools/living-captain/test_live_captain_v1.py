@@ -14,7 +14,8 @@ sys.path.insert(0, str(ROOT))
 import gemini_provider
 import live_captain_cli
 from conversation import ConversationStore
-from model_provider import Message, ProviderError, ProviderResponse
+from live_captain_engine import CaptainEngine
+from model_provider import GenerationLimits, Message, ProviderError, ProviderResponse
 from usage_budget import (
     BudgetExceeded,
     MAX_INPUT_TOKENS,
@@ -141,7 +142,7 @@ class LiveCaptainVersion1Tests(unittest.TestCase):
             response = provider.generate(
                 "system",
                 [Message("user", "hello")],
-                live_captain_cli.GenerationLimits(max_output_tokens=8),
+                GenerationLimits(max_output_tokens=8),
             )
         request = call.call_args.args[0]
         request_body = json.loads(request.data)
@@ -170,7 +171,7 @@ class LiveCaptainVersion1Tests(unittest.TestCase):
                 provider.generate(
                     "system",
                     [Message("user", "hello")],
-                    live_captain_cli.GenerationLimits(max_output_tokens=8),
+                    GenerationLimits(max_output_tokens=8),
                 )
         self.assertNotIn(key, str(raised.exception))
         self.assertIn("[REDACTED]", str(raised.exception))
@@ -181,6 +182,13 @@ class LiveCaptainVersion1Tests(unittest.TestCase):
             store = ConversationStore(path)
             budget = UsageBudget(path / "usage.json")
             provider = FakeProvider()
+            engine = CaptainEngine(
+                provider=provider,
+                store=store,
+                budget=budget,
+                system_prompt="Captain system prompt",
+                acquire_owner_lock=False,
+            )
             output = io.StringIO()
             with (
                 patch("builtins.input", side_effect=["What is our prior context?", "/quit"]),
@@ -188,10 +196,7 @@ class LiveCaptainVersion1Tests(unittest.TestCase):
                 patch("sys.stdout", output),
             ):
                 result = live_captain_cli.run_chat(
-                    provider,
-                    store,
-                    budget,
-                    "Captain system prompt",
+                    engine,
                 )
             self.assertEqual(result, 0)
             self.assertIn("Provider: Fake / fake-v1", output.getvalue())
