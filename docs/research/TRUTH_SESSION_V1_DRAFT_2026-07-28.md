@@ -346,3 +346,55 @@ theatrical crew display that outruns actual capability.
 capsules—Watchman, Researcher, and Archivist—and replay the same bounded event
 through each. Verify role-specific outputs, shared factual consistency,
 provenance, clean yielding, and successful resumption after context removal.
+
+## Product-direction hypothesis: Integrated Captain CLI
+
+- **Recorded:** 2026-07-28
+- **Status:** Draft architectural hypothesis; not canon
+- **Source:** Admiral/Captain conversation
+
+**Direct report:** The Admiral asks where a version of the integrated Captain
+CLI might gradually become the default development model.
+
+**Interpretation:** “Development model” means the normal operating pattern for
+human/machine software work, not a mandate to use one model provider or model
+identity.
+
+**Hypothesis:** The Captain CLI could become the default interface when it
+reliably unifies:
+
+- natural conversation and explicit objectives;
+- repository doctrine and authority boundaries;
+- fluid technical roles without lossy handoffs;
+- source inspection, implementation, tests, and live verification;
+- work packets, evidence, provenance, and rollback;
+- durable context restoration across sessions and model providers;
+- concise human intervention at genuine decision points.
+
+### Gradual course
+
+1. **Instrument:** The CLI restores context, names the current station, and
+   reports repository/live state without changing anything.
+2. **Workbench:** It carries one bounded idea through architecture,
+   implementation, verification, and archival closeout.
+3. **Steward:** It maintains evidence-backed continuity across sessions while
+   preserving human rulings and unresolved questions.
+4. **Crew substrate:** A small model cohort time-shares many explicit role
+   capsules through the same interface.
+5. **Default:** Operators voluntarily begin work through Captain CLI because it
+   produces better continuity and fewer coordination failures than raw shell,
+   chat, or ticket handoffs.
+
+**Decision rule:** Default status must be earned through adoption and outcomes,
+not installed by doctrine. Conventional shell, editor, Git, and direct
+instrument access remain functional fallbacks.
+
+**Failure signals:** The CLI should not become the default if it obscures which
+actor changed what, increases ceremony, manufactures work, traps state in
+model memory, prevents direct tool use, or makes ordinary development harder
+when the Captain layer is unavailable.
+
+**Smallest evidence-producing test:** Use Captain CLI conventions for one real
+public-UX change and compare context recovery, elapsed coordination, rework,
+verification completeness, and operator burden against a recent conventional
+handoff.
