@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Observe — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .page-header { padding: 56px 0 24px; border-bottom: 1px solid #1E2C42; }
+  .page-eyebrow { font-size: 10.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 8px; }
+  .page-header h1 { font-family: 'Oswald', sans-serif; font-size: 28px; letter-spacing: 0.08em; font-weight: 700; }
+  .page-header p { font-size: 12px; color: #6B7C93; margin-top: 10px; max-width: 620px; }
+  .section { padding: 36px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 4px; }
+  .section-eyebrow { font-size: 10.5px; color: #6B7C93; letter-spacing: 0.03em; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
+  .card:hover { border-color: #4FD1C5; background: #14203380; }
+  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #6B7C93; }
+  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-review { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .tag-new { color: #E8A33D; border: 1px solid #E8A33D44; animation: tag-new-pulse 2s ease-in-out infinite; }
+  @keyframes tag-new-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-header">
+      <div class="page-eyebrow">Watch</div>
+      <h1>Observe</h1>
+      <p>See the fleet and world without touching the controls — live instruments, read-only status, and the review queues waiting on a decision.</p>
+    </div>
+
+    <div class="section" style="padding-top: 28px;">
+      <h2>Live Instruments</h2>
+      <p class="section-eyebrow">Direct panels into the running world.</p>
+      <div class="grid">
+        <a class="card" href="toys/fleet-motion/">
+          <div class="card-name">Fleet Motion</div>
+          <div class="card-desc">Live fleet chart — routing, wake trails, real escort station-keeping in the sim engine.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/periscope/">
+          <div class="card-name">Periscope Station</div>
+          <div class="card-desc">Bearing/range viewport into the live world.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/radio-console/">
+          <div class="card-name">Radio Console</div>
+          <div class="card-desc">Communications Station — ambient fleet chatter.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="fleet.html">
+          <div class="card-name">Fleet Command Map</div>
+          <div class="card-desc">Chart view of every vessel's position.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Review &amp; Watch</h2>
+      <p class="section-eyebrow">Read-only oversight of the fleet and the narrative layer. No command authority here.</p>
+      <div class="grid">
+        <a class="card" href="toys/watch-officer/">
+          <div class="card-name">Watch Officer</div>
+          <div class="card-desc">Vessel state, World Intake's review backlog, and Mission Bus's projections in one read-only view.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="toys/review-inbox/">
+          <div class="card-name">Review Inbox</div>
+          <div class="card-desc">World Intake and Mission Bus review cards, normalized into one feed. Each card links to where it's actually decided.</div>
+          <span class="card-tag tag-review">review</span>
+        </a>
+        <a class="card" href="toys/world-intake/">
+          <div class="card-name">Living World Intake</div>
+          <div class="card-desc">Captain review queue — narrative proposals remain non-canonical until FleetCore accepts an approved command.</div>
+          <span class="card-tag tag-review">review</span>
+        </a>
+        <a class="card" href="toys/living-captain/">
+          <div class="card-name">Living Captain</div>
+          <div class="card-desc">Durable command presence — persistent identity, read-only fleet sight, an inspectable action record. No canon-mutating authority.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/monad-nav.js" data-root="" data-section="observe"></script>
+</body>
+</html>

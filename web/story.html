@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Story &amp; Records — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .page-header { padding: 56px 0 24px; border-bottom: 1px solid #1E2C42; }
+  .page-eyebrow { font-size: 10.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 8px; }
+  .page-header h1 { font-family: 'Oswald', sans-serif; font-size: 28px; letter-spacing: 0.08em; font-weight: 700; }
+  .page-header p { font-size: 12px; color: #6B7C93; margin-top: 10px; max-width: 620px; }
+  .section { padding: 36px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 4px; }
+  .section-eyebrow { font-size: 10.5px; color: #6B7C93; letter-spacing: 0.03em; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
+  .card:hover { border-color: #4FD1C5; background: #14203380; }
+  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #6B7C93; }
+  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-narrative { color: #E8A33D; border: 1px solid #E8A33D44; }
+  .tag-archive { color: #6B7C93; border: 1px solid #6B7C9344; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-header">
+      <div class="page-eyebrow">Remember</div>
+      <h1>Story &amp; Records</h1>
+      <p>Narrative missions, after-action reports, the ship's log, and the archive — history, not live systems.</p>
+    </div>
+
+    <div class="section" style="padding-top: 28px;">
+      <h2>Narrative</h2>
+      <p class="section-eyebrow">Playable scenarios.</p>
+      <div class="grid">
+        <a class="card" href="missions/sea-monster-hunt-001/">
+          <div class="card-name">Adventure Stations</div>
+          <div class="card-desc">Sea-monster hunt scenario — lookout, echo, lure, net, and recovery stations.</div>
+          <span class="card-tag tag-narrative">narrative</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Mission Archive</h2>
+      <p class="section-eyebrow">Completed runs, retired from active watch.</p>
+      <div class="grid">
+        <a class="card" href="archive/missions/quacken-transit-002/">
+          <div class="card-name">Quacken Transit 002</div>
+          <div class="card-desc">Second completed run. Full evidence trail and capture log.</div>
+          <span class="card-tag tag-archive">after-action</span>
+        </a>
+        <a class="card" href="archive/missions/quacken-transit-001/">
+          <div class="card-name">Quacken Transit 001</div>
+          <div class="card-desc">Strait transit, rendezvous hold, mission complete. Full evidence trail and capture log.</div>
+          <span class="card-tag tag-archive">after-action</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Reports &amp; Log</h2>
+      <div class="grid">
+        <a class="card" href="logs.html">
+          <div class="card-name">Ship's Log</div>
+          <div class="card-desc">Chronological record of what's happened aboard Monad.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+        <a class="card" href="final.html">
+          <div class="card-name">Sea Trial Report</div>
+          <div class="card-desc">Sea Trial Acceptance Report — the formal record of commissioning.</div>
+          <span class="card-tag tag-archive">report</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Media</h2>
+      <div class="grid">
+        <a class="card" href="assets/logs/2026-07-13-fleet-status-deck.png">
+          <div class="card-name">Fleet Status, Tick 5593</div>
+          <div class="card-desc">FleetCore Live — MONAD and all three scouts accounted for, holding position.</div>
+          <span class="card-tag tag-live">photo</span>
+        </a>
+        <a class="card" href="assets/posters/monad_slide1.png">
+          <div class="card-name">The Monad Manifesto</div>
+          <div class="card-desc">Persistent memory, rented cognition, continuous evolution — the fleet roster and doctrine, illustrated.</div>
+          <span class="card-tag tag-archive">poster</span>
+        </a>
+        <a class="card" href="assets/posters/monad_slide2.png">
+          <div class="card-name">The Monad Doctrine</div>
+          <div class="card-desc">Log schema, data hierarchy, the Helmsman's Oath, and the Command Card — the operating principles in one sheet.</div>
+          <span class="card-tag tag-archive">poster</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/monad-nav.js" data-root="" data-section="story"></script>
+</body>
+</html>

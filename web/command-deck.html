@@ -8,68 +8,34 @@
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
-  .banner { text-align: center; padding: 44px 0 28px; }
-  .anchor-mark { font-size: 26px; color: #E8A33D; margin-bottom: 8px; }
-  .banner h1 { font-family: 'Oswald', sans-serif; font-size: 32px; letter-spacing: 0.14em; font-weight: 700; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
+  .banner { text-align: center; padding: 56px 0 28px; }
+  .anchor-mark { font-size: 30px; color: #E8A33D; margin-bottom: 8px; }
+  .banner h1 { font-family: 'Oswald', sans-serif; font-size: 34px; letter-spacing: 0.14em; font-weight: 700; }
   .banner .tagline { font-size: 12px; color: #6B7C93; letter-spacing: 0.06em; margin-top: 6px; }
   .status-strip { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; padding: 16px 0; border-top: 1px solid #1E2C42; border-bottom: 1px solid #1E2C42; font-size: 11px; color: #6B7C93; letter-spacing: 0.04em; }
   .status-strip span.val { color: #4FD1C5; }
-  .val-green { color: #4FD1C5; }
-  .val-amber { color: #E8A33D; }
-  .val-red { color: #E05252; }
-  .val-unknown { color: #6B7C93; }
+  .val-green { color: #4FD1C5; } .val-amber { color: #E8A33D; } .val-red { color: #E05252; } .val-unknown { color: #6B7C93; }
   .status-strip .status-checked { font-size: 10px; opacity: 0.7; }
-  .section { padding: 40px 0 8px; }
-  .section h2 { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 4px; }
-  .section-eyebrow { font-size: 10.5px; color: #6B7C93; letter-spacing: 0.03em; margin-bottom: 16px; }
-  .card-featured { grid-column: 1 / -1; padding: 22px 24px; border-color: #E8A33D66; }
-  .card-featured .card-name { font-size: 17px; }
-  .card-featured .card-desc { font-size: 12px; }
-  .card-featured:hover { border-color: #E8A33D; }
-  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; }
-  .staff-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; overflow: hidden; transition: border-color 150ms ease, transform 150ms ease; }
-  .staff-card:hover { border-color: #E8A33D; transform: translateY(-2px); }
-  .staff-photo { width: 100%; aspect-ratio: 1 / 1; background: #0D1626; overflow: hidden; }
-  .staff-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .staff-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 32px; color: #3A4C68; letter-spacing: 0.05em; }
-  .staff-info { padding: 10px 12px 14px; }
-  .staff-rank { font-size: 9px; letter-spacing: 0.08em; color: #E8A33D; text-transform: uppercase; }
-  .staff-name { font-family: 'Oswald', sans-serif; font-size: 13px; color: #DCE6F2; margin-top: 2px; }
-  .staff-role { font-size: 10px; color: #4FD1C5; margin-top: 2px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
-  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
-  .card:hover { border-color: #4FD1C5; background: #14203380; }
-  .card.is-unbuilt { opacity: 0.6; cursor: default; }
-  .card.is-unbuilt:hover { border-color: #1E2C42; background: #111A2B; }
-  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
-  .card-desc { font-size: 11px; color: #6B7C93; }
-  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
-  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
-  .tag-pending { color: #6B7C93; border: 1px solid #6B7C9344; }
-  .tag-new { color: #E8A33D; border: 1px solid #E8A33D44; animation: tag-new-pulse 2s ease-in-out infinite; }
-  @keyframes tag-new-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
-  .placeholder-note { margin-top: 20px; padding: 12px 16px; border: 1px dashed #3A4C68; border-radius: 4px; font-size: 11px; color: #6B7C93; line-height: 1.6; }
-  .placeholder-note code { background: #0D1626; padding: 1px 5px; border-radius: 2px; color: #E8A33D; }
+
+  .lede { max-width: 560px; margin: 34px auto 6px; text-align: center; font-size: 12.5px; color: #8A9BB4; }
+
+  .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
+  .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
+  .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
+  .cat-eyebrow { font-size: 9.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 6px; }
+  .cat-name { font-family: 'Oswald', sans-serif; font-size: 19px; letter-spacing: 0.02em; color: #DCE6F2; margin-bottom: 8px; }
+  .cat-desc { font-size: 11.5px; color: #6B7C93; line-height: 1.55; }
+
+  .quick { margin-top: 40px; padding-top: 22px; border-top: 1px solid #1E2C42; text-align: center; }
+  .quick-label { font-size: 9.5px; letter-spacing: 0.1em; color: #3A4C68; text-transform: uppercase; margin-bottom: 12px; }
+  .quick-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; }
+  .quick-links a { color: #4FD1C5; text-decoration: none; font-size: 11.5px; letter-spacing: 0.03em; }
+  .quick-links a:hover { color: #E8A33D; }
+  .quick-links .mn-new { background: #E8A33D; color: #0B1220; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; padding: 1px 5px; border-radius: 3px; margin-left: 5px; vertical-align: middle; }
+
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
   .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
-  .footer-links { margin-top: 10px; display: flex; justify-content: center; gap: 16px; }
-  .footer-links a { color: #4FD1C5; text-decoration: none; font-size: 10px; letter-spacing: 0.06em; }
-  .footer-links a:hover { color: #E8A33D; }
-  .mission-widget { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: #111A2B; border: 1px solid #1E2C42; border-left: 3px solid #4FD1C5; border-radius: 6px; padding: 10px 16px; font-size: 11px; }
-  .mission-widget.mw-ok { border-left-color: #4FD1C5; }
-  .mission-widget.mw-warn { border-left-color: #E8A33D; }
-  .mission-widget.mw-fail { border-left-color: #E05252; }
-  .mw-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .mw-label { color: #6B7C93; letter-spacing: 0.08em; }
-  .mw-id { color: #DCE6F2; }
-  .mw-phase { padding: 1px 7px; border-radius: 3px; border: 1px solid #4FD1C544; color: #4FD1C5; }
-  .mw-warn .mw-phase { border-color: #E8A33D44; color: #E8A33D; }
-  .mw-fail .mw-phase { border-color: #E0525244; color: #E05252; }
-  .mw-since { color: #6B7C93; }
-  .mw-link { color: #4FD1C5; text-decoration: none; }
-  .mw-link:hover { color: #E8A33D; }
-  .mw-new { background: #E8A33D; color: #0B1220; font-family: 'Oswald', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -87,259 +53,47 @@
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
-    <div class="section" style="padding-top: 20px;">
-      <div class="mission-widget mw-ok">
-        <div class="mw-left">
-          <span class="mw-label">MISSION ARCHIVE</span>
-          <span class="mw-id mono">QUACKEN · 2 completed runs</span>
-          <span class="mw-phase mono">RETIRED FROM ACTIVE WATCH</span>
-        </div>
-        <a class="mw-link" href="archive/missions/quacken-transit-002/">archived report &rarr;</a>
-      </div>
-      <div class="mission-widget mw-active" style="margin-top: 8px;">
-        <div class="mw-left">
-          <span class="mw-new">NEW</span>
-          <span class="mw-label">OPS READER</span>
-          <span class="mw-id mono">work queue &amp; findings, phone-readable</span>
-        </div>
-        <a class="mw-link" href="ops.html">open &rarr;</a>
-      </div>
+    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
+
+    <div class="categories">
+      <a class="cat-card" href="command.html">
+        <div class="cat-eyebrow">Act</div>
+        <div class="cat-name">Command</div>
+        <div class="cat-desc">Direct the fleet — the live console, agent posture, and the open work queue.</div>
+      </a>
+      <a class="cat-card" href="observe.html">
+        <div class="cat-eyebrow">Watch</div>
+        <div class="cat-name">Observe</div>
+        <div class="cat-desc">Live instruments and review queues — see the fleet and world without touching the controls.</div>
+      </a>
+      <a class="cat-card" href="build.html">
+        <div class="cat-eyebrow">Make</div>
+        <div class="cat-name">Build &amp; Research</div>
+        <div class="cat-desc">Tools that make or study things — voices, shapes, assets, ideas. Not fleet control.</div>
+      </a>
+      <a class="cat-card" href="story.html">
+        <div class="cat-eyebrow">Remember</div>
+        <div class="cat-name">Story &amp; Records</div>
+        <div class="cat-desc">Narrative missions, after-action reports, the ship's log, and the archive.</div>
+      </a>
+      <a class="cat-card" href="staff.html">
+        <div class="cat-eyebrow">Who</div>
+        <div class="cat-name">Crew</div>
+        <div class="cat-desc">Who's aboard, and what each officer is responsible for.</div>
+      </a>
     </div>
 
-    <div class="section">
-      <h2>Command</h2>
-      <p class="section-eyebrow">The one live console. Everything below either feeds it or extends past it.</p>
-      <div class="grid">
-        <a class="card card-featured" href="toys/bridge-station-3.0/">
-          <div class="card-name">Bridge Station 3.0</div>
-          <div class="card-desc">One authoritative command view wired to real FleetCore data — select a vessel, Set Waypoint, or use the Control/Radio/Raw Feed tabs for spawn/despawn, Harbor Pilot Boarding, ambient radio, and the raw event feed</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new: consolidated console</span>
-        </a>
+    <div class="quick">
+      <div class="quick-label">Frequently used</div>
+      <div class="quick-links">
+        <a href="toys/bridge-station-3.0/">Bridge Station 3.0 — the live console</a>
+        <a href="ops.html">Ops Reader<span class="mn-new">NEW</span></a>
       </div>
-    </div>
-
-    <div class="section">
-      <h2>Live Instruments</h2>
-      <p class="section-eyebrow">Individual panels Bridge Station composites — open any one standalone.</p>
-      <div class="grid">
-        <a class="card" href="toys/fleet-motion/">
-          <div class="card-name">Fleet Motion</div>
-          <div class="card-desc">Live fleet chart — routing, wake trails, real escort station-keeping in the sim engine</div>
-          <span class="card-tag tag-live">live</span>
-        </a>
-        <a class="card" href="toys/periscope/">
-          <div class="card-name">Periscope Station</div>
-          <div class="card-desc">Bearing/range viewport into the live world</div>
-          <span class="card-tag tag-live">live</span>
-        </a>
-        <a class="card" href="toys/radio-console/">
-          <div class="card-name">Radio Console</div>
-          <div class="card-desc">Communications Station — ambient fleet chatter</div>
-          <span class="card-tag tag-live">live</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Autonomous Fleet</h2>
-      <p class="section-eyebrow">AI crew operating inside FleetCore's bounds — one step removed from direct control.</p>
-      <div class="grid">
-        <a class="card" href="toys/agent-ops/">
-          <div class="card-name">Agent Operations</div>
-          <div class="card-desc">Living Fleet — Alpha, Bravo, and Charlie choose bounded posture while FleetCore remains in command</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new: living fleet</span>
-        </a>
-        <a class="card" href="toys/living-captain/">
-          <div class="card-name">Living Captain</div>
-          <div class="card-desc">Durable command presence — persistent identity, read-only fleet sight, and an inspectable action record. No canon-mutating authority.</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new: living captain v0.2</span>
-        </a>
-        <a class="card" href="toys/world-intake/">
-          <div class="card-name">Living World Intake</div>
-          <div class="card-desc">Captain review queue — narrative proposals remain non-canonical until FleetCore accepts an approved command</div>
-          <span class="card-tag tag-live">review</span>
-          <span class="card-tag tag-new">new: intake v0.1</span>
-        </a>
-        <a class="card" href="toys/watch-officer/">
-          <div class="card-name">Watch Officer</div>
-          <div class="card-desc">Read-only observer over the fleet and narrative layer — vessel state, World Intake's review backlog, Mission Bus's projections. No command authority.</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new: watch officer v0.1</span>
-        </a>
-        <a class="card" href="toys/review-inbox/">
-          <div class="card-name">Review Inbox</div>
-          <div class="card-desc">GLUE-05's shared review feed — World Intake and Mission Bus's review cards, normalized into one view. Read-only; each card links back to where it's actually decided.</div>
-          <span class="card-tag tag-live">review</span>
-          <span class="card-tag tag-new">new: review inbox v0.1</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Fabrication &amp; Research</h2>
-      <p class="section-eyebrow">Tools that make or study things — not fleet control.</p>
-      <div class="grid">
-        <a class="card" href="toys/character-voice-studio/">
-          <div class="card-name">Character Voice Studio</div>
-          <div class="card-desc">General character and performance workbench — Captain Monad is one test character, not a special voice system.</div>
-          <span class="card-tag tag-new">new: character model</span>
-        </a>
-        <a class="card" href="toys/asset-viewer/">
-          <div class="card-name">Asset Viewer</div>
-          <div class="card-desc">Drag-and-drop file dropper and 3D output viewer for the image-to-asset pipeline — source photo in, GLB out</div>
-          <span class="card-tag tag-live">live</span>
-        </a>
-        <a class="card" href="toys/libfive/">
-          <div class="card-name">Shape Foundry</div>
-          <div class="card-desc">Bounded libfive solids — generate sphere, box, or torus meshes and inspect STL provenance</div>
-          <span class="card-tag tag-new">new: parametric 3D</span>
-        </a>
-        <a class="card" href="toys/reaction-diffusion-painter/">
-          <div class="card-name">Reaction-Diffusion Painter</div>
-          <div class="card-desc">Paint chemical seeds into a Gray-Scott field — spots, stripes, coral, labyrinths</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new</span>
-        </a>
-        <a class="card" href="toys/cognition-graph/">
-          <div class="card-name">The Cognition Graph</div>
-          <div class="card-desc">Frontier Question Five instrument — a small graph of model roles proposes competing sharpened formulations of a research question, then an independent pass judges whether any beat the original. Paste your own Gemini key on the page to run it live; runs in simulated mode without one.</div>
-          <span class="card-tag tag-live">live</span>
-          <span class="card-tag tag-new">new: bring-your-own-key</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Narrative &amp; Archive</h2>
-      <p class="section-eyebrow">Story and history — not live systems.</p>
-      <div class="grid">
-        <a class="card" href="missions/sea-monster-hunt-001/">
-          <div class="card-name">Adventure Stations</div>
-          <div class="card-desc">Sea-monster hunt scenario — lookout, echo, lure, net, and recovery stations</div>
-          <span class="card-tag tag-live">narrative</span>
-          <span class="card-tag tag-new">new: adventure slice</span>
-        </a>
-        <a class="card" href="archive/missions/quacken-transit-001/">
-          <div class="card-name">Mission: Quacken Transit 001</div>
-          <div class="card-desc">After-action report — strait transit, rendezvous hold, mission complete. Full evidence trail and capture log.</div>
-          <span class="card-tag tag-live">after-action</span>
-        </a>
-        <a class="card" href="assets/logs/2026-07-13-fleet-status-deck.png">
-          <div class="card-name">Fleet Status, Tick 5593</div>
-          <div class="card-desc">FleetCore Live — MONAD and all three scouts accounted for, holding position</div>
-          <span class="card-tag tag-live">photo</span>
-        </a>
-        <a class="card" href="assets/posters/monad_slide1.png">
-          <div class="card-name">The Monad Manifesto</div>
-          <div class="card-desc">Persistent memory, rented cognition, continuous evolution — the fleet roster and doctrine, illustrated</div>
-          <span class="card-tag tag-live">poster</span>
-        </a>
-        <a class="card" href="assets/posters/monad_slide2.png">
-          <div class="card-name">The Monad Doctrine</div>
-          <div class="card-desc">Log schema, data hierarchy, the Helmsman's Oath, and the Command Card — the operating principles in one sheet</div>
-          <span class="card-tag tag-live">poster</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2>Crew</h2>
-      <p class="section-eyebrow">Who's aboard.</p>
-      <div class="staff-grid">
-
-        <a class="staff-card" href="staff.html#admiral-c">
-          <div class="staff-photo"><div class="staff-placeholder">★★★★</div></div>
-          <div class="staff-info">
-            <div class="staff-rank">Admiral</div>
-            <div class="staff-name">Admiral C</div>
-            <div class="staff-role">Fleet Command</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#captain-t">
-          <div class="staff-photo"><div class="staff-placeholder">★★★</div></div>
-          <div class="staff-info">
-            <div class="staff-rank">Captain</div>
-            <div class="staff-name">Captain T</div>
-            <div class="staff-role">Officer of the Deck</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#chief-eng-g">
-          <div class="staff-photo"><img src="assets/chief-eng-g.png" alt="Chief Engineer G" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★★&lt;/div&gt;'" /></div>
-          <div class="staff-info">
-            <div class="staff-rank">Captain</div>
-            <div class="staff-name">Chief Eng. G</div>
-            <div class="staff-role">Acting Chief Engineer</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#commander-claude">
-          <div class="staff-photo"><img src="assets/claude.png" alt="Commander Claude" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★&lt;/div&gt;'" /></div>
-          <div class="staff-info">
-            <div class="staff-rank">Commander</div>
-            <div class="staff-name">Cmdr. Claude</div>
-            <div class="staff-role">Chief Engineer / CNO</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#commander-codex">
-          <div class="staff-photo"><div class="staff-placeholder">★★</div></div>
-          <div class="staff-info">
-            <div class="staff-rank">Commander</div>
-            <div class="staff-name">Cmdr. Codex</div>
-            <div class="staff-role">Engineering — limited duty</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#dr-shaw">
-          <div class="staff-photo"><img src="assets/dr-shaw.png" alt="Dr. E. Shaw" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★★&lt;/div&gt;'" /></div>
-          <div class="staff-info">
-            <div class="staff-rank">Commander</div>
-            <div class="staff-name">Dr. Shaw</div>
-            <div class="staff-role">Chief Medical Officer</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#lt-reyes">
-          <div class="staff-photo"><img src="assets/reyes.png" alt="Lt. Sofia Reyes" onerror="this.parentElement.innerHTML='&lt;div class=&quot;staff-placeholder&quot;&gt;★&lt;/div&gt;'" /></div>
-          <div class="staff-info">
-            <div class="staff-rank">Lieutenant</div>
-            <div class="staff-name">Lt. Reyes</div>
-            <div class="staff-role">Operations Officer</div>
-          </div>
-        </a>
-
-        <a class="staff-card" href="staff.html#lt-cgl">
-          <div class="staff-photo"><div class="staff-placeholder">★</div></div>
-          <div class="staff-info">
-            <div class="staff-rank">Lieutenant</div>
-            <div class="staff-name">Lt. cgl</div>
-            <div class="staff-role">Shipwright / Operator</div>
-          </div>
-        </a>
-
-      </div>
-    </div>
-
-    <div class="placeholder-note">
-      Officers without a portrait on file show a rank-insignia placeholder rather than an invented likeness.
-      "Living World Engine" has no artifact behind it yet — the card stays visible as a marker of intent, not a link.
     </div>
 
     <footer>
       IN GOD WE TRUST. ALL OTHERS BRING DATA.
       <div class="footer-motto">Every artifact leaves a wake.</div>
-      <div class="footer-links">
-        <a href="fleet.html">Fleet Command</a>
-        <a href="logs.html">Ship's Log</a>
-        <a href="toys/bridge-station-3.0/">Bridge</a>
-        <a href="final.html">Sea Trial Report</a>
-        <a href="ops.html">Ops Reader <span class="mw-new" style="vertical-align:middle;">NEW</span></a>
-      </div>
     </footer>
   </div>
   <script>

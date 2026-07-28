@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Command — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .page-header { padding: 56px 0 24px; border-bottom: 1px solid #1E2C42; }
+  .page-eyebrow { font-size: 10.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 8px; }
+  .page-header h1 { font-family: 'Oswald', sans-serif; font-size: 28px; letter-spacing: 0.08em; font-weight: 700; }
+  .page-header p { font-size: 12px; color: #6B7C93; margin-top: 10px; max-width: 620px; }
+  .section { padding: 36px 0 8px; }
+  .section h2 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #DCE6F2; text-transform: uppercase; margin-bottom: 4px; }
+  .section-eyebrow { font-size: 10.5px; color: #6B7C93; letter-spacing: 0.03em; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 6px; padding: 18px 20px; transition: border-color 150ms ease, background 150ms ease; }
+  .card:hover { border-color: #4FD1C5; background: #14203380; }
+  .card-featured { grid-column: 1 / -1; padding: 22px 24px; border-color: #E8A33D66; }
+  .card-featured .card-name { font-size: 17px; }
+  .card-featured .card-desc { font-size: 12px; }
+  .card-featured:hover { border-color: #E8A33D; }
+  .card-name { font-family: 'Oswald', sans-serif; font-size: 14px; color: #DCE6F2; margin-bottom: 4px; }
+  .card-desc { font-size: 11px; color: #6B7C93; }
+  .card-tag { display: inline-block; margin-top: 10px; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; }
+  .tag-live { color: #4FD1C5; border: 1px solid #4FD1C544; }
+  .tag-review { color: #6B7C93; border: 1px solid #6B7C9344; }
+  .tag-new { color: #E8A33D; border: 1px solid #E8A33D44; animation: tag-new-pulse 2s ease-in-out infinite; }
+  @keyframes tag-new-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-header">
+      <div class="page-eyebrow">Act</div>
+      <h1>Command</h1>
+      <p>Direct the fleet. The one live console, the autonomous crew's posture, and the open work queue — everything here can change what the fleet does next.</p>
+    </div>
+
+    <div class="section" style="padding-top: 28px;">
+      <div class="grid">
+        <a class="card card-featured" href="toys/bridge-station-3.0/">
+          <div class="card-name">Bridge Station 3.0</div>
+          <div class="card-desc">One authoritative command view wired to real FleetCore data — select a vessel, Set Waypoint, or use the Control/Radio/Raw Feed tabs for spawn/despawn, Harbor Pilot Boarding, ambient radio, and the raw event feed.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Autonomous Crew</h2>
+      <p class="section-eyebrow">AI crew operating inside FleetCore's bounds.</p>
+      <div class="grid">
+        <a class="card" href="toys/agent-ops/">
+          <div class="card-name">Agent Operations</div>
+          <div class="card-desc">Living Fleet — Alpha, Bravo, and Charlie choose bounded posture while FleetCore remains in command.</div>
+          <span class="card-tag tag-live">live</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Work Queue</h2>
+      <p class="section-eyebrow">Open findings and tasks, kept phone-readable.</p>
+      <div class="grid">
+        <a class="card" href="ops.html">
+          <div class="card-name">Ops Reader</div>
+          <div class="card-desc">Work queue &amp; findings — everything currently open, in one readable feed.</div>
+          <span class="card-tag tag-new">new</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="assets/js/monad-nav.js" data-root="" data-section="command"></script>
+</body>
+</html>
