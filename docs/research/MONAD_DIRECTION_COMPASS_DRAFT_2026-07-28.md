@@ -170,3 +170,54 @@ site:
 Record where their interpretation and behavior diverge from the intended
 direction. That evidence, combined with the Admiral's answers above, is enough
 to select or revise the first public-release thesis.
+
+## Proposed human usability, discoverability, and relevance study
+
+**Admiral's observation:** The high-level shape of the public site warrants a
+substantial human study before further structural growth.
+
+**Human-only contribution:** Observe uncoached behavior, judge whether outcomes
+matter, and rule on project direction. The Captain can prepare prompts,
+preserve transcripts, classify findings, and synthesize evidence.
+
+### Session shape
+
+Use three to five people unfamiliar with the current structure. Run each
+session for 15–20 minutes without explaining Monad first.
+
+1. Open only `https://cameronlampley.com/`.
+2. Ask: “What do you think this is?”
+3. Ask: “What would you click first, and why?”
+4. Ask them to find something happening live.
+5. Ask them to find something they can meaningfully do.
+6. Ask them to find evidence distinguishing fact, simulation, and story.
+7. Ask: “Who is this for, and would you return?”
+8. End by asking what they expected but could not find.
+
+### Record
+
+- first interpretation and confidence;
+- first click and hesitation time;
+- route taken without coaching;
+- successful and failed discoveries;
+- language the participant uses for Monad;
+- moment of strongest interest;
+- moment relevance collapses;
+- requested capability or missing explanation;
+- whether the maritime, inquiry, or living-archive direction was perceived.
+
+Do not collect unnecessary personal data. Preserve behavioral observations and
+short paraphrases rather than identifying information.
+
+### Decision rule
+
+The study is complete when recurring patterns are clear enough to answer:
+
+1. Which direction visitors actually perceive;
+2. which experience creates genuine relevance;
+3. which top-level category labels aid or obstruct discovery;
+4. whether the intended first voyage can be completed without coaching;
+5. what one structural change has the strongest evidence behind it.
+
+Do not average contradictory visitors into false consensus. Preserve distinct
+audiences or task types when they imply different beast-domains.
