@@ -15,6 +15,8 @@
  * data-page: current page's human label. Omit on a section's own landing page.
  */
 (function () {
+  if (document.querySelector(".monad-nav")) return;
+
   var thisScript = document.currentScript;
   var root = thisScript.getAttribute("data-root") || "";
   var section = thisScript.getAttribute("data-section") || "";
