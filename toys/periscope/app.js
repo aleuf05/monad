@@ -8,10 +8,11 @@ import {
   autoAcquireSharedContact,
   tickBearing,
   focusContactForOptics,
+  configurePresentationCreatures,
   OPTICS_TIERS,
 } from "./state.js";
 import { createPeriscopeScene } from "./scene.js";
-import { resolveKrakenContactVisual } from "./kraken.js";
+import { createCreatureVisualResolver, creatureContacts, loadCreatureManifest } from "./creatures.js";
 
 const canvas = document.querySelector("#periscopeCanvas");
 const overlayCanvas = document.querySelector("#periscopeOverlay");
@@ -37,7 +38,13 @@ const panelRange = document.querySelector("#panelRange");
 
 const periscope = createPeriscopeState();
 const scene = createPeriscopeScene({ canvas, overlayCanvas });
-scene.setContactVisualResolver(resolveKrakenContactVisual);
+const creatures = await loadCreatureManifest();
+configurePresentationCreatures(creatureContacts(creatures));
+scene.setContactVisualResolver(createCreatureVisualResolver(creatures));
+if (creatures.length) {
+  periscope.selectedId = creatures[0].id;
+  periscope.targetBearing = creatures[0].position.bearing;
+}
 
 let latestContacts = [];
 let contactButtonsReady = false;

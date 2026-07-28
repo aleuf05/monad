@@ -217,7 +217,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     group.add(wake);
 
     scene.add(group);
-    entry = { group, sprite, wake, textureKey: null, model: null, modelScaleBasis: 0 };
+    entry = { group, sprite, wake, textureKey: null, model: null, modelScaleBasis: 0, modelScaleMultiplier: 1 };
     contactPool.set(contact.id, entry);
 
     const custom = contactVisualResolver(contact, contact.profile);
@@ -234,6 +234,10 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
           const maxDimension = Math.max(size.x, size.y, size.z) || 1;
           entry.model = model;
           entry.modelScaleBasis = 1 / maxDimension;
+          entry.modelScaleMultiplier = Number(custom.scale) || 1;
+          if (Array.isArray(custom.rotation) && custom.rotation.length === 3) {
+            entry.model.rotation.set(...custom.rotation.map(THREE.MathUtils.degToRad));
+          }
           group.add(model);
           entry.sprite.visible = false;
         })
@@ -255,7 +259,7 @@ export function createPeriscopeScene({ canvas, overlayCanvas }) {
     const baseSize = distance * 0.34 * contact.profile.size;
 
     if (entry.model) {
-      const modelScale = baseSize * 1.6 * entry.modelScaleBasis;
+      const modelScale = baseSize * 1.6 * entry.modelScaleBasis * entry.modelScaleMultiplier;
       entry.model.scale.setScalar(modelScale);
     } else {
       const textureKey = contact.profile.sprite;
