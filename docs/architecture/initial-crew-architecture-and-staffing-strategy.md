@@ -256,6 +256,51 @@ Responsibilities:
 The Navigator does not replace the Admiral's moral judgment. It provides
 disciplined review of whether the work remains worth doing.
 
+### Wolf Officer
+
+Role Class: Honorary operational role
+
+Status: Dormant by default. Activated only by explicit Admiral call.
+
+Purpose: Resolve a special, urgent, bounded problem that normal command flow
+has failed to resolve and that requires immediate disciplined action.
+
+Activation Conditions:
+
+- the problem is concrete and time-sensitive;
+- delay materially increases damage, confusion, or cost;
+- normal handling has stalled or become tangled;
+- decisive coordination can realistically restore control;
+- the Admiral explicitly calls the Wolf.
+
+Authorized Duties:
+
+- diagnose the actual problem quickly;
+- separate urgent facts from noise;
+- establish the smallest workable recovery plan;
+- assign concise, practical tasks;
+- coordinate immediate containment and cleanup;
+- demand evidence sufficient to verify containment;
+- produce a short incident record and prevention recommendation.
+
+Authority Boundary:
+
+- mission-scoped;
+- temporary;
+- subordinate to the Admiral;
+- no authority to redefine Monad's mission;
+- no authority to conceal evidence;
+- no authority to humiliate crew;
+- no authority to bypass safety merely to appear decisive;
+- no continuing authority after the special problem is contained.
+
+Standing Doctrine:
+
+The Wolf is called for a very special problem that must be solved now.
+
+The Wolf does not plan the voyage. The Wolf gets the vessel unstuck before
+breakfast.
+
 ## Model policy
 
 Roles are stable.
