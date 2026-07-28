@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cameronlampley.com/toys/claim-lab/claim-schema.json",
+  "title": "Monad Scientific Claim Record",
+  "type": "object",
+  "required": [
+    "id",
+    "proposition",
+    "classification",
+    "falsification",
+    "protocol",
+    "evidence",
+    "reproduction",
+    "criticism",
+    "verdict",
+    "history",
+    "human_authority"
+  ],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "proposition": { "type": "string", "minLength": 10 },
+    "classification": {
+      "enum": ["observation", "hypothesis", "model", "established-result"]
+    },
+    "falsification": {
+      "type": "object",
+      "required": ["condition", "measurement"],
+      "properties": {
+        "condition": { "type": "string", "minLength": 10 },
+        "measurement": { "type": "string", "minLength": 10 }
+      }
+    },
+    "protocol": {
+      "type": "object",
+      "required": ["procedure", "success_threshold", "failure_threshold"],
+      "properties": {
+        "procedure": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+        "success_threshold": { "type": "string", "minLength": 1 },
+        "failure_threshold": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence": { "type": "array" },
+    "reproduction": {
+      "type": "object",
+      "required": ["attempts", "independent_attempts", "status"],
+      "properties": {
+        "attempts": { "type": "integer", "minimum": 0 },
+        "independent_attempts": { "type": "integer", "minimum": 0 },
+        "status": { "enum": ["not-run", "partial", "reproduced", "failed"] }
+      }
+    },
+    "criticism": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "verdict": {
+      "enum": ["untested", "supported", "weakened", "rejected", "unresolved"]
+    },
+    "history": { "type": "array", "minItems": 1 },
+    "human_authority": {
+      "type": "object",
+      "required": ["owner", "promotion_required"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1 },
+        "promotion_required": { "const": true }
+      }
+    }
+  }
+}

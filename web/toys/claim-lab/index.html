@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scientific Claim Laboratory — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  :root { --hull:#0b1220; --panel:#111a2b; --line:#26344b; --ink:#dce6f2; --dim:#8291a8; --amber:#e8a33d; --green:#4fd1c5; --red:#e06b67; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--hull); color:var(--ink); font-family:'JetBrains Mono',monospace; line-height:1.55; }
+  .wrap { max-width:1040px; margin:auto; padding:64px 22px 90px; }
+  .eyebrow { color:var(--amber); font-size:10px; letter-spacing:.14em; text-transform:uppercase; }
+  h1,h2 { font-family:'Oswald',sans-serif; }
+  h1 { margin:5px 0 8px; font-size:clamp(30px,6vw,48px); letter-spacing:.05em; }
+  .lede { color:var(--dim); max-width:76ch; font-size:13px; }
+  .maxim { margin:24px 0; border-left:3px solid var(--amber); padding:10px 16px; background:#111a2b; font-family:'Oswald',sans-serif; font-size:18px; }
+  .truth-boundary { border:1px solid var(--amber); color:var(--amber); padding:12px 15px; font-size:12px; margin:22px 0 30px; }
+  .grid { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(260px,.6fr); gap:18px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:7px; padding:20px; }
+  .panel h2 { margin:0 0 14px; font-size:17px; letter-spacing:.06em; }
+  .field { border-top:1px solid var(--line); padding:13px 0; }
+  .field:first-of-type { border-top:0; }
+  .label { color:var(--amber); font-size:9px; letter-spacing:.1em; text-transform:uppercase; margin-bottom:4px; }
+  .value { font-size:12px; }
+  ul,ol { margin:6px 0 0; padding-left:20px; }
+  li { margin:4px 0; }
+  .verifier { position:sticky; top:54px; align-self:start; }
+  .result { font-family:'Oswald',sans-serif; font-size:27px; margin:6px 0; }
+  .pass { color:var(--green); } .fail { color:var(--red); }
+  .status { color:var(--dim); font-size:11px; }
+  button { width:100%; margin-top:16px; background:var(--amber); color:var(--hull); border:0; border-radius:4px; padding:11px; font:600 11px 'JetBrains Mono',monospace; cursor:pointer; text-transform:uppercase; letter-spacing:.06em; }
+  .mutation { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); font-size:11px; color:var(--dim); }
+  .links { margin-top:20px; display:flex; flex-wrap:wrap; gap:12px; }
+  .links a { color:var(--green); font-size:11px; }
+  .foot { margin-top:28px; color:var(--dim); font-size:10px; }
+  @media(max-width:760px) { .grid { grid-template-columns:1fr; } .verifier { position:static; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">New · Corps of Research · Evidence Instrument</div>
+  <h1>Scientific Claim Laboratory</h1>
+  <p class="lede">A claim becomes operational when another person can identify what it says, what would defeat it, how it will be tested, what evidence exists, and who may promote it. This laboratory checks that record. Reality still judges the proposition.</p>
+  <div class="maxim">Monad guides the process. Reality decides what survives.</div>
+  <div class="truth-boundary"><strong>VERIFIER BOUNDARY:</strong> PASS means the record is complete and internally consistent. It does not mean the proposition is true.</div>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="claimTitle">
+      <h2 id="claimTitle">Worked claim</h2>
+      <div id="claimRecord"><div class="status">Loading machine-readable claim…</div></div>
+    </section>
+    <aside class="panel verifier" aria-live="polite">
+      <div class="eyebrow">Deterministic verifier</div>
+      <div id="verifierResult" class="result">WAIT</div>
+      <div id="verifierStatus" class="status">Loading schema and claim.</div>
+      <button id="runVerifier" type="button">Run verifier again</button>
+      <div class="mutation">
+        <strong>Controlled negative tests</strong>
+        <div id="mutationStatus">Not run.</div>
+      </div>
+      <div class="links">
+        <a href="claim-schema.json">Schema JSON</a>
+        <a href="example-claim.json">Claim JSON</a>
+        <a href="verifier.mjs">Verifier source</a>
+      </div>
+    </aside>
+  </div>
+  <p class="foot">Human promotion required. Evidence and criticism remain visible. Every change leaves history.</p>
+</main>
+<script type="module">
+  import { verifyClaim } from "./verifier.mjs";
+
+  let claim;
+  let schema;
+  const record = document.getElementById("claimRecord");
+  const result = document.getElementById("verifierResult");
+  const status = document.getElementById("verifierStatus");
+  const mutationStatus = document.getElementById("mutationStatus");
+
+  function esc(value) {
+    return String(value).replace(/[&<>"']/g, (character) => ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+    })[character]);
+  }
+
+  function list(items) {
+    return "<ul>" + items.map((item) => "<li>" + esc(item) + "</li>").join("") + "</ul>";
+  }
+
+  function renderClaim() {
+    record.innerHTML =
+      '<div class="field"><div class="label">Proposition</div><div class="value">' + esc(claim.proposition) + "</div></div>" +
+      '<div class="field"><div class="label">Classification · current verdict</div><div class="value">' + esc(claim.classification) + " · " + esc(claim.verdict) + "</div></div>" +
+      '<div class="field"><div class="label">What would defeat it</div><div class="value">' + esc(claim.falsification.condition) + "</div></div>" +
+      '<div class="field"><div class="label">Measurement</div><div class="value">' + esc(claim.falsification.measurement) + "</div></div>" +
+      '<div class="field"><div class="label">Pre-registered procedure</div><div class="value">' + list(claim.protocol.procedure) + "</div></div>" +
+      '<div class="field"><div class="label">Thresholds</div><div class="value"><strong>Support:</strong> ' + esc(claim.protocol.success_threshold) + "<br><strong>Failure:</strong> " + esc(claim.protocol.failure_threshold) + "</div></div>" +
+      '<div class="field"><div class="label">Evidence and reproduction</div><div class="value">' + claim.evidence.length + " evidence records · " + claim.reproduction.attempts + " attempts · " + claim.reproduction.independent_attempts + " independent · " + esc(claim.reproduction.status) + "</div></div>" +
+      '<div class="field"><div class="label">Known criticism</div><div class="value">' + list(claim.criticism) + "</div></div>" +
+      '<div class="field"><div class="label">Human authority</div><div class="value">' + esc(claim.human_authority.owner) + " · promotion required</div></div>";
+  }
+
+  function run() {
+    const check = verifyClaim(claim, schema);
+    result.textContent = check.valid ? "PASS" : "FAIL";
+    result.className = "result " + (check.valid ? "pass" : "fail");
+    status.textContent = check.valid
+      ? check.checks + " structural and consistency checks passed. Claim remains " + claim.verdict + "."
+      : check.errors.join(" ");
+
+    const missingFalsifier = structuredClone(claim);
+    delete missingFalsifier.falsification;
+    const falseProof = structuredClone(claim);
+    falseProof.verdict = "proven-by-monad";
+    const rejected = !verifyClaim(missingFalsifier, schema).valid &&
+      !verifyClaim(falseProof, schema).valid;
+    mutationStatus.textContent = rejected
+      ? "PASS — missing falsifier and invented verdict were rejected."
+      : "FAIL — a controlled invalid record escaped.";
+    mutationStatus.className = rejected ? "pass" : "fail";
+  }
+
+  Promise.all([
+    fetch("./claim-schema.json", { cache:"no-store" }).then((response) => response.json()),
+    fetch("./example-claim.json", { cache:"no-store" }).then((response) => response.json())
+  ]).then(([loadedSchema, loadedClaim]) => {
+    schema = loadedSchema;
+    claim = loadedClaim;
+    renderClaim();
+    run();
+  }).catch((error) => {
+    result.textContent = "FAIL";
+    result.className = "result fail";
+    status.textContent = "Artifact load failed: " + error.message;
+  });
+
+  document.getElementById("runVerifier").addEventListener("click", () => {
+    if (claim && schema) run();
+  });
+</script>
+<script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Scientific Claim Laboratory"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+{
+  "id": "monad.claim-record.effectiveness.v0.1",
+  "proposition": "Using a Scientific Claim Record reduces unsupported completion claims in comparable Monad engineering tasks.",
+  "classification": "hypothesis",
+  "falsification": {
+    "condition": "The record-assisted group has an equal or higher unsupported-completion rate than the control group.",
+    "measurement": "Blind reviewers count completion statements not supported by the predefined acceptance evidence."
+  },
+  "protocol": {
+    "procedure": [
+      "Pre-register ten comparable engineering tasks and their acceptance evidence.",
+      "Randomly assign five tasks to ordinary workflow and five to claim-record-assisted workflow.",
+      "Have operators complete the tasks without seeing the scoring rubric.",
+      "Give blinded independent reviewers the outputs and preserved evidence.",
+      "Compare unsupported-completion claims per task and publish all exclusions."
+    ],
+    "success_threshold": "At least 30% fewer unsupported-completion claims in the assisted group.",
+    "failure_threshold": "No reduction, or any increase, in the assisted group."
+  },
+  "evidence": [],
+  "reproduction": {
+    "attempts": 0,
+    "independent_attempts": 0,
+    "status": "not-run"
+  },
+  "criticism": [
+    "Ten tasks may be too small to distinguish the record from operator skill.",
+    "Reviewers may disagree on what counts as adequate acceptance evidence.",
+    "The record may improve reporting while leaving actual task quality unchanged."
+  ],
+  "verdict": "untested",
+  "history": [
+    {
+      "at": "2026-07-28T00:00:00Z",
+      "actor": "Captain / Codex",
+      "change": "Created a falsifiable worked example; no experiment has been run."
+    }
+  ],
+  "human_authority": {
+    "owner": "Admiral / Lieutenant cgl",
+    "promotion_required": true
+  }
+}
