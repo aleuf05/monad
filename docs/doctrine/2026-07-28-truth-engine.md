@@ -71,3 +71,9 @@ Ledger carried across runs.
 This is a draft capture, not a canon promotion — building the small
 reversible instrument is ordinary engineering work under existing policy;
 it does not itself assert this doctrine as adopted project purpose.
+
+## Conversational protocol
+
+[`CaptainChat — Truth Session v1`](../research/TRUTH_SESSION_V1_DRAFT_2026-07-28.md)
+is the compact, non-canonical conversation format for applying these
+observation, inference, uncertainty, and next-action boundaries in real time.

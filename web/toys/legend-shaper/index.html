@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Legend Shaper — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  :root {
+    --ink: #e8e2d4;
+    --muted: #918b80;
+    --amber: #e8a33d;
+    --teal: #4fd1c5;
+    --deep: #07111c;
+    --panel: #101b28;
+    --line: #263445;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 15% 10%, #173047 0, transparent 36%),
+      radial-gradient(circle at 90% 85%, #302419 0, transparent 30%),
+      var(--deep);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .wrap { width: min(980px, calc(100% - 32px)); margin: 0 auto; padding: 72px 0 90px; }
+  .eyebrow { color: var(--amber); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; }
+  h1 {
+    margin: 10px 0 8px;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(42px, 8vw, 76px);
+    line-height: .9;
+  }
+  .lede { max-width: 700px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+  .warning {
+    margin: 26px 0;
+    padding: 13px 16px;
+    border: 1px solid #e8a33d66;
+    border-left: 4px solid var(--amber);
+    background: #e8a33d0c;
+    color: #eacb99;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+  .layout { display: grid; grid-template-columns: minmax(250px, .75fr) minmax(0, 1.5fr); gap: 18px; }
+  .panel { background: #101b28e8; border: 1px solid var(--line); border-radius: 9px; padding: 20px; }
+  label { display: block; margin: 0 0 6px; color: var(--muted); font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  select, input, button {
+    width: 100%;
+    border: 1px solid #34465a;
+    border-radius: 5px;
+    background: #09131f;
+    color: var(--ink);
+    font: inherit;
+  }
+  select, input { height: 40px; padding: 0 10px; margin-bottom: 16px; font-size: 12px; }
+  input[type="range"] { padding: 0; accent-color: var(--amber); }
+  button {
+    min-height: 43px;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: #07111c;
+    background: var(--amber);
+    border-color: var(--amber);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  button:hover { filter: brightness(1.08); }
+  button.secondary { margin-top: 9px; color: var(--teal); background: transparent; border-color: #4fd1c566; }
+  .output-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .stamp { color: var(--teal); font-size: 9px; letter-spacing: .13em; text-transform: uppercase; }
+  #legend {
+    min-height: 250px;
+    margin: 28px 0 32px;
+    display: flex;
+    align-items: center;
+    font-family: "Cormorant Garamond", serif;
+    font-size: clamp(25px, 4vw, 39px);
+    font-weight: 600;
+    line-height: 1.23;
+    text-wrap: balance;
+  }
+  .recipe {
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 9.5px;
+    line-height: 1.6;
+  }
+  .recipe strong { color: var(--ink); font-weight: 500; }
+  .anatomy { margin-top: 18px; }
+  .anatomy h2 { margin: 0 0 10px; font-size: 10px; color: var(--amber); letter-spacing: .12em; text-transform: uppercase; }
+  .anatomy ol { margin: 0; padding-left: 19px; color: var(--muted); font-size: 10px; line-height: 1.8; }
+  @media (max-width: 720px) {
+    .wrap { padding-top: 82px; }
+    .layout { grid-template-columns: 1fr; }
+    #legend { min-height: 210px; }
+  }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">NEW · Controlled Narrative Instrument</div>
+  <h1>Legend Shaper</h1>
+  <p class="lede">Explore the linguistic silhouette of myth without asking a machine to invent history. Every result is deterministic, inspectable, and made entirely in this browser.</p>
+
+  <div class="warning">
+    <strong>SIMULATED NONSENSE — NOT A TRUE ACCOUNT.</strong>
+    Output is generated from a small visible grammar. It is not evidence, fleet state, recovered tradition, canon, or a statement about real people or events.
+  </div>
+
+  <div class="layout">
+    <section class="panel" aria-label="Legend controls">
+      <label for="domain">Beast-domain</label>
+      <select id="domain">
+        <option value="deep">The Unlit Deep</option>
+        <option value="harbor">The Crooked Harbor</option>
+        <option value="sky">The Brass Sky</option>
+        <option value="archive">The Drowned Archive</option>
+      </select>
+
+      <label for="tone">Voice</label>
+      <select id="tone">
+        <option value="solemn">Solemn witness</option>
+        <option value="salt">Salt-worn telling</option>
+        <option value="oracle">Broken oracle</option>
+      </select>
+
+      <label for="shape">Legend shape</label>
+      <select id="shape">
+        <option value="origin">Origin</option>
+        <option value="warning">Warning</option>
+        <option value="ritual">Ritual</option>
+      </select>
+
+      <label for="strangeness">Strangeness</label>
+      <input id="strangeness" type="range" min="0" max="2" value="1" />
+
+      <label for="seed">Seed</label>
+      <input id="seed" value="MONAD-001" maxlength="40" spellcheck="false" />
+
+      <button id="shapeLegend" type="button">Shape a legend</button>
+      <button id="mutate" class="secondary" type="button">Mutate seed</button>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div class="output-head">
+        <span class="stamp">Generated candidate · simulated</span>
+        <span class="stamp" id="seedReadout">MONAD-001</span>
+      </div>
+      <div id="legend">Choose a domain, then shape its first impossible memory.</div>
+      <div class="recipe" id="recipe">
+        <strong>Recipe:</strong> domain + figure + impossible event + consequence + refrain
+      </div>
+      <button id="copy" class="secondary" type="button">Copy with warning label</button>
+    </section>
+  </div>
+
+  <section class="panel anatomy">
+    <h2>Grammar under the lantern</h2>
+    <ol>
+      <li>A domain supplies place-language and atmosphere.</li>
+      <li>A figure carries an epithet, never a factual identity.</li>
+      <li>An impossible event breaks ordinary causality.</li>
+      <li>A communal consequence gives the telling cultural shape.</li>
+      <li>A refrain closes the form without claiming truth.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const banks = {
+    deep: {
+      places: ["beneath the unlit meridian", "where the black current folds", "below the last sounding"],
+      figures: ["the Lantern Kraken", "the Cartographer Without Eyes", "the Whale of Thirteen Names"],
+      events: [
+        ["swallowed the seventh bell", "taught an anchor to dream", "returned a shadow before its sailor"],
+        ["drank the moon from a brass cup", "knotted yesterday around a drowned mast", "counted every silence in the sea"],
+        ["opened a door beneath the ocean", "made the compass confess", "carried dawn backward through the trench"]
+      ]
+    },
+    harbor: {
+      places: ["inside the crooked harbor", "at the quay that appears only in fog", "under the harbor master's dead clock"],
+      figures: ["the Rope-Mender Queen", "Old Copper Gull", "the Pilot in the Green Coat"],
+      events: [
+        ["moored a storm to the eastern pier", "sold the tide an empty bottle", "rang a buoy with no bell"],
+        ["persuaded the breakwater to move", "borrowed a century from the lighthouse", "tied three winds into one knot"],
+        ["gave every ship the same impossible name", "sailed through a warehouse wall", "found the harbor inside a pearl"]
+      ]
+    },
+    sky: {
+      places: ["above the brass horizon", "in the country of upward rain", "where clouds keep their iron nests"],
+      figures: ["the Copper Albatross", "Saint Thunder-of-No-Church", "the Keeper of the Ninth Horizon"],
+      events: [
+        ["stole a spark from an unborn star", "folded lightning into a chart", "taught the north wind to whisper"],
+        ["built a ladder from seven eclipses", "weighed a cloud against a crown", "hid noon inside a blue feather"],
+        ["unfastened the sky from its hinges", "sailed beyond the final color", "called every storm by its childhood name"]
+      ]
+    },
+    archive: {
+      places: ["within the drowned archive", "between the pages the sea refused", "under the library of salt"],
+      figures: ["the Ink-Sleeved Diver", "the Librarian of Lost Wakes", "the Witness Made of Margins"],
+      events: [
+        ["read a voyage that had never begun", "found a footnote older than water", "erased a word and released a tide"],
+        ["catalogued the dreams of anchors", "bound a hurricane in blue thread", "translated silence into seventeen maps"],
+        ["opened the book that remembers its reader", "returned with tomorrow's missing log", "taught the archive to forget on purpose"]
+      ]
+    }
+  };
+
+  const consequences = {
+    origin: [
+      "From that hour, every navigator carried one blank chart.",
+      "That is why the fleet leaves an empty place at every table.",
+      "Since then, no true keel is laid without a borrowed name."
+    ],
+    warning: [
+      "So no wise watch rings the final bell twice.",
+      "That is why sailors turn one mirror toward the wall.",
+      "Since then, the third light is counted but never followed."
+    ],
+    ritual: [
+      "Each departure now begins with a compass left unopened.",
+      "To remember it, the crew pours one cup back into the sea.",
+      "Even now, every safe return is marked by an unspoken name."
+    ]
+  };
+
+  const refrains = {
+    solemn: ["The sea remembers what the chart refuses.", "What was impossible left an ordinary wake.", "No witness agreed, and none forgot."],
+    salt: ["Believe the gull if you like; the gull charges less.", "A dry boot doubts what a wet deck knows.", "The tide denies it every morning and repeats it every night."],
+    oracle: ["The first ending has not happened yet.", "Count backward when the silent bell answers.", "The map is awake where the road is sleeping."]
+  };
+
+  function hashSeed(value) {
+    let h = 2166136261;
+    for (let i = 0; i < value.length; i++) {
+      h ^= value.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function rngFrom(seed) {
+    let state = hashSeed(seed) || 1;
+    return () => {
+      state += 0x6D2B79F5;
+      let t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function pick(list, rng) {
+    return list[Math.floor(rng() * list.length)];
+  }
+
+  const els = {
+    domain: document.querySelector("#domain"),
+    tone: document.querySelector("#tone"),
+    shape: document.querySelector("#shape"),
+    strange: document.querySelector("#strangeness"),
+    seed: document.querySelector("#seed"),
+    legend: document.querySelector("#legend"),
+    recipe: document.querySelector("#recipe"),
+    seedReadout: document.querySelector("#seedReadout"),
+    shapeLegend: document.querySelector("#shapeLegend"),
+    mutate: document.querySelector("#mutate"),
+    copy: document.querySelector("#copy")
+  };
+
+  function generate() {
+    const seed = els.seed.value.trim() || "MONAD-001";
+    const rng = rngFrom([seed, els.domain.value, els.tone.value, els.shape.value, els.strange.value].join("|"));
+    const domain = banks[els.domain.value];
+    const level = Number(els.strange.value);
+    const place = pick(domain.places, rng);
+    const figure = pick(domain.figures, rng);
+    const event = pick(domain.events[level], rng);
+    const consequence = pick(consequences[els.shape.value], rng);
+    const refrain = pick(refrains[els.tone.value], rng);
+    const opener = els.tone.value === "salt" ? "They say" : els.tone.value === "oracle" ? "It was written backward:" : "The oldest telling says";
+
+    els.legend.textContent = `${opener} ${place}, ${figure} ${event}. ${consequence} ${refrain}`;
+    els.seedReadout.textContent = seed;
+    els.recipe.innerHTML = `<strong>Recipe:</strong> ${els.domain.options[els.domain.selectedIndex].text} · ${els.tone.options[els.tone.selectedIndex].text} · ${els.shape.options[els.shape.selectedIndex].text} · strangeness ${level} · seed ${seed}`;
+  }
+
+  els.shapeLegend.addEventListener("click", generate);
+  els.mutate.addEventListener("click", () => {
+    const base = els.seed.value.trim().replace(/-\d+$/, "") || "MONAD";
+    const suffix = String((hashSeed(els.seed.value + Date.now()) % 999) + 1).padStart(3, "0");
+    els.seed.value = `${base}-${suffix}`;
+    generate();
+  });
+  els.copy.addEventListener("click", async () => {
+    const text = `SIMULATED NONSENSE — NOT A TRUE ACCOUNT.\n\n${els.legend.textContent}\n\n${els.recipe.textContent}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      els.copy.textContent = "Copied with warning";
+      setTimeout(() => { els.copy.textContent = "Copy with warning label"; }, 1600);
+    } catch {
+      els.copy.textContent = "Clipboard unavailable";
+    }
+  });
+
+  generate();
+})();
+</script>
+<script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Legend Shaper"></script>
+</body>
+</html>
