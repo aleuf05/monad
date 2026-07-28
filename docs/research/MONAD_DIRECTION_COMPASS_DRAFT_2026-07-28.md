@@ -228,3 +228,6 @@ The [`First Public Voyage Path Audit`](../verification/2026-07-28-first-voyage-p
 verified that the doctrinal voyage's components are live but are not connected
 as a discoverable sequence. This strengthens the case for testing visitor
 behavior before adding instruments or redesigning the hierarchy.
+
+The [`Human Field Card`](MONAD_PUBLIC_UX_FIELD_CARD_2026-07-28.md) converts the
+study protocol into a phone-readable, repeatable 15–20 minute session.
