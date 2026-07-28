@@ -1,6 +1,6 @@
 # Engineering Packet — Live Captain Site Integration — Version 1
 
-Status: blocked on privileged commissioning
+Status: verified complete
 
 ## 1. Originating intent
 
@@ -85,6 +85,25 @@ privileged handoff and privately chooses the conference password.
 - 2026-07-28: commissioning correctly remains blocked while PID 29244 is
   running the human's terminal Live Captain. No process was interrupted.
 
-Next state: the Lieutenant exits the terminal Captain with `/quit`, chooses
-the Private Conference password through the hidden prompt in `cmd.sh`, and
-returns control to Codex for live UI deployment and real-domain verification.
+The commissioning gate was resolved when the Lieutenant exited the terminal
+Captain, chose the Private Conference password through the hidden prompt, and
+ran the pinned handoff.
+
+- 2026-07-28: the Lieutenant completed the privileged handoff. The protected
+  authentication file exists with mode 0600.
+- 2026-07-28: `live-captain-web.service` is enabled and active, running the
+  intended `web_service.py` process as user `cgl`.
+- 2026-07-28: the service listens only on `127.0.0.1:4776`; local `/health`
+  and the public Caddy health route both return HTTP 200.
+- 2026-07-28: unauthenticated public transcript access returns HTTP 401.
+- 2026-07-28: the Private Conference panel was deployed to the existing live
+  Living Captain page, visibly labeled `NEW`, with independent degraded-state
+  handling that leaves the public status instrument operational.
+- 2026-07-28: a short-lived signed test session reached the real public
+  domain, authenticated successfully, and completed one Gemini reply with
+  HTTP 200. Provider was `gemini-3.5-flash-lite`; the persistent ledger showed
+  six total attempts and a conservative reserved estimate of $0.019164.
+- 2026-07-28: service logs were clean after live acceptance. No terminal
+  Captain process remained and no secret value was printed.
+
+Completion state: verified complete and recorded.

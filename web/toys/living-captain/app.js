@@ -1,4 +1,5 @@
 const API_BASE = new URLSearchParams(location.search).get("api") || "/living-captain-api/status";
+const CONFERENCE_API = "/live-captain-chat-api";
 const POLL_INTERVAL_MS = 10000;
 
 const el = (id) => document.getElementById(id);
@@ -233,3 +234,154 @@ async function refresh() {
 
 refresh();
 setInterval(refresh, POLL_INTERVAL_MS);
+
+// --- Private Conference: optional authenticated conversation. This is
+// deliberately independent of the public status poll above, so model or
+// conference failure cannot take the Living Captain instrument down. ---
+const conference = {
+  authenticated: false,
+  busy: false,
+};
+
+function setConferenceState(label, ok = false) {
+  el("conferenceStatus").textContent = label;
+  el("conferenceDot").classList.toggle("is-live", ok);
+  el("conferenceDot").classList.toggle("is-error", !ok);
+}
+
+function conferenceFeedback(message, error = false) {
+  el("conferenceFeedback").textContent = message;
+  el("conferenceFeedback").classList.toggle("is-error", error);
+}
+
+function renderConferenceMessages(messages) {
+  const container = el("conferenceMessages");
+  container.replaceChildren();
+  messages.forEach((message) => {
+    const article = document.createElement("article");
+    article.className = `conference-message ${message.role}`;
+    const label = document.createElement("small");
+    label.textContent = message.role === "assistant" ? "Captain" : "Admiral";
+    const content = document.createElement("div");
+    content.textContent = message.content;
+    article.append(label, content);
+    container.append(article);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function renderConferenceUsage(usage = {}) {
+  const reserved = Number(usage.reserved_dollars || 0);
+  el("conferenceUsage").textContent =
+    `${usage.request_count ?? 0}/${usage.max_requests ?? "—"} requests · $${reserved.toFixed(4)}/$${Number(usage.max_dollars || 2).toFixed(2)} reserved estimate`;
+}
+
+async function conferenceRequest(path, options = {}) {
+  const response = await fetch(`${CONFERENCE_API}${path}`, {
+    credentials: "same-origin",
+    cache: "no-store",
+    ...options,
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+  });
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    data = { ok: false, error: `HTTP ${response.status}` };
+  }
+  if (!response.ok) {
+    const error = new Error(data.error || `HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+}
+
+async function loadConference() {
+  try {
+    const [status, transcript] = await Promise.all([
+      conferenceRequest("/status"),
+      conferenceRequest("/messages"),
+    ]);
+    conference.authenticated = true;
+    el("conferenceLogin").hidden = true;
+    el("conferenceRoom").hidden = false;
+    el("conferenceProvider").textContent = `${status.provider} / ${status.model}`;
+    renderConferenceUsage(status.usage);
+    renderConferenceMessages(transcript.messages || []);
+    setConferenceState("Private service ready", true);
+    conferenceFeedback("Authenticated session. The Captain remains advisory and read-only.");
+  } catch (error) {
+    conference.authenticated = false;
+    el("conferenceRoom").hidden = true;
+    if (error.status === 401) {
+      el("conferenceLogin").hidden = false;
+      setConferenceState("Authentication required");
+      conferenceFeedback("Enter the private conference password. Public instruments remain available.");
+    } else {
+      el("conferenceLogin").hidden = true;
+      setConferenceState("Conference unavailable");
+      conferenceFeedback(`Private conference offline: ${error.message}. Public status remains operational.`, true);
+    }
+  }
+}
+
+el("conferenceLogin").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  conferenceFeedback("Authenticating…");
+  try {
+    await conferenceRequest("/login", {
+      method: "POST",
+      body: JSON.stringify({ password: el("conferencePassword").value }),
+    });
+    el("conferencePassword").value = "";
+    await loadConference();
+  } catch (error) {
+    conferenceFeedback(error.status === 401 ? "Password rejected." : `Login failed: ${error.message}`, true);
+  }
+});
+
+el("conferenceComposer").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (conference.busy) return;
+  const message = el("conferenceMessage").value.trim();
+  if (!message) return;
+  conference.busy = true;
+  el("conferenceSend").disabled = true;
+  el("conferenceMessage").disabled = true;
+  conferenceFeedback("Captain is considering the message…");
+  try {
+    const result = await conferenceRequest("/messages", {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    });
+    el("conferenceMessage").value = "";
+    renderConferenceUsage(result.usage);
+    const transcript = await conferenceRequest("/messages");
+    renderConferenceMessages(transcript.messages || []);
+    conferenceFeedback("Reply received and preserved.");
+  } catch (error) {
+    conferenceFeedback(`No reply: ${error.message}`, true);
+    if (error.status === 401) await loadConference();
+    else {
+      const transcript = await conferenceRequest("/messages").catch(() => null);
+      if (transcript) renderConferenceMessages(transcript.messages || []);
+    }
+  } finally {
+    conference.busy = false;
+    el("conferenceSend").disabled = false;
+    el("conferenceMessage").disabled = false;
+    el("conferenceMessage").focus();
+  }
+});
+
+el("conferenceLogout").addEventListener("click", async () => {
+  await conferenceRequest("/logout", { method: "POST", body: "{}" }).catch(() => {});
+  conference.authenticated = false;
+  el("conferenceRoom").hidden = true;
+  el("conferenceLogin").hidden = false;
+  setConferenceState("Authentication required");
+  conferenceFeedback("Private conference closed. Local history remains preserved.");
+});
+
+loadConference();
