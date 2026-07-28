@@ -103,6 +103,19 @@ const DEMO_VESSELS = [
   },
 ];
 
+const KRAKEN_CONTACT = {
+  id: "contact.kraken-tripo-v1",
+  name: "Tripo Blue Kraken",
+  callsign: "KRAKEN — NEW",
+  mission: "Periscope First Contact",
+  status: "Simulated 3D contact",
+  report: "Real Tripo GLB rendered from the preserved intake asset.",
+  color: "#4fd1c5",
+  bearing: 0,
+  range: 3.8,
+  vesselClass: "scout",
+};
+
 // A shared contact's raw bearing/range only changes when Fleet Motion (or
 // FleetCore-live) writes a fresh sample -- roughly once a second, not once a
 // frame. With no smoothing, a contact visibly steps between writes instead
@@ -215,8 +228,10 @@ function sharedContacts(periscope) {
 
 export function currentContacts(periscope, elapsedSeconds, now) {
   const shared = sharedContacts(periscope);
-  if (shared) return interpolateSharedContacts(shared, now);
-  return localContacts(elapsedSeconds);
+  const contacts = shared ? interpolateSharedContacts(shared, now) : localContacts(elapsedSeconds);
+  return contacts.some((contact) => contact.id === KRAKEN_CONTACT.id)
+    ? contacts
+    : [KRAKEN_CONTACT, ...contacts];
 }
 
 export function projectContact(periscope, contact) {
