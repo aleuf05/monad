@@ -3,6 +3,25 @@
 **Status:** working context accepted; friction recorded; smallest reversible
 step proposed. No broad redesign performed (per instruction 3).
 
+**Addendum, 2026-07-29 — parallel effort discovered, not yet reconciled:**
+this packet was written without visibility into a separate, concurrent
+Captain-CLI thread already running on this same branch (discovered only via
+`git log`, not any live signal — see commits `e962d21`, `0cc015d`, `48fc4f3`
+among others). That thread recorded its own, more developed doctrine at
+`docs/research/TRUTH_SESSION_V1_DRAFT_2026-07-28.md` under "Product-direction
+hypothesis: Integrated Captain CLI" (a 5-stage adoption path: Instrument ->
+Workbench -> Steward -> Crew substrate -> Default) and has been shipping real
+Monad-core features (Scientific Claim Laboratory, Geometric Language
+Laboratory) under it. On first reading, the two documents are complementary,
+not contradictory: that draft defines a *conversational epistemics protocol*
+(observed/inferred/unknown/next-step, for human<->Captain exchanges); this
+packet defines *engineering role architecture* (role vs. occupant, for how
+the role relates to whichever model fills it). No actual conflict identified
+yet to escalate. The `docs/architecture/role-registry.md` proposed below
+would be the natural shared artifact both threads' future occupants read
+before acting, replacing after-the-fact git archaeology with a visible
+record — still not built, still just proposed.
+
 **Source handoff (recorded verbatim, 2026-07-28):**
 
 > Operational roles and model implementations are independent axes. Roles
