@@ -20,6 +20,13 @@
 
   .lede { max-width: 560px; margin: 34px auto 6px; text-align: center; font-size: 12.5px; color: #8A9BB4; }
 
+  .mike-berth { display: block; position: relative; overflow: hidden; margin: 26px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #17283A, #111A2B 55%, #312213); border: 1px solid #E8A33D; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .mike-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #E8A33D22; }
+  .mike-berth::after { content: "NEW · BUILDING LIVE"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #E8A33D; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .mike-berth .project-kicker { color: #4FD1C5; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
@@ -56,6 +63,12 @@
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
+
+    <a class="mike-berth" href="toys/mike-rocketry/">
+      <div class="project-kicker">Admiral's Special Project · For Mike</div>
+      <div class="project-title">THE VARIABLE-EXHAUST ROCKET LAB</div>
+      <div class="project-desc">Complete an unfinished propulsion investigation—and turn its equations into a playable instrument. The Captain is building and verifying it now.</div>
+    </a>
 
     <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
 
