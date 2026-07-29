@@ -16,6 +16,15 @@
   h1 { font-size:clamp(31px,6vw,50px); line-height:1.05; margin:7px 0 10px; letter-spacing:.04em; }
   .lede { color:var(--dim); max-width:80ch; font-size:12px; }
   .boundary { margin:22px 0; border:1px solid var(--amber); padding:11px 14px; color:var(--amber); font-size:11px; }
+  .guide { margin:0 0 18px; border:1px solid var(--cyan); background:rgba(79,209,197,.05); }
+  .guide-top { display:flex; justify-content:space-between; align-items:center; gap:14px; }
+  .guide h2 { margin:0; }
+  .guide-progress { color:var(--cyan); font-size:10px; white-space:nowrap; }
+  .guide-next { margin:12px 0 0; color:var(--ink); font-size:12px; }
+  .guide-steps { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin-top:12px; }
+  .guide-step { border-top:3px solid var(--line); padding-top:5px; color:var(--dim); font-size:8px; }
+  .guide-step.done { border-color:var(--cyan); color:var(--cyan); }
+  .guide-start { width:auto; margin:13px 0 0; padding:9px 14px; }
   .workspace { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr); gap:16px; min-width:0; }
   .panel { min-width:0; background:var(--panel); border:1px solid var(--line); border-radius:7px; padding:17px; }
   .panel h2 { margin:0 0 4px; font-size:17px; letter-spacing:.05em; }
@@ -44,6 +53,10 @@
   .primary { width:100%; border:0; border-radius:4px; background:var(--amber); color:#151006; font-weight:700; padding:11px; margin-top:13px; cursor:pointer; }
   .secondary { border:1px solid var(--line); border-radius:4px; background:transparent; color:var(--cyan); padding:8px 10px; font-size:10px; cursor:pointer; }
   .compile { margin-top:16px; }
+  .reflection { display:none; margin:10px 0; padding:11px; border-left:3px solid var(--cyan); background:#091322; font-size:11px; }
+  .reflection.visible { display:block; }
+  details { margin-top:9px; }
+  summary { color:var(--dim); cursor:pointer; font-size:10px; }
   .state { display:inline-block; border:1px solid var(--line); border-radius:20px; padding:3px 8px; color:var(--dim); font-size:9px; text-transform:uppercase; }
   .state.ready { color:var(--cyan); border-color:var(--cyan); }
   .state.unresolved { color:var(--amber); border-color:var(--amber); }
@@ -62,6 +75,7 @@
   .empty { color:var(--dim); font-size:10px; font-style:italic; }
   .signal { min-height:18px; margin-top:8px; font-size:10px; color:var(--cyan); }
   @media(max-width:820px) { .workspace { grid-template-columns:1fr; } .stage-wrap { min-height:285px; } }
+  @media(max-width:520px) { .guide-steps { grid-template-columns:1fr; } .guide-step { border-top:0; border-left:3px solid var(--line); padding:3px 0 3px 7px; } .guide-step.done { border-left-color:var(--cyan); } }
   @media(max-width:440px) { .wrap { padding-left:12px; padding-right:12px; } .panel { padding:12px; } .stage-wrap { min-height:0; } }
 </style>
 </head>
@@ -71,6 +85,25 @@
   <h1>Geometric Language Laboratory</h1>
   <p class="lede">Invent a personal language for physical intent by combining words, explicit geometry references, and demonstrated gestures. The laboratory preserves what you actually indicated and asks you to review the interpretation before anything becomes reusable.</p>
   <div class="boundary"><strong>MEANING BOUNDARY:</strong> One teaching episode proposes a meaning. Repetition and physical evidence may strengthen it; fluency alone does not.</div>
+
+  <section class="panel guide" id="guide">
+    <div class="guide-top">
+      <div>
+        <div class="eyebrow">First visit · one-minute experiment</div>
+        <h2>Teach “usual forgiving fit”</h2>
+      </div>
+      <div class="guide-progress" id="guideProgress">0 / 5</div>
+    </div>
+    <p class="guide-next" id="guideNext">Start here. The laboratory will guide one real teaching episode.</p>
+    <div class="guide-steps">
+      <div class="guide-step" data-guide-step="1">1 · Choose references</div>
+      <div class="guide-step" data-guide-step="2">2 · Protect them</div>
+      <div class="guide-step" data-guide-step="3">3 · Draw keep-out</div>
+      <div class="guide-step" data-guide-step="4">4 · Define and compile</div>
+      <div class="guide-step" data-guide-step="5">5 · Review and save</div>
+    </div>
+    <button class="primary guide-start" id="startGuide" type="button">Start guided experiment</button>
+  </section>
 
   <div class="workspace">
     <section class="panel">
@@ -126,7 +159,11 @@
 
       <div class="compile">
         <span class="state" id="compileState">not compiled</span>
-        <pre id="intentPreview">Words, references, and gesture evidence will appear here.</pre>
+        <div class="reflection" id="reflectionSummary"></div>
+        <details id="recordDetails">
+          <summary>Inspect the complete machine record</summary>
+          <pre id="intentPreview">Words, references, and gesture evidence will appear here.</pre>
+        </details>
       </div>
       <label class="review"><input id="humanReviewed" type="checkbox"> I reviewed this interpretation. Saving records my current meaning, not a universal geometric truth.</label>
       <button class="primary" id="saveEntry" type="button" disabled>Save reviewed lexicon version</button>

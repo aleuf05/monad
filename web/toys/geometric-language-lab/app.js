@@ -8,6 +8,8 @@
   var gesture = null;
   var drawing = false;
   var currentEpisode = null;
+  var guideActive = false;
+  var guideSaved = false;
 
   var stage = document.getElementById("geometryStage");
   var path = document.getElementById("gesturePath");
@@ -21,6 +23,38 @@
   var saveButton = document.getElementById("saveEntry");
   var signal = document.getElementById("signal");
   var cards = document.getElementById("lexiconCards");
+  var guideProgress = document.getElementById("guideProgress");
+  var guideNext = document.getElementById("guideNext");
+  var reflection = document.getElementById("reflectionSummary");
+
+  var GUIDE_REFS = ["Fan.Face:A", "Panel.Hole:1", "Panel.Hole:2"];
+
+  function updateGuide() {
+    if (!guideActive) return;
+    var referencesDone = GUIDE_REFS.every(function (ref) { return selected.has(ref); });
+    var sacredDone = referencesDone && GUIDE_REFS.every(function (ref) { return sacred.has(ref); });
+    var gestureDone = sacredDone && gesture && gesture.type === "keep-out" && gesture.points.length > 1;
+    var compileDone = Boolean(gestureDone && currentEpisode && operationalMeaning.value.trim());
+    var states = [referencesDone, sacredDone, gestureDone, compileDone, guideSaved];
+    var count = states.filter(Boolean).length;
+    document.querySelectorAll("[data-guide-step]").forEach(function (element, index) {
+      element.classList.toggle("done", states[index]);
+    });
+    guideProgress.textContent = count + " / 5";
+    if (!referencesDone) {
+      guideNext.textContent = "Tap these three named chips below the diagram: Fan.Face:A, Panel.Hole:1, and Panel.Hole:2.";
+    } else if (!sacredDone) {
+      guideNext.textContent = "Good. Press “Mark selected sacred” so those exact interfaces cannot silently move.";
+    } else if (!gestureDone) {
+      guideNext.textContent = "Choose “Trace keep-out,” then draw a line across the diagram where the cable needs room.";
+    } else if (!compileDone) {
+      guideNext.textContent = "Describe what “usual forgiving fit” means for you, then press “Compile teaching episode.”";
+    } else if (!guideSaved) {
+      guideNext.textContent = "Read the plain-language reflection, check the human-review box, then save the lexicon version.";
+    } else {
+      guideNext.textContent = "Complete. You saved one provisional private meaning. A real printed fit must still test it.";
+    }
+  }
 
   function loadLexicon() {
     try {
@@ -71,6 +105,7 @@
     }
     updateGeometryClasses();
     updateReadout();
+    updateGuide();
   }
 
   function setMode(next) {
@@ -143,6 +178,7 @@
     drawing = false;
     if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
     updateReadout();
+    updateGuide();
   }
   stage.addEventListener("pointerup", finishGesture);
   stage.addEventListener("pointercancel", finishGesture);
@@ -156,6 +192,7 @@
     updateGeometryClasses();
     updateReadout();
     setSignal("Selected references marked sacred in this teaching episode.");
+    updateGuide();
   });
 
   document.getElementById("clearStage").addEventListener("click", function () {
@@ -163,15 +200,19 @@
     sacred.clear();
     gesture = null;
     currentEpisode = null;
+    guideSaved = false;
     reviewed.checked = false;
     saveButton.disabled = true;
     path.setAttribute("d", "");
     preview.textContent = "Words, references, and gesture evidence will appear here.";
+    reflection.textContent = "";
+    reflection.className = "reflection";
     compileState.textContent = "not compiled";
     compileState.className = "state";
     updateGeometryClasses();
     updateReadout();
     setSignal("Teaching stage reset.");
+    updateGuide();
   });
 
   function unresolvedTerms(text, meaning) {
@@ -234,6 +275,22 @@
     };
 
     preview.textContent = JSON.stringify(currentEpisode, null, 2);
+    var referenceNames = currentEpisode.explicit_references.map(function (item) {
+      return item.ref + (item.sacred ? " (sacred)" : "");
+    });
+    reflection.innerHTML =
+      "<strong>I understood:</strong><br>" +
+      (referenceNames.length
+        ? "Use " + escapeHtml(referenceNames.join(", ")) + ".<br>"
+        : "No exact geometry references were supplied.<br>") +
+      (gesture
+        ? "Treat your drawn path as an explicit <strong>" + escapeHtml(gesture.type) + "</strong> gesture.<br>"
+        : "No gesture was supplied.<br>") +
+      (meaning
+        ? "For now, “" + escapeHtml(phrase) + "” means: " + escapeHtml(meaning) + "<br>"
+        : "The private phrase still lacks an operational meaning.<br>") +
+      "<em>This interpretation is proposed, not physically validated.</em>";
+    reflection.className = "reflection visible";
     compileState.textContent = unresolved.length ? "unresolved language" : "ready for review";
     compileState.className = "state " + (unresolved.length ? "unresolved" : "ready");
     reviewed.checked = false;
@@ -241,6 +298,7 @@
     setSignal(unresolved.length
       ? "Compiled with unresolved terms: " + unresolved.join(", ") + ". Define the operational meaning or preserve the uncertainty."
       : "Teaching episode compiled. Inspect it before review.");
+    updateGuide();
   }
 
   document.getElementById("compileIntent").addEventListener("click", compile);
@@ -280,6 +338,8 @@
     writeLexicon(entries);
     preview.textContent = JSON.stringify(currentEpisode, null, 2);
     renderLexicon();
+    guideSaved = true;
+    updateGuide();
     saveButton.disabled = true;
     setSignal("Saved “" + phrase + "” version " + entry.version + " as provisional.");
   });
@@ -333,6 +393,32 @@
     localStorage.removeItem(STORAGE_KEY);
     renderLexicon();
     setSignal("Local lexicon cleared.");
+  });
+
+  document.getElementById("startGuide").addEventListener("click", function () {
+    guideActive = true;
+    guideSaved = false;
+    selected.clear();
+    sacred.clear();
+    gesture = null;
+    currentEpisode = null;
+    path.setAttribute("d", "");
+    utterance.value = "Mount this fan to these two holes, keep the airflow open, avoid the cable, and use my usual forgiving fit.";
+    privatePhrase.value = "usual forgiving fit";
+    operationalMeaning.value = "";
+    operationalMeaning.placeholder = "Example: 0.25–0.35 mm clearance per side for removable PETG fits on my FDM printer.";
+    reviewed.checked = false;
+    saveButton.disabled = true;
+    preview.textContent = "The complete machine record will appear after compilation.";
+    reflection.textContent = "";
+    reflection.className = "reflection";
+    compileState.textContent = "guided experiment";
+    compileState.className = "state";
+    updateGeometryClasses();
+    updateReadout();
+    updateGuide();
+    document.getElementById("stageWrap").scrollIntoView({ behavior: "smooth", block: "center" });
+    setSignal("Guided experiment started.");
   });
 
   updateReadout();
