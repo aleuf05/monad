@@ -316,6 +316,8 @@
     }
     var entries = loadLexicon();
     var priorVersions = entries.filter(function (entry) { return entry.phrase.toLowerCase() === phrase.toLowerCase(); });
+    currentEpisode.human_review.reviewed = true;
+    currentEpisode.epistemic_status = "reviewed-provisional";
     var entry = {
       schema_version: "monad.intentLexiconEntry.v0.1",
       phrase: phrase,
@@ -326,14 +328,13 @@
       evidence: currentEpisode.evidence,
       confidence: "provisional",
       exceptions: [],
-      source_episode: currentEpisode.id,
+      source_episode_id: currentEpisode.id,
+      source_episode: structuredClone(currentEpisode),
       reviewed_at: new Date().toISOString(),
       revision_history: priorVersions.map(function (prior) {
         return { version: prior.version, reviewed_at: prior.reviewed_at };
       })
     };
-    currentEpisode.human_review.reviewed = true;
-    currentEpisode.epistemic_status = "reviewed-provisional";
     entries.push(entry);
     writeLexicon(entries);
     preview.textContent = JSON.stringify(currentEpisode, null, 2);
@@ -356,11 +357,20 @@
           " · " + entry.revision_history.length + " prior version" +
           (entry.revision_history.length === 1 ? "" : "s")
         : "First recorded version";
+      var episode = entry.source_episode && typeof entry.source_episode === "object"
+        ? entry.source_episode
+        : null;
+      var sampleCount = episode?.gesture?.samples?.length || 0;
+      var trace = episode
+        ? "Trace preserved · " + episode.explicit_references.length + " references · " +
+          sampleCount + " gesture samples"
+        : "Legacy trace · source ID only";
       return '<article class="card">' +
         "<h3>“" + escapeHtml(entry.phrase) + "” <span class=\"meta\">v" + entry.version + "</span></h3>" +
         '<div class="meaning">' + escapeHtml(entry.operational_meaning) + "</div>" +
         '<div class="meta">Context: ' + escapeHtml(entry.contexts.join(", ") || "not yet bounded") + "</div>" +
         '<div class="meta">' + escapeHtml(lineage) + "</div>" +
+        '<div class="meta">' + escapeHtml(trace) + "</div>" +
         '<div class="warning">Provisional · ' + entry.evidence.physical_results + " physical results · not universal</div>" +
         "</article>";
     }).join("");
