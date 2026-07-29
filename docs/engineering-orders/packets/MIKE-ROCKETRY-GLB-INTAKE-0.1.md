@@ -60,3 +60,6 @@ Pre-commissioning evidence:
 - non-GLB upload receives HTTP 400;
 - smoke-test intake files were moved out of the repository after validation;
 - Caddy route and systemd unit are staged but not installed.
+- Admiral subsequently ruled that the upload be served as a normal part of
+  the site. A single idempotent installer now tests, installs, enables, routes,
+  and checks both loopback and public health.
