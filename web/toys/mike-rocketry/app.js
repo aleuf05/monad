@@ -145,13 +145,13 @@ $("share").addEventListener("click", async () => {
 
 $("shareRocketSource").addEventListener("click", async () => {
   const status = $("assetShareStatus");
-  const sourceUrl = new URL("assets/mike-lab-rocket-tripo-source-v1.png", location.href);
+  const sourceUrl = new URL("assets/mike-lab-rocket-tripo-phone-v2.jpg", location.href);
   status.textContent = "Preparing image…";
   try {
     const response = await fetch(sourceUrl);
     if (!response.ok) throw new Error(`image HTTP ${response.status}`);
     const blob = await response.blob();
-    const file = new File([blob], "mike-lab-rocket-tripo-source-v1.png", { type: "image/png" });
+    const file = new File([blob], "mike-lab-rocket-tripo-phone-v2.jpg", { type: "image/jpeg" });
     if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
       await navigator.share({
         title: "Mike Lab rocket source for Tripo",

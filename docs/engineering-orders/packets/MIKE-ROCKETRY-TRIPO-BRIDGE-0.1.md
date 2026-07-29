@@ -75,3 +75,9 @@ Verified 2026-07-29:
   least 46px tall; official Tripo link is present; simulated no-Web-Share
   environment successfully triggers the plain-download fallback; no page
   errors.
+- After the operator reported that the Tripo app rejected the original shared
+  PNG, a compatibility-first derivative was produced: 1024 × 1024, baseline
+  non-progressive JPEG, sRGB, 8-bit RGB, no alpha/profile, 4:4:4 chroma, 75 KB.
+  The helper now shares this JPEG and retains the original PNG as an explicit
+  archival alternative. JPEG SHA-256:
+  `dbf4a781e982f866c225b56c92225e789830158b59b5550365fb1e682d74857a`.
