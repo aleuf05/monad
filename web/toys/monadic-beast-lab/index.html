@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monadic Beast Lab</title><link rel="stylesheet" href="style.css">
+</head>
+<body><main>
+<header><a href="../../build.html">← Build &amp; Research</a><p class="eyebrow">New · Structural creature instrument · v0.1</p><h1>Monadic Beast Lab</h1><p>Design the logic of a strange creature, then see that logic become art.</p><div class="boundary">THE RECIPE IS THE BEAST. THE IMAGE IS AN INTERPRETATION.</div></header>
+<section class="workspace">
+<aside class="panel controls"><h2>1 · Anatomical logic</h2>
+<label>Radial symmetry <output id="symmetryOut"></output><input id="symmetry" type="range" min="3" max="12" value="7"></label>
+<label>Branch depth <output id="depthOut"></output><input id="depth" type="range" min="0" max="3" value="2"></label>
+<label>Reach <output id="reachOut"></output><input id="reach" type="range" min="35" max="90" value="66"></label>
+<label>Curl <output id="curlOut"></output><input id="curl" type="range" min="-80" max="80" value="28"></label>
+<label>Controlled irregularity <output id="irregularityOut"></output><input id="irregularity" type="range" min="0" max="60" value="16"></label>
+<label>Terminal organ<select id="terminal"><option value="eye">Watcher eyes</option><option value="maw">Petal maws</option><option value="spike">Signal spines</option></select></label>
+<label>Variation seed<input id="seed" type="number" value="1407" min="1" max="999999"></label>
+<div class="actions"><button id="mutate">Mutate</button><button id="newSeed">New seed</button></div>
+</aside>
+<section class="panel stage"><div class="head"><div><h2>2 · Structural schematic</h2><p>Exact organization, not surface appearance.</p></div><span id="identity">RADIAL HYDRA</span></div><svg id="schematic" viewBox="0 0 700 700" role="img" aria-label="Beast structural schematic"></svg></section>
+<section class="panel art"><div class="head"><div><h2>3 · Concept interpretation</h2><p>A painterly reading of the same recipe.</p></div><button id="render">Interpret again</button></div><canvas id="concept" width="900" height="900"></canvas></section>
+</section>
+<section class="panel recipe"><div><h2>Beast definition</h2><p>Deterministic, editable, portable source of truth.</p></div><pre id="definition"></pre><div class="export"><button id="saveRecipe">Export recipe</button><button id="saveImage">Export image</button><button id="copyLink">Copy permalink</button><span id="status"></span></div></section>
+</main><script type="module" src="app.js"></script><script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Monadic Beast Lab"></script></body></html>
