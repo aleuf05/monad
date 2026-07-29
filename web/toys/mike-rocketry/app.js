@@ -143,5 +143,37 @@ $("share").addEventListener("click", async () => {
   }
 });
 
+$("shareRocketSource").addEventListener("click", async () => {
+  const status = $("assetShareStatus");
+  const sourceUrl = new URL("assets/mike-lab-rocket-tripo-source-v1.png", location.href);
+  status.textContent = "Preparing image…";
+  try {
+    const response = await fetch(sourceUrl);
+    if (!response.ok) throw new Error(`image HTTP ${response.status}`);
+    const blob = await response.blob();
+    const file = new File([blob], "mike-lab-rocket-tripo-source-v1.png", { type: "image/png" });
+    if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+      await navigator.share({
+        title: "Mike Lab rocket source for Tripo",
+        text: "Upload this source image to Tripo Image to 3D.",
+        files: [file],
+      });
+      status.textContent = "Image shared. Next: open Tripo.";
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = sourceUrl;
+    link.download = file.name;
+    link.click();
+    status.textContent = "Image downloaded. Next: open Tripo.";
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      status.textContent = "Share cancelled; nothing changed.";
+    } else {
+      status.innerHTML = `Share unavailable. <a href="${sourceUrl}" download>Download the image directly.</a>`;
+    }
+  }
+});
+
 setValues(readUrl());
 render();

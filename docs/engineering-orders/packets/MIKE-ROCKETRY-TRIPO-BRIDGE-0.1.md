@@ -38,6 +38,8 @@ manual-operation and no-result-yet status.
 - Instructions name Tripo settings and GLB return step.
 - The helper states that no Tripo model has yet been claimed.
 - Existing 2D laboratory remains independent of the sidecar.
+- Phone users get a near-top shortcut, native file share/save when supported,
+  direct official Tripo launch, and plain-download fallback.
 
 ## 7. Tests / rollback
 
@@ -66,3 +68,10 @@ Verified 2026-07-29:
 - Chromium helper rendering at 1440 × 1000 and 390 × 844: visible and within
   viewport bounds;
 - existing Asset Viewer link retained as a Granite-local optional return path.
+- phone refinement added: native Web Share file handoff with direct-download
+  fallback, 46px minimum action targets, near-top shortcut, direct official
+  Tripo link, and a separately labeled Granite-only return action.
+- Chromium phone test at 390 × 844: shortcut reaches helper; every action is at
+  least 46px tall; official Tripo link is present; simulated no-Web-Share
+  environment successfully triggers the plain-download fallback; no page
+  errors.
