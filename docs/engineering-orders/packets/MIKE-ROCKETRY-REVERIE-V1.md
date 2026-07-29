@@ -43,6 +43,8 @@ remain visibly unofficial and portable until Mike joins the process.
   \(G(r)=(r-1)/(\sqrt r\ln r)\).
 - URL parameters restore a shared state.
 - Assumptions and unofficial Reverie status are visible.
+- Verified results and unresolved problems remain visibly distinguished on the
+  live page.
 - Static HTML, CSS, and JavaScript require no backend or build step.
 - Real production HTML and module URLs return HTTP 200.
 
@@ -66,6 +68,8 @@ Current evidence:
 - `node --check` for `app.js` and `math.js`: PASS;
 - live HTML, application module, and math module: HTTP 200;
 - source attribution, gain reveal, and share control present in live HTML.
+- a public Reality Check distinguishes verified math, open physical-model
+  assumptions, pending visual inspection, and the boundary awaiting Mike.
 
 Remaining before verified complete: interactive browser and narrow-viewport
 inspection, portable package assembly, and final live marker review.
