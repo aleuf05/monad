@@ -175,5 +175,39 @@ $("shareRocketSource").addEventListener("click", async () => {
   }
 });
 
+$("glbUploadForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const input = $("glbUpload");
+  const button = $("glbUploadButton");
+  const progress = $("glbUploadProgress");
+  const status = $("glbUploadStatus");
+  const file = input.files?.[0];
+  if (!file) return status.textContent = "Choose the GLB downloaded from Tripo first.";
+  if (!file.name.toLowerCase().endsWith(".glb")) return status.textContent = "Only a .glb file is accepted.";
+  if (file.size > 30 * 1024 * 1024) return status.textContent = "That GLB is larger than the 30 MB intake limit.";
+  button.disabled = true;
+  progress.hidden = false;
+  progress.value = 20;
+  status.textContent = "Uploading and validating…";
+  try {
+    const body = new FormData();
+    body.append("file", file);
+    progress.value = 45;
+    const response = await fetch("/mike-rocketry-intake-api/upload", { method: "POST", body });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    progress.value = 100;
+    const receipt = result.receipt;
+    status.textContent = `Received safely: ${receipt.stored_name} · ${receipt.validation.meshes} mesh(es) · Captain review required.`;
+    input.value = "";
+  } catch (error) {
+    progress.value = 0;
+    status.textContent = `Upload unavailable: ${error.message}. The intake service may still need operator commissioning.`;
+  } finally {
+    button.disabled = false;
+    setTimeout(() => { progress.hidden = true; }, 1200);
+  }
+});
+
 setValues(readUrl());
 render();

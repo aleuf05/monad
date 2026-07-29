@@ -187,6 +187,13 @@
           <a class="asset-button granite-only" href="../asset-viewer/">Return GLB on Granite</a>
         </div>
         <p id="assetShareStatus" class="asset-share-status" role="status"></p>
+        <form id="glbUploadForm" class="glb-upload">
+          <label for="glbUpload">Already generated it? Upload the GLB here</label>
+          <input id="glbUpload" name="file" type="file" accept=".glb,model/gltf-binary">
+          <button id="glbUploadButton" class="asset-button primary" type="submit">Upload GLB for Captain review</button>
+          <progress id="glbUploadProgress" max="100" value="0" hidden></progress>
+          <p id="glbUploadStatus" role="status">The file will be validated and quarantined—not published automatically.</p>
+        </form>
         <p class="asset-note">Phone source: square 1024px baseline RGB JPEG, 75 KB · SHA-256 <code>dbf4a781…2d74857a</code> · No Tripo model has been claimed yet.</p>
       </div>
     </section>

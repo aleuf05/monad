@@ -94,6 +94,12 @@ svg text { fill: #7890a5; font-size: 10px; }
 .asset-button:hover { border-color: var(--amber); color: var(--amber); }
 .asset-helper .asset-note { margin-top: 14px; color: #64778a; font-size: 9px; }
 .asset-share-status { min-height: 18px; margin: 9px 0 0; color: var(--cyan) !important; }
+.glb-upload { margin-top: 20px; padding-top: 17px; border-top: 1px solid var(--line); }
+.glb-upload label { margin-bottom: 9px; color: var(--text); font-weight: 800; }
+.glb-upload input { width: 100%; margin-bottom: 9px; color: var(--muted); }
+.glb-upload button { width: 100%; }
+.glb-upload progress { width: 100%; margin-top: 10px; accent-color: var(--cyan); }
+.glb-upload p { min-height: 18px; margin: 8px 0 0; font-size: 9px; }
 footer { padding: 38px 0 60px; color: #64778a; text-align: center; font-size: 10px; }
 @media (max-width: 900px) {
   .lab-grid { grid-template-columns: 1fr 1fr; }

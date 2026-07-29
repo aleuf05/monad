@@ -34,6 +34,10 @@ cameronlampley.com {
 		reverse_proxy 127.0.0.1:4787
 	}
 
+	handle_path /mike-rocketry-intake-api/* {
+		reverse_proxy 127.0.0.1:4789
+	}
+
 	handle {
 		root * /home/cgl/dev/monad/web
 		file_server
