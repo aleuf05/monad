@@ -23,6 +23,10 @@
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
+  .cat-card.mission-card { grid-column: 1 / -1; border-color: #E8A33D; background: linear-gradient(120deg, #171C2A, #111A2B 58%, #132A30); position: relative; overflow: hidden; }
+  .cat-card.mission-card::after { content: "LIVING DRAFT"; position: absolute; right: 18px; top: 16px; color: #E8A33D; border: 1px solid #E8A33D66; border-radius: 20px; padding: 3px 8px; font-size: 8px; letter-spacing: .1em; }
+  .cat-card.mission-card:hover { box-shadow: 0 0 24px #E8A33D18; }
+  .cat-card.mission-card .cat-desc { max-width: 660px; }
   .cat-eyebrow { font-size: 9.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 6px; }
   .cat-name { font-family: 'Oswald', sans-serif; font-size: 19px; letter-spacing: 0.02em; color: #DCE6F2; margin-bottom: 8px; }
   .cat-desc { font-size: 11.5px; color: #6B7C93; line-height: 1.55; }
@@ -80,6 +84,11 @@
         <div class="cat-eyebrow">Who</div>
         <div class="cat-name">Crew</div>
         <div class="cat-desc">Who's aboard, and what each officer is responsible for.</div>
+      </a>
+      <a class="cat-card mission-card" href="core-mission.html">
+        <div class="cat-eyebrow">Why · Proposed</div>
+        <div class="cat-name">Core Mission</div>
+        <div class="cat-desc">Enter the living redefinition: Monad as a humane, evidence-bound restorative process—turning lived intent into testable intervention and preserving what reality teaches.</div>
       </a>
     </div>
 
