@@ -1,0 +1,75 @@
+{
+  "schema_version": "intentforge.measurementResolution.v0.1",
+  "source_episode_id": "episode-integration-fixture-001",
+  "fixture_status": "synthetic-computational-test",
+  "units": "mm",
+  "envelope": {
+    "width": 70.0,
+    "height": 70.0,
+    "thickness": 3.0
+  },
+  "panel_holes": [
+    {
+      "source_ref": "Panel.Hole:1",
+      "cx": -25.0,
+      "cy": 25.0,
+      "diameter": 4.5,
+      "purpose": "existing panel mounting hole (M4 clearance)"
+    },
+    {
+      "source_ref": "Panel.Hole:2",
+      "cx": 25.0,
+      "cy": 25.0,
+      "diameter": 4.5,
+      "purpose": "existing panel mounting hole (M4 clearance)"
+    }
+  ],
+  "fan_interface": {
+    "source_ref": "Fan.Face:A",
+    "center": [0.0, -5.0],
+    "bolt_spacing": 32.0,
+    "bolt_diameter": 4.5,
+    "airflow_diameter": 34.0
+  },
+  "keep_out": {
+    "source_gesture_type": "keep-out",
+    "representation": "edge-notch",
+    "edge": "south",
+    "center_offset": -22.0,
+    "width": 10.0,
+    "depth": 5.0,
+    "purpose": "cable clearance"
+  },
+  "manufacturing": {
+    "process": "FDM",
+    "material": "PETG",
+    "min_wall_thickness": 3.0,
+    "support_preference": "flat-without-supports"
+  },
+  "private_meaning_dispositions": [
+    {
+      "phrase": "usual forgiving fit",
+      "version": 1,
+      "disposition": "unsupported-not-applicable",
+      "reason": "IntentForge v0.0 has no mating-fit feature. The phrase remains preserved but supplies no numeric generator field."
+    }
+  ],
+  "acceptance_criteria": [
+    "all bolts align with the two existing holes and the fan's four mounting holes",
+    "fan airflow opening is unobstructed",
+    "cable retains clearance through the notch",
+    "part prints flat without supports (uniform thickness, no overhangs by construction)"
+  ],
+  "assumptions": [
+    "all dimensions are inherited illustrative fixture values, not measurements from a physical object",
+    "32mm fan bolt spacing is illustrative and not tied to a verified fan datasheet",
+    "M4 clearance hole is represented as 4.5mm diameter",
+    "the keep-out gesture supplies intent and provenance only; edge-notch dimensions come exclusively from this resolution fixture"
+  ],
+  "review_decision": {
+    "state": "approved-computational-test",
+    "actor": "integration-test-fixture",
+    "scope": "computational-only",
+    "physical_authority": false
+  }
+}

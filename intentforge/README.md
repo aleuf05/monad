@@ -59,6 +59,48 @@ estimated (bounded by wall-thickness rule). Not simulated, not
 manufactured, not physically tested, not externally reviewed, not
 validated for any use.
 
+## First living integration pulse
+
+`intent_bridge.py` connects one reviewed Geometric Language Laboratory
+export to this narrow generator without pretending that conversational or SVG
+coordinates are physical dimensions.
+
+The bridge deliberately has two phases:
+
+1. language evidence alone produces a translation proposal with nine explicit
+   unresolved requirements and refuses geometry;
+2. a separate synthetic, millimetre-valued resolution fixture supplies the
+   demonstrator's physical fields and an explicitly computational-only review
+   decision.
+
+Run the pulse:
+
+```sh
+cd intentforge
+python3 integrated_demo.py
+python3 -m unittest test_bracket_generator.py test_intent_bridge.py -v
+```
+
+Inputs:
+
+- `fixtures/fan-bracket-language-export-v0.1.json` — reviewed-provisional
+  expression, references, gesture, private phrase, and provenance;
+- `fixtures/fan-bracket-measurements-v0.1.json` — separate synthetic
+  millimetre resolution and computational-only review.
+
+Outputs:
+
+- `output/fan-mount-bracket-integrated-v0.1.stl`;
+- `output/fan-mount-bracket-integrated-v0.1.json`.
+
+The integrated STL is intentionally byte-identical to the inherited v0.0 STL:
+the new work proves a truthful source-to-contract chain, not new geometry.
+The report preserves seven feature-to-intent traces, the initial refusal,
+review scope, warnings, and all still-false physical evidence states.
+
+This is one verified pulse in a continuing integration process, not a claim
+that the Language Laboratory, IntentForge, or living integration is complete.
+
 ## Growth path (not built, not promised -- just the visible next steps)
 
 - Swap this extrusion engine for real libfive CSG once the exporter is

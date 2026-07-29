@@ -1,0 +1,99 @@
+{
+  "schema_version": "monad.intentLexiconExport.v0.1",
+  "exported_at": "2026-07-29T00:00:00Z",
+  "portability_note": "Synthetic integration fixture. Private meanings remain contextual and are not universal claims.",
+  "entries": [
+    {
+      "schema_version": "monad.intentLexiconEntry.v0.1",
+      "phrase": "usual forgiving fit",
+      "version": 1,
+      "operational_meaning": "0.25–0.35 mm clearance per side for removable PETG fits on the operator's FDM printer.",
+      "contexts": [
+        "Fan.Face:A",
+        "Panel.Hole:1",
+        "Panel.Hole:2"
+      ],
+      "gesture_type": "keep-out",
+      "evidence": {
+        "demonstrations": 1,
+        "physical_results": 0,
+        "independent_confirmations": 0
+      },
+      "confidence": "provisional",
+      "exceptions": [],
+      "source_episode_id": "episode-integration-fixture-001",
+      "source_episode": {
+        "schema_version": "monad.geometricTeachingEpisode.v0.1",
+        "id": "episode-integration-fixture-001",
+        "recorded_at": "2026-07-29T00:00:00Z",
+        "epistemic_status": "reviewed-provisional",
+        "expression": {
+          "words": "Mount this fan to these two holes, keep the airflow open, avoid the cable, and use my usual forgiving fit.",
+          "private_phrase_candidate": "usual forgiving fit"
+        },
+        "explicit_references": [
+          {
+            "ref": "Fan.Face:A",
+            "sacred": true
+          },
+          {
+            "ref": "Panel.Hole:1",
+            "sacred": true
+          },
+          {
+            "ref": "Panel.Hole:2",
+            "sacred": true
+          }
+        ],
+        "gesture": {
+          "type": "keep-out",
+          "coordinate_space": "demo-stage-640x400",
+          "samples": [
+            [288.0, 288.0],
+            [340.0, 258.0],
+            [394.0, 224.0],
+            [448.0, 178.0]
+          ]
+        },
+        "proposed_interpretation": {
+          "relations": [
+            {
+              "operation": "CONNECT",
+              "status": "proposed"
+            },
+            {
+              "operation": "CLEAR",
+              "status": "proposed"
+            },
+            {
+              "operation": "PRESERVE",
+              "references": [
+                "Fan.Face:A",
+                "Panel.Hole:1",
+                "Panel.Hole:2"
+              ],
+              "status": "explicit-or-proposed"
+            },
+            {
+              "operation": "PRESERVE_REGION",
+              "status": "proposed"
+            }
+          ],
+          "operational_meaning": "0.25–0.35 mm clearance per side for removable PETG fits on the operator's FDM printer.",
+          "unresolved_terms": []
+        },
+        "evidence": {
+          "demonstrations": 1,
+          "physical_results": 0,
+          "independent_confirmations": 0
+        },
+        "human_review": {
+          "reviewed": true,
+          "universal_claim": false
+        }
+      },
+      "reviewed_at": "2026-07-29T00:00:01Z",
+      "revision_history": []
+    }
+  ]
+}

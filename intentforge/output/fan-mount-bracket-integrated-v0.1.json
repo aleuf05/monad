@@ -1,0 +1,164 @@
+{
+  "schema_version": "intentforge.integratedDesignReport.v0.1",
+  "pulse_status": "verified-computational-chain",
+  "living_integration_complete": false,
+  "source_episode_id": "episode-integration-fixture-001",
+  "unresolved_proposal": {
+    "compile_refused": true,
+    "reason": "translation proposal is not executable: physical units; envelope width, height, and thickness; Panel.Hole:1 physical position and diameter; Panel.Hole:2 physical position and diameter; Fan.Face:A physical center, bolt spacing, bolt diameter, and airflow diameter; keep-out physical representation and dimensions; minimum wall thickness and manufacturing assumptions; private phrase disposition for the current generator; translation review decision and scope",
+    "requirements": [
+      "physical units",
+      "envelope width, height, and thickness",
+      "Panel.Hole:1 physical position and diameter",
+      "Panel.Hole:2 physical position and diameter",
+      "Fan.Face:A physical center, bolt spacing, bolt diameter, and airflow diameter",
+      "keep-out physical representation and dimensions",
+      "minimum wall thickness and manufacturing assumptions",
+      "private phrase disposition for the current generator",
+      "translation review decision and scope"
+    ]
+  },
+  "resolved_translation": {
+    "schema_version": "intentforge.intentTranslationProposal.v0.1",
+    "source_episode_id": "episode-integration-fixture-001",
+    "source_coordinate_space": "demo-stage-640x400",
+    "coordinate_boundary": "Source gesture samples are provenance in their declared coordinate space. They are never interpreted as physical dimensions.",
+    "mappings": [
+      {
+        "source": "Panel.Hole:1",
+        "target": "FanMountBracketIntent.existing_holes",
+        "value_source": "measurement-resolution",
+        "units": "mm",
+        "sacred": true,
+        "status": "resolved"
+      },
+      {
+        "source": "Panel.Hole:2",
+        "target": "FanMountBracketIntent.existing_holes",
+        "value_source": "measurement-resolution",
+        "units": "mm",
+        "sacred": true,
+        "status": "resolved"
+      },
+      {
+        "source": "Fan.Face:A",
+        "target": "fan interface fields",
+        "value_source": "measurement-resolution",
+        "units": "mm",
+        "sacred": true,
+        "status": "resolved"
+      },
+      {
+        "source": "gesture:keep-out",
+        "target": "cable_notch",
+        "value_source": "measurement-resolution; gesture retained as intent provenance only",
+        "units": "mm",
+        "status": "resolved"
+      },
+      {
+        "source": "lexicon:usual forgiving fit@v1",
+        "target": null,
+        "status": "preserved-unsupported-not-applicable",
+        "reason": "IntentForge v0.0 has no mating-fit feature. The phrase remains preserved but supplies no numeric generator field."
+      }
+    ],
+    "unresolved": [],
+    "warnings": [
+      "The demo-stage gesture coordinate space is non-physical and cannot supply millimetres.",
+      "A reviewed private phrase remains contextual and does not become a generator parameter without a typed supported mapping."
+    ],
+    "review_decision": {
+      "state": "approved-computational-test",
+      "actor": "integration-test-fixture",
+      "scope": "computational-only",
+      "physical_authority": false
+    },
+    "ready_to_compile": true
+  },
+  "review_decision": {
+    "state": "approved-computational-test",
+    "actor": "integration-test-fixture",
+    "scope": "computational-only",
+    "physical_authority": false
+  },
+  "feature_trace": [
+    {
+      "feature": "outer plate envelope",
+      "intent_source": "Mount this fan to these two holes, keep the airflow open, avoid the cable, and use my usual forgiving fit.",
+      "value_source": "measurement-resolution.envelope"
+    },
+    {
+      "feature": "existing mounting hole 1",
+      "intent_source": "Panel.Hole:1",
+      "value_source": "measurement-resolution.panel_holes[0]",
+      "sacred": true
+    },
+    {
+      "feature": "existing mounting hole 2",
+      "intent_source": "Panel.Hole:2",
+      "value_source": "measurement-resolution.panel_holes[1]",
+      "sacred": true
+    },
+    {
+      "feature": "fan bolt pattern and airflow opening",
+      "intent_source": "Fan.Face:A + PRESERVE_REGION relation",
+      "value_source": "measurement-resolution.fan_interface",
+      "sacred": true
+    },
+    {
+      "feature": "cable-clearance edge notch",
+      "intent_source": "episode-integration-fixture-001:gesture:keep-out",
+      "value_source": "measurement-resolution.keep_out",
+      "source_samples_are_dimensions": false
+    },
+    {
+      "feature": "minimum wall thickness",
+      "intent_source": "manufacturing assumption",
+      "value_source": "measurement-resolution.manufacturing.min_wall_thickness"
+    },
+    {
+      "feature": "private phrase disposition",
+      "intent_source": "usual forgiving fit@v1",
+      "value_source": "measurement-resolution.private_meaning_dispositions",
+      "generator_effect": "none"
+    }
+  ],
+  "geometry": {
+    "output_file": "intentforge/output/fan-mount-bracket-integrated-v0.1.stl",
+    "sha256": "b740c05d18bb8bf975ec76db5d5bfed03ab9f45384aae4795da1409b978c2757",
+    "bytes": 36484,
+    "vertices": 732,
+    "triangles": 728,
+    "watertight": true,
+    "signed_volume_mm3": 11574.23
+  },
+  "validation_status": {
+    "geometry_proposed": true,
+    "constraints_checked": true,
+    "printability_estimated": true,
+    "simulation_completed": false,
+    "prototype_manufactured": false,
+    "prototype_tested": false,
+    "externally_reviewed": false,
+    "validated_for_use": false
+  },
+  "warnings": [
+    "all dimensions are inherited illustrative fixture values, not measurements from a physical object",
+    "32mm fan bolt spacing is illustrative and not tied to a verified fan datasheet",
+    "M4 clearance hole is represented as 4.5mm diameter",
+    "the keep-out gesture supplies intent and provenance only; edge-notch dimensions come exclusively from this resolution fixture",
+    "translation source is a reviewed-provisional teaching episode",
+    "demo-stage gesture samples were preserved as provenance and not converted into physical dimensions",
+    "private phrase was explicitly preserved as unsupported/not applicable to the v0.0 generator",
+    "translation authorized only for scope: computational-only"
+  ],
+  "not_yet_true": [
+    "living integration is not complete",
+    "private fit language has no executable v0.0 generator field",
+    "not simulated",
+    "not manufactured",
+    "not physically tested",
+    "not externally reviewed",
+    "not validated for use"
+  ]
+}
