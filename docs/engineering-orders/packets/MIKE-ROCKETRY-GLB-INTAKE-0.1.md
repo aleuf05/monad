@@ -49,7 +49,7 @@ handoff.
 
 ## 9. Evidence and completion state
 
-**Lifecycle:** executing; commissioning pending.
+**Lifecycle:** verified complete → recorded.
 
 Pre-commissioning evidence:
 
@@ -63,3 +63,17 @@ Pre-commissioning evidence:
 - Admiral subsequently ruled that the upload be served as a normal part of
   the site. A single idempotent installer now tests, installs, enables, routes,
   and checks both loopback and public health.
+
+Commissioned and exercised 2026-07-29:
+
+- `mike-rocketry-glb-intake.service`: active;
+- public `/mike-rocketry-intake-api/health`: HTTP 200;
+- operator phone upload accepted a 1,926,500-byte Tripo GLB;
+- receipt SHA-256
+  `21751df24fbb54ea886ddfcd572860ab8a5bc88d35199974cb58013a238ebf92`
+  matches stored bytes;
+- Tripo generator metadata present; one scene, node, mesh, primitive, and
+  material; three embedded textures; nondegenerate 3-axis bounding box;
+- quarantined model rendered successfully in Chromium and is recognizably the
+  prepared rocket;
+- asset remains review-required and has not been cataloged or published.
