@@ -3,25 +3,135 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A playable comparison of constant and optimally scheduled rocket exhaust under the same ideal energy budget.">
   <title>Mike's Variable-Exhaust Rocket Lab</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; color: #dce6f2; background: radial-gradient(circle at 50% 18%, #18334a, #0b1220 54%); font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
-    main { width: min(760px, 100%); padding: 34px; background: #111a2be8; border: 1px solid #e8a33d; border-radius: 12px; box-shadow: 0 24px 80px #0008; }
-    a { color: #4fd1c5; }
-    .badge { display: inline-block; padding: 3px 9px; color: #0b1220; background: #e8a33d; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
-    h1 { margin: 14px 0 8px; color: #f6c76d; font: 700 clamp(30px, 6vw, 54px)/1.05 system-ui, sans-serif; }
-    p { color: #9aacbf; }
-    .signal { margin-top: 24px; padding: 16px; border-left: 3px solid #4fd1c5; background: #132434; color: #dce6f2; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <a href="../../index.html">← Fleet Monad</a>
-    <div style="margin-top:24px"><span class="badge">BUILDING LIVE</span></div>
+  <header class="masthead">
+    <a class="back" href="../../index.html">← Fleet Monad</a>
+    <div class="eyebrow">Captain's Reverie · Unofficial Preview · Version 1</div>
     <h1>Mike's Variable-Exhaust Rocket Lab</h1>
-    <p>A playable completion of Mike's investigation into energy-limited rockets, variable exhaust schedules, reaction mass, relativistic bounds, and interstellar implications.</p>
-    <div class="signal">The berth is established. Verified controls, plots, and mission experiments are now under construction.</div>
+    <p>Spend the same ideal energy two ways. Watch the optimal exhaust schedule pull ahead.</p>
+    <p class="attribution">Based on <a href="https://github.com/mds2/rocketry" rel="noopener">Mike's challenge and original derivation</a>. Mike has not yet reviewed or endorsed this interpretation.</p>
+  </header>
+
+  <main>
+    <section class="lab-grid" aria-label="Interactive rocket laboratory">
+      <aside class="panel controls">
+        <div class="panel-label">01 · Set the vehicle</div>
+        <label>Initial mass, <i>m</i><sub>i</sub> <output id="miOut"></output>
+          <input id="mi" type="range" min="2" max="200" step="1">
+        </label>
+        <label>Final mass, <i>m</i><sub>f</sub> <output id="mfOut"></output>
+          <input id="mf" type="range" min="1" max="100" step="1">
+        </label>
+        <label>Specific energy, <i>R</i><sub>e</sub> <output id="reOut"></output>
+          <input id="re" type="range" min="1" max="1000" step="1">
+        </label>
+        <div class="presets" aria-label="Presets">
+          <button data-preset="modest">Modest</button>
+          <button data-preset="launch">Launch vehicle</button>
+          <button data-preset="extreme">Extreme</button>
+          <button data-preset="mike">Mike's example</button>
+        </div>
+        <button id="share" class="share">Copy shareable link</button>
+        <span id="shareStatus" class="share-status" role="status"></span>
+      </aside>
+
+      <section class="panel flight">
+        <div class="panel-label">02 · Run the burn</div>
+        <div class="space" aria-hidden="true">
+          <div class="stars"></div>
+          <div id="exhaust" class="exhaust"></div>
+          <div id="rocket" class="rocket">▶</div>
+          <div class="model-tag constant-tag">constant</div>
+          <div class="model-tag optimal-tag">optimal</div>
+          <div id="constantGhost" class="ghost constant-ghost">◆</div>
+          <div id="optimalGhost" class="ghost optimal-ghost">◆</div>
+        </div>
+        <label class="burn-label">Mass remaining, <i>m</i> <output id="massOut"></output>
+          <input id="burn" type="range" min="0" max="1000" step="1">
+        </label>
+        <button id="play" class="play">▶ Run burn</button>
+        <div class="energy-ledger">
+          <span>Energy released <strong id="energyReleased">0%</strong></span>
+          <span>Same total budget <strong>✓</strong></span>
+        </div>
+      </section>
+
+      <aside class="panel readout">
+        <div class="panel-label">03 · Compare</div>
+        <div class="metric">
+          <span>Constant Δv</span>
+          <strong id="constantDv">—</strong>
+        </div>
+        <div class="metric optimal">
+          <span>Optimal Δv</span>
+          <strong id="optimalDv">—</strong>
+        </div>
+        <div class="metric">
+          <span>Constant exhaust</span>
+          <strong id="constantVe">—</strong>
+        </div>
+        <div class="metric optimal">
+          <span>Optimal exhaust now</span>
+          <strong id="optimalVe">—</strong>
+        </div>
+        <div class="gain-card">
+          <span>Final gain factor</span>
+          <strong id="gain">—</strong>
+          <code>G(r) = (r−1) / (√r ln r)</code>
+        </div>
+      </aside>
+    </section>
+
+    <section class="charts">
+      <article class="chart-card">
+        <div><span class="line-key constant-key"></span> constant <span class="line-key optimal-key"></span> optimal</div>
+        <h2>Accumulated Δv</h2>
+        <svg id="dvChart" viewBox="0 0 640 260" role="img" aria-label="Accumulated delta-v by mass spent"></svg>
+      </article>
+      <article class="chart-card">
+        <div><span class="line-key constant-key"></span> constant <span class="line-key optimal-key"></span> optimal</div>
+        <h2>Exhaust velocity schedule</h2>
+        <svg id="veChart" viewBox="0 0 640 260" role="img" aria-label="Exhaust velocity by mass spent"></svg>
+      </article>
+    </section>
+
+    <details class="derivation">
+      <summary>Inspect Mike's derivation</summary>
+      <div class="derivation-grid">
+        <div>
+          <h2>Fixed energy budget</h2>
+          <p class="equation">R<sub>e</sub>(m<sub>i</sub>−m<sub>f</sub>) = ∫ ½v<sub>e</sub>²(m) dm</p>
+          <p>Both schedules receive exactly the same idealized energy.</p>
+        </div>
+        <div>
+          <h2>Optimal schedule</h2>
+          <p class="equation">v<sub>e</sub>(m) = k/m, &nbsp; k = √(2R<sub>e</sub>m<sub>i</sub>m<sub>f</sub>)</p>
+          <p>The optimal exhaust velocity rises as the spacecraft gets lighter.</p>
+        </div>
+        <div>
+          <h2>Final comparison</h2>
+          <p class="equation">Δv<sub>opt</sub> = (m<sub>i</sub>−m<sub>f</sub>)√(2R<sub>e</sub>/(m<sub>i</sub>m<sub>f</sub>))</p>
+          <p>Only the mass ratio controls the gain over constant exhaust.</p>
+        </div>
+      </div>
+    </details>
+
+    <section class="assumptions">
+      <h2>What this instrument assumes</h2>
+      <ul>
+        <li>One-dimensional, non-relativistic motion.</li>
+        <li>No gravity, drag, structural mass changes, or conversion losses.</li>
+        <li>Energy can be stored and reassigned between parcels of reaction mass without penalty.</li>
+        <li>The result is an ideal upper-bound comparison—not an engine design.</li>
+      </ul>
+    </section>
   </main>
+
+  <footer>Preserve Mike's idea first. Add delight second. Reality decides what survives.</footer>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
