@@ -1,0 +1,340 @@
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "monad.geometricIntentLexicon.v0.1";
+  var mode = "reference";
+  var selected = new Set();
+  var sacred = new Set();
+  var gesture = null;
+  var drawing = false;
+  var currentEpisode = null;
+
+  var stage = document.getElementById("geometryStage");
+  var path = document.getElementById("gesturePath");
+  var readout = document.getElementById("selectionReadout");
+  var utterance = document.getElementById("utterance");
+  var privatePhrase = document.getElementById("privatePhrase");
+  var operationalMeaning = document.getElementById("operationalMeaning");
+  var preview = document.getElementById("intentPreview");
+  var compileState = document.getElementById("compileState");
+  var reviewed = document.getElementById("humanReviewed");
+  var saveButton = document.getElementById("saveEntry");
+  var signal = document.getElementById("signal");
+  var cards = document.getElementById("lexiconCards");
+
+  function loadLexicon() {
+    try {
+      var parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeLexicon(entries) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  function setSignal(message, isError) {
+    signal.textContent = message;
+    signal.style.color = isError ? "var(--red)" : "var(--cyan)";
+  }
+
+  function updateReadout() {
+    var refs = Array.from(selected);
+    var protectedRefs = Array.from(sacred);
+    var parts = refs.length ? "References: " + refs.join(", ") : "No explicit references selected.";
+    if (protectedRefs.length) parts += " · Sacred: " + protectedRefs.join(", ");
+    if (gesture) parts += " · Gesture: " + gesture.type + " (" + gesture.points.length + " samples)";
+    readout.textContent = parts;
+  }
+
+  function updateGeometryClasses() {
+    document.querySelectorAll(".reference").forEach(function (element) {
+      var ref = element.dataset.ref;
+      element.classList.toggle("selected", selected.has(ref));
+      element.classList.toggle("sacred", sacred.has(ref));
+    });
+    document.querySelectorAll("[data-select-ref]").forEach(function (element) {
+      var ref = element.dataset.selectRef;
+      element.classList.toggle("selected", selected.has(ref));
+      element.classList.toggle("sacred", sacred.has(ref));
+    });
+  }
+
+  function toggleReference(ref) {
+    if (selected.has(ref)) {
+      selected.delete(ref);
+      sacred.delete(ref);
+    } else {
+      selected.add(ref);
+    }
+    updateGeometryClasses();
+    updateReadout();
+  }
+
+  function setMode(next) {
+    mode = next;
+    document.querySelectorAll("[data-mode]").forEach(function (button) {
+      button.classList.toggle("active", button.dataset.mode === next);
+    });
+    stage.style.cursor = next === "reference" ? "default" : "crosshair";
+  }
+
+  function svgPoint(event) {
+    var point = stage.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    return point.matrixTransform(stage.getScreenCTM().inverse());
+  }
+
+  function renderGesture() {
+    if (!gesture || gesture.points.length < 2) {
+      path.setAttribute("d", "");
+      return;
+    }
+    var d = gesture.points.map(function (point, index) {
+      return (index ? "L" : "M") + point.x.toFixed(1) + " " + point.y.toFixed(1);
+    }).join(" ");
+    path.setAttribute("d", d);
+  }
+
+  document.querySelectorAll("[data-mode]").forEach(function (button) {
+    button.addEventListener("click", function () { setMode(button.dataset.mode); });
+  });
+
+  document.querySelectorAll(".reference").forEach(function (element) {
+    element.addEventListener("click", function (event) {
+      if (mode !== "reference") return;
+      event.stopPropagation();
+      toggleReference(element.dataset.ref);
+    });
+  });
+
+  document.querySelectorAll("[data-select-ref]").forEach(function (element) {
+    element.addEventListener("click", function () {
+      setMode("reference");
+      toggleReference(element.dataset.selectRef);
+    });
+  });
+
+  stage.addEventListener("pointerdown", function (event) {
+    if (mode === "reference") return;
+    event.preventDefault();
+    drawing = true;
+    stage.setPointerCapture(event.pointerId);
+    gesture = { type: mode, points: [svgPoint(event)] };
+    renderGesture();
+    updateReadout();
+  });
+
+  stage.addEventListener("pointermove", function (event) {
+    if (!drawing || !gesture) return;
+    var point = svgPoint(event);
+    var previous = gesture.points[gesture.points.length - 1];
+    if (Math.hypot(point.x - previous.x, point.y - previous.y) < 5) return;
+    gesture.points.push(point);
+    renderGesture();
+    updateReadout();
+  });
+
+  function finishGesture(event) {
+    if (!drawing) return;
+    drawing = false;
+    if (stage.hasPointerCapture(event.pointerId)) stage.releasePointerCapture(event.pointerId);
+    updateReadout();
+  }
+  stage.addEventListener("pointerup", finishGesture);
+  stage.addEventListener("pointercancel", finishGesture);
+
+  document.getElementById("markSacred").addEventListener("click", function () {
+    if (!selected.size) {
+      setSignal("Select one or more explicit references before marking them sacred.", true);
+      return;
+    }
+    selected.forEach(function (ref) { sacred.add(ref); });
+    updateGeometryClasses();
+    updateReadout();
+    setSignal("Selected references marked sacred in this teaching episode.");
+  });
+
+  document.getElementById("clearStage").addEventListener("click", function () {
+    selected.clear();
+    sacred.clear();
+    gesture = null;
+    currentEpisode = null;
+    reviewed.checked = false;
+    saveButton.disabled = true;
+    path.setAttribute("d", "");
+    preview.textContent = "Words, references, and gesture evidence will appear here.";
+    compileState.textContent = "not compiled";
+    compileState.className = "state";
+    updateGeometryClasses();
+    updateReadout();
+    setSignal("Teaching stage reset.");
+  });
+
+  function unresolvedTerms(text, meaning) {
+    var candidateTerms = ["usual", "forgiving", "stout", "natural", "enough", "strong", "light", "clean"];
+    return candidateTerms.filter(function (term) {
+      return new RegExp("\\b" + term + "\\b", "i").test(text) && !meaning.trim();
+    });
+  }
+
+  function inferRelations(text) {
+    var relations = [];
+    if (/\bmount|connect|attach\b/i.test(text)) relations.push({ operation: "CONNECT", status: "proposed" });
+    if (/\bavoid|keep[- ]?out|clear of\b/i.test(text)) relations.push({ operation: "CLEAR", status: "proposed" });
+    if (/\bpreserve|sacred|must not change\b/i.test(text) || sacred.size) {
+      relations.push({ operation: "PRESERVE", references: Array.from(sacred), status: "explicit-or-proposed" });
+    }
+    if (/\bairflow|open\b/i.test(text)) relations.push({ operation: "PRESERVE_REGION", status: "proposed" });
+    return relations;
+  }
+
+  function compile() {
+    var words = utterance.value.trim();
+    var phrase = privatePhrase.value.trim();
+    var meaning = operationalMeaning.value.trim();
+    var unresolved = unresolvedTerms(words, meaning);
+
+    currentEpisode = {
+      schema_version: "monad.geometricTeachingEpisode.v0.1",
+      id: "episode-" + Date.now(),
+      recorded_at: new Date().toISOString(),
+      epistemic_status: "human-review-required",
+      expression: {
+        words: words,
+        private_phrase_candidate: phrase
+      },
+      explicit_references: Array.from(selected).map(function (ref) {
+        return { ref: ref, sacred: sacred.has(ref) };
+      }),
+      gesture: gesture ? {
+        type: gesture.type,
+        coordinate_space: "demo-stage-640x400",
+        samples: gesture.points.map(function (point) {
+          return [Number(point.x.toFixed(1)), Number(point.y.toFixed(1))];
+        })
+      } : null,
+      proposed_interpretation: {
+        relations: inferRelations(words),
+        operational_meaning: meaning || null,
+        unresolved_terms: unresolved
+      },
+      evidence: {
+        demonstrations: 1,
+        physical_results: 0,
+        independent_confirmations: 0
+      },
+      human_review: {
+        reviewed: false,
+        universal_claim: false
+      }
+    };
+
+    preview.textContent = JSON.stringify(currentEpisode, null, 2);
+    compileState.textContent = unresolved.length ? "unresolved language" : "ready for review";
+    compileState.className = "state " + (unresolved.length ? "unresolved" : "ready");
+    reviewed.checked = false;
+    saveButton.disabled = true;
+    setSignal(unresolved.length
+      ? "Compiled with unresolved terms: " + unresolved.join(", ") + ". Define the operational meaning or preserve the uncertainty."
+      : "Teaching episode compiled. Inspect it before review.");
+  }
+
+  document.getElementById("compileIntent").addEventListener("click", compile);
+  reviewed.addEventListener("change", function () {
+    saveButton.disabled = !(reviewed.checked && currentEpisode);
+  });
+
+  saveButton.addEventListener("click", function () {
+    if (!currentEpisode || !reviewed.checked) return;
+    var phrase = privatePhrase.value.trim();
+    var meaning = operationalMeaning.value.trim();
+    if (!phrase || !meaning) {
+      setSignal("A reusable entry requires both a private phrase and your explicit operational meaning.", true);
+      return;
+    }
+    var entries = loadLexicon();
+    var priorVersions = entries.filter(function (entry) { return entry.phrase.toLowerCase() === phrase.toLowerCase(); });
+    var entry = {
+      schema_version: "monad.intentLexiconEntry.v0.1",
+      phrase: phrase,
+      version: priorVersions.length + 1,
+      operational_meaning: meaning,
+      contexts: Array.from(selected),
+      gesture_type: gesture ? gesture.type : null,
+      evidence: currentEpisode.evidence,
+      confidence: "provisional",
+      exceptions: [],
+      source_episode: currentEpisode.id,
+      reviewed_at: new Date().toISOString(),
+      revision_history: priorVersions.map(function (prior) {
+        return { version: prior.version, reviewed_at: prior.reviewed_at };
+      })
+    };
+    currentEpisode.human_review.reviewed = true;
+    currentEpisode.epistemic_status = "reviewed-provisional";
+    entries.push(entry);
+    writeLexicon(entries);
+    preview.textContent = JSON.stringify(currentEpisode, null, 2);
+    renderLexicon();
+    saveButton.disabled = true;
+    setSignal("Saved “" + phrase + "” version " + entry.version + " as provisional.");
+  });
+
+  function renderLexicon() {
+    var entries = loadLexicon();
+    if (!entries.length) {
+      cards.innerHTML = '<div class="empty">No reviewed private meanings saved yet.</div>';
+      return;
+    }
+    cards.innerHTML = entries.slice().reverse().map(function (entry) {
+      var lineage = entry.revision_history.length
+        ? "Evolved from v" + entry.revision_history[entry.revision_history.length - 1].version +
+          " · " + entry.revision_history.length + " prior version" +
+          (entry.revision_history.length === 1 ? "" : "s")
+        : "First recorded version";
+      return '<article class="card">' +
+        "<h3>“" + escapeHtml(entry.phrase) + "” <span class=\"meta\">v" + entry.version + "</span></h3>" +
+        '<div class="meaning">' + escapeHtml(entry.operational_meaning) + "</div>" +
+        '<div class="meta">Context: ' + escapeHtml(entry.contexts.join(", ") || "not yet bounded") + "</div>" +
+        '<div class="meta">' + escapeHtml(lineage) + "</div>" +
+        '<div class="warning">Provisional · ' + entry.evidence.physical_results + " physical results · not universal</div>" +
+        "</article>";
+    }).join("");
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (character) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
+    });
+  }
+
+  document.getElementById("exportLexicon").addEventListener("click", function () {
+    var payload = {
+      schema_version: "monad.intentLexiconExport.v0.1",
+      exported_at: new Date().toISOString(),
+      portability_note: "Private meanings remain inspectable and are not universal claims.",
+      entries: loadLexicon()
+    };
+    var url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = "geometric-intent-lexicon.json";
+    link.click();
+    URL.revokeObjectURL(url);
+    setSignal("Lexicon exported as inspectable JSON.");
+  });
+
+  document.getElementById("clearLexicon").addEventListener("click", function () {
+    if (!confirm("Clear this browser's private geometric lexicon? Export first if you need a recoverable copy.")) return;
+    localStorage.removeItem(STORAGE_KEY);
+    renderLexicon();
+    setSignal("Local lexicon cleared.");
+  });
+
+  updateReadout();
+  renderLexicon();
+}());
