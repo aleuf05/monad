@@ -26,6 +26,7 @@
   var guideProgress = document.getElementById("guideProgress");
   var guideNext = document.getElementById("guideNext");
   var reflection = document.getElementById("reflectionSummary");
+  var continueIntentForge = document.getElementById("continueIntentForge");
 
   var GUIDE_REFS = ["Fan.Face:A", "Panel.Hole:1", "Panel.Hole:2"];
 
@@ -67,6 +68,15 @@
 
   function writeLexicon(entries) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  function exportPayload(entries) {
+    return {
+      schema_version: "monad.intentLexiconExport.v0.1",
+      exported_at: new Date().toISOString(),
+      portability_note: "Private meanings remain inspectable and are not universal claims.",
+      entries: entries
+    };
   }
 
   function setSignal(message, isError) {
@@ -347,6 +357,7 @@
 
   function renderLexicon() {
     var entries = loadLexicon();
+    continueIntentForge.classList.toggle("visible", entries.length > 0);
     if (!entries.length) {
       cards.innerHTML = '<div class="empty">No reviewed private meanings saved yet.</div>';
       return;
@@ -383,12 +394,7 @@
   }
 
   document.getElementById("exportLexicon").addEventListener("click", function () {
-    var payload = {
-      schema_version: "monad.intentLexiconExport.v0.1",
-      exported_at: new Date().toISOString(),
-      portability_note: "Private meanings remain inspectable and are not universal claims.",
-      entries: loadLexicon()
-    };
+    var payload = exportPayload(loadLexicon());
     var url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
     var link = document.createElement("a");
     link.href = url;
@@ -396,6 +402,12 @@
     link.click();
     URL.revokeObjectURL(url);
     setSignal("Lexicon exported as inspectable JSON.");
+  });
+
+  continueIntentForge.addEventListener("click", function () {
+    var entries = loadLexicon();
+    var payload = exportPayload(entries.length ? [entries[entries.length - 1]] : []);
+    localStorage.setItem("intentforge.pendingLexicon.v0.1", JSON.stringify(payload));
   });
 
   document.getElementById("clearLexicon").addEventListener("click", function () {

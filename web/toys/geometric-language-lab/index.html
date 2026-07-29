@@ -66,6 +66,9 @@
   .lexicon { margin-top:18px; }
   .lex-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .lex-actions { display:flex; gap:7px; }
+  .continue { display:none; margin-top:12px; padding:12px 14px; border:1px solid var(--cyan); background:rgba(79,209,197,.05); color:var(--ink); text-decoration:none; font-size:11px; }
+  .continue.visible { display:block; }
+  .continue strong { color:var(--cyan); }
   .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:11px; margin-top:12px; }
   .card { background:#0d1727; border:1px solid var(--line); border-left:3px solid var(--cyan); border-radius:5px; padding:13px; }
   .card h3 { margin:0 0 5px; font-size:15px; }
@@ -183,6 +186,7 @@
       </div>
     </div>
     <div class="cards" id="lexiconCards"></div>
+    <a class="continue" id="continueIntentForge" href="../intentforge-translation-bench/"><strong>Continue into IntentForge →</strong><br>Inspect what this reviewed language can—and cannot yet—become as physical geometry.</a>
   </section>
 </main>
 <script src="app.js"></script>
