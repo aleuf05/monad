@@ -60,7 +60,7 @@ Captain / Codex CLI, under the Admiral's high-level design oversight.
 
 ## 9. Evidence and completion state
 
-**Lifecycle:** executing → verification pending.
+**Lifecycle:** verified complete → recorded.
 
 Current evidence:
 
@@ -69,7 +69,12 @@ Current evidence:
 - live HTML, application module, and math module: HTTP 200;
 - source attribution, gain reveal, and share control present in live HTML.
 - a public Reality Check distinguishes verified math, open physical-model
-  assumptions, pending visual inspection, and the boundary awaiting Mike.
-
-Remaining before verified complete: interactive browser and narrow-viewport
-inspection, portable package assembly, and final live marker review.
+  assumptions, verified browser behavior, and the boundary awaiting Mike;
+- Chromium full-page renders inspected at 1440 × 1000 and 390 × 844: layout,
+  controls, charts, assumptions, and Reality Check remain legible with no
+  overlap;
+- browser interaction check: Mike and extreme presets update; slider reaches
+  final state; URL state restores and rewrites correctly; page-error channel
+  remains empty;
+- portable package assembled locally under the source repository's `site/`
+  directory; it remains unpublished pending review and Mike's involvement.
