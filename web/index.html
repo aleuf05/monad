@@ -27,6 +27,10 @@
   .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
   .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
 
+  .mike-berth-annex { display: flex; align-items: center; gap: 10px; margin: 0 0 22px; padding: 10px 16px; color: #9AACBF; text-decoration: none; background: #111A2B; border: 1px solid #1E2C42; border-radius: 7px; font-size: 11px; transition: border-color 150ms ease; }
+  .mike-berth-annex:hover { border-color: #4FD1C5; color: #C9D6E8; }
+  .mike-berth-annex .annex-badge { color: #0B1220; background: #4FD1C5; border-radius: 20px; padding: 2px 8px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
@@ -68,6 +72,11 @@
       <div class="project-kicker">Admiral's Special Project · Captain's Reverie for Mike</div>
       <div class="project-title">THE VARIABLE-EXHAUST ROCKET LAB</div>
       <div class="project-desc">A playable, unofficial interpretation of Mike's propulsion investigation. Built in reverie until Mike is invited aboard and chooses its course.</div>
+    </a>
+
+    <a class="mike-berth-annex" href="toys/mike-rocketry-notebook/">
+      <span class="annex-badge">NEW</span>
+      <span>Read Mike's actual notebook, verbatim &mdash; read-only render of <code>rocket equations.ipynb</code>, not a reinterpretation</span>
     </a>
 
     <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
