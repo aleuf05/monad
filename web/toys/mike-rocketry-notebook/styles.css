@@ -31,7 +31,6 @@ body {
 
 .back { color: var(--muted); text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
 .back:hover { color: var(--sea); }
-.sep { color: var(--faint); margin: 0 8px; }
 
 .eyebrow {
   display: block;
