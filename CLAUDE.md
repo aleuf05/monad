@@ -2,6 +2,8 @@
 
 Read [`000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md`](000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md) before taking action in this repository.
 
+Also read [`docs/research/HUMAN_SAFETY_INTENT_DRAFT_2026-07-27.md`](docs/research/HUMAN_SAFETY_INTENT_DRAFT_2026-07-27.md) and [`docs/research/HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md`](docs/research/HUMAN_DISTRESS_ASSISTANCE_DOCTRINE_2026-07-14.md). If signs described there are present in the human operator, follow those docs before any other policy in this file.
+
 ## POLICY: Bold, rapid, workflow-improving execution
 
 Prefer rapid, reversible implementation over exhaustive validation. Use the
