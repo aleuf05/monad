@@ -150,6 +150,21 @@ class EngineTests(unittest.TestCase):
         self.assertNotEqual(first_session, second_session["id"])
         engine.close()
 
+    def test_mode_switch_scopes_provider_context_not_full_history(self):
+        provider, engine = self._engine([
+            "Sure.\n```captain-json\n{}\n```",
+            "Sure.\n```captain-json\n{}\n```",
+        ])
+        engine.reply("master turn one")
+        database.update_state(self.conn, current_mode="design")
+        engine.reply("design turn one")
+
+        design_call_messages = provider.calls[-1][1]
+        contents = [m.content for m in design_call_messages]
+        self.assertIn("design turn one", contents)
+        self.assertNotIn("master turn one", contents)
+        engine.close()
+
     def test_master_mode_gets_workspace_write_sandbox(self):
         provider, engine = self._engine(["OK.\n```captain-json\n{}\n```"])
         self.assertEqual(database.get_state(self.conn)["current_mode"], "master")

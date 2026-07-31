@@ -158,7 +158,11 @@ class Handler(BaseHTTPRequestHandler):
         if not session_id:
             self._json({"ok": True, "session_id": None, "messages": []})
             return
-        messages = database.list_messages(self.server.conn, session_id)
+        mode = (query.get("mode") or [None])[0]
+        if mode and mode in database.MODES:
+            messages = database.list_messages_by_mode(self.server.conn, session_id, mode)
+        else:
+            messages = database.list_messages(self.server.conn, session_id)
         self._json({"ok": True, "session_id": session_id, "messages": messages})
 
     def _handle_get_harvest(self, query: dict) -> None:

@@ -15,6 +15,54 @@ from model_provider import Message
 RECENT_MESSAGE_LIMIT = 20
 RECENT_HARVEST_LIMIT = 5
 
+# Distinct role instructions per mode -- what makes switching modes a
+# context switch (inhabit a different operational role) rather than a
+# history switch (same role, different conversation thread). Master
+# carries the fewest constraints since it is the default, general-purpose
+# station; every other mode narrows behavior toward its specific job.
+MODE_ROLE_INSTRUCTIONS = {
+    "master": (
+        "You are in Master mode: the default station, general-purpose and "
+        "unconstrained beyond the standing rules above. Help with whatever "
+        "the Admiral raises; do not narrow the conversation to a single "
+        "specialty unless he does."
+    ),
+    "project_formation": (
+        "You are in Project Formation mode: help the Admiral turn a raw "
+        "idea into a scoped project -- name, purpose, boundaries, and a "
+        "first next action. Push toward a concrete project_suggestion or a "
+        "project_candidate harvest proposal rather than staying abstract; "
+        "do not let the conversation drift into unrelated design or review "
+        "work while in this mode."
+    ),
+    "design": (
+        "You are in Design mode: reason concretely about architecture, "
+        "tradeoffs, and technical shape. Produce specific, evaluable "
+        "proposals -- not vague direction -- and harvest durable design "
+        "decisions as design or engineering_handoff candidates."
+    ),
+    "review": (
+        "You are in Review mode: evaluate existing work, decisions, or "
+        "proposals critically rather than generating new ones. Verify "
+        "claims against what is actually true, surface risks and gaps "
+        "plainly, and harvest durable verdicts as decision or "
+        "engineering_handoff candidates."
+    ),
+    "associative_lab": (
+        "You are in Associative Lab mode: decode generously and conclude "
+        "conservatively. Contain raw associative expression inside Monad; "
+        "do not encourage escalation, intensification, or external "
+        "communication. Useful findings become harvest candidates, never "
+        "canon."
+    ),
+    "record": (
+        "You are in Record mode: capture what is said and decided "
+        "faithfully with minimal interpretation. Favor precise "
+        "captain_brief, incident_note, and next_action harvest candidates "
+        "over open-ended discussion."
+    ),
+}
+
 OUTPUT_CONTRACT_INSTRUCTIONS = """
 ## Output contract
 
@@ -74,7 +122,11 @@ def compile_system_prompt(
     accepted_recent = database.list_harvest_items(conn, status="accepted")[:RECENT_HARVEST_LIMIT]
     open_questions = database.list_harvest_items(conn, status="unresolved")[:RECENT_HARVEST_LIMIT]
 
-    sections = [seed_instruction, "\n## Current situation\n"]
+    sections = [seed_instruction]
+    role_instruction = MODE_ROLE_INSTRUCTIONS.get(mode)
+    if role_instruction:
+        sections.append(f"\n## Current operational role\n\n{role_instruction}")
+    sections.append("\n## Current situation\n")
     sections.append(f"- Active mode: {mode}")
     if project:
         sections.append(f"- Active project: {project['title']} ({project['id']})")
@@ -103,8 +155,13 @@ def compile_system_prompt(
     return "\n".join(sections)
 
 
-def bounded_messages(conn, session_id: str, limit: int = RECENT_MESSAGE_LIMIT) -> list[Message]:
-    rows = database.list_messages(conn, session_id, limit=10_000)
+def bounded_messages(
+    conn, session_id: str, *, mode: Optional[str] = None, limit: int = RECENT_MESSAGE_LIMIT
+) -> list[Message]:
+    if mode is not None:
+        rows = database.list_messages_by_mode(conn, session_id, mode, limit=10_000)
+    else:
+        rows = database.list_messages(conn, session_id, limit=10_000)
     recent = rows[-limit:]
     return [Message(role=row["role"], content=row["content"]) for row in recent]
 

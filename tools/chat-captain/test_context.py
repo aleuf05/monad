@@ -60,6 +60,30 @@ class ContextCompilerTests(unittest.TestCase):
         self.assertEqual(len(messages), 5)
         self.assertEqual(messages[-1].content, "msg 29")
 
+    def test_bounded_messages_scoped_by_mode_when_mode_given(self):
+        session = database.create_session(self.conn, mode="master", project_id=None)
+        database.append_message(self.conn, session_id=session["id"], role="user", content="master turn", mode="master")
+        database.append_message(self.conn, session_id=session["id"], role="user", content="design turn", mode="design")
+        database.append_message(self.conn, session_id=session["id"], role="user", content="another master turn", mode="master")
+
+        master_only = context_compiler.bounded_messages(self.conn, session["id"], mode="master")
+        self.assertEqual([m.content for m in master_only], ["master turn", "another master turn"])
+
+        design_only = context_compiler.bounded_messages(self.conn, session["id"], mode="design")
+        self.assertEqual([m.content for m in design_only], ["design turn"])
+
+        unscoped = context_compiler.bounded_messages(self.conn, session["id"])
+        self.assertEqual(len(unscoped), 3)
+
+    def test_compile_system_prompt_includes_role_instruction_for_active_mode(self):
+        state = database.get_state(self.conn)
+        state["current_mode"] = "associative_lab"
+        prompt = context_compiler.compile_system_prompt(
+            self.conn, seed_instruction="SEED", state=state, project=None, last_brief=None,
+        )
+        self.assertIn("decode generously", prompt)
+        self.assertNotIn("Project Formation mode", prompt)
+
     def test_extract_structured_reply_parses_valid_block(self):
         raw = (
             "Here is my reply.\n\n"

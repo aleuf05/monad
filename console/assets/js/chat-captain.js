@@ -61,7 +61,7 @@
   function renderTranscript(messages) {
     transcriptEl.innerHTML = "";
     if (!messages.length) {
-      renderMessage("system", "No messages yet in this session. Say hello to the Captain.");
+      renderMessage("system", "No messages yet in this role. Say hello to the Captain.");
       return;
     }
     messages.forEach(function (message) {
@@ -161,6 +161,12 @@
     }
   }
 
+  function loadMessages(mode) {
+    return api("/api/messages?mode=" + encodeURIComponent(mode)).then(function (messagesBody) {
+      renderTranscript(messagesBody.messages);
+    });
+  }
+
   function loadState() {
     return api("/api/state").then(function (body) {
       modeSelect.value = body.state.current_mode;
@@ -168,9 +174,7 @@
       lastBriefEl.textContent = body.state.last_session_brief || "None yet.";
       state.project = body.project;
       loadProjects();
-      return api("/api/messages").then(function (messagesBody) {
-        renderTranscript(messagesBody.messages);
-      });
+      return loadMessages(body.state.current_mode);
     });
   }
 
@@ -307,9 +311,22 @@
   });
 
   modeSelect.addEventListener("change", function () {
-    post("/api/mode", { mode: modeSelect.value, reason: "operator changed mode" }).catch(function (error) {
-      renderMessage("system", "Could not change mode: " + error.message);
-    });
+    var newMode = modeSelect.value;
+    var label = modeSelect.options[modeSelect.selectedIndex].text;
+    post("/api/mode", { mode: newMode, reason: "operator changed mode" })
+      .then(function () {
+        // Switching mode changes which role Codex inhabits (a fresh,
+        // role-scoped context), not which "conversation" is open -- the
+        // transcript reload makes that visible rather than just leaving
+        // the previous role's messages on screen.
+        return loadMessages(newMode);
+      })
+      .then(function () {
+        renderMessage("system", "Switched to " + label + ".");
+      })
+      .catch(function (error) {
+        renderMessage("system", "Could not change mode: " + error.message);
+      });
   });
 
   projectSelect.addEventListener("change", function () {

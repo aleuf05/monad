@@ -301,6 +301,20 @@ def list_messages(conn: sqlite3.Connection, session_id: str, *, limit: int = 200
     return [dict(row) for row in rows]
 
 
+def list_messages_by_mode(
+    conn: sqlite3.Connection, session_id: str, mode: str, *, limit: int = 200
+) -> list[dict[str, Any]]:
+    # A mode switch changes which role Codex inhabits, not which
+    # "conversation" is open -- messages fed back as context (and shown
+    # in the transcript) are scoped to the mode they were sent under, not
+    # the whole session regardless of mode.
+    rows = conn.execute(
+        "SELECT * FROM messages WHERE session_id = ? AND mode = ? ORDER BY id ASC LIMIT ?",
+        (session_id, mode, limit),
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
 # --- harvest_items -----------------------------------------------------------
 
 def create_harvest_item(

@@ -142,7 +142,11 @@ class CaptainEngine:
             project=project,
             last_brief=state.get("last_session_brief"),
         )
-        messages = bounded_messages(self.conn, session_id)
+        # Mode-scoped, not session-scoped: a mode switch changes which
+        # role Codex inhabits, so its recent-message context should be
+        # this mode's own prior turns, not the whole session regardless
+        # of which mode each message was sent under.
+        messages = bounded_messages(self.conn, session_id, mode=state["current_mode"])
 
         self.budget.reserve(system_prompt + "".join(message.content for message in messages))
         # Master mode: full natural capability, no artificial ceiling --
