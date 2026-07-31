@@ -32,7 +32,11 @@ only.
 - `server.py` — authenticated loopback HTTP API (scrypt password + signed
   session cookie, same mechanism as `tools/living-captain/web_service.py`,
   minus the `Secure` cookie attribute since the LAN Caddy block is plain
-  HTTP).
+  HTTP). Includes `GET /api/brief` — the Root Console's "Captain's Brief"
+  popup: a thin authenticated read of `docs/context/current-state.json`
+  (the Context Steward's own compact projection), not a second
+  summarization path. Full access, executive-level content by
+  construction, not by redaction.
 - `usage_budget.py` — daily turn-count ceiling (Codex has no metered
   per-token API key from this codebase's perspective, so this guards
   against runaway loops rather than approximating dollar cost).

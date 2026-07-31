@@ -31,10 +31,11 @@
   }
   @keyframes sim-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   .exit-btn {
-    margin-left: auto; background: var(--accent); color: #05201D; text-decoration: none;
+    background: var(--accent); color: #05201D; text-decoration: none;
     font-weight: 700; font-size: 12px; padding: 9px 16px; border-radius: 8px;
   }
   .exit-btn:hover { filter: brightness(1.1); }
+  .brief-link { margin-left: auto; background: var(--amber); }
 
   .banner {
     margin: 16px 18px 0; padding: 10px 14px; border: 1px dashed #E8A33D66; border-radius: 8px;
@@ -88,13 +89,16 @@
   <header class="topbar">
     <span class="ship-mark">⚓ Root Console</span>
     <span class="sim-badge">Simulated Preview</span>
+    <a class="exit-btn brief-link" href="/app.html?brief=1">📋 Captain's Brief →</a>
     <a class="exit-btn" href="https://cameronlampley.com/">Exit to Public Site →</a>
   </header>
 
   <div class="banner">
-    This page is a visual preview of where the Root Console is headed — nothing on it is wired up yet
-    except the button above. The real, working Chat Captain (login, live conversation, restart-safe
-    memory, Harvest Tray) already exists at <strong>/app.html</strong>.
+    This page is a visual preview of where the Root Console is headed — most of it isn't wired up yet.
+    Two things on it are real: <strong>Captain's Brief</strong> above (full-access, executive-level
+    read of the Captain's own current-course documentation — login required, same credentials as the
+    app) and <strong>Exit to Public Site</strong>. The real, working Chat Captain (login, live
+    conversation, restart-safe memory, Harvest Tray) already exists at <strong>/app.html</strong>.
   </div>
 
   <main class="layout">

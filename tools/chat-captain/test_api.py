@@ -10,6 +10,7 @@ import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[0]))
 
@@ -182,6 +183,41 @@ class ApiTests(unittest.TestCase):
         status, body = self._post(opener, f"/api/harvest/{item_id}/accept", {})
         self.assertEqual(status, 200)
         self.assertEqual(body["item"]["status"], "accepted")
+
+    def test_brief_requires_authentication(self):
+        opener = self._opener()
+        status, body = self._get(opener, "/api/brief")
+        self.assertEqual(status, 401)
+        self.assertFalse(body["ok"])
+
+    def test_brief_returns_current_state_projection(self):
+        opener = self._opener()
+        self._post(opener, "/login", {"password": TEST_PASSWORD})
+        fake_state = {
+            "generated_at": "2026-07-31T00:00:00+00:00",
+            "projection": True,
+            "active_course": {"mission": "M", "goal": "G", "next_action": "N"},
+            "established_truth": ["T1"],
+            "decisions": ["D1"],
+            "defects": ["X1"],
+        }
+        with mock.patch.object(server_module, "BRIEF_PATH", mock.Mock(
+            read_text=mock.Mock(return_value=json.dumps(fake_state))
+        )):
+            status, body = self._get(opener, "/api/brief")
+        self.assertEqual(status, 200)
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["brief"]["active_course"]["mission"], "M")
+        self.assertEqual(body["brief"]["established_truth"], ["T1"])
+
+    def test_brief_missing_file_returns_503(self):
+        opener = self._opener()
+        self._post(opener, "/login", {"password": TEST_PASSWORD})
+        missing = Path(self._tmp.name) / "does-not-exist.json"
+        with mock.patch.object(server_module, "BRIEF_PATH", missing):
+            status, body = self._get(opener, "/api/brief")
+        self.assertEqual(status, 503)
+        self.assertFalse(body["ok"])
 
 
 if __name__ == "__main__":

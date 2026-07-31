@@ -34,6 +34,12 @@ from usage_budget import BudgetExceeded, UsageBudget
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data" / "chat-captain"
 PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "captain-system.md"
+# The Admiral's Brief reuses the Context Steward's own compact projection
+# (docs/context/current-state.json) rather than a second summarization
+# path -- it is already full-access (nothing redacted) and already
+# executive-level (a curated projection, not the raw doc tree), so this
+# endpoint is a thin authenticated read of an existing repository artifact.
+BRIEF_PATH = ROOT / "docs" / "context" / "current-state.json"
 HOST = "127.0.0.1"
 PORT = 4778
 # Chat Captain is LAN-only by deliberate design (see docs/deployment.md's
@@ -152,6 +158,8 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_get_messages(query)
         elif path == "/api/harvest":
             self._handle_get_harvest(query)
+        elif path == "/api/brief":
+            self._handle_get_brief()
         else:
             self._json({"ok": False, "error": "not found"}, 404)
 
@@ -248,6 +256,19 @@ class Handler(BaseHTTPRequestHandler):
         status = (query.get("status") or [None])[0]
         items = database.list_harvest_items(self.server.conn, status=status)
         self._json({"ok": True, "items": items})
+
+    def _handle_get_brief(self) -> None:
+        try:
+            raw = BRIEF_PATH.read_text(encoding="utf-8")
+        except OSError:
+            self._json({"ok": False, "error": "brief unavailable"}, 503)
+            return
+        try:
+            brief = json.loads(raw)
+        except json.JSONDecodeError:
+            self._json({"ok": False, "error": "brief is malformed"}, 503)
+            return
+        self._json({"ok": True, "brief": brief})
 
     def _handle_chat(self, body: dict) -> None:
         text = body.get("message")

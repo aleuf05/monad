@@ -22,6 +22,12 @@
   var harvestTrayEl = document.getElementById("harvestTray");
   var closeSessionBtn = document.getElementById("closeSessionBtn");
   var providerBadge = document.getElementById("providerBadge");
+  var briefBtn = document.getElementById("briefBtn");
+  var briefOverlay = document.getElementById("briefOverlay");
+  var briefCard = document.getElementById("briefCard");
+  var briefCloseBtn = document.getElementById("briefCloseBtn");
+  var briefStamp = document.getElementById("briefStamp");
+  var briefBody = document.getElementById("briefBody");
 
   function api(path, options) {
     options = options || {};
@@ -139,13 +145,102 @@
     });
   }
 
+  function renderList(container, items, emptyText) {
+    if (!items || !items.length) {
+      var empty = document.createElement("p");
+      empty.className = "brief-empty";
+      empty.textContent = emptyText;
+      container.appendChild(empty);
+      return;
+    }
+    var list = document.createElement("ul");
+    items.forEach(function (item) {
+      var li = document.createElement("li");
+      li.textContent = item;
+      list.appendChild(li);
+    });
+    container.appendChild(list);
+  }
+
+  function renderBriefSection(title, body) {
+    var section = document.createElement("div");
+    section.className = "brief-section";
+    var heading = document.createElement("h3");
+    heading.textContent = title;
+    section.appendChild(heading);
+    briefBody.appendChild(section);
+    return section;
+  }
+
+  function renderBrief(brief) {
+    briefBody.innerHTML = "";
+    briefStamp.textContent = "Full access, executive-level projection · generated " +
+      (brief.generated_at || "unknown time") +
+      (brief.projection ? " · Context Steward projection, cited sources remain authoritative" : "");
+
+    var course = brief.active_course || {};
+    var missionSection = renderBriefSection("Mission", null);
+    var missionP = document.createElement("p");
+    missionP.textContent = course.mission || "Not recorded.";
+    missionSection.appendChild(missionP);
+
+    var goalSection = renderBriefSection("Active course", null);
+    var goalP = document.createElement("p");
+    goalP.textContent = course.goal || "Not recorded.";
+    goalSection.appendChild(goalP);
+
+    var nextSection = renderBriefSection("Next action", null);
+    var nextP = document.createElement("p");
+    nextP.textContent = course.next_action || "Not recorded.";
+    nextSection.appendChild(nextP);
+
+    var truthSection = renderBriefSection("Established truth", null);
+    renderList(truthSection, brief.established_truth, "None recorded.");
+
+    var decisionsSection = renderBriefSection("Decisions", null);
+    renderList(decisionsSection, brief.decisions, "None recorded.");
+
+    var defectsSection = renderBriefSection("Known defects", null);
+    renderList(defectsSection, brief.defects, "None recorded.");
+  }
+
+  function openBrief() {
+    briefOverlay.hidden = false;
+    briefBody.innerHTML = '<p class="brief-empty">Loading…</p>';
+    api("/api/brief")
+      .then(function (body) {
+        renderBrief(body.brief);
+      })
+      .catch(function (error) {
+        briefBody.innerHTML = '<p class="brief-empty">Could not load brief: ' + escapeHtml(error.message || "request failed") + "</p>";
+      });
+  }
+
+  function closeBrief() {
+    briefOverlay.hidden = true;
+  }
+
+  briefBtn.addEventListener("click", openBrief);
+  briefCloseBtn.addEventListener("click", closeBrief);
+  briefOverlay.addEventListener("click", function (event) {
+    if (event.target === briefOverlay) closeBrief();
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && !briefOverlay.hidden) closeBrief();
+  });
+
   loginForm.addEventListener("submit", function (event) {
     event.preventDefault();
     loginError.hidden = true;
     post("/login", { password: loginPassword.value })
       .then(function () {
         loginPassword.value = "";
-        boot();
+        return boot();
+      })
+      .then(function () {
+        if (/(?:^|[?&])brief=1(?:&|$)/.test(window.location.search)) {
+          openBrief();
+        }
       })
       .catch(function (error) {
         loginError.textContent = error.status === 429 ? "Too many attempts, wait a minute." : "Incorrect password.";
@@ -235,7 +330,16 @@
 
   // If already authenticated (cookie still valid from a prior visit),
   // boot() succeeds immediately and we skip the login screen.
-  boot().catch(function () {
-    loginScreen.hidden = false;
-  });
+  boot()
+    .then(function () {
+      // console/index.html links here with ?brief=1 so the splash's
+      // "Captain's Brief" affordance opens the popup the moment the
+      // authenticated app is ready, instead of landing on the chat view.
+      if (/(?:^|[?&])brief=1(?:&|$)/.test(window.location.search)) {
+        openBrief();
+      }
+    })
+    .catch(function () {
+      loginScreen.hidden = false;
+    });
 })();

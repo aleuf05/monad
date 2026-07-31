@@ -94,6 +94,12 @@ or implementation truth by being linked here.
 - [Chronicle of Vessel Monad](../002_CHRONICLE_OF_VESSEL_MONAD_2026-07-16.md).
 - [`logs/`](logs/), [`handoff/`](handoff/), [`incidents/`](incidents/), and
   [`context/archive/`](context/archive/) — dated operational memory.
+- **Anticipated, not yet built:** an Admiral-facing section of this archive —
+  a curated, executive-level read surface over Captain records, distinct from
+  the full operational log. Not scoped or scheduled; noted here so the
+  archive's structure and any related tooling (e.g. the Root Console's
+  [Captain's Brief](../tools/chat-captain/README.md)) aren't designed in a
+  way that forecloses it.
 
 ## Reading status correctly
 
