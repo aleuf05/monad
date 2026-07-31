@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Living Basin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <h1>The Living Basin</h1>
+    <p class="subtitle">Every visible feature is an earned consequence of simulation state. Every explanation below is derived from recorded causes, not generated afterward.</p>
+  </header>
+
+  <main class="layout">
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="terrain" width="640" height="640"></canvas>
+      </div>
+      <div class="transport">
+        <button id="btnReset" title="Reset to tick 0">⟲ Reset</button>
+        <button id="btnStep" title="Advance one recorded tick">⏭ Tick</button>
+        <button id="btnPlay" title="Play / pause">▶ Play</button>
+        <label class="speed-label">Speed
+          <select id="speed">
+            <option value="400">0.5x</option>
+            <option value="200" selected>1x</option>
+            <option value="80">2x</option>
+            <option value="30">4x</option>
+          </select>
+        </label>
+        <div class="tick-readout">Tick <span id="tickVal">0</span> / <span id="tickMax">0</span></div>
+      </div>
+      <div class="scrub-wrap">
+        <input type="range" id="scrub" min="0" max="0" value="0" step="1">
+      </div>
+      <div class="meta-row">
+        <span>Seed: <code id="seedVal">-</code></span>
+        <span id="statusMsg" class="status-msg">Loading run data&hellip;</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="layers">
+        <h2>Layers</h2>
+        <label><input type="checkbox" data-layer="vegetation_biomass" checked> Vegetation</label>
+        <label><input type="checkbox" data-layer="surface_water" checked> Water</label>
+        <label><input type="checkbox" data-layer="trail_intensity" checked> Trails</label>
+        <label><input type="checkbox" data-layer="erosion_depth" checked> Erosion</label>
+        <label><input type="checkbox" data-layer="provenance" checked> Provenance markers</label>
+      </div>
+
+      <div class="diagnostic">
+        <h2>Diagnostic Card</h2>
+        <div id="cardEmpty" class="card-empty">Hover or click a cell to inspect it.</div>
+        <div id="card" class="card" hidden>
+          <div class="card-type" id="cardType"></div>
+          <div class="card-row"><span>Cell</span><span id="cardCell"></span></div>
+          <div class="card-row"><span>Genesis tick</span><span id="cardTick"></span></div>
+          <div class="card-row"><span>Status</span><span id="cardStatus"></span></div>
+          <h3>Causal Lineage</h3>
+          <ol id="cardLineage"></ol>
+          <div class="card-row overrides"><span>Authored overrides</span><span id="cardOverrides"></span></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    Static local prototype &middot; data precomputed by <code>run_demo.py</code>, replayed here exactly as recorded &middot; see <a href="../README.md">README</a>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
