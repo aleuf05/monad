@@ -47,3 +47,20 @@ cameronlampley.com {
 		file_server
 	}
 }
+
+# Monad Root Console -- LAN-only Chat Captain cockpit. Deliberately NOT part
+# of the public cameronlampley.com block above: matched by LAN IP, plain
+# HTTP (no public cert is obtainable for a bare LAN address), not reachable
+# from the public internet. Narrow, single-console exception to the
+# web-lan/ pattern retired 2026-07-13 -- see docs/deployment.md for the
+# discussion that authorized this one instance.
+http://192.168.0.100:8080 {
+	handle_path /chat-captain-api/* {
+		reverse_proxy 127.0.0.1:4778
+	}
+
+	handle {
+		root * /home/cgl/dev/monad/console
+		file_server
+	}
+}

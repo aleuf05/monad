@@ -1,5 +1,12 @@
 # PROJECT MONAD COMMAND CHARTER
 
+> **Historical continuity note (2026-07-31):** This charter remains
+> provisional and is preserved as an important earlier command and aspiration
+> formulation. Monad's current documentation-level mission is recorded in
+> [`docs/mission.md`](docs/mission.md). The aspirational language below is not
+> erased or silently superseded; it describes a horizon, while the current
+> mission describes the project's practical organizing purpose.
+
 - **DATE CODE:** 2026-07-15
 - **PRIORITY:** HIGHEST
 - **STATUS:** PROVISIONAL — not yet adopted; see Article V

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Root Console — Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  :root {
+    --bg: #0B1220;
+    --panel: #111A2B;
+    --border: #1E2C42;
+    --text: #DCE6F2;
+    --muted: #6B7C93;
+    --accent: #4FD1C5;
+    --amber: #E8A33D;
+    --red: #E05252;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; line-height: 1.5; min-height: 100vh; }
+  button, select { font: inherit; }
+  .muted { color: var(--muted); }
+  .small { font-size: 11.5px; }
+
+  .topbar { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .ship-mark { font-family: 'Oswald', sans-serif; letter-spacing: 0.1em; color: var(--amber); font-size: 16px; }
+  .sim-badge {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--amber);
+    border: 1px solid #E8A33D66; border-radius: 20px; padding: 3px 10px;
+    animation: sim-pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes sim-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .exit-btn {
+    margin-left: auto; background: var(--accent); color: #05201D; text-decoration: none;
+    font-weight: 700; font-size: 12px; padding: 9px 16px; border-radius: 8px;
+  }
+  .exit-btn:hover { filter: brightness(1.1); }
+
+  .banner {
+    margin: 16px 18px 0; padding: 10px 14px; border: 1px dashed #E8A33D66; border-radius: 8px;
+    color: var(--amber); font-size: 11px; background: #E8A33D0d;
+  }
+
+  .layout { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 16px; padding: 16px 18px 60px; }
+  @media (min-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; } }
+
+  .conversation { display: flex; flex-direction: column; gap: 10px; }
+  .transcript { display: flex; flex-direction: column; gap: 10px; padding: 4px; }
+  .msg { max-width: 88%; padding: 10px 13px; border-radius: 10px; font-size: 13px; }
+  .msg.user { align-self: flex-end; background: var(--accent); color: #05201D; }
+  .msg.assistant { align-self: flex-start; background: var(--panel); border: 1px solid var(--border); }
+  .msg.system { align-self: center; color: var(--muted); font-size: 10.5px; border: 1px dashed var(--border); padding: 6px 10px; }
+
+  .composer { display: flex; gap: 8px; opacity: 0.5; }
+  .composer .fake-input {
+    flex: 1; background: var(--panel); border: 1px solid var(--border); color: var(--muted);
+    border-radius: 8px; padding: 12px; font-size: 12.5px;
+  }
+  .composer button { background: var(--amber); color: #241704; border: none; border-radius: 8px; padding: 0 18px; font-weight: 700; cursor: not-allowed; }
+
+  .rail { display: flex; flex-direction: column; gap: 12px; }
+  .rail-card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .rail-title { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
+
+  .mode-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 10px; padding: 4px 9px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted);
+  }
+  .chip.active { border-color: var(--accent); color: var(--accent); background: #4FD1C51a; }
+
+  .safety-row { display: flex; align-items: center; gap: 8px; }
+  .safety-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .safety-label { font-size: 12px; font-weight: 700; color: var(--accent); }
+
+  .harvest-list { display: flex; flex-direction: column; gap: 8px; }
+  .harvest-item { border: 1px solid var(--border); border-radius: 6px; padding: 8px; font-size: 11.5px; }
+  .harvest-type { display: inline-block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--amber); margin-bottom: 4px; }
+  .harvest-title { font-weight: 700; margin-bottom: 2px; }
+  .harvest-summary { color: var(--muted); margin-bottom: 6px; }
+  .harvest-actions { display: flex; gap: 6px; opacity: 0.55; }
+  .harvest-actions button { flex: 1; background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: 5px; padding: 5px; font-size: 10px; cursor: not-allowed; }
+
+  .footer-note { max-width: 1080px; margin: 0 auto; padding: 0 18px 40px; color: var(--muted); font-size: 10.5px; }
+  .footer-note a { color: var(--accent); }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="ship-mark">⚓ Root Console</span>
+    <span class="sim-badge">Simulated Preview</span>
+    <a class="exit-btn" href="https://cameronlampley.com/">Exit to Public Site →</a>
+  </header>
+
+  <div class="banner">
+    This page is a visual preview of where the Root Console is headed — nothing on it is wired up yet
+    except the button above. The real, working Chat Captain (login, live conversation, restart-safe
+    memory, Harvest Tray) already exists at <strong>/app.html</strong>.
+  </div>
+
+  <main class="layout">
+    <section class="conversation">
+      <div class="transcript">
+        <div class="msg system">— session preview, not live —</div>
+        <div class="msg assistant">Welcome aboard, Admiral. I'm your Chat Captain, standing by.</div>
+        <div class="msg user">Where do things stand?</div>
+        <div class="msg assistant">Mode: Master. No active project yet. No prior brief. Ready when you are.</div>
+      </div>
+      <div class="composer">
+        <div class="fake-input">Conversation input — preview only, use /app.html to actually talk to the Captain</div>
+        <button disabled>Send</button>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <div class="rail-card">
+        <div class="rail-title">Mode</div>
+        <div class="mode-chips">
+          <span class="chip active">Master</span>
+          <span class="chip">Project Formation</span>
+          <span class="chip">Design</span>
+          <span class="chip">Review</span>
+          <span class="chip">Associative Lab</span>
+          <span class="chip">Record</span>
+        </div>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-title">Safety state</div>
+        <div class="safety-row">
+          <span class="safety-dot"></span>
+          <span class="safety-label">GREEN</span>
+        </div>
+        <p class="muted small" style="margin-top:6px;">Automatic containment &amp; review queue — proposed next, not yet built.</p>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-title">Active project</div>
+        <p style="font-weight:700; margin-bottom:2px;">— none selected —</p>
+        <p class="muted small">A future version lets you form and switch projects here directly.</p>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-title">Harvest Tray</div>
+        <div class="harvest-list">
+          <div class="harvest-item">
+            <span class="harvest-type">decision</span>
+            <div class="harvest-title">Example: use SQLite for ship state</div>
+            <div class="harvest-summary">Sample candidate — this is what a real proposal looks like.</div>
+            <div class="harvest-actions"><button disabled>Accept</button><button disabled>Reject</button></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <p class="footer-note">
+    Root Console preview, built 2026-07-31. Real functioning app: <a href="/app.html">/app.html</a>.
+    Public site: <a href="https://cameronlampley.com/">cameronlampley.com</a>.
+  </p>
+</body>
+</html>

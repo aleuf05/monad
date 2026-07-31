@@ -1,5 +1,11 @@
 # Session Packets — 2026-07-31 (Claude Code session)
 
+> **Reconciliation note (2026-07-31):** The patrol directive's mission wording
+> informed the current [Project Mission](../mission.md), and items 3–4 informed
+> [Semantic Artifact Engineering](SEMANTIC_ARTIFACT_ENGINEERING.md). This file
+> remains draft provenance: its other claims and role formulations are not
+> promoted by those links and still require their stated review.
+
 - **Recorded:** 2026-07-31
 - **Status:** Draft; not canon; not reviewed against existing charter/doctrine
 - **Provenance:** Written in a single Claude Code chat session. The session
