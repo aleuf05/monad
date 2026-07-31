@@ -22,6 +22,27 @@ cameronlampley.com {
 		import console_routes
 	}
 
+	# Public fallback so the Admiral can reach the console from anywhere
+	# (not just the LAN) without depending on the DNS override working.
+	# This path is reachable by anyone on the internet, so it is gated by
+	# HTTP Basic Auth -- the browser caches the credential after one
+	# prompt, so it does not ask again on later visits from the same
+	# browser. Password hash only; the plaintext was shown once and is
+	# not stored anywhere in this repo.
+	handle_path /root/* {
+		basicauth {
+			admiral $2a$14$RfRrVqTGScCL0j4GTMvSP.i1Z/qX8kFHO8KLhOZdeYSUohkDVs4ZK
+		}
+		import console_routes
+	}
+
+	handle_path /chat-captain-api/* {
+		basicauth {
+			admiral $2a$14$RfRrVqTGScCL0j4GTMvSP.i1Z/qX8kFHO8KLhOZdeYSUohkDVs4ZK
+		}
+		reverse_proxy 127.0.0.1:4778
+	}
+
 	handle_path /monad/portainer/* {
 		reverse_proxy https://localhost:9443 {
 			transport http {
