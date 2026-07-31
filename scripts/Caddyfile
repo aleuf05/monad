@@ -31,14 +31,14 @@ cameronlampley.com {
 	# not stored anywhere in this repo.
 	handle_path /root/* {
 		basicauth {
-			admiral $2a$14$RfRrVqTGScCL0j4GTMvSP.i1Z/qX8kFHO8KLhOZdeYSUohkDVs4ZK
+			admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
 		}
 		import console_routes
 	}
 
 	handle_path /chat-captain-api/* {
 		basicauth {
-			admiral $2a$14$RfRrVqTGScCL0j4GTMvSP.i1Z/qX8kFHO8KLhOZdeYSUohkDVs4ZK
+			admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
 		}
 		reverse_proxy 127.0.0.1:4778
 	}
