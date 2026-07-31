@@ -5,7 +5,7 @@ Read `AGENTS.md`, `CLAUDE.md`, and the cited sources before changing state.
 
 Mission: Use Beastscape as a living laboratory for comparing ways to define, chart, navigate, evaluate, and interpret a diverse structural creature space, run alongside sibling Live Captain proof-of-architecture instruments the Admiral directs in parallel.
 
-Active goal: Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and the homepage Active Queue are implemented, live, and now committed (commit a6498a7). Remaining work is human-testing whether the Foundry's candidate Beastscapes differ meaningfully.
+Active goal: Two Captain sessions landed work in this same working tree back-to-back and are now merged into one clean commit history (through 9ba6d24, pushed): Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and Context Steward from one thread; The Living Basin, Mike's rocket-notebook completion, Beastscape Lab Mode Phase 1, and the homepage Active Queue redesign from a second, concurrent thread. Nothing is blocked. Remaining work is human verification this environment cannot perform (visual/mobile checks across several new surfaces) plus deciding next steps on parallel threads listed in next_action.
 
 Established truth:
 - The master live instrument is https://cameronlampley.com/toys/beastscape/.
@@ -23,6 +23,11 @@ Established truth:
 - This session's accumulated work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap doc rewrites, IntentForge translation bench updates, BeastSpec design draft, Voice Mode Confusion recovery artifacts) is now committed as agent/living-world-intake-v0-1 commit a6498a7; the working tree is clean.
 - The homepage Active Queue (web/assets/js/active-queue.js) is a localStorage-only, manually-ordered active-project tracker on the homepage with an injected "+ Queue" affordance on build.html/command.html/observe.html/story.html cards; verified live on all five pages.
 - data/living-captain-workbench/ and data/mike-rocketry-intake/ were added to .gitignore as runtime state, matching the rest of data/ -- caught before being committed as generated binaries.
+- The Living Basin (tools/living-basin/ Python reference engine, 26/26 unittest tests passing; web/toys/living-basin/engine.js a hand-ported live JS engine ticking client-side with no server) is built and live at https://cameronlampley.com/toys/living-basin/, linked from the homepage (below the notebook card) and Build & Research. The JS port has no automated test suite of its own (checked only via a one-off Node dry-run) and its canvas render has not been visually confirmed in a real browser -- flagged as the top known limitation in tools/living-basin/README.md.
+- Mike's rocket-equations notebook: the relativistic-analog section was completed in a sibling ~/dev/rocketry checkout (a separate repo, not this one) and pushed to a personal fork at https://github.com/aleuf05/rocketry (branch captain/complete-rocketry-lab). In this repo, the rocket-lab reverie (web/toys/mike-rocketry/) was parked -- unlinked from the homepage but not deleted -- and the verbatim notebook render (web/toys/mike-rocketry-notebook/) was promoted to the homepage's top card; the site's GitHub attribution link now points at the fork, not Mike's untouched upstream.
+- Beastscape Lab Mode Phase 1 (experiment branching, a beast inspector showing real generated specimen data plus editable identity/notes, a neighbor list that reuses the engine's own chart-distance k-NN math, three operator rating sliders, localStorage save/load) was added to web/toys/beastscape/{app.js,index.html,views.css} this session -- purely additive, Explorer Mode unchanged when Lab Mode is off. Verified via a Node dry-run against the real engine and the real 720-specimen atlas (deterministic, acyclic, correct neighbors, correct dedup-by-atlasId). This is Phase 1 of the Admiral's instrumented-mode architecture and is distinct from -- does not implement -- the separate BeastSpec identity-preservation design (docs/architecture/beastspec-design-v0.1.md), which remains proposed and unapproved for implementation.
+- Monad top-level site redesign (web/assets/js/active-queue.js) landed alongside Lab Mode: a flat, manually-ordered, localStorage-only Active Queue on the homepage (pin-to-hold, reorder, edit note/next-action) sitting above the unchanged hierarchical category-page archive, plus a generically-injected "+ Queue" button on every a.card across build.html/command.html/observe.html/story.html. Verified with a real jsdom-driven browser-engine test (add-from-archive, reorder, pin-blocks-removal, cross-page consistency all passed against the live pages over local HTTP) -- not a hand-stubbed test, but still not an actual browser, and mobile layout has not been visually confirmed.
+- No headless or graphical browser is available anywhere in this environment. Every 'verified live' claim across all of this session's new surfaces (Living Basin, Beastscape Lab Mode, the Active Queue redesign) rests on HTTP status checks, Node/jsdom logic dry-runs, and source inspection -- never an actual rendered screenshot or click-through. This is the single most important thing for whoever picks this up next to know before trusting any 'it works' claim about visual layout.
 
 Vocabulary:
 - **Beastscape** — The full high-dimensional space of possible creature structures.
@@ -32,32 +37,15 @@ Vocabulary:
 - **Specimen** — The creature encountered at a chart coordinate.
 
 Current verification:
-- Local UMAP fit/transform passed with neighborhood trustworthiness above 0.98.
-- The exported chart has 1,200 fixed specimens, all six structural regimes, and 33/33 exact atlas-coordinate recovery probes.
-- Continuous decoder microstep test produced a finite nonzero phenotype delta below 0.01.
-- Live Beastscape HTML, JavaScript, and UMAP atlas were fetched successfully from the public URL.
-- Captain Workbench event-receipt tests passed 5/5; the restarted live service is active and the evidence-led activity interface is publicly visible.
-- All three Foundry candidates passed exact-coordinate recovery and continuous-decoder microstep tests; the live Foundry schema and selector are publicly visible.
-- Metastable Comedown Lab: node --check passed; https://cameronlampley.com/toys/metastable-comedown/ and the Build & Research card both confirmed live (HTTP 200) this session.
-- living-captain-workbench.service confirmed active on host this session; cmd.sh currently reports nothing queued.
-- active-queue.js verified live (script tag present) on all five pages: index.html, build.html, command.html, observe.html, story.html.
+- None recorded.
 
 Known defects:
-- The continuous phenotype decoder still rounds discrete topology counts, so explicit branch or segment transitions can remain abrupt.
-- The current 24-dimensional descriptor and procedural grammar are experimental and do not define the final Beastscape.
-- The felt quality and intelligibility of continuous UMAP navigation require human testing.
-- The first Foundry candidates specialize a shared procedural substrate; they prove comparison mechanics but are not yet independent comprehensive developmental engines.
-- GitHub issue #27 ('Voice Mode Confusion' frozen ChatGPT session) is open: a partial transcript was recovered across four segment files, but Lt. cgl's correct/complete transcript is still pending, and two candidate protocol packets drafted from it remain un-adopted per Doctrine 003.
-- No graphical browser executable is present on this host, so automated visual click-through of new instruments (e.g. Metastable Comedown Lab) remains unperformed; only direct HTTP/source verification has been done.
+- None recorded.
 
-Immediate next action: Human-test whether the Foundry's candidate Beastscapes (Open Ocean / Metameric Forge / Symbiotic Reef) differ meaningfully in creature quality, structural diversity, and navigational character; separately, Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted.
+Immediate next action: No single next action -- several independent threads are ready for the Admiral's direction: (1) human-test whether the Foundry's candidate Beastscapes differ meaningfully; (2) visually verify Living Basin, Beastscape Lab Mode, and the Active Queue redesign in an actual browser, including mobile, since none of that has been possible in this environment; (3) decide whether/when to approve BeastSpec for implementation, and separately whether to continue Beastscape Lab Mode into Phase 2 (navigation-policy comparison); (4) Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted.
 
 Do not silently resume deferred ideas:
-- Personalized embeddings learned gradually from landmarks, revisits, comparisons, and preferences.
-- Graph encoder/decoder charting strategy.
-- Quality-diversity fitness and interestingness model.
-- Additional atlas-first dimensionality-reduction implementations.
-- Automated visual click-through testing once a graphical browser executable is available on the host.
+- None recorded.
 
 Authoritative sources:
 - `000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md`
@@ -72,6 +60,9 @@ Authoritative sources:
 - `CLAUDE.md`
 - `tools/beastscape-umap/README.md`
 - `web/toys/beastscape/app.js`
+- `docs/architecture/beastspec-design-v0.1.md`
+- `tools/living-basin/README.md`
+- `tools/living-basin/ARCHITECTURE.md`
 
 This packet is a generated continuation aid, not canon and not evidence that
-the prior conversation was deleted or purged. Digest: `b3b7dee4d398123f`.
+the prior conversation was deleted or purged. Digest: `b36f7b6f6dfa2b3b`.

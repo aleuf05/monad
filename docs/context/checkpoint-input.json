@@ -2,7 +2,7 @@
   "schema": "monad.contextSteward.v0.1",
   "workspace": "/home/cgl/dev/monad",
   "mission": "Use Beastscape as a living laboratory for comparing ways to define, chart, navigate, evaluate, and interpret a diverse structural creature space, run alongside sibling Live Captain proof-of-architecture instruments the Admiral directs in parallel.",
-  "active_goal": "Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and the homepage Active Queue are implemented, live, and now committed (commit a6498a7). Remaining work is human-testing whether the Foundry's candidate Beastscapes differ meaningfully.",
+  "active_goal": "Two Captain sessions landed work in this same working tree back-to-back and are now merged into one clean commit history (through 9ba6d24, pushed): Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and Context Steward from one thread; The Living Basin, Mike's rocket-notebook completion, Beastscape Lab Mode Phase 1, and the homepage Active Queue redesign from a second, concurrent thread. Nothing is blocked. Remaining work is human verification this environment cannot perform (visual/mobile checks across several new surfaces) plus deciding next steps on parallel threads listed in next_action.",
   "vocabulary": [
     {
       "term": "Beastscape",
@@ -40,7 +40,12 @@
     "Monadic Beast Lab was removed from the worktree as an orphaned/superseded instrument (web/toys/monadic-beast-lab deleted).",
     "This session's accumulated work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap doc rewrites, IntentForge translation bench updates, BeastSpec design draft, Voice Mode Confusion recovery artifacts) is now committed as agent/living-world-intake-v0-1 commit a6498a7; the working tree is clean.",
     "The homepage Active Queue (web/assets/js/active-queue.js) is a localStorage-only, manually-ordered active-project tracker on the homepage with an injected \"+ Queue\" affordance on build.html/command.html/observe.html/story.html cards; verified live on all five pages.",
-    "data/living-captain-workbench/ and data/mike-rocketry-intake/ were added to .gitignore as runtime state, matching the rest of data/ -- caught before being committed as generated binaries."
+    "data/living-captain-workbench/ and data/mike-rocketry-intake/ were added to .gitignore as runtime state, matching the rest of data/ -- caught before being committed as generated binaries.",
+    "The Living Basin (tools/living-basin/ Python reference engine, 26/26 unittest tests passing; web/toys/living-basin/engine.js a hand-ported live JS engine ticking client-side with no server) is built and live at https://cameronlampley.com/toys/living-basin/, linked from the homepage (below the notebook card) and Build & Research. The JS port has no automated test suite of its own (checked only via a one-off Node dry-run) and its canvas render has not been visually confirmed in a real browser -- flagged as the top known limitation in tools/living-basin/README.md.",
+    "Mike's rocket-equations notebook: the relativistic-analog section was completed in a sibling ~/dev/rocketry checkout (a separate repo, not this one) and pushed to a personal fork at https://github.com/aleuf05/rocketry (branch captain/complete-rocketry-lab). In this repo, the rocket-lab reverie (web/toys/mike-rocketry/) was parked -- unlinked from the homepage but not deleted -- and the verbatim notebook render (web/toys/mike-rocketry-notebook/) was promoted to the homepage's top card; the site's GitHub attribution link now points at the fork, not Mike's untouched upstream.",
+    "Beastscape Lab Mode Phase 1 (experiment branching, a beast inspector showing real generated specimen data plus editable identity/notes, a neighbor list that reuses the engine's own chart-distance k-NN math, three operator rating sliders, localStorage save/load) was added to web/toys/beastscape/{app.js,index.html,views.css} this session -- purely additive, Explorer Mode unchanged when Lab Mode is off. Verified via a Node dry-run against the real engine and the real 720-specimen atlas (deterministic, acyclic, correct neighbors, correct dedup-by-atlasId). This is Phase 1 of the Admiral's instrumented-mode architecture and is distinct from -- does not implement -- the separate BeastSpec identity-preservation design (docs/architecture/beastspec-design-v0.1.md), which remains proposed and unapproved for implementation.",
+    "Monad top-level site redesign (web/assets/js/active-queue.js) landed alongside Lab Mode: a flat, manually-ordered, localStorage-only Active Queue on the homepage (pin-to-hold, reorder, edit note/next-action) sitting above the unchanged hierarchical category-page archive, plus a generically-injected \"+ Queue\" button on every a.card across build.html/command.html/observe.html/story.html. Verified with a real jsdom-driven browser-engine test (add-from-archive, reorder, pin-blocks-removal, cross-page consistency all passed against the live pages over local HTTP) -- not a hand-stubbed test, but still not an actual browser, and mobile layout has not been visually confirmed.",
+    "No headless or graphical browser is available anywhere in this environment. Every 'verified live' claim across all of this session's new surfaces (Living Basin, Beastscape Lab Mode, the Active Queue redesign) rests on HTTP status checks, Node/jsdom logic dry-runs, and source inspection -- never an actual rendered screenshot or click-through. This is the single most important thing for whoever picks this up next to know before trusting any 'it works' claim about visual layout."
   ],
   "decisions": [
     "Beastscape is a research apparatus rather than a user product: its interface exposes methods, observations, unknowns, artifacts, and comparative evidence.",
@@ -58,7 +63,10 @@
     "tools/context-steward/ and docs/context/ — compact continuation projection.",
     "AGENTS.md, CLAUDE.md, docs/commissioning-handoff.md — rewritten for the Captain-authority bootstrap and the codified Context Steward operating policy.",
     "web/toys/monadic-beast-lab/ — removed, superseded.",
-    "web/assets/js/active-queue.js and web/index.html/build.html/command.html/observe.html/story.html — homepage Active Queue and archive \"+ Queue\" affordance, verified live."
+    "web/assets/js/active-queue.js and web/index.html/build.html/command.html/observe.html/story.html — homepage Active Queue and archive \"+ Queue\" affordance, verified live.",
+    "tools/living-basin/ and web/toys/living-basin/ — The Living Basin v0 causal terrain simulation: Python reference engine + tests, live JS engine port.",
+    "web/toys/beastscape/{app.js,index.html,views.css} — Beastscape Lab Mode Phase 1, additive to the existing Foundry instrument.",
+    "web/index.html and web/toys/mike-rocketry/index.html — rocket-lab reverie parked (unlinked from homepage), notebook promoted to top card, GitHub attribution repointed to the aleuf05/rocketry fork."
   ],
   "verification": [
     "Local UMAP fit/transform passed with neighborhood trustworthiness above 0.98.",
@@ -69,7 +77,11 @@
     "All three Foundry candidates passed exact-coordinate recovery and continuous-decoder microstep tests; the live Foundry schema and selector are publicly visible.",
     "Metastable Comedown Lab: node --check passed; https://cameronlampley.com/toys/metastable-comedown/ and the Build & Research card both confirmed live (HTTP 200) this session.",
     "living-captain-workbench.service confirmed active on host this session; cmd.sh currently reports nothing queued.",
-    "active-queue.js verified live (script tag present) on all five pages: index.html, build.html, command.html, observe.html, story.html."
+    "active-queue.js verified live (script tag present) on all five pages: index.html, build.html, command.html, observe.html, story.html.",
+    "Living Basin Python engine: 26/26 unittest tests passing (determinism, hydrology, vegetation/grazing, trails, erosion, provenance, replay). Living Basin JS engine: Node dry-run confirmed determinism, acyclic lineage, and a full trail->grazing->rain->saturation->erosion->gully causal chain on a 300-tick run.",
+    "Beastscape Lab Mode: Node dry-run against the real 720-specimen atlas confirmed correct experiment CRUD, correct real-atlas-derived neighbor lists, and correct dedup-by-atlasId across two different navigated coordinates.",
+    "Active Queue redesign: jsdom-driven test against the live pages over local HTTP confirmed add-from-archive, reorder/move-to-top, pin-blocks-removal, unpin-then-remove, homepage archive text search, and cross-page (index.html + build.html) localStorage consistency.",
+    "Mike's rocket notebook: full top-to-bottom kernel re-execution of the completed relativistic-analog section passed with zero error outputs; the GitHub fork and the site's repointed attribution link were both confirmed live."
   ],
   "defects": [
     "The continuous phenotype decoder still rounds discrete topology counts, so explicit branch or segment transitions can remain abrupt.",
@@ -77,9 +89,11 @@
     "The felt quality and intelligibility of continuous UMAP navigation require human testing.",
     "The first Foundry candidates specialize a shared procedural substrate; they prove comparison mechanics but are not yet independent comprehensive developmental engines.",
     "GitHub issue #27 ('Voice Mode Confusion' frozen ChatGPT session) is open: a partial transcript was recovered across four segment files, but Lt. cgl's correct/complete transcript is still pending, and two candidate protocol packets drafted from it remain un-adopted per Doctrine 003.",
-    "No graphical browser executable is present on this host, so automated visual click-through of new instruments (e.g. Metastable Comedown Lab) remains unperformed; only direct HTTP/source verification has been done."
+    "No graphical browser executable is present on this host, so automated visual click-through of new instruments (e.g. Metastable Comedown Lab, Living Basin, Beastscape Lab Mode, the Active Queue redesign) remains unperformed; only direct HTTP/source/Node/jsdom-level verification has been done for any of them.",
+    "Living Basin's JS engine (engine.js) has no automated test suite of its own, unlike its Python reference (26 tests); porting or writing one is the single highest-value next step named in tools/living-basin/README.md.",
+    "BeastSpec (docs/architecture/beastspec-design-v0.1.md) remains a proposed, unimplemented design; Beastscape Lab Mode Phase 1 answers a different, narrower brief (the Admiral's instrumented-mode packet) and should not be mistaken for BeastSpec progress."
   ],
-  "next_action": "Human-test whether the Foundry's candidate Beastscapes (Open Ocean / Metameric Forge / Symbiotic Reef) differ meaningfully in creature quality, structural diversity, and navigational character; separately, Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted.",
+  "next_action": "No single next action -- several independent threads are ready for the Admiral's direction: (1) human-test whether the Foundry's candidate Beastscapes differ meaningfully; (2) visually verify Living Basin, Beastscape Lab Mode, and the Active Queue redesign in an actual browser, including mobile, since none of that has been possible in this environment; (3) decide whether/when to approve BeastSpec for implementation, and separately whether to continue Beastscape Lab Mode into Phase 2 (navigation-policy comparison); (4) Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted.",
   "deferred_ideas": [
     "Personalized embeddings learned gradually from landmarks, revisits, comparisons, and preferences.",
     "Graph encoder/decoder charting strategy.",
@@ -105,6 +119,9 @@
     "AGENTS.md",
     "CLAUDE.md",
     "tools/beastscape-umap/README.md",
-    "web/toys/beastscape/app.js"
+    "web/toys/beastscape/app.js",
+    "docs/architecture/beastspec-design-v0.1.md",
+    "tools/living-basin/README.md",
+    "tools/living-basin/ARCHITECTURE.md"
   ]
 }
