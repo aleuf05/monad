@@ -27,6 +27,13 @@
   .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
   .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
 
+  .basin-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #1E2416, #111A2B 55%, #1B2A1E); border: 1px solid #8FBF6E; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .basin-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #8FBF6E22; }
+  .basin-berth::after { content: "NEW · CAUSAL SIMULATION"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #8FBF6E; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .basin-berth .project-kicker { color: #8FBF6E; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .basin-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #C9E0A8; font-size: 23px; letter-spacing: .04em; }
+  .basin-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
@@ -68,6 +75,12 @@
       <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
       <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
       <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
+    </a>
+
+    <a class="basin-berth" href="toys/living-basin/">
+      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
+      <div class="project-title">THE LIVING BASIN</div>
+      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
     </a>
 
     <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
