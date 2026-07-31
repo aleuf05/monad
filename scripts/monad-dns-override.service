@@ -1,0 +1,18 @@
+[Unit]
+Description=Monad LAN DNS override (split-horizon: cameronlampley.com -> 192.168.0.100)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dnsmasq
+Group=nogroup
+ExecStart=/usr/sbin/dnsmasq -k --conf-file=/home/cgl/dev/monad/scripts/monad-dns-override.conf
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
