@@ -37,24 +37,39 @@ cameronlampley.com {
 		# Public fallback so the Admiral can reach the console from
 		# anywhere (not just the LAN) without depending on the DNS
 		# override working. This path is reachable by anyone on the
-		# internet, so it is gated by HTTP Basic Auth -- the browser
-		# caches the credential after one prompt, so it does not ask
-		# again on later visits from the same browser. Password hash
-		# only; the plaintext was shown once and is not stored anywhere
-		# in this repo. /root (no trailing slash) is redirected
-		# explicitly -- it does not match /root/* on its own, and typing
-		# the URL without a trailing slash is the natural/common case.
+		# internet, so it is gated -- password-only (this page has
+		# exactly one intended user, no username field) by
+		# tools/public-root-auth/server.py via forward_auth. That service
+		# issues a 1-year session cookie on successful login, so this
+		# reads as "log in once," not a per-visit prompt. /root-login
+		# itself must stay unauthenticated -- it's the login form.
+		# /root (no trailing slash) is redirected explicitly -- it does
+		# not match /root/* on its own, and typing the URL without a
+		# trailing slash is the natural/common case.
+		# handle, not handle_path -- the backend expects the literal
+		# /root-login path; handle_path would strip it to empty and the
+		# backend's own path check would never match (confirmed live).
+		handle /root-login* {
+			reverse_proxy 127.0.0.1:4779
+		}
 		redir /root /root/ 308
+		# A bare 401 (not a redirect to the login page) is deliberate: an
+		# earlier attempt to redirect unauthenticated requests here (via
+		# forward_auth's handle_response, and separately via a nested
+		# handle_errors) was found live to let the real console through
+		# to unauthenticated requests instead of blocking it. Correctness
+		# over polish -- this plain form is confirmed to never leak
+		# content; the Admiral can navigate to /root-login directly.
 		handle_path /root/* {
-			basicauth {
-				admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
+			forward_auth 127.0.0.1:4779 {
+				uri /check
 			}
 			import console_routes
 		}
 
 		handle_path /chat-captain-api/* {
-			basicauth {
-				admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
+			forward_auth 127.0.0.1:4779 {
+				uri /check
 			}
 			reverse_proxy 127.0.0.1:4778
 		}

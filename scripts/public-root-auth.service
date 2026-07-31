@@ -1,0 +1,21 @@
+[Unit]
+Description=Monad public-root-auth (password-only gate for cameronlampley.com/root)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+EnvironmentFile=/home/cgl/.config/monad/public-root-auth.env
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/public-root-auth/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

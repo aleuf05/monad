@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-07-31T13:45:01.895739+00:00",
+  "fetched_at": "2026-07-31T15:15:01.481535+00:00",
   "items": [
+    {
+      "title": "Keeping cool without AC: Our readers share their tips",
+      "link": "https://www.npr.org/2026/07/31/g-s1-136442/extreme-heat-air-conditioning-keeping-cool",
+      "pubDate": "Fri, 31 Jul 2026 10:44:47 -0400"
+    },
     {
       "title": "In Nebraska, Americans begin to lose Medicaid under Trump's work rules",
       "link": "https://www.npr.org/2026/07/31/nx-s1-5913947/medicaid-trump-work-requirements-big-beautiful-bill-nebraska",
@@ -19,29 +24,24 @@
       "pubDate": "Fri, 31 Jul 2026 05:01:00 -0400"
     },
     {
-      "title": "Democrats show divisions on Israel amid competitive midterm elections",
-      "link": "https://www.npr.org/2026/07/31/nx-s1-5896216/democrats-israel-congress-2026-midterm-elections",
-      "pubDate": "Fri, 31 Jul 2026 05:00:00 -0400"
-    },
-    {
       "title": "450K borrowers say they were ripped off. Their student loans are being erased",
       "link": "https://www.npr.org/2026/07/31/nx-s1-5910885/student-loans-colleges-fraud-borrower-defense-education-department-trump",
       "pubDate": "Fri, 31 Jul 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump's noncitizen voter data remains a mystery. But the claims raise midterm fears",
-      "link": "https://www.npr.org/2026/07/31/nx-s1-5906708/trump-claim-noncitizens-midterms-election-interference-voter-rolls",
+      "title": "Democrats show divisions on Israel amid competitive midterm elections",
+      "link": "https://www.npr.org/2026/07/31/nx-s1-5896216/democrats-israel-congress-2026-midterm-elections",
       "pubDate": "Fri, 31 Jul 2026 05:00:00 -0400"
     },
     {
-      "title": "One Big Beautiful Bill cut healthcare funds. Now, Republicans have to sell the costs",
+      "title": "Ahead of midterms, Republicans run ads after cutting healthcare funds",
       "link": "https://www.npr.org/2026/07/31/nx-s1-5870960/republican-ads-healthcare-medicaid-2026-midterms",
       "pubDate": "Fri, 31 Jul 2026 05:00:00 -0400"
     },
     {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/07/31/nx-s1-5901900/morning-news-brief",
-      "pubDate": "Fri, 31 Jul 2026 04:49:30 -0400"
+      "title": "Trump's claims of 250,000 non-U.S. citizens on voter rolls leave some states baffled",
+      "link": "https://www.npr.org/2026/07/31/nx-s1-5906708/trump-claim-noncitizens-midterms-election-interference-voter-rolls",
+      "pubDate": "Fri, 31 Jul 2026 05:00:00 -0400"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "schema_version": "monad.fleetStatus.v1",
-  "status": "green",
-  "summary": "All systems nominal.",
-  "checked_at": "2026-07-31T14:17:25.848410Z",
+  "status": "amber",
+  "summary": "fleetcore-serve endpoint unreachable",
+  "checked_at": "2026-07-31T15:22:25.848525Z",
   "hostname": "granite",
-  "git_commit": "3ae7bdabe0ccf58844eecaf4ae03352845305be9"
+  "git_commit": "25cc58484130cdbb80a7b3ff2719f4f641fc00df"
 }
