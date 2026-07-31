@@ -125,6 +125,21 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/check":
             self._send(200 if self._authenticated() else 401, b"")
             return
+        if path == "/check-page":
+            # Same check as /check, but for forward_auth gating a real
+            # page load (/root/*), not a JS fetch() to the API. Caddy's
+            # forward_auth returns any non-2xx response from here
+            # directly to the client -- handle_errors cannot intercept
+            # it (it's a normal response, not a Caddy "error"; confirmed
+            # live) -- so the redirect has to be issued right here.
+            if self._authenticated():
+                self._send(200, b"")
+            else:
+                self.send_response(302)
+                self.send_header("Location", "/root-login")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+            return
         if path == "/root-login":
             self._send_html(200, LOGIN_PAGE.format(error=""))
             return

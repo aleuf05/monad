@@ -53,16 +53,16 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4779
 		}
 		redir /root /root/ 308
-		# A bare 401 (not a redirect to the login page) is deliberate: an
-		# earlier attempt to redirect unauthenticated requests here (via
-		# forward_auth's handle_response, and separately via a nested
-		# handle_errors) was found live to let the real console through
-		# to unauthenticated requests instead of blocking it. Correctness
-		# over polish -- this plain form is confirmed to never leak
-		# content; the Admiral can navigate to /root-login directly.
+		# /check-page (not /check) -- unlike /chat-captain-api/* below,
+		# this gates a real browser page load, so on failure it should
+		# redirect to the login form rather than return a bare 401. That
+		# redirect must come from the upstream auth check itself: Caddy's
+		# forward_auth returns any non-2xx response directly to the
+		# client, and handle_errors cannot intercept it (it's a normal
+		# response, not a Caddy "error" -- confirmed live).
 		handle_path /root/* {
 			forward_auth 127.0.0.1:4779 {
-				uri /check
+				uri /check-page
 			}
 			import console_routes
 		}
