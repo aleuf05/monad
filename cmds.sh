@@ -62,3 +62,38 @@ echo "-- public playground itself still fully intact --"
 curl -s -m 6 -o /dev/null -w "public site: %{http_code}\n" https://cameronlampley.com/
 
 echo "== done =="
+
+echo "== 2026-07-31 (continued): remove the redundant app-level password =="
+echo "   Per the Admiral: the whole reason the Root Console is a separate,"
+echo "   dedicated LAN-only site is so network reachability alone is the"
+echo "   access-control boundary. Only the Admiral has physical/network access"
+echo "   to this LAN, so a password on top of that binary boundary was a"
+echo "   second access-control system solving a problem the first one already"
+echo "   solved. tools/chat-captain/server.py no longer has a login route,"
+echo "   session cookie, or password check; console/app.html loads directly."
+echo "   See docs/deployment.md's 2026-07-31 amendment entry for the full"
+echo "   reasoning. Origin allowlist checking on POST is kept (CSRF hygiene,"
+echo "   not access control)."
+
+sudo install -m 644 "$REPO_ROOT/scripts/chat-captain-web.service" /etc/systemd/system/chat-captain-web.service
+sudo systemctl daemon-reload
+sudo systemctl restart chat-captain-web.service
+sleep 1
+
+echo "== verifying =="
+curl --fail --silent --show-error http://127.0.0.1:4778/health && echo
+curl --fail --silent --show-error http://192.168.0.100:8080/chat-captain-api/health && echo
+echo "-- /api/state must now succeed with no login at all (expect ok:true, no cookie) --"
+curl -s -m 6 http://192.168.0.100:8080/chat-captain-api/api/state
+echo
+curl -s -m 5 -o /dev/null -w "public site unaffected: %{http_code}\n" https://cameronlampley.com/
+curl -s -m 5 -o /dev/null -w "public chat-captain-api route still absent (expect 404): %{http_code}\n" https://cameronlampley.com/chat-captain-api/health
+
+echo "== stale credential cleanup =="
+echo "   The old scrypt password/salt/session-secret env file is now dead"
+echo "   config (nothing reads CHAT_CAPTAIN_PASSWORD_* or"
+echo "   CHAT_CAPTAIN_SESSION_SECRET any more); removing it rather than"
+echo "   leaving an unused credential sitting on disk."
+rm -f /home/cgl/.config/monad/chat-captain-web.env
+
+echo "== done =="

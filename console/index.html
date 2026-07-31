@@ -96,9 +96,11 @@
   <div class="banner">
     This page is a visual preview of where the Root Console is headed — most of it isn't wired up yet.
     Two things on it are real: <strong>Captain's Brief</strong> above (full-access, executive-level
-    read of the Captain's own current-course documentation — login required, same credentials as the
-    app) and <strong>Exit to Public Site</strong>. The real, working Chat Captain (login, live
-    conversation, restart-safe memory, Harvest Tray) already exists at <strong>/app.html</strong>.
+    read of the Captain's own current-course documentation) and <strong>Exit to Public Site</strong>.
+    Neither requires a password — this console has no application-level login; the LAN-only Caddy
+    site block it's served from is the entire access boundary (see docs/deployment.md). The real,
+    working Chat Captain (live conversation, restart-safe memory, Harvest Tray) already exists at
+    <strong>/app.html</strong>.
   </div>
 
   <main class="layout">

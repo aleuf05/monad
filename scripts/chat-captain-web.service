@@ -1,5 +1,5 @@
 [Unit]
-Description=Monad Chat Captain (authenticated, loopback only, Codex-backed)
+Description=Monad Chat Captain (LAN-only, Codex-backed; access control is the Caddy site block, not app login)
 After=network-online.target
 Wants=network-online.target
 
@@ -8,7 +8,6 @@ Type=simple
 User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
-EnvironmentFile=/home/cgl/.config/monad/chat-captain-web.env
 Environment=CHAT_CAPTAIN_ALLOWED_ORIGINS=https://cameronlampley.com,http://192.168.0.100:8080
 ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/chat-captain/server.py
 Restart=on-failure

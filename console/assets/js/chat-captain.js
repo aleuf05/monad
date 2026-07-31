@@ -4,11 +4,6 @@
   var API_BASE = "/chat-captain-api";
   var state = { project: null, messages: [], sending: false };
 
-  var loginScreen = document.getElementById("loginScreen");
-  var loginForm = document.getElementById("loginForm");
-  var loginPassword = document.getElementById("loginPassword");
-  var loginError = document.getElementById("loginError");
-  var app = document.getElementById("app");
   var transcriptEl = document.getElementById("transcript");
   var chatForm = document.getElementById("chatForm");
   var chatInput = document.getElementById("chatInput");
@@ -139,8 +134,6 @@
 
   function boot() {
     return loadState().then(function () {
-      app.hidden = false;
-      loginScreen.hidden = true;
       return loadHarvest();
     });
   }
@@ -229,25 +222,6 @@
     if (event.key === "Escape" && !briefOverlay.hidden) closeBrief();
   });
 
-  loginForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-    loginError.hidden = true;
-    post("/login", { password: loginPassword.value })
-      .then(function () {
-        loginPassword.value = "";
-        return boot();
-      })
-      .then(function () {
-        if (/(?:^|[?&])brief=1(?:&|$)/.test(window.location.search)) {
-          openBrief();
-        }
-      })
-      .catch(function (error) {
-        loginError.textContent = error.status === 429 ? "Too many attempts, wait a minute." : "Incorrect password.";
-        loginError.hidden = false;
-      });
-  });
-
   chatForm.addEventListener("submit", function (event) {
     event.preventDefault();
     if (state.sending) return;
@@ -328,18 +302,19 @@
       });
   });
 
-  // If already authenticated (cookie still valid from a prior visit),
-  // boot() succeeds immediately and we skip the login screen.
+  // No login gate -- access control is the LAN-only Caddy site block this
+  // page is served from (see docs/deployment.md), not an app-level
+  // password, so the app loads directly.
   boot()
     .then(function () {
       // console/index.html links here with ?brief=1 so the splash's
       // "Captain's Brief" affordance opens the popup the moment the
-      // authenticated app is ready, instead of landing on the chat view.
+      // app has finished loading, instead of landing on the chat view.
       if (/(?:^|[?&])brief=1(?:&|$)/.test(window.location.search)) {
         openBrief();
       }
     })
-    .catch(function () {
-      loginScreen.hidden = false;
+    .catch(function (error) {
+      renderMessage("system", "Could not reach the Captain: " + (error.message || "request failed"));
     });
 })();

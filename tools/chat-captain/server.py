@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
-"""Authenticated loopback API for Chat Captain.
+"""Loopback API for Chat Captain.
 
-Auth block (scrypt password verifier + HMAC-signed session cookie + origin
-allowlist + login rate limit + security headers) is copied wholesale from
-tools/living-captain/web_service.py -- it is schema-agnostic and proven
-live on this host already, just re-pointed at a distinct cookie/env prefix
-and port so it runs as an independent sibling service.
+No application-level login. Access control is entirely the network layer:
+this service is only reachable via the LAN-only Caddy site block (see
+docs/deployment.md's 2026-07-31 exception entry) -- only the Admiral has
+physical/network access to that LAN, so a password on top of an
+already-binary on-the-LAN-or-not boundary was redundant. An earlier
+version of this file carried a scrypt password + HMAC-signed session
+cookie (copied from tools/living-captain/web_service.py); it was removed
+2026-07-31 once the console was confirmed to be its own isolated site
+rather than a path on the public one -- see git history for that code if
+a different service ever needs it.
 """
 
 from __future__ import annotations
 
-import base64
-import hashlib
-import hmac
 import json
 import os
-import secrets
 import sys
 import threading
-import time
-from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -38,7 +37,7 @@ PROMPT_PATH = Path(__file__).resolve().parent / "prompts" / "captain-system.md"
 # (docs/context/current-state.json) rather than a second summarization
 # path -- it is already full-access (nothing redacted) and already
 # executive-level (a curated projection, not the raw doc tree), so this
-# endpoint is a thin authenticated read of an existing repository artifact.
+# endpoint is a thin read of an existing repository artifact.
 BRIEF_PATH = ROOT / "docs" / "context" / "current-state.json"
 HOST = "127.0.0.1"
 PORT = 4778
@@ -52,9 +51,11 @@ PORT = 4778
 #      confirmed working 2026-07-31 -- see scripts/Caddyfile).
 #   2. http://192.168.0.100:8080/ -- a dedicated LAN-IP Caddy site block,
 #      kept as a fallback while (1) is being verified.
-# The session cookie intentionally omits the Secure attribute so it works
-# over both the plain-HTTP fallback (2) and the HTTPS primary path (1) --
-# a non-Secure cookie is still accepted over HTTPS, just not restricted to it.
+# Origin is still checked on POST (below) as ordinary CSRF hygiene -- a
+# malicious page open in another tab shouldn't be able to fire requests
+# at this loopback service just because a browser on the LAN can reach
+# it. That is not the access-control boundary (the LAN-only Caddy block
+# is); it costs the Admiral nothing to keep.
 ALLOWED_ORIGINS = frozenset(
     origin.strip()
     for origin in os.environ.get(
@@ -63,79 +64,18 @@ ALLOWED_ORIGINS = frozenset(
     ).split(",")
     if origin.strip()
 )
-COOKIE_NAME = "monad_chat_captain_session"
-SESSION_SECONDS = 12 * 60 * 60
 MAX_BODY_BYTES = 32_768
 MAX_MESSAGE_CHARS = 6_000
-LOGIN_WINDOW_SECONDS = 60
-LOGIN_ATTEMPTS_PER_WINDOW = 5
-
-
-class AuthConfig:
-    def __init__(self, salt: bytes, password_hash: bytes, session_secret: bytes):
-        self.salt = salt
-        self.password_hash = password_hash
-        self.session_secret = session_secret
-
-    @classmethod
-    def from_environment(cls) -> "AuthConfig":
-        try:
-            return cls(
-                bytes.fromhex(os.environ["CHAT_CAPTAIN_PASSWORD_SALT"]),
-                bytes.fromhex(os.environ["CHAT_CAPTAIN_PASSWORD_HASH"]),
-                bytes.fromhex(os.environ["CHAT_CAPTAIN_SESSION_SECRET"]),
-            )
-        except (KeyError, ValueError) as error:
-            raise ValueError("Chat Captain authentication is not configured") from error
-
-    def verify_password(self, password: str) -> bool:
-        candidate = hashlib.scrypt(
-            password.encode("utf-8"), salt=self.salt, n=2**14, r=8, p=1, dklen=32
-        )
-        return hmac.compare_digest(candidate, self.password_hash)
-
-    def issue_session(self, now: int | None = None) -> str:
-        timestamp = int(time.time()) if now is None else now
-        payload = f"{timestamp}.{secrets.token_hex(16)}"
-        signature = hmac.new(self.session_secret, payload.encode("ascii"), hashlib.sha256).digest()
-        encoded = base64.urlsafe_b64encode(signature).decode("ascii").rstrip("=")
-        return f"{payload}.{encoded}"
-
-    def verify_session(self, token: str, now: int | None = None) -> bool:
-        try:
-            timestamp_text, nonce, supplied = token.split(".", 2)
-            timestamp = int(timestamp_text)
-        except (ValueError, AttributeError):
-            return False
-        current = int(time.time()) if now is None else now
-        if timestamp > current + 60 or current - timestamp > SESSION_SECONDS:
-            return False
-        payload = f"{timestamp}.{nonce}"
-        signature = hmac.new(self.session_secret, payload.encode("ascii"), hashlib.sha256).digest()
-        expected = base64.urlsafe_b64encode(signature).decode("ascii").rstrip("=")
-        return hmac.compare_digest(expected, supplied)
 
 
 class CaptainServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, handler, engine: CaptainEngine, conn, auth: AuthConfig):
+    def __init__(self, address, handler, engine: CaptainEngine, conn):
         super().__init__(address, handler)
         self.engine = engine
         self.conn = conn
-        self.auth = auth
         self.inference_lock = threading.Lock()
-        self.login_lock = threading.Lock()
-        self.login_attempts: list[float] = []
-
-    def allow_login_attempt(self) -> bool:
-        now = time.monotonic()
-        with self.login_lock:
-            self.login_attempts = [a for a in self.login_attempts if now - a < LOGIN_WINDOW_SECONDS]
-            if len(self.login_attempts) >= LOGIN_ATTEMPTS_PER_WINDOW:
-                return False
-            self.login_attempts.append(now)
-            return True
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -148,9 +88,6 @@ class Handler(BaseHTTPRequestHandler):
         query = parse_qs(urlparse(self.path).query)
         if path == "/health":
             self._json({"ok": True, "service": "chat-captain"})
-            return
-        if not self._authenticated():
-            self._json({"ok": False, "error": "authentication required"}, 401)
             return
         if path == "/api/state":
             self._handle_get_state()
@@ -174,15 +111,6 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": str(error)}, 400)
             return
 
-        if path == "/login":
-            self._handle_login(body)
-            return
-        if path == "/logout":
-            self._handle_logout()
-            return
-        if not self._authenticated():
-            self._json({"ok": False, "error": "authentication required"}, 401)
-            return
         if path == "/api/chat":
             self._handle_chat(body)
         elif path.startswith("/api/harvest/") and path.endswith("/accept"):
@@ -201,31 +129,6 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "not found"}, 404)
 
     # --- handlers ------------------------------------------------------
-
-    def _handle_login(self, body: dict) -> None:
-        if not self.server.allow_login_attempt():
-            self._json({"ok": False, "error": "login temporarily limited"}, 429)
-            return
-        password = body.get("password")
-        if not isinstance(password, str) or not self.server.auth.verify_password(password):
-            self._json({"ok": False, "error": "invalid credentials"}, 401)
-            return
-        token = self.server.auth.issue_session()
-        self._json(
-            {"ok": True},
-            headers={
-                "Set-Cookie": (
-                    f"{COOKIE_NAME}={token}; Path=/; Max-Age={SESSION_SECONDS}; "
-                    "HttpOnly; SameSite=Strict"
-                )
-            },
-        )
-
-    def _handle_logout(self) -> None:
-        self._json(
-            {"ok": True},
-            headers={"Set-Cookie": f"{COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"},
-        )
 
     def _handle_get_state(self) -> None:
         state = database.get_state(self.server.conn)
@@ -361,11 +264,6 @@ class Handler(BaseHTTPRequestHandler):
 
     # --- plumbing --------------------------------------------------------
 
-    def _authenticated(self) -> bool:
-        cookie = SimpleCookie(self.headers.get("Cookie", ""))
-        morsel = cookie.get(COOKIE_NAME)
-        return bool(morsel and self.server.auth.verify_session(morsel.value))
-
     def _read_json(self) -> dict:
         length_text = self.headers.get("Content-Length")
         if length_text is None:
@@ -418,12 +316,11 @@ def build_engine() -> tuple[CaptainEngine, object]:
 
 def main() -> int:
     try:
-        auth = AuthConfig.from_environment()
         engine, conn = build_engine()
     except (OSError, ValueError, OwnershipError) as error:
         print(f"Chat Captain web service cannot start: {error}", file=sys.stderr)
         return 2
-    server = CaptainServer((HOST, PORT), Handler, engine, conn, auth)
+    server = CaptainServer((HOST, PORT), Handler, engine, conn)
     print(f"Chat Captain listening on http://{HOST}:{PORT}")
     try:
         server.serve_forever()

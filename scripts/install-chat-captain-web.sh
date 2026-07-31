@@ -2,11 +2,6 @@
 set -euo pipefail
 
 repo="/home/cgl/dev/monad"
-auth_file="/home/cgl/.config/monad/chat-captain-web.env"
-
-if [[ ! -s "${auth_file}" ]]; then
-  python3 "${repo}/tools/chat-captain/configure_web_auth.py"
-fi
 
 python3 -m unittest discover -s "${repo}/tools/chat-captain" -p 'test_*.py'
 install -d -m 700 "${repo}/data/chat-captain"

@@ -7,11 +7,18 @@ principle 5. Codex itself is used statelessly per turn (fresh ephemeral
 thread each call); nothing about resuming this conversation depends on the
 provider.
 
-**Deliberately LAN-only.** Not exposed on the public
-`https://cameronlampley.com/` domain — see `docs/deployment.md`'s
-2026-07-31 exception entry for why and how this differs from the retired
-`web-lan/` pattern. Live at `http://192.168.0.100:8080/` on the home LAN
-only.
+**Deliberately LAN-only, and that LAN-only-ness *is* the access control.**
+Not exposed on the public `https://cameronlampley.com/` domain — see
+`docs/deployment.md`'s 2026-07-31 exception entry for why and how this
+differs from the retired `web-lan/` pattern. Live at
+`http://192.168.0.100:8080/` on the home LAN only. **There is no
+application-level password.** An earlier version had one (scrypt +
+session cookie); it was removed 2026-07-31 as redundant once it was
+confirmed the console is its own isolated network-layer boundary, not a
+path carved out of the public site — only the Admiral has physical/network
+access to this LAN, so a second gate on top of that binary boundary added
+friction without adding security. Do not reintroduce a login without a
+reason the network boundary itself doesn't already cover.
 
 ## Layout
 
@@ -29,18 +36,17 @@ only.
 - `engine.py` — `CaptainEngine`: owns the exclusive lock on ship state
   (`fcntl.flock`, mirrors `tools/living-captain/live_captain_engine.py`)
   and drives one full turn end-to-end.
-- `server.py` — authenticated loopback HTTP API (scrypt password + signed
-  session cookie, same mechanism as `tools/living-captain/web_service.py`,
-  minus the `Secure` cookie attribute since the LAN Caddy block is plain
-  HTTP). Includes `GET /api/brief` — the Root Console's "Captain's Brief"
-  popup: a thin authenticated read of `docs/context/current-state.json`
+- `server.py` — loopback HTTP API. No login: the LAN-only Caddy site block
+  is the access boundary (see above). POST requests still check `Origin`
+  against `CHAT_CAPTAIN_ALLOWED_ORIGINS` as ordinary CSRF hygiene, not as
+  an access-control gate. Includes `GET /api/brief` — the Root Console's
+  "Captain's Brief" popup: a thin read of `docs/context/current-state.json`
   (the Context Steward's own compact projection), not a second
   summarization path. Full access, executive-level content by
   construction, not by redaction.
 - `usage_budget.py` — daily turn-count ceiling (Codex has no metered
   per-token API key from this codebase's perspective, so this guards
   against runaway loops rather than approximating dollar cost).
-- `configure_web_auth.py` — provisions `~/.config/monad/chat-captain-web.env`.
 
 Static frontend lives in `console/` at the repo root (its own deploy
 target, parallel to `web/`), not under `tools/chat-captain/` — see
