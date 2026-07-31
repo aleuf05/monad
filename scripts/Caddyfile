@@ -1,5 +1,26 @@
+(console_routes) {
+	handle_path /chat-captain-api/* {
+		reverse_proxy 127.0.0.1:4778
+	}
+	handle {
+		root * /home/cgl/dev/monad/console
+		file_server
+	}
+}
+
 cameronlampley.com {
 	encode zstd gzip
+
+	# LAN-direct branch: viable only once LAN clients resolve this hostname
+	# straight to 192.168.0.100 via router-side DNS (see docs/deployment.md).
+	# That path never touches the router's NAT hairpin, so remote_ip here
+	# is the client's real private address -- unlike the disproved
+	# same-hostname-via-hairpin attempt, where source was rewritten to the
+	# public WAN IP and looked identical to real internet traffic.
+	@lan remote_ip private_ranges
+	handle @lan {
+		import console_routes
+	}
 
 	handle_path /monad/portainer/* {
 		reverse_proxy https://localhost:9443 {
@@ -55,12 +76,5 @@ cameronlampley.com {
 # web-lan/ pattern retired 2026-07-13 -- see docs/deployment.md for the
 # discussion that authorized this one instance.
 http://192.168.0.100:8080 {
-	handle_path /chat-captain-api/* {
-		reverse_proxy 127.0.0.1:4778
-	}
-
-	handle {
-		root * /home/cgl/dev/monad/console
-		file_server
-	}
+	import console_routes
 }
