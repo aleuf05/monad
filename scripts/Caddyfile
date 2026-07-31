@@ -11,82 +11,99 @@
 cameronlampley.com {
 	encode zstd gzip
 
-	# LAN-direct branch: viable only once LAN clients resolve this hostname
-	# straight to 192.168.0.100 via router-side DNS (see docs/deployment.md).
-	# That path never touches the router's NAT hairpin, so remote_ip here
-	# is the client's real private address -- unlike the disproved
-	# same-hostname-via-hairpin attempt, where source was rewritten to the
-	# public WAN IP and looked identical to real internet traffic.
-	@lan remote_ip private_ranges
-	handle @lan {
-		import console_routes
-	}
-
-	# Public fallback so the Admiral can reach the console from anywhere
-	# (not just the LAN) without depending on the DNS override working.
-	# This path is reachable by anyone on the internet, so it is gated by
-	# HTTP Basic Auth -- the browser caches the credential after one
-	# prompt, so it does not ask again on later visits from the same
-	# browser. Password hash only; the plaintext was shown once and is
-	# not stored anywhere in this repo.
-	handle_path /root/* {
-		basicauth {
-			admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
+	# Everything below is wrapped in one explicit `route` block. Caddy's
+	# automatic Caddyfile directive ordering does NOT preserve file order
+	# here -- confirmed repeatedly via `caddy adapt`: handle vs
+	# handle_path, and even route vs handle, got silently resorted by
+	# path specificity/directive type rather than file position (e.g. the
+	# unconditional catch-all handle{} at the bottom of this file was
+	# sorted BEFORE a route{} block placed near the top). `route` disables
+	# that automatic reordering entirely and runs its contents in the
+	# exact sequence written, so every matcher below is evaluated
+	# top-to-bottom, first match wins, exactly as it reads.
+	route {
+		# LAN-direct branch: viable only once LAN clients resolve this
+		# hostname straight to 192.168.0.100 via router-side DNS (see
+		# docs/deployment.md). That path never touches the router's NAT
+		# hairpin, so remote_ip here is the client's real private address
+		# -- unlike the disproved same-hostname-via-hairpin attempt, where
+		# source was rewritten to the public WAN IP and looked identical
+		# to real internet traffic.
+		@lan remote_ip private_ranges
+		handle @lan {
+			import console_routes
 		}
-		import console_routes
-	}
 
-	handle_path /chat-captain-api/* {
-		basicauth {
-			admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
-		}
-		reverse_proxy 127.0.0.1:4778
-	}
-
-	handle_path /monad/portainer/* {
-		reverse_proxy https://localhost:9443 {
-			transport http {
-				tls_insecure_skip_verify
+		# Public fallback so the Admiral can reach the console from
+		# anywhere (not just the LAN) without depending on the DNS
+		# override working. This path is reachable by anyone on the
+		# internet, so it is gated by HTTP Basic Auth -- the browser
+		# caches the credential after one prompt, so it does not ask
+		# again on later visits from the same browser. Password hash
+		# only; the plaintext was shown once and is not stored anywhere
+		# in this repo. /root (no trailing slash) is redirected
+		# explicitly -- it does not match /root/* on its own, and typing
+		# the URL without a trailing slash is the natural/common case.
+		redir /root /root/ 308
+		handle_path /root/* {
+			basicauth {
+				admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
 			}
-			header_up Host {upstream_hostport}
+			import console_routes
 		}
-	}
 
-	handle_path /fleetcore-ws/* {
-		reverse_proxy 127.0.0.1:4771
-	}
+		handle_path /chat-captain-api/* {
+			basicauth {
+				admiral $2a$14$x9XWoAKQGp5mFlKq6GdfLuyKJaD4V9Jn1oulhTIcnfqKlsozN.1Hm
+			}
+			reverse_proxy 127.0.0.1:4778
+		}
 
-	handle_path /captain-memory-api/* {
-		reverse_proxy 127.0.0.1:4772
-	}
+		handle_path /monad/portainer/* {
+			reverse_proxy https://localhost:9443 {
+				transport http {
+					tls_insecure_skip_verify
+				}
+				header_up Host {upstream_hostport}
+			}
+		}
 
-	handle_path /world-intake-api/* {
-		reverse_proxy 127.0.0.1:4773
-	}
+		handle_path /fleetcore-ws/* {
+			reverse_proxy 127.0.0.1:4771
+		}
 
-	handle_path /living-captain-api/* {
-		reverse_proxy 127.0.0.1:4774
-	}
+		handle_path /captain-memory-api/* {
+			reverse_proxy 127.0.0.1:4772
+		}
 
-	handle_path /live-captain-chat-api/* {
-		reverse_proxy 127.0.0.1:4776
-	}
+		handle_path /world-intake-api/* {
+			reverse_proxy 127.0.0.1:4773
+		}
 
-	handle_path /libfive-api/* {
-		reverse_proxy 127.0.0.1:4787
-	}
+		handle_path /living-captain-api/* {
+			reverse_proxy 127.0.0.1:4774
+		}
 
-	handle_path /mike-rocketry-intake-api/* {
-		reverse_proxy 127.0.0.1:4789
-	}
+		handle_path /live-captain-chat-api/* {
+			reverse_proxy 127.0.0.1:4776
+		}
 
-	handle_path /captain-workbench-api/* {
-		reverse_proxy 127.0.0.1:4791
-	}
+		handle_path /libfive-api/* {
+			reverse_proxy 127.0.0.1:4787
+		}
 
-	handle {
-		root * /home/cgl/dev/monad/web
-		file_server
+		handle_path /mike-rocketry-intake-api/* {
+			reverse_proxy 127.0.0.1:4789
+		}
+
+		handle_path /captain-workbench-api/* {
+			reverse_proxy 127.0.0.1:4791
+		}
+
+		handle {
+			root * /home/cgl/dev/monad/web
+			file_server
+		}
 	}
 }
 
