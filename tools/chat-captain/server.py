@@ -27,6 +27,7 @@ import database
 from codex_provider import CodexProvider
 from context_compiler import load_seed_instruction
 from engine import CaptainEngine, OwnershipError
+from image_generator import ImageGenerator
 from model_provider import ProviderError
 from usage_budget import BudgetExceeded, UsageBudget
 
@@ -71,10 +72,11 @@ MAX_MESSAGE_CHARS = 6_000
 class CaptainServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, handler, engine: CaptainEngine, conn):
+    def __init__(self, address, handler, engine: CaptainEngine, conn, image_generator: ImageGenerator | None = None):
         super().__init__(address, handler)
         self.engine = engine
         self.conn = conn
+        self.image_generator = image_generator
         self.inference_lock = threading.Lock()
 
 
@@ -97,6 +99,10 @@ class Handler(BaseHTTPRequestHandler):
             self._handle_get_harvest(query)
         elif path == "/api/brief":
             self._handle_get_brief()
+        elif path.startswith("/api/image/") and path.endswith("/file"):
+            self._handle_get_image_file(path)
+        elif path.startswith("/api/image/"):
+            self._handle_get_image_status(path)
         else:
             self._json({"ok": False, "error": "not found"}, 404)
 
@@ -172,6 +178,33 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "brief is malformed"}, 503)
             return
         self._json({"ok": True, "brief": brief})
+
+    def _handle_get_image_status(self, path: str) -> None:
+        job_id = path.split("/")[3] if len(path.split("/")) > 3 else ""
+        job = database.get_image_job(self.server.conn, job_id) if job_id else None
+        if job is None:
+            self._json({"ok": False, "error": "image job not found"}, 404)
+            return
+        self._json({"ok": True, "job": job})
+
+    def _handle_get_image_file(self, path: str) -> None:
+        parts = path.split("/")
+        job_id = parts[3] if len(parts) > 4 else ""
+        job = database.get_image_job(self.server.conn, job_id) if job_id else None
+        if job is None or job["status"] != "succeeded":
+            self._json({"ok": False, "error": "image not ready"}, 404)
+            return
+        artifact = self.server.image_generator.artifact_path(job)
+        if artifact is None:
+            self._json({"ok": False, "error": "image artifact missing"}, 404)
+            return
+        data = artifact.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", job["artifact_mime"] or "application/octet-stream")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+        self.end_headers()
+        self.wfile.write(data)
 
     def _handle_chat(self, body: dict) -> None:
         text = body.get("message")
@@ -300,27 +333,35 @@ class Handler(BaseHTTPRequestHandler):
         pass
 
 
-def build_engine() -> tuple[CaptainEngine, object]:
+def build_engine() -> tuple[CaptainEngine, object, ImageGenerator | None]:
     conn = database.connect(DATA_DIR / "captain.sqlite3")
     prompt = load_seed_instruction(str(PROMPT_PATH))
     provider = CodexProvider(cwd=ROOT)
+    # Image generation is optional: if no key is configured, image_request
+    # is simply never fulfilled (the Captain's text reply still lands
+    # normally) rather than the whole service failing to start.
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    image_generator = (
+        ImageGenerator(conn, api_key, DATA_DIR / "images") if api_key else None
+    )
     engine = CaptainEngine(
         provider=provider,
         conn=conn,
         budget=UsageBudget(DATA_DIR / "usage.json"),
         seed_instruction=prompt,
         data_dir=DATA_DIR,
+        image_generator=image_generator,
     )
-    return engine, conn
+    return engine, conn, image_generator
 
 
 def main() -> int:
     try:
-        engine, conn = build_engine()
+        engine, conn, image_generator = build_engine()
     except (OSError, ValueError, OwnershipError) as error:
         print(f"Chat Captain web service cannot start: {error}", file=sys.stderr)
         return 2
-    server = CaptainServer((HOST, PORT), Handler, engine, conn)
+    server = CaptainServer((HOST, PORT), Handler, engine, conn, image_generator)
     print(f"Chat Captain listening on http://{HOST}:{PORT}")
     try:
         server.serve_forever()

@@ -45,11 +45,13 @@ class CaptainEngine:
         seed_instruction: str,
         data_dir: Path,
         acquire_owner_lock: bool = True,
+        image_generator=None,
     ):
         self.provider = provider
         self.conn = conn
         self.budget = budget
         self.seed_instruction = seed_instruction
+        self.image_generator = image_generator
         self._lock_handle = None
         if acquire_owner_lock:
             self._acquire_owner_lock(Path(data_dir) / "owner.lock")
@@ -150,6 +152,12 @@ class CaptainEngine:
 
         structured = extract_structured_reply(response.text)
 
+        image_job = None
+        image_request = structured.get("image_request")
+        prompt_text = image_request.get("prompt") if isinstance(image_request, dict) else image_request
+        if self.image_generator is not None and isinstance(prompt_text, str) and prompt_text.strip():
+            image_job = self.image_generator.submit(session_id, prompt_text.strip())
+
         database.append_message(
             self.conn,
             session_id=session_id,
@@ -159,6 +167,7 @@ class CaptainEngine:
             project_id=active_project_id,
             provider=response.provider,
             model=response.model,
+            image_job_id=image_job["id"] if image_job else None,
         )
 
         stored_harvest = []
@@ -198,6 +207,7 @@ class CaptainEngine:
             "safety_signal": structured.get("safety_signal"),
             "provider": response.provider,
             "model": response.model,
+            "image_job": image_job,
         }
 
     def status(self) -> dict[str, Any]:

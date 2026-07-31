@@ -164,6 +164,123 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(status, 503)
         self.assertFalse(body["ok"])
 
+    def test_image_status_not_found(self):
+        status, body = self._get("/api/image/does-not-exist")
+        self.assertEqual(status, 404)
+        self.assertFalse(body["ok"])
+
+    def test_image_file_not_ready(self):
+        job = database.create_image_job(self.conn, session_id="sess-x", prompt="a ship")
+        status, body = self._get(f"/api/image/{job['id']}/file")
+        self.assertEqual(status, 404)
+        self.assertFalse(body["ok"])
+
+
+class FakeImageGenerator:
+    def __init__(self, artifacts_dir: Path):
+        self.artifacts_dir = artifacts_dir
+        self.artifacts_dir.mkdir(parents=True, exist_ok=True)
+        self.conn = None
+
+    def submit(self, session_id, prompt):
+        job = database.create_image_job(self.conn, session_id=session_id, prompt=prompt)
+        content = b"\xff\xd8\xff fake jpeg"
+        name = f"{job['id']}.jpg"
+        (self.artifacts_dir / name).write_bytes(content)
+        return database.update_image_job(
+            self.conn, job["id"], status="succeeded", artifact_name=name, artifact_mime="image/jpeg",
+        )
+
+    def artifact_path(self, job):
+        if not job.get("artifact_name"):
+            return None
+        path = self.artifacts_dir / job["artifact_name"]
+        return path if path.exists() else None
+
+
+class ImageApiTests(unittest.TestCase):
+    """Separate from ApiTests -- needs a server/engine wired with an
+    image_generator, unlike the plain setUp shared by the rest of the suite."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        data_dir = Path(self._tmp.name)
+        self.conn = database.connect(data_dir / "captain.sqlite3")
+        self.provider = ScriptedProvider()
+        self.image_generator = FakeImageGenerator(data_dir / "images")
+        self.image_generator.conn = self.conn
+        self.engine = CaptainEngine(
+            provider=self.provider, conn=self.conn, budget=UsageBudget(data_dir / "usage.json"),
+            seed_instruction="SEED", data_dir=data_dir, image_generator=self.image_generator,
+        )
+        self.http_server = server_module.CaptainServer(
+            ("127.0.0.1", 0), server_module.Handler, self.engine, self.conn, self.image_generator
+        )
+        self.port = self.http_server.server_address[1]
+        self.thread = threading.Thread(target=self.http_server.serve_forever, daemon=True)
+        self.thread.start()
+
+    def tearDown(self):
+        self.http_server.shutdown()
+        self.http_server.server_close()
+        self.engine.close()
+        self.conn.close()
+        self._tmp.cleanup()
+
+    def _url(self, path: str) -> str:
+        return f"http://127.0.0.1:{self.port}{path}"
+
+    def _post(self, path, payload):
+        data = json.dumps(payload).encode()
+        request = urllib.request.Request(
+            self._url(path), data=data, method="POST",
+            headers={"Content-Type": "application/json", "Origin": ORIGIN},
+        )
+        try:
+            response = urllib.request.urlopen(request)
+            return response.status, json.loads(response.read())
+        except urllib.error.HTTPError as error:
+            return error.code, json.loads(error.read())
+
+    def _get(self, path):
+        request = urllib.request.Request(self._url(path))
+        try:
+            response = urllib.request.urlopen(request)
+            return response.status, response.read(), dict(response.headers)
+        except urllib.error.HTTPError as error:
+            return error.code, error.read(), dict(error.headers)
+
+    def test_chat_with_image_request_creates_a_servable_image(self):
+        self.provider.script = [
+            "Generating that now.\n```captain-json\n"
+            '{"reply": "Generating that now.", "image_request": "a red ship on a calm sea"}\n```'
+        ]
+        status, body = self._post("/api/chat", {"message": "draw me a ship"})
+        self.assertEqual(status, 200)
+        self.assertIsNotNone(body["image_job"])
+        self.assertEqual(body["image_job"]["status"], "succeeded")
+        job_id = body["image_job"]["id"]
+
+        status, raw, headers = self._get(f"/api/image/{job_id}")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(raw)["job"]["status"], "succeeded")
+
+        status, raw, headers = self._get(f"/api/image/{job_id}/file")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers.get("Content-Type"), "image/jpeg")
+        self.assertEqual(raw, b"\xff\xd8\xff fake jpeg")
+
+    def test_message_history_carries_image_job_id(self):
+        self.provider.script = [
+            "OK.\n```captain-json\n{\"reply\": \"OK.\", \"image_request\": \"a lighthouse\"}\n```"
+        ]
+        self._post("/api/chat", {"message": "draw a lighthouse"})
+        request = urllib.request.Request(self._url("/api/messages"))
+        response = urllib.request.urlopen(request)
+        messages = json.loads(response.read())["messages"]
+        assistant = [m for m in messages if m["role"] == "assistant"][0]
+        self.assertIsNotNone(assistant["image_job_id"])
+
 
 if __name__ == "__main__":
     unittest.main()

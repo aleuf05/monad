@@ -89,9 +89,23 @@ CREATE TABLE IF NOT EXISTS messages (
     mode TEXT,
     project_id TEXT,
     provider TEXT,
-    model TEXT
+    model TEXT,
+    image_job_id TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_messages_session ON messages(session_id, id);
+
+CREATE TABLE IF NOT EXISTS image_jobs (
+    id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    prompt TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'queued',
+    artifact_name TEXT,
+    artifact_mime TEXT,
+    error TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_image_jobs_session ON image_jobs(session_id, created_at);
 
 CREATE TABLE IF NOT EXISTS harvest_items (
     id TEXT PRIMARY KEY,
@@ -138,8 +152,18 @@ def connect(db_path: str | Path) -> sqlite3.Connection:
     conn.execute("PRAGMA synchronous=FULL")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.executescript(SCHEMA)
+    _migrate(conn)
     _ensure_state_row(conn)
     return conn
+
+
+def _migrate(conn: sqlite3.Connection) -> None:
+    # CREATE TABLE IF NOT EXISTS above doesn't add columns to a table that
+    # already existed before this column was introduced -- explicit,
+    # idempotent ALTER for databases created before image generation.
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(messages)").fetchall()}
+    if "image_job_id" not in columns:
+        conn.execute("ALTER TABLE messages ADD COLUMN image_job_id TEXT")
 
 
 def _ensure_state_row(conn: sqlite3.Connection) -> None:
@@ -256,13 +280,14 @@ def append_message(
     project_id: Optional[str] = None,
     provider: Optional[str] = None,
     model: Optional[str] = None,
+    image_job_id: Optional[str] = None,
 ) -> dict[str, Any]:
     timestamp = now()
     cursor = conn.execute(
         """INSERT INTO messages
-           (session_id, role, content, created_at, mode, project_id, provider, model)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-        (session_id, role, content, timestamp, mode, project_id, provider, model),
+           (session_id, role, content, created_at, mode, project_id, provider, model, image_job_id)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (session_id, role, content, timestamp, mode, project_id, provider, model, image_job_id),
     )
     row = conn.execute("SELECT * FROM messages WHERE id = ?", (cursor.lastrowid,)).fetchone()
     return dict(row)
@@ -347,3 +372,33 @@ def log_mode_event(
     )
     row = conn.execute("SELECT * FROM mode_events WHERE id = ?", (cursor.lastrowid,)).fetchone()
     return dict(row)
+
+
+# --- image_jobs ----------------------------------------------------------
+
+IMAGE_JOB_STATUSES = ("queued", "running", "succeeded", "failed")
+
+
+def create_image_job(conn: sqlite3.Connection, *, session_id: str, prompt: str) -> dict[str, Any]:
+    job_id = new_id("img")
+    timestamp = now()
+    conn.execute(
+        """INSERT INTO image_jobs (id, session_id, prompt, status, created_at, updated_at)
+           VALUES (?, ?, ?, 'queued', ?, ?)""",
+        (job_id, session_id, prompt, timestamp, timestamp),
+    )
+    return get_image_job(conn, job_id)
+
+
+def get_image_job(conn: sqlite3.Connection, job_id: str) -> Optional[dict[str, Any]]:
+    row = conn.execute("SELECT * FROM image_jobs WHERE id = ?", (job_id,)).fetchone()
+    return row_to_dict(row)
+
+
+def update_image_job(conn: sqlite3.Connection, job_id: str, **fields: Any) -> Optional[dict[str, Any]]:
+    if not fields:
+        return get_image_job(conn, job_id)
+    fields["updated_at"] = now()
+    columns = ", ".join(f"{key} = ?" for key in fields)
+    conn.execute(f"UPDATE image_jobs SET {columns} WHERE id = ?", (*fields.values(), job_id))
+    return get_image_job(conn, job_id)

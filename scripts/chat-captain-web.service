@@ -8,6 +8,7 @@ Type=simple
 User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
+EnvironmentFile=/home/cgl/.config/monad/gemini.env
 Environment=CHAT_CAPTAIN_ALLOWED_ORIGINS=https://cameronlampley.com,http://192.168.0.100:8080
 ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/chat-captain/server.py
 Restart=on-failure

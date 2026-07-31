@@ -43,6 +43,13 @@
   .msg.assistant { align-self: flex-start; background: var(--panel); border: 1px solid var(--border); }
   .msg.system { align-self: center; color: var(--muted); font-size: 11px; border: 1px dashed var(--border); background: transparent; }
 
+  .image-card { padding: 8px; max-width: 320px; }
+  .image-card img { display: block; width: 100%; border-radius: 6px; }
+  .image-loading { display: flex; align-items: center; gap: 8px; padding: 10px 4px; color: var(--muted); font-size: 12px; }
+  .image-spinner { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); border-top-color: var(--amber); animation: image-spin 0.8s linear infinite; flex: none; }
+  @keyframes image-spin { to { transform: rotate(360deg); } }
+  .image-failed { padding: 10px 4px; color: var(--red); font-size: 12px; }
+
   .composer { display: flex; gap: 8px; }
   .composer textarea { flex: 1; resize: vertical; background: var(--panel); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; }
   .composer button { background: var(--amber); color: #241704; border: none; border-radius: 8px; padding: 0 18px; font-weight: 700; cursor: pointer; }
@@ -97,7 +104,7 @@
     <section class="conversation">
       <div id="transcript" class="transcript" aria-live="polite"></div>
       <form id="chatForm" class="composer">
-        <textarea id="chatInput" placeholder="Speak with the Captain…" rows="2" required></textarea>
+        <textarea id="chatInput" placeholder="Speak with the Captain… (Enter to send, Shift+Enter for a new line)" rows="2" required></textarea>
         <button type="submit" id="sendBtn">Send</button>
       </form>
     </section>

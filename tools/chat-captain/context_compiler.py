@@ -28,12 +28,18 @@ apply this turn -- do not omit keys):
   "project_suggestion": null,
   "harvest_proposals": [],
   "state_notes": [],
-  "safety_signal": null
+  "safety_signal": null,
+  "image_request": null
 }
 
 Rules:
 - mode_suggestion, if not null, must be one of: master, project_formation,
   design, review, associative_lab, record.
+- image_request, if not null, must be a short descriptive text prompt for
+  an image to generate. Set it only when the Admiral has clearly asked to
+  see, make, draw, or generate an image/picture/visual -- not for every
+  turn. Your prose reply should acknowledge the request naturally (e.g.
+  "Generating that now.") without claiming the image already exists yet.
 - Each harvest_proposals entry must have: type, title, summary, confidence
   (0.0-1.0), provenance_note. type must be one of: vision, principle,
   project_candidate, decision, design, engineering_handoff, experiment,
@@ -116,6 +122,7 @@ def extract_structured_reply(raw_text: str) -> dict[str, Any]:
         "harvest_proposals": [],
         "state_notes": [],
         "safety_signal": None,
+        "image_request": None,
     }
     if start == -1:
         return fallback

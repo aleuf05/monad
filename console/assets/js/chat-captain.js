@@ -66,7 +66,49 @@
     }
     messages.forEach(function (message) {
       renderMessage(message.role, message.content);
+      if (message.image_job_id) {
+        api("/api/image/" + message.image_job_id)
+          .then(function (body) { renderImageJob(body.job); })
+          .catch(function () {});
+      }
     });
+  }
+
+  function updateImageCard(el, job) {
+    if (job.status === "succeeded") {
+      el.innerHTML = '<img src="' + API_BASE + "/api/image/" + job.id + '/file" alt="' + escapeHtml(job.prompt || "generated image") + '">';
+    } else if (job.status === "failed") {
+      el.innerHTML = '<div class="image-failed">Image generation failed' + (job.error ? ": " + escapeHtml(job.error) : "") + ".</div>";
+    } else {
+      el.innerHTML = '<div class="image-loading"><span class="image-spinner"></span>Generating image…</div>';
+    }
+  }
+
+  function pollImageJob(jobId) {
+    var el = document.getElementById("image-" + jobId);
+    if (!el) return; // transcript was re-rendered (e.g. mode switch) -- stop polling a card that no longer exists
+    api("/api/image/" + jobId)
+      .then(function (body) {
+        updateImageCard(el, body.job);
+        if (body.job.status === "queued" || body.job.status === "running") {
+          setTimeout(function () { pollImageJob(jobId); }, 2000);
+        }
+      })
+      .catch(function () {
+        setTimeout(function () { pollImageJob(jobId); }, 3000);
+      });
+  }
+
+  function renderImageJob(job) {
+    var wrap = document.createElement("div");
+    wrap.className = "msg assistant image-card";
+    wrap.id = "image-" + job.id;
+    updateImageCard(wrap, job);
+    transcriptEl.appendChild(wrap);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    if (job.status === "queued" || job.status === "running") {
+      pollImageJob(job.id);
+    }
   }
 
   function renderHarvestItems(items) {
@@ -234,6 +276,9 @@
     post("/api/chat", { message: text })
       .then(function (body) {
         renderMessage("assistant", body.reply);
+        if (body.image_job) {
+          renderImageJob(body.image_job);
+        }
         if (body.mode_suggestion && body.mode_suggestion !== modeSelect.value) {
           renderMessage("system", "Captain suggests mode: " + body.mode_suggestion + " (use the Mode selector to switch)");
         }
@@ -252,6 +297,13 @@
         state.sending = false;
         sendBtn.disabled = false;
       });
+  });
+
+  chatInput.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      chatForm.requestSubmit();
+    }
   });
 
   modeSelect.addEventListener("change", function () {

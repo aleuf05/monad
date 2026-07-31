@@ -32,6 +32,15 @@ class FakeProvider:
         )
 
 
+class FakeImageGenerator:
+    def __init__(self):
+        self.submitted: list[tuple[str, str]] = []
+
+    def submit(self, session_id, prompt):
+        self.submitted.append((session_id, prompt))
+        return {"id": "img-fake0000000000", "session_id": session_id, "prompt": prompt, "status": "queued"}
+
+
 class EngineTests(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
@@ -139,6 +148,49 @@ class EngineTests(unittest.TestCase):
         engine.close_session()
         second_session = engine.start_session()
         self.assertNotEqual(first_session, second_session["id"])
+        engine.close()
+
+    def test_image_request_submits_job_and_links_to_assistant_message(self):
+        reply_text = (
+            "Generating that now.\n```captain-json\n"
+            '{"reply": "Generating that now.", "image_request": "a red ship on a calm sea"}\n```'
+        )
+        provider = FakeProvider([reply_text])
+        image_generator = FakeImageGenerator()
+        engine = CaptainEngine(
+            provider=provider, conn=self.conn, budget=self.budget,
+            seed_instruction="SEED", data_dir=self.data_dir, image_generator=image_generator,
+        )
+        result = engine.reply("draw me a ship")
+
+        self.assertEqual(len(image_generator.submitted), 1)
+        session_id, prompt = image_generator.submitted[0]
+        self.assertEqual(prompt, "a red ship on a calm sea")
+        self.assertIsNotNone(result["image_job"])
+        self.assertEqual(result["image_job"]["id"], "img-fake0000000000")
+
+        state = database.get_state(self.conn)
+        messages = database.list_messages(self.conn, state["current_session_id"])
+        assistant_message = [m for m in messages if m["role"] == "assistant"][0]
+        self.assertEqual(assistant_message["image_job_id"], "img-fake0000000000")
+        engine.close()
+
+    def test_no_image_request_means_no_job_and_no_generator_call(self):
+        _, engine = self._engine(["OK.\n```captain-json\n{}\n```"])
+        engine.image_generator = FakeImageGenerator()
+        result = engine.reply("hello")
+        self.assertIsNone(result["image_job"])
+        self.assertEqual(engine.image_generator.submitted, [])
+        engine.close()
+
+    def test_missing_image_generator_does_not_crash_on_image_request(self):
+        reply_text = (
+            "Sure.\n```captain-json\n"
+            '{"reply": "Sure.", "image_request": "a lighthouse"}\n```'
+        )
+        _, engine = self._engine([reply_text])  # no image_generator configured
+        result = engine.reply("draw a lighthouse")
+        self.assertIsNone(result["image_job"])
         engine.close()
 
 
