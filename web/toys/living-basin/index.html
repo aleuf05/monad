@@ -11,7 +11,7 @@
   <header class="masthead">
     <a class="back" href="../../build.html">&larr; Build &amp; Research</a>
     <h1>The Living Basin</h1>
-    <p class="subtitle">Every visible feature is an earned consequence of simulation state. Every explanation below is derived from recorded causes, not generated afterward. v0 prototype &mdash; a fixed, precomputed replay of one deterministic run, not a live simulation.</p>
+    <p class="subtitle">Every visible feature is an earned consequence of simulation state. Every explanation below is derived from recorded causes, not generated afterward. v0 prototype &mdash; ticking live in this browser tab, not a replay.</p>
   </header>
 
   <main class="layout">
@@ -20,8 +20,8 @@
         <canvas id="terrain" width="640" height="640"></canvas>
       </div>
       <div class="transport">
-        <button id="btnReset" title="Reset to tick 0">⟲ Reset</button>
-        <button id="btnStep" title="Advance one recorded tick">⏭ Tick</button>
+        <button id="btnReset" title="Restart from tick 0 with the same seed">⟲ Reset</button>
+        <button id="btnStep" title="Advance one tick">⏭ Tick</button>
         <button id="btnPlay" title="Play / pause">▶ Play</button>
         <label class="speed-label">Speed
           <select id="speed">
@@ -31,14 +31,11 @@
             <option value="30">4x</option>
           </select>
         </label>
-        <div class="tick-readout">Tick <span id="tickVal">0</span> / <span id="tickMax">0</span></div>
-      </div>
-      <div class="scrub-wrap">
-        <input type="range" id="scrub" min="0" max="0" value="0" step="1">
+        <div class="tick-readout">Tick <span id="tickVal">0</span></div>
       </div>
       <div class="meta-row">
         <span>Seed: <code id="seedVal">-</code></span>
-        <span id="statusMsg" class="status-msg">Loading run data&hellip;</span>
+        <span id="statusMsg" class="status-msg">Starting&hellip;</span>
       </div>
     </section>
 
@@ -69,9 +66,10 @@
   </main>
 
   <footer class="foot">
-    Static replay &middot; data precomputed by a local <code>run_demo.py</code> run and replayed here exactly as recorded &middot; source, architecture notes, and tests live in <code>tools/living-basin/</code> in the repo
+    Live simulation, ticking in this tab &middot; JS port of the tested Python reference engine in <code>tools/living-basin/engine/</code> &middot; source, architecture notes, and Python test suite live in <code>tools/living-basin/</code> in the repo
   </footer>
 
+  <script src="engine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
