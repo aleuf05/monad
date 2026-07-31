@@ -2,7 +2,7 @@
   "schema": "monad.contextSteward.v0.1",
   "workspace": "/home/cgl/dev/monad",
   "mission": "Use Beastscape as a living laboratory for comparing ways to define, chart, navigate, evaluate, and interpret a diverse structural creature space, run alongside sibling Live Captain proof-of-architecture instruments the Admiral directs in parallel.",
-  "active_goal": "Beastscape Foundry (Open Ocean / Metameric Forge / Symbiotic Reef) is implemented and live; Metastable Comedown Lab and Captain Workbench Beast Image also landed this session. Commit the accumulated uncommitted work, then human-test whether the Foundry's candidate Beastscapes differ meaningfully.",
+  "active_goal": "Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and the homepage Active Queue are implemented, live, and now committed (commit a6498a7). Remaining work is human-testing whether the Foundry's candidate Beastscapes differ meaningfully.",
   "vocabulary": [
     {
       "term": "Beastscape",
@@ -38,7 +38,9 @@
     "Metastable Comedown Lab (docs/research/METASTABLE_COMEDOWN_ARCHITECTURE_DRAFT_2026-07-30.md) is built and verified live at https://cameronlampley.com/toys/metastable-comedown/, linked from Build & Research.",
     "Captain Workbench Beast Image (beast.image.enhance, one bounded Gemini call per job) is staged and installed; living-captain-workbench.service is confirmed active on the host.",
     "Monadic Beast Lab was removed from the worktree as an orphaned/superseded instrument (web/toys/monadic-beast-lab deleted).",
-    "A large body of this session's verified work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap doc rewrites, IntentForge translation bench updates) remains uncommitted on branch agent/living-world-intake-v0-1 — nothing is lost, but none of it is durable git history yet."
+    "This session's accumulated work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap doc rewrites, IntentForge translation bench updates, BeastSpec design draft, Voice Mode Confusion recovery artifacts) is now committed as agent/living-world-intake-v0-1 commit a6498a7; the working tree is clean.",
+    "The homepage Active Queue (web/assets/js/active-queue.js) is a localStorage-only, manually-ordered active-project tracker on the homepage with an injected \"+ Queue\" affordance on build.html/command.html/observe.html/story.html cards; verified live on all five pages.",
+    "data/living-captain-workbench/ and data/mike-rocketry-intake/ were added to .gitignore as runtime state, matching the rest of data/ -- caught before being committed as generated binaries."
   ],
   "decisions": [
     "Beastscape is a research apparatus rather than a user product: its interface exposes methods, observations, unknowns, artifacts, and comparative evidence.",
@@ -55,7 +57,8 @@
     "web/toys/metastable-comedown/ — new deterministic closed-loop dynamics laboratory, linked from web/build.html.",
     "tools/context-steward/ and docs/context/ — compact continuation projection.",
     "AGENTS.md, CLAUDE.md, docs/commissioning-handoff.md — rewritten for the Captain-authority bootstrap and the codified Context Steward operating policy.",
-    "web/toys/monadic-beast-lab/ — removed, superseded."
+    "web/toys/monadic-beast-lab/ — removed, superseded.",
+    "web/assets/js/active-queue.js and web/index.html/build.html/command.html/observe.html/story.html — homepage Active Queue and archive \"+ Queue\" affordance, verified live."
   ],
   "verification": [
     "Local UMAP fit/transform passed with neighborhood trustworthiness above 0.98.",
@@ -65,18 +68,18 @@
     "Captain Workbench event-receipt tests passed 5/5; the restarted live service is active and the evidence-led activity interface is publicly visible.",
     "All three Foundry candidates passed exact-coordinate recovery and continuous-decoder microstep tests; the live Foundry schema and selector are publicly visible.",
     "Metastable Comedown Lab: node --check passed; https://cameronlampley.com/toys/metastable-comedown/ and the Build & Research card both confirmed live (HTTP 200) this session.",
-    "living-captain-workbench.service confirmed active on host this session; cmd.sh currently reports nothing queued."
+    "living-captain-workbench.service confirmed active on host this session; cmd.sh currently reports nothing queued.",
+    "active-queue.js verified live (script tag present) on all five pages: index.html, build.html, command.html, observe.html, story.html."
   ],
   "defects": [
     "The continuous phenotype decoder still rounds discrete topology counts, so explicit branch or segment transitions can remain abrupt.",
     "The current 24-dimensional descriptor and procedural grammar are experimental and do not define the final Beastscape.",
     "The felt quality and intelligibility of continuous UMAP navigation require human testing.",
     "The first Foundry candidates specialize a shared procedural substrate; they prove comparison mechanics but are not yet independent comprehensive developmental engines.",
-    "Substantial verified work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority docs) sits uncommitted in git on agent/living-world-intake-v0-1; it needs to be committed to become durable history.",
     "GitHub issue #27 ('Voice Mode Confusion' frozen ChatGPT session) is open: a partial transcript was recovered across four segment files, but Lt. cgl's correct/complete transcript is still pending, and two candidate protocol packets drafted from it remain un-adopted per Doctrine 003.",
     "No graphical browser executable is present on this host, so automated visual click-through of new instruments (e.g. Metastable Comedown Lab) remains unperformed; only direct HTTP/source verification has been done."
   ],
-  "next_action": "Commit this session's verified uncommitted work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap docs, monadic-beast-lab removal, IntentForge updates), then human-test whether the Foundry's candidate Beastscapes differ meaningfully in creature quality, structural diversity, and navigational character.",
+  "next_action": "Human-test whether the Foundry's candidate Beastscapes (Open Ocean / Metameric Forge / Symbiotic Reef) differ meaningfully in creature quality, structural diversity, and navigational character; separately, Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted.",
   "deferred_ideas": [
     "Personalized embeddings learned gradually from landmarks, revisits, comparisons, and preferences.",
     "Graph encoder/decoder charting strategy.",
