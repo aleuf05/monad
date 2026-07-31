@@ -97,3 +97,19 @@ echo "   leaving an unused credential sitting on disk."
 rm -f /home/cgl/.config/monad/chat-captain-web.env
 
 echo "== done =="
+
+echo "== 2026-07-31: master mode gets real Codex workspace-write execution =="
+echo "   tools/chat-captain/codex_provider.py now requests sandbox=workspace-write"
+echo "   only when current_mode=master (engine.py). Required an AppArmor profile"
+echo "   for bwrap -- Ubuntu 24.04 blocks unprivileged user-namespace creation"
+echo "   by default (kernel.apparmor_restrict_unprivileged_userns=1), which broke"
+echo "   Codex's own internal sandbox at startup. Scoped to bwrap only; the"
+echo "   system-wide sysctl is untouched."
+
+sudo install -m 644 "$REPO_ROOT/scripts/apparmor-bwrap-codex.profile" /etc/apparmor.d/bwrap-codex
+sudo apparmor_parser -r /etc/apparmor.d/bwrap-codex
+sudo systemctl restart chat-captain-web.service
+sleep 2
+systemctl is-active chat-captain-web.service
+
+echo "== done =="

@@ -145,8 +145,15 @@ class CaptainEngine:
         messages = bounded_messages(self.conn, session_id)
 
         self.budget.reserve(system_prompt + "".join(message.content for message in messages))
+        # Master mode: full natural capability, no artificial ceiling --
+        # workspace-write is the same sandbox value already proven live in
+        # tools/living-captain-workbench/codex_bridge.py. Every other mode
+        # stays at the provider's conservative read-only default.
+        generate_kwargs = {}
+        if state["current_mode"] == "master":
+            generate_kwargs["sandbox"] = "workspace-write"
         response = self.provider.generate(
-            system_prompt, messages, GenerationLimits(max_output_tokens=MAX_OUTPUT_TOKENS)
+            system_prompt, messages, GenerationLimits(max_output_tokens=MAX_OUTPUT_TOKENS), **generate_kwargs
         )
         self.budget.record_usage(input_tokens=response.input_tokens, output_tokens=response.output_tokens)
 

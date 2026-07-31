@@ -107,6 +107,7 @@ class CodexProvider:
         system_prompt: str,
         messages: list[Message],
         limits: GenerationLimits,
+        sandbox: str = "read-only",
     ) -> ProviderResponse:
         transcript = "\n\n".join(
             f"{message.role.upper()}: {message.content}" for message in messages
@@ -120,7 +121,7 @@ class CodexProvider:
                 "thread/start",
                 {
                     "cwd": str(self.cwd),
-                    "sandbox": "read-only",
+                    "sandbox": sandbox,
                     "approvalPolicy": "never",
                     "ephemeral": True,
                 },

@@ -26,7 +26,7 @@ class ScriptedProvider:
     def __init__(self):
         self.script: list[str] = []
 
-    def generate(self, system_prompt, messages, limits):
+    def generate(self, system_prompt, messages, limits, sandbox="read-only"):
         text = self.script.pop(0) if self.script else "OK.\n```captain-json\n{}\n```"
         return ProviderResponse(
             text=text, provider=self.name, model=self.model,

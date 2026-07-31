@@ -19,8 +19,8 @@ class FakeProvider:
         self._script = list(script)
         self.calls = []
 
-    def generate(self, system_prompt, messages, limits):
-        self.calls.append((system_prompt, messages))
+    def generate(self, system_prompt, messages, limits, sandbox="read-only"):
+        self.calls.append((system_prompt, messages, sandbox))
         if not self._script:
             raise ProviderError("fake provider exhausted")
         next_text = self._script.pop(0)
@@ -148,6 +148,20 @@ class EngineTests(unittest.TestCase):
         engine.close_session()
         second_session = engine.start_session()
         self.assertNotEqual(first_session, second_session["id"])
+        engine.close()
+
+    def test_master_mode_gets_workspace_write_sandbox(self):
+        provider, engine = self._engine(["OK.\n```captain-json\n{}\n```"])
+        self.assertEqual(database.get_state(self.conn)["current_mode"], "master")
+        engine.reply("do something real")
+        self.assertEqual(provider.calls[-1][2], "workspace-write")
+        engine.close()
+
+    def test_non_master_mode_stays_read_only(self):
+        provider, engine = self._engine(["OK.\n```captain-json\n{}\n```"])
+        database.update_state(self.conn, current_mode="design")
+        engine.reply("just discuss this")
+        self.assertEqual(provider.calls[-1][2], "read-only")
         engine.close()
 
     def test_image_request_submits_job_and_links_to_assistant_message(self):
