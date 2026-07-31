@@ -8,6 +8,39 @@
 - **AI contribution:** Contract shape, boundaries, and initial implementation
   sequence drafted by Captain / Codex.
 
+## Priority ruling — 2026-07-29
+
+- **Project doctrine (human ruling):** The Beast Lab experiment is primarily
+  a proof of the major Live Captain architecture concept, not an image-editor
+  feature.
+- **Technical finding:** The proving interaction is a live product event that
+  begins only when the human presses the enhancement button, makes Captain
+  activity visible, and returns the produced artifact into the same live
+  instrument.
+- **Current experiment boundary:** Sign-in, access control, and platform
+  robustness are deliberately deferred so they do not obscure the event →
+  Captain capability → visible activity → artifact-return loop.
+- **Unknown:** A web listener/provider adapter can prove the interaction
+  shape, but it does not establish that this transient interactive Codex
+  session can be independently awakened by a browser event. That identity and
+  runtime-continuity question remains part of the architecture experiment.
+
+## Codex service proof — 2026-07-29
+
+- **Technical finding:** Beastscape can wake a persistent local
+  `codex app-server` through the Captain Workbench, start an ephemeral bounded
+  turn using saved ChatGPT authentication, attach the structural schematic,
+  invoke built-in `$imagegen`, stream agent activity into the durable job
+  receipt, and return the generated artifact to the same web instrument.
+- **Evidence:** Job `5934f8d05768a3ee5e2bb5a0` succeeded through engine
+  `codex`; its 1254 × 1254 PNG is preserved in the Workbench artifact store.
+- **Cost boundary:** This Codex path does not use an OpenAI API key. Gemini
+  remains available as the existing direct-provider comparison engine.
+- **Implementation note:** Codex stores built-in image output under the
+  generating thread's `$CODEX_HOME/generated_images/<thread-id>/` directory.
+  The bridge, not the agent prompt, owns the deterministic copy into the job
+  artifact store.
+
 ## North star
 
 > Live Monad applications may submit bounded, durable work to the Live

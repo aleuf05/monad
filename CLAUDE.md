@@ -28,9 +28,10 @@ three things:
 1. **Hard block** -- a genuinely missing input only the Admiral/Lieutenant
    can supply, not resolvable by inspection, testing, or judgment call (see
    `docs/reports/2026-07-15-inadequate-specs.md`).
-2. **`cmd.sh` handoff** -- privileged/`sudo` work is staged for the
-   Lieutenant to run per `docs/commissioning-handoff.md`; that staging point
-   is the one place execution legitimately pauses and waits.
+2. **Human-only boundary** -- after the one-time Captain-authority bootstrap,
+   `sudo` is not a pause condition. Pause only for testing that genuinely
+   requires a human or when the course is inadequate, ambiguous, or
+   conflicting and cannot be resolved by inspection and engineering judgment.
 3. **Captain conference boundary** -- during a declared private conference
    (`docs/doctrine/004-private-conference-continuity.md`), only a Red Alert
    condition or an instruction boundary that can't be lawfully or
@@ -140,9 +141,9 @@ for the full policy and claim protocol:
   the Feature Matrix, and `docs/doctrine/*.md`, where completed
   findings and evidence actually live.
 
-One-line rule: action lives in the work queue; truth lives in the
-report queue. Privileged work stays exclusively in `cmd.sh` per
-`docs/commissioning-handoff.md` -- neither queue covers that.
+One-line rule: action lives in the work queue; truth lives in the report
+queue. Privilege does not create a separate human handoff after the
+Captain-authority bootstrap; see `docs/commissioning-handoff.md`.
 
 ## POLICY: One source of truth -- don't replicate it
 
@@ -155,3 +156,12 @@ incident, a stated recovery requirement), it gets evaluated on its
 merits then, not assumed as good practice now. Matches this repo's
 existing "no staging, `web/` is production" posture: one source of
 truth, not several copies to keep in sync.
+
+## POLICY: Context Steward at navigational handoffs
+
+Follow the Context Steward operating policy in `AGENTS.md`. At meaningful
+milestones and active-course changes, refresh and archive the concise
+repository-local continuation projection. Recommend a fresh thread when doing
+so would materially reduce accumulated context; only the human opens that
+thread. Do not checkpoint routine turns, treat generated context as canon, or
+claim the current conversation was purged.

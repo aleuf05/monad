@@ -25,6 +25,8 @@ data/world-intake.sqlite3*
 data/mission-record/
 data/voice-engine/
 data/image-intake/
+data/living-captain-workbench/
+data/mike-rocketry-intake/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/watch-officer-fetch.log

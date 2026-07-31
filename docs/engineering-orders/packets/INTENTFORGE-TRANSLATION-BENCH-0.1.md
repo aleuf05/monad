@@ -14,9 +14,11 @@
 4. **Scope and exclusions** — Add a static IntentForge Translation Bench,
    accept a same-origin handoff or uploaded lexicon export, validate the
    narrow v0.1 source shape, and show mappings, preserved meaning, warnings,
-   and unresolved requirements. Add a direct Laboratory handoff. Do not
-   generate geometry in the browser, infer dimensions from SVG coordinates,
-   claim physical evidence, add a service, or widen the supported part family.
+   and unresolved requirements. Add a guided illustrative measurement
+   resolution that compiles a visible computational bracket proposal and a
+   downloadable typed contract packet. Add a direct Laboratory handoff. Do
+   not infer dimensions from SVG coordinates, claim physical evidence, add a
+   service, or widen the supported part family.
 
 5. **Constraints / authority** — The public bench must reproduce the tested
    bridge's epistemic boundary: language establishes identity and intent, not
@@ -32,6 +34,8 @@
    - SVG samples are explicitly excluded from dimensional interpretation;
    - geometry, simulation, manufacture, physical test, review, and validation
      remain visibly unearned;
+   - illustrative measurements compile into a clearly computational-only
+     proposal and contract download;
    - the bench is click-reachable from Build & Research and works at mobile
      width.
 
@@ -58,6 +62,14 @@
      `/tmp/intentforge-translation-bench-mobile.png`.
 
 10. **Result** — Reviewed personal geometric language now has a public,
-    inspectable path into IntentForge. The path preserves semantic identity
-    while making the absence of physical measurements—and therefore the
-    refusal to generate geometry—the dominant visible result.
+    inspectable path into IntentForge. The path preserves semantic identity,
+    makes the absence of physical measurements visible, and now lets a user
+    cross that boundary explicitly with illustrative fixture values to see a
+    computational-only proposal. It does not claim a manufactured part.
+
+11. **Follow-up evidence** — JavaScript syntax and the inherited 18/18 Python
+    bridge suite remain green. The live page exposes the new “Resolve the
+    bracket’s physical facts,” “Compile computational demo,” and “Download
+    contract packet” controls. Browser-level click-through and mobile visual
+    evidence remain the next verification step when a headless browser is
+    available.

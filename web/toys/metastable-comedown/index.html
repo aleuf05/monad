@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080c12">
+  <title>Metastable Comedown Lab · Fleet Monad</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="mast">
+      <a class="back" href="../../build.html">← Build &amp; Research</a>
+      <div class="title-row">
+        <div>
+          <p class="kicker">Experimental control instrument · v0.1</p>
+          <h1>Metastable<br><em>Comedown</em></h1>
+        </div>
+        <div class="status-block">
+          <span class="live-dot" id="liveDot"></span>
+          <span id="runStatus">IDLE / READY</span>
+        </div>
+      </div>
+      <p class="lede">Ride the narrow water between fixation and dissolution. This replayable simulation exposes the controller; it does not claim to reproduce or diagnose a human cognitive state.</p>
+    </header>
+
+    <section class="instrument-grid">
+      <aside class="controls panel">
+        <div class="panel-head">
+          <span>01</span>
+          <h2>Control surface</h2>
+        </div>
+
+        <label class="field">
+          <span>Seed phrase</span>
+          <textarea id="seedText" rows="3">The signal leaves a wake in the dark water</textarea>
+        </label>
+
+        <div class="button-row">
+          <button class="primary" id="startBtn">Start run</button>
+          <button id="stepBtn">Single step</button>
+          <button id="resetBtn" aria-label="Reset run">↺</button>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title">Entrapment band <b>R</b></div>
+          <label class="slider">
+            <span>Exit <output id="rLowOut">0.54</output></span>
+            <input id="rLow" type="range" min="20" max="75" value="54">
+          </label>
+          <label class="slider">
+            <span>Enter <output id="rHighOut">0.76</output></span>
+            <input id="rHigh" type="range" min="55" max="95" value="76">
+          </label>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title">Coherence band <b>C</b></div>
+          <label class="slider">
+            <span>Enter rescue <output id="cLowOut">0.34</output></span>
+            <input id="cLow" type="range" min="10" max="55" value="34">
+          </label>
+          <label class="slider">
+            <span>Exit rescue <output id="cHighOut">0.57</output></span>
+            <input id="cHigh" type="range" min="35" max="80" value="57">
+          </label>
+        </div>
+
+        <label class="slider decay">
+          <span>Perturbation half-life <output id="decayOut">6 steps</output></span>
+          <input id="decay" type="range" min="2" max="14" value="6">
+        </label>
+
+        <div class="legend">
+          <span><i class="sea"></i>Metastable</span>
+          <span><i class="amber"></i>Correction</span>
+          <span><i class="red"></i>Boundary</span>
+        </div>
+      </aside>
+
+      <section class="readout">
+        <div class="state-card panel" id="stateCard">
+          <div class="panel-head">
+            <span>02</span>
+            <h2>Current generative state</h2>
+            <span class="state-pill" id="statePill">QUIET WATER</span>
+          </div>
+          <div class="metrics">
+            <div class="metric" id="recurrenceMetric">
+              <div class="metric-top"><span>Recurrence</span><strong id="recurrenceValue">0.00</strong></div>
+              <div class="track"><i id="recurrenceBar"></i><b id="rLowMark"></b><b id="rHighMark"></b></div>
+              <small>trajectory looping</small>
+            </div>
+            <div class="metric" id="coherenceMetric">
+              <div class="metric-top"><span>Coherence</span><strong id="coherenceValue">0.00</strong></div>
+              <div class="track"><i id="coherenceBar"></i><b id="cLowMark"></b><b id="cHighMark"></b></div>
+              <small>local topic ancestry</small>
+            </div>
+            <div class="metric">
+              <div class="metric-top"><span>Perturbation</span><strong id="perturbValue">0.00</strong></div>
+              <div class="track"><i id="perturbBar"></i></div>
+              <small>damped correction force</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="trace-card panel">
+          <div class="panel-head">
+            <span>03</span>
+            <h2>Phase trajectory</h2>
+            <span class="axis-key">coherence ↑ · recurrence →</span>
+          </div>
+          <div class="plot-wrap">
+            <canvas id="phasePlot" width="900" height="390" aria-label="Phase trajectory plot"></canvas>
+            <span class="plot-label upper">DISSOLVED</span>
+            <span class="plot-label lower">ENTRAPPED</span>
+          </div>
+        </div>
+
+        <div class="output-card panel">
+          <div class="panel-head">
+            <span>04</span>
+            <h2>Generated wake</h2>
+            <span class="step-count" id="stepCount">STEP 000</span>
+          </div>
+          <div class="wake" id="wake" aria-live="polite">
+            <p class="placeholder">The first phrase is waiting below the surface.</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="events panel">
+        <div class="panel-head">
+          <span>05</span>
+          <h2>Controller log</h2>
+        </div>
+        <div class="event-list" id="eventList">
+          <div class="event neutral"><time>000</time><p>Instrument initialized.</p></div>
+        </div>
+        <div class="formula">
+          <span>correction(t)</span>
+          <code>A · 2<sup>−t / half-life</sup></code>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

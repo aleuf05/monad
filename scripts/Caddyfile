@@ -38,6 +38,10 @@ cameronlampley.com {
 		reverse_proxy 127.0.0.1:4789
 	}
 
+	handle_path /captain-workbench-api/* {
+		reverse_proxy 127.0.0.1:4791
+	}
+
 	handle {
 		root * /home/cgl/dev/monad/web
 		file_server

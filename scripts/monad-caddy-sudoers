@@ -1,0 +1,7 @@
+# Captain-controlled Caddy lifecycle. Caddy configuration is intentionally
+# delegated to cgl by Lieutenant ruling, 2026-07-29.
+cgl ALL=(root) NOPASSWD: /usr/bin/systemctl start caddy.service
+cgl ALL=(root) NOPASSWD: /usr/bin/systemctl stop caddy.service
+cgl ALL=(root) NOPASSWD: /usr/bin/systemctl restart caddy.service
+cgl ALL=(root) NOPASSWD: /usr/bin/systemctl reload caddy.service
+cgl ALL=(root) NOPASSWD: /usr/bin/systemctl try-restart caddy.service

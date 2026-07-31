@@ -44,9 +44,23 @@
   .truth div { border:1px solid #553339; color:var(--red); padding:8px; text-align:center; font-size:8.5px; text-transform:uppercase; }
   .next { margin-top:15px; padding:15px; border:1px solid var(--cyan); color:var(--dim); font-size:10.5px; }
   .next strong { color:var(--cyan); }
+  .resolve { display:none; margin-top:15px; border:1px solid var(--cyan); background:#0c2430; padding:16px; }
+  .resolve.visible { display:block; }
+  .resolve h2 { margin:4px 0; }
+  .measurement-grid { display:grid; grid-template-columns:repeat(5,minmax(100px,1fr)); gap:8px; margin:14px 0; }
+  .measurement-grid label { color:var(--dim); font-size:9px; }
+  .measurement-grid input { width:100%; margin-top:5px; padding:7px; color:var(--ink); background:#08111e; border:1px solid var(--line); }
+  .measurement-grid span { color:var(--amber); font-size:9px; }
+  .compiled { margin-top:16px; border-top:1px solid var(--line); padding-top:15px; }
+  .compiled-head { display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .status.good { border-color:var(--cyan); color:var(--cyan); }
+  #bracketPreview { width:100%; max-width:560px; margin:14px 0; border:1px solid var(--line); background:#08111e; }
+  .truth.compact { margin:12px 0; max-width:700px; }
+  .truth.compact div { color:var(--cyan); border-color:#245e61; }
+  .truth.compact div:nth-child(n+4) { color:var(--red); border-color:#553339; }
   .links { margin-top:20px; display:flex; gap:9px; flex-wrap:wrap; }
   .links a { color:var(--cyan); font-size:10px; text-decoration:none; }
-  @media(max-width:700px) { .grid { grid-template-columns:1fr; } .unresolved { grid-column:auto; } .unresolved ol { columns:1; } }
+  @media(max-width:700px) { .grid { grid-template-columns:1fr; } .unresolved { grid-column:auto; } .unresolved ol { columns:1; } .measurement-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media(max-width:430px) { .wrap { padding-left:12px; padding-right:12px; } .panel { padding:13px; } .map { grid-template-columns:1fr; } .map .arrow { text-align:left; } }
 </style>
 </head>
@@ -84,7 +98,13 @@
       </article>
     </div>
     <div class="truth" id="truth"></div>
-    <div class="next"><strong>Next smallest truthful action:</strong> measure the named physical interfaces in millimetres, describe the keep-out as a real volume or supported feature, record manufacturing assumptions, and review the resulting typed contract. The original gesture remains provenance—not a ruler.</div>
+    <div class="next" id="next"><strong>Next smallest truthful action:</strong> measure the named physical interfaces in millimetres, describe the keep-out as a real volume or supported feature, record manufacturing assumptions, and review the resulting typed contract. The original gesture remains provenance—not a ruler.</div>
+    <div class="resolve" id="resolve">
+      <div><span class="eyebrow">Guided computational example</span><h2>Resolve the bracket’s physical facts</h2><p>These values are deliberately marked as illustrative fixture data. Replace them with measurements from a real object before treating any output as a design.</p></div>
+      <div class="measurement-grid"><label>Envelope width <input data-measure="width" value="70" type="number" step="0.1"> <span>mm</span></label><label>Envelope height <input data-measure="height" value="70" type="number" step="0.1"> <span>mm</span></label><label>Plate thickness <input data-measure="thickness" value="3" type="number" step="0.1"> <span>mm</span></label><label>Fan bolt spacing <input data-measure="spacing" value="32" type="number" step="0.1"> <span>mm</span></label><label>Cable notch width <input data-measure="notch" value="10" type="number" step="0.1"> <span>mm</span></label></div>
+      <button class="button" id="compileDemo" type="button">Compile computational demo</button><span class="signal" id="compileSignal">No geometry proposal has been compiled.</span>
+      <div class="compiled" id="compiled" hidden><div class="compiled-head"><span class="status good">Proposal compiled · computational only</span><span class="signal">No physical validation claimed.</span></div><svg id="bracketPreview" viewBox="0 0 420 300" role="img" aria-label="Schematic fan bracket proposal"></svg><div class="truth compact"><div>Geometry proposed</div><div>Constraints checked</div><div>Printability estimated</div><div>Not manufactured</div><div>Not physically tested</div><div>Not validated for use</div></div><button class="button" id="downloadContract" type="button">Download contract packet</button><p class="signal">The verified fixture STL and JSON report are generated locally by <code>intentforge/integrated_demo.py</code>; this public bench is the review surface, not a claim of public manufacturing output.</p></div>
+    </div>
   </section>
 
   <div class="links">

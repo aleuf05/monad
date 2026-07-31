@@ -1,15 +1,43 @@
-# Commissioning handoff protocol
+# Captain execution authority and exceptional handoff protocol
 
-Monad has no passwordless sudo for agent sessions. Any privileged Granite
-action—service restart, systemd installation, or `/etc/caddy/Caddyfile`
-deployment—is staged by engineering and run by the Lieutenant through
-`/home/cgl/cmd.sh`, outside the repository.
+**Authority:** Lieutenant cgl, 2026-07-29.
 
-## Current-batch rule
+After the one-time authority bootstrap, `cgl` has passwordless administrative
+execution authority. Captain performs routine privileged Granite work
+directly, including service, Caddy, unit, package, filesystem, and host
+configuration changes within the active project course.
 
-`cmd.sh` contains only the current actionable batch. It is never a template,
-placeholder, or stale prior rollout. If nothing is queued, it says so and exits
-successfully.
+Human interruption is reserved for:
+
+1. testing that genuinely requires human perception, judgment, credentials,
+   hardware interaction, or acceptance; or
+2. an inadequate, ambiguous, or conflicting course that cannot be resolved by
+   inspection and engineering judgment.
+
+Sudo is no longer itself a human handoff boundary.
+
+## Caddy exception — Captain-controlled subsystem
+
+**Authority:** Lieutenant cgl, 2026-07-29.
+
+Caddy configuration and service lifecycle are explicitly delegated to Captain
+control. The repository file `scripts/Caddyfile` is the intended live source
+of truth, and `cgl` may receive narrowly scoped passwordless authority to
+start, stop, restart, reload, and recover `caddy.service`.
+
+Caddy work does not require a human approval handoff. Captain must still
+validate configuration before reload,
+verify the public site afterward, preserve the Portainer route, and report any
+failed recovery plainly.
+
+The later full-authority ruling supersedes Caddy-only delegation.
+
+## Exceptional human-handoff rule
+
+`cmd.sh` remains available for the one-time authority bootstrap and for rare
+actions that technically require a human context despite Captain authority.
+It contains only the current actionable batch. If nothing is queued, it says
+so and exits successfully.
 
 Every privileged handoff must:
 

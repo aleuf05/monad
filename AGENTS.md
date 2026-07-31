@@ -64,11 +64,39 @@ changes committable directly without `sudo`) so two agent sessions
 (e.g. Claude and Codex) working this repo at different times don't
 duplicate or silently drop each other's work.
 
-**This queue never covers anything requiring `sudo`.** Privileged work
-(service restarts, systemd installs, `/etc/caddy/Caddyfile` changes)
-stays exclusively in `/home/cgl/cmd.sh` under
-[`docs/commissioning-handoff.md`](docs/commissioning-handoff.md)'s
-existing protocol — do not route privileged work through this queue.
+The queue coordinates project work, not privilege. After the documented
+one-time Captain-authority bootstrap, `sudo` does not create a human handoff;
+Captain executes privileged work directly. Human interruption is reserved for
+human testing or an inadequate/ambiguous course. See
+[`docs/commissioning-handoff.md`](docs/commissioning-handoff.md).
+
+## Context Steward operating policy
+
+Long-running work uses the repository-local Context Steward so the current
+course does not become buried in accumulated chat history.
+
+- At a meaningful milestone, before changing the active goal, or when the
+  conversation begins repeating substantial history, Captain updates
+  `docs/context/checkpoint-input.json` and runs
+  `scripts/context-checkpoint --archive <milestone-name>`.
+- Routine turns and minor edits do not require checkpoints. A checkpoint marks
+  a coherent navigational handoff, not every exchange.
+- Captain reviews `docs/context/current-brief.md` and
+  `docs/context/continuation.md` before recommending a fresh thread. Generated
+  context remains a projection; cited repository sources remain authoritative.
+- When a fresh thread would materially reduce context load, Captain explicitly
+  notifies the Admiral and points to the ready-to-paste continuation packet.
+  Captain must not claim to have opened, deleted, compacted, or purged the
+  product conversation.
+- The human-only boundary is starting the fresh product thread and pasting the
+  packet. The new Captain reads `AGENTS.md`, `CLAUDE.md`, and the packet's
+  cited sources, then resumes at its immediate next action.
+- During the next Beastscape sprint, observe whether this protocol reduces
+  repeated orientation and context load. Record evidence before changing the
+  protocol or making an allowance-multiplier claim.
+
+Implementation and verification commands live in
+[`tools/context-steward/README.md`](tools/context-steward/README.md).
 
 ### Claim protocol
 
