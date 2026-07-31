@@ -1,99 +1,89 @@
 {
   "schema": "monad.contextSteward.v0.1",
-  "generated_at": "2026-07-31T05:50:24+00:00",
-  "input_digest": "b36f7b6f6dfa2b3b",
+  "generated_at": "2026-07-31T13:31:44+00:00",
+  "input_digest": "58d3b814288f969e",
   "projection": true,
   "active_course": {
-    "mission": "Use Beastscape as a living laboratory for comparing ways to define, chart, navigate, evaluate, and interpret a diverse structural creature space, run alongside sibling Live Captain proof-of-architecture instruments the Admiral directs in parallel.",
-    "goal": "Two Captain sessions landed work in this same working tree back-to-back and are now merged into one clean commit history (through 9ba6d24, pushed): Beastscape Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, and Context Steward from one thread; The Living Basin, Mike's rocket-notebook completion, Beastscape Lab Mode Phase 1, and the homepage Active Queue redesign from a second, concurrent thread. Nothing is blocked. Remaining work is human verification this environment cannot perform (visual/mobile checks across several new surfaces) plus deciding next steps on parallel threads listed in next_action.",
-    "next_action": "No single next action -- several independent threads are ready for the Admiral's direction: (1) human-test whether the Foundry's candidate Beastscapes differ meaningfully; (2) visually verify Living Basin, Beastscape Lab Mode, and the Active Queue redesign in an actual browser, including mobile, since none of that has been possible in this environment; (3) decide whether/when to approve BeastSpec for implementation, and separately whether to continue Beastscape Lab Mode into Phase 2 (navigation-policy comparison); (4) Lt. cgl's correct/complete Voice Mode Confusion transcript (GitHub issue #27) is still pending before its draft protocol packets can be adopted."
+    "mission": "Monad organizes Cameron's cognitive landscape so valuable engineering work is preserved, connected, refined, and recoverable instead of becoming fragmented or buried (docs/mission.md). Beastscape and sibling Live Captain instruments remain active parallel product threads within that mission.",
+    "goal": "A prior session crashed mid-redesign with uncommitted work; this session recovered state from disk and the host (not from chat memory), verified everything described was already fully built and live, then committed and pushed it as agent/living-world-intake-v0-1 commit 52a1d10. Nothing is currently blocked or in flight.",
+    "next_action": "No committed next action from the Admiral yet. Open threads: (1) confirm with the Admiral whether the Root Console splash's proposed next features (Project Formation, Design, Review, Associative Lab, Record modes; the Harvest Tray Accept/Reject actions; the automatic containment/review queue) should move from mockup to real implementation, and in what order; (2) reconcile with whatever the concurrent Codex doc-archive session lands, since both sessions touched docs/history/ and related files independently; (3) visually verify the Root Console and Chat Captain UI in an actual browser on the LAN once available, since only HTTP/source-level verification has been possible here."
   },
   "established_truth": [
-    "The master live instrument is https://cameronlampley.com/toys/beastscape/.",
-    "The authored Passage and Continuous UMAP Passage share the current Beastscape instrument.",
-    "The UMAP atlas contains 1,200 deterministic soundings represented by 24 structural descriptors and embedded into three chart dimensions.",
-    "The Continuous UMAP Passage uses a 12-anchor local kernel decoder rather than nearest-specimen replacement.",
-    "The Beastscape Foundry compares Open Ocean, Metameric Forge, and Symbiotic Reef; each candidate has an explicit developmental grammar, 720 structural soundings, and an independently learned UMAP Passage; it is implemented in web/toys/beastscape/app.js and confirmed live.",
-    "Gemini direct and GPT Live Captain enhancement paths remain available; GPT uses saved ChatGPT authentication through codex app-server without an OpenAI API key.",
-    "Context Steward is standard Captain operating policy at meaningful milestones and active-course changes, now codified in AGENTS.md; the human opens any recommended fresh product thread.",
-    "Captain enhancement activity is represented as durable observed events and terminal artifact facts; the interface does not invent a completion percentage.",
-    "Lt. cgl granted Captain passwordless privileged execution authority on 2026-07-29 (docs/commissioning-handoff.md); sudo is no longer itself a human-handoff boundary, only genuine human-only testing or an inadequate/ambiguous course is.",
-    "Metastable Comedown Lab (docs/research/METASTABLE_COMEDOWN_ARCHITECTURE_DRAFT_2026-07-30.md) is built and verified live at https://cameronlampley.com/toys/metastable-comedown/, linked from Build & Research.",
-    "Captain Workbench Beast Image (beast.image.enhance, one bounded Gemini call per job) is staged and installed; living-captain-workbench.service is confirmed active on the host.",
-    "Monadic Beast Lab was removed from the worktree as an orphaned/superseded instrument (web/toys/monadic-beast-lab deleted).",
-    "This session's accumulated work (Foundry, Metastable Comedown Lab, Captain Workbench Beast Image, Context Steward, authority-bootstrap doc rewrites, IntentForge translation bench updates, BeastSpec design draft, Voice Mode Confusion recovery artifacts) is now committed as agent/living-world-intake-v0-1 commit a6498a7; the working tree is clean.",
-    "The homepage Active Queue (web/assets/js/active-queue.js) is a localStorage-only, manually-ordered active-project tracker on the homepage with an injected \"+ Queue\" affordance on build.html/command.html/observe.html/story.html cards; verified live on all five pages.",
-    "data/living-captain-workbench/ and data/mike-rocketry-intake/ were added to .gitignore as runtime state, matching the rest of data/ -- caught before being committed as generated binaries.",
-    "The Living Basin (tools/living-basin/ Python reference engine, 26/26 unittest tests passing; web/toys/living-basin/engine.js a hand-ported live JS engine ticking client-side with no server) is built and live at https://cameronlampley.com/toys/living-basin/, linked from the homepage (below the notebook card) and Build & Research. The JS port has no automated test suite of its own (checked only via a one-off Node dry-run) and its canvas render has not been visually confirmed in a real browser -- flagged as the top known limitation in tools/living-basin/README.md.",
-    "Mike's rocket-equations notebook: the relativistic-analog section was completed in a sibling ~/dev/rocketry checkout (a separate repo, not this one) and pushed to a personal fork at https://github.com/aleuf05/rocketry (branch captain/complete-rocketry-lab). In this repo, the rocket-lab reverie (web/toys/mike-rocketry/) was parked -- unlinked from the homepage but not deleted -- and the verbatim notebook render (web/toys/mike-rocketry-notebook/) was promoted to the homepage's top card; the site's GitHub attribution link now points at the fork, not Mike's untouched upstream.",
-    "Beastscape Lab Mode Phase 1 (experiment branching, a beast inspector showing real generated specimen data plus editable identity/notes, a neighbor list that reuses the engine's own chart-distance k-NN math, three operator rating sliders, localStorage save/load) was added to web/toys/beastscape/{app.js,index.html,views.css} this session -- purely additive, Explorer Mode unchanged when Lab Mode is off. Verified via a Node dry-run against the real engine and the real 720-specimen atlas (deterministic, acyclic, correct neighbors, correct dedup-by-atlasId). This is Phase 1 of the Admiral's instrumented-mode architecture and is distinct from -- does not implement -- the separate BeastSpec identity-preservation design (docs/architecture/beastspec-design-v0.1.md), which remains proposed and unapproved for implementation.",
-    "Monad top-level site redesign (web/assets/js/active-queue.js) landed alongside Lab Mode: a flat, manually-ordered, localStorage-only Active Queue on the homepage (pin-to-hold, reorder, edit note/next-action) sitting above the unchanged hierarchical category-page archive, plus a generically-injected \"+ Queue\" button on every a.card across build.html/command.html/observe.html/story.html. Verified with a real jsdom-driven browser-engine test (add-from-archive, reorder, pin-blocks-removal, cross-page consistency all passed against the live pages over local HTTP) -- not a hand-stubbed test, but still not an actual browser, and mobile layout has not been visually confirmed.",
-    "No headless or graphical browser is available anywhere in this environment. Every 'verified live' claim across all of this session's new surfaces (Living Basin, Beastscape Lab Mode, the Active Queue redesign) rests on HTTP status checks, Node/jsdom logic dry-runs, and source inspection -- never an actual rendered screenshot or click-through. This is the single most important thing for whoever picks this up next to know before trusting any 'it works' claim about visual layout."
+    "Chat Captain (tools/chat-captain/: server.py, engine.py, database.py, codex_provider.py, context_compiler.py, harvest.py, usage_budget.py, configure_web_auth.py, plus unittest coverage) is built, authenticated (scrypt password + HMAC-signed session cookie), and installed as chat-captain-web.service -- confirmed active and healthy on the host (running clean 1h41m+ at last check, no crash-loop in the journal).",
+    "The Root Console is deliberately LAN-only by explicit prior Admiral authorization (docs/deployment.md's 2026-07-31 entry): served at http://192.168.0.100:8080/ via a dedicated Caddy site block in scripts/Caddyfile, plain HTTP (no public cert obtainable for a bare LAN address). This is narrower than the retired web-lan/ pattern -- one console, not a mirrored site -- and required its own explicit conversation, not a default.",
+    "A same-hostname LAN-detection approach (Caddy remote_ip matching on cameronlampley.com itself) was tried and disproved this cycle: the router's (Archer A7 / OpenWrt) NAT hairpin rewrites source IPs so LAN-originated traffic through the public hostname is indistinguishable from real internet traffic. Documented in docs/deployment.md so it isn't re-attempted without first re-verifying router behavior. Split-horizon DNS is the noted alternative if a same-hostname approach is wanted later.",
+    "console/index.html (the splash) explicitly labels itself a non-functional visual preview and links to /app.html for the real app and to https://cameronlampley.com/ to exit; console/app.html is the actual login-gated, working conversation UI (console/assets/js/chat-captain.js).",
+    "The public site is unaffected and was verified after the deploy: https://cameronlampley.com/ returns 200; https://cameronlampley.com/chat-captain-api/health returns 404 (no route exists there) -- confirmed both via cmds.sh's own verification block and independently this session.",
+    "cmds.sh scripts/Caddyfile and scripts/chat-captain-web.service on disk in the repo were diffed byte-for-byte against the live /etc/caddy/Caddyfile and /etc/systemd/system/chat-captain-web.service on the host and found identical -- the redeploy in cmds.sh had already been executed before the crash, nothing was lost.",
+    "This same session, README.md was substantially rewritten (dropping stale Bridge-Station-era content that no longer matched the site) and docs/ was restructured with new top-level entry points: docs/mission.md, docs/README.md (documentation map), docs/command-structure.md, docs/safety/README.md, docs/history/README.md. The older 001_MONAD_COMMAND_CHARTER_2026-07-15.md and docs/research/MONAD_SESSION_PACKETS_DRAFT_2026-07-31.md were preserved, not deleted, with notes marking them explicitly historical/draft and pointing forward to the current mission doc.",
+    "docs/research/SEMANTIC_ARTIFACT_ENGINEERING.md and docs/research/OPERATIONAL_TOPOLOGY_PACKET_006_2026-07-31.md were added this session as new research material feeding the docs restructure.",
+    "data/chat-captain/ (holding the runtime password salt/hash/session-secret env file) was added to .gitignore alongside the repo's existing data/ runtime-state pattern; no secrets were committed -- checked explicitly before commit.",
+    "At commit time the working tree had 38 files changed (3648 insertions, 281 deletions) all landing in one commit (52a1d10) on agent/living-world-intake-v0-1, fast-forward pushed to origin with no conflicts.",
+    "Before committing, the Admiral flagged that a separate Codex agent session is concurrently working on 'core doc archive' in the same repository. git fetch confirmed origin/agent/living-world-intake-v0-1 had not moved past this session's parent commit at push time, so no conflict occurred, but the next Captain should git pull and check docs/history/, docs/README.md, docs/mission.md, docs/command-structure.md, and docs/safety/ for Codex's changes before assuming this session's versions of those files are still current."
   ],
   "vocabulary": [
     {
+      "term": "Root Console",
+      "meaning": "The new private, LAN-only front door at http://192.168.0.100:8080/ -- console/index.html is a visual splash/preview of its future UI; console/app.html is the real working Chat Captain app."
+    },
+    {
+      "term": "Chat Captain",
+      "meaning": "The authenticated, Codex-backed, persistent Admiral-Captain conversation service (tools/chat-captain/), served only on the LAN console, never on the public domain."
+    },
+    {
       "term": "Beastscape",
-      "meaning": "The full high-dimensional space of possible creature structures."
-    },
-    {
-      "term": "Passage",
-      "meaning": "A particular navigable low-dimensional submanifold through Beastscape."
-    },
-    {
-      "term": "Charting strategy",
-      "meaning": "The method used to discover, construct, and decode a Passage."
-    },
-    {
-      "term": "Chart coordinates",
-      "meaning": "The three abstract bearings locating the explorer within a Passage."
-    },
-    {
-      "term": "Specimen",
-      "meaning": "The creature encountered at a chart coordinate."
+      "meaning": "The full high-dimensional space of possible creature structures (unchanged this session; see docs/context/archive/ for its own history)."
     }
   ],
   "decisions": [
-    "Beastscape is a research apparatus rather than a user product: its interface exposes methods, observations, unknowns, artifacts, and comparative evidence.",
-    "The Beastscape pre-exists any chart; a charting strategy is a navigational device, not the territory.",
-    "Atlas soundings define learned geography but are not the only creatures allowed to exist.",
-    "Human-adaptive embeddings remain deferred until static charting strategies provide comparative evidence.",
-    "The next Beastscape sprint is the first observation period for Context Steward; evidence must precede any firm allowance-multiplier claim.",
-    "Context Steward checkpoints are taken at meaningful milestones and active-course changes, not every turn, per the codified AGENTS.md operating policy."
+    "Network isolation (LAN-only Caddy site block), not password-gating the public domain, is the chosen security boundary for the private Admiral-Captain conference channel -- an explicit, narrow, discussed exception to the CLAUDE.md 'no strange ports' policy, not a precedent for LAN-only being fine by default.",
+    "The Root Console splash page is intentionally a non-functional preview shipped alongside the real, functional app rather than gating the real app behind an unfinished redesign -- the Admiral gets both the working tool today and visibility into where the UI is headed.",
+    "Historical/superseded documentation is marked and cross-linked forward rather than deleted, per docs/history/README.md's reading rules -- consistent with this session's charter and session-packet edits."
   ],
   "changed_surfaces": [
-    "web/toys/beastscape/ — live master instrument, continuous UMAP Passage, and the new Foundry candidate selector."
+    "tools/chat-captain/ -- new authenticated Codex-backed Captain conversation service.",
+    "console/ -- new LAN-only Root Console (index.html splash preview, app.html real app, assets/js/chat-captain.js).",
+    "scripts/Caddyfile, scripts/chat-captain-web.service, scripts/install-chat-captain-web.sh, cmds.sh -- LAN console deploy and its audit trail; live and matches the running host config.",
+    "README.md -- rewritten front door.",
+    "docs/mission.md, docs/README.md, docs/command-structure.md, docs/safety/README.md, docs/history/README.md -- new documentation-level entry points.",
+    "docs/deployment.md, 001_MONAD_COMMAND_CHARTER_2026-07-15.md, docs/research/MONAD_SESSION_PACKETS_DRAFT_2026-07-31.md -- annotated for the new structure without deleting prior content.",
+    "docs/research/SEMANTIC_ARTIFACT_ENGINEERING.md, docs/research/OPERATIONAL_TOPOLOGY_PACKET_006_2026-07-31.md -- new research material."
   ],
-  "verification": [],
-  "defects": [],
+  "verification": [
+    "grep across tools/chat-captain/*.py, console/*.html, and the two new scripts/ files for credential-shaped strings found no hardcoded secrets; the one plaintext password is a test fixture in test_api.py, and the real runtime secret file lives in gitignored data/chat-captain/.",
+    "http://192.168.0.100:8080/ fetched live this session: <title>Root Console — Monad</title>.",
+    "http://192.168.0.100:8080/chat-captain-api/health fetched live this session: {\"ok\":true,\"service\":\"chat-captain\"}.",
+    "https://cameronlampley.com/ returned 200 and https://cameronlampley.com/chat-captain-api/health returned 404, both fetched live this session.",
+    "systemctl status/journalctl for chat-captain-web.service showed active (running), no restarts or errors since the last intentional redeploy 1h41m+ prior.",
+    "diff of scripts/Caddyfile and scripts/chat-captain-web.service against the live /etc/caddy/Caddyfile and /etc/systemd/system/chat-captain-web.service returned no differences.",
+    "git status --short was empty and git push was a clean fast-forward (ee32a7d..52a1d10) with no conflicting remote commits at push time."
+  ],
+  "defects": [
+    "No graphical or headless browser is available anywhere in this environment (unchanged from prior sessions) -- the Root Console splash and app pages have been verified only via curl/HTTP status and source inspection, never an actual rendered screenshot or click-through.",
+    "A concurrent Codex agent session was reported as working on 'core doc archive' in this same repository at the time of this session's commit; the next Captain should re-check docs/history/, docs/README.md, docs/mission.md, docs/command-structure.md, and docs/safety/ against origin before trusting this checkpoint's description of them as current."
+  ],
   "deferred_ideas": [],
   "historical_wake": [
-    "The original Beast editor and separate navigator were consolidated into one Beastscape master instrument.",
-    "Nearest-atlas lookup proved the atlas-first architecture but was superseded by the continuous local decoder.",
-    "Monadic Beast Lab was superseded and removed after the Captain Workbench Beast Image proof landed on the shared Beastscape/Beast Lab surface."
+    "The prior checkpoint (docs/context/archive/20260731-living-basin-and-lab-mode-and-active-queue-handoff-*.md) covered a separate, earlier Beastscape/Living Basin/Active Queue milestone; this checkpoint supersedes it only as the *current* projection, not as a claim that earlier content is now wrong -- see docs/history/README.md's reading rules."
   ],
   "disposable_repetition_excluded": 0,
   "sources": [
-    "000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md",
-    "docs/research/BEAST_STRUCTURAL_LATENT_SPACE_DRAFT_2026-07-29.md",
-    "docs/research/METASTABLE_COMEDOWN_ARCHITECTURE_DRAFT_2026-07-30.md",
-    "docs/architecture/live-captain-workbench-v0.1.md",
-    "docs/engineering-orders/packets/CONTEXT-STEWARD-0.1.md",
-    "docs/engineering-orders/packets/METASTABLE-COMEDOWN-LAB-0.1.md",
-    "docs/engineering-orders/packets/CAPTAIN-WORKBENCH-BEAST-IMAGE-0.1.md",
-    "docs/commissioning-handoff.md",
+    "docs/mission.md",
+    "docs/README.md",
+    "docs/command-structure.md",
+    "docs/safety/README.md",
+    "docs/history/README.md",
+    "docs/deployment.md",
+    "tools/chat-captain/README.md",
+    "console/index.html",
+    "console/app.html",
+    "scripts/Caddyfile",
+    "cmds.sh",
     "AGENTS.md",
-    "CLAUDE.md",
-    "tools/beastscape-umap/README.md",
-    "web/toys/beastscape/app.js",
-    "docs/architecture/beastspec-design-v0.1.md",
-    "tools/living-basin/README.md",
-    "tools/living-basin/ARCHITECTURE.md"
+    "CLAUDE.md"
   ],
   "omissions": [
-    "deferred_ideas",
-    "defects",
-    "verification",
-    "changed_surfaces"
+    "deferred_ideas"
   ],
   "limits_bytes": {
     "current-brief.md": 10000,
