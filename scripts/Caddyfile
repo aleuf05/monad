@@ -68,6 +68,13 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4792
 		}
 
+		handle_path /live-captain-bootstrap-api/* {
+			forward_auth 127.0.0.1:4779 {
+				uri /check
+			}
+			reverse_proxy 127.0.0.1:4778
+		}
+
 		handle_path /monad/portainer/* {
 			reverse_proxy https://localhost:9443 {
 				transport http {

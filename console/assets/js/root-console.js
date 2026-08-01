@@ -3,7 +3,15 @@
 // 4792) through Caddy's /root-console-api/* reverse proxy -- there is no
 // separate dev deployment, this file IS the live page.
 const API_BASE = "/root-console-api/api";
+// The conversation surface itself (turn/stream only) is served by the
+// separate Live Captain minimum-context bootstrap
+// (tools/live-captain/server.py, port 4778) -- see
+// LIVE-CAPTAIN-MINIMUM-CONTEXT-BOOTSTRAP-0.1. Login, status, and handoffs
+// stay on root-console.service above; only the actual Captain
+// conversation moved.
+const LIVE_CAPTAIN_API_BASE = "/live-captain-bootstrap-api/api";
 
+const bearingIndicatorEl = document.getElementById("bearing-indicator");
 const loginGate = document.getElementById("login-gate");
 const loginForm = document.getElementById("login-form");
 const loginPassword = document.getElementById("login-password");
@@ -370,6 +378,19 @@ async function pollStatus() {
   } catch (err) {
     // status endpoint unreachable; telemetry goes stale, connection indicator still reflects reality
   }
+  try {
+    const bearingResponse = await fetch(`${LIVE_CAPTAIN_API_BASE}/status`);
+    if (!bearingResponse.ok) {
+      bearingIndicatorEl.textContent = `Live Captain — status unavailable (HTTP ${bearingResponse.status})`;
+      return;
+    }
+    const bearing = await bearingResponse.json();
+    bearingIndicatorEl.textContent =
+      `${bearing.label} · kernel ${bearing.kernel_digest.slice(0, 8)} · ` +
+      `bearing ${bearing.bearing_digest.slice(0, 8)} · restarts ${bearing.restart_count}`;
+  } catch (err) {
+    bearingIndicatorEl.textContent = "Live Captain — status unavailable";
+  }
 }
 
 function showLoginGate() {
@@ -594,7 +615,7 @@ function handleEvent(event) {
 
 function connect() {
   if (streamSource) return;
-  streamSource = new EventSource(`${API_BASE}/stream`);
+  streamSource = new EventSource(`${LIVE_CAPTAIN_API_BASE}/stream`);
   streamSource.onopen = () => {
     connEl.classList.add("live");
     connTextEl.textContent = "live";
@@ -618,7 +639,7 @@ async function submitDirective() {
   input.value = "";
   startThinking();
   try {
-    const response = await fetch(`${API_BASE}/turn`, {
+    const response = await fetch(`${LIVE_CAPTAIN_API_BASE}/turn`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text }),
