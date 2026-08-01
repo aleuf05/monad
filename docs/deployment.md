@@ -17,6 +17,43 @@ building out elaborate local test harnesses first.
 - This does not relax the URL/port policy right below -- "test live" means
   the real domain, not a throwaway port standing in for it.
 
+## POLICY: Liveness means concurrent, not just deployed
+
+"No staging" has a sharper edge than "edit the real files instead of a
+copy." As of 2026-08-01, Root Console proved it in practice: while Claude
+was mid-edit on `console/assets/js/root-console.js`, the Captain -- the
+Codex daemon in `tools/root-console`, which holds its own real
+`sandbox: workspace-write` session against this same repo -- independently
+added a whole feature (an image-preview lightbox) to that same file, in the
+same window, with no coordination between the two agents beyond the
+filesystem itself. Full account, evidence, and the near-miss risk this
+creates: `docs/reports/2026-08-01-live-concurrent-ux-development.md`.
+
+That is what "live" actually means here, and it is stated as policy because
+it changes how any agent -- human, Claude, or Captain -- must behave when
+editing shared files, not just where:
+
+- **Re-read a file immediately before editing it, even one you read
+  minutes ago in the same session.** On this project, staleness between a
+  read and a write is not a hypothetical to guard against out of general
+  discipline -- it has already happened. Another live agent may hold
+  write access to the exact file you're about to change.
+- **There is no lock and no merge step.** Two agents editing the same file
+  concurrently can clobber each other; it hasn't happened yet by luck of
+  non-overlapping regions, not by any protection. Prefer small, frequent
+  edits over long-held in-progress rewrites of a shared file, to shrink the
+  window where a collision is possible.
+- **A file diverging from what you last wrote is not necessarily an error
+  or an accident to investigate and revert.** It may be the Captain (or the
+  Admiral, or a future second agent) doing its own live, authorized work on
+  the same live surface. Read what changed, understand it, build on it --
+  don't reflexively stomp it back to your last version.
+- This is the operational payoff of "no dev/staging, ever": it is precisely
+  what makes this kind of live multi-agent collaboration possible at all.
+  A copy-then-merge-later workflow would have hidden the Captain's edit
+  from Claude (and vice versa) until an explicit sync step -- which is the
+  failure mode this policy exists to prevent.
+
 ## POLICY: No strange URLs or ports
 
 Every piece of public-facing functionality must be discoverable by plainly

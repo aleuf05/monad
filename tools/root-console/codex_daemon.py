@@ -27,6 +27,8 @@ CODEX_BIN = os.environ.get("CODEX_BIN", "/home/cgl/.local/bin/codex")
 INIT_TIMEOUT_SECONDS = 30
 EXECUTION_SANDBOX = "danger-full-access"
 APPROVAL_POLICY = "never"
+SUBSCRIBER_QUEUE_SIZE = 512
+CHILD_EXIT_CODE = 70
 
 
 class CodexError(RuntimeError):
@@ -49,6 +51,7 @@ class CodexDaemon:
             bufsize=1,
         )
         self._responses: dict[int, queue.Queue] = {}
+        self._responses_lock = threading.Lock()
         self._counter = 0
         self._counter_lock = threading.Lock()
         self._subscribers: list[queue.Queue] = []
@@ -56,6 +59,7 @@ class CodexDaemon:
         self._turn_lock = threading.Lock()
         self._active_thread_id: str | None = None
         self._started_at = time.time()
+        self._closing = False
         threading.Thread(target=self._read, daemon=True, name="codex-app-server-reader").start()
         self._request(
             "initialize",
@@ -84,14 +88,16 @@ class CodexDaemon:
     def _request(self, method: str, params: dict, timeout: int = 30) -> dict:
         request_id = self._next_id()
         response_queue: queue.Queue = queue.Queue(maxsize=1)
-        self._responses[request_id] = response_queue
+        with self._responses_lock:
+            self._responses[request_id] = response_queue
         self._send({"method": method, "id": request_id, "params": params})
         try:
             response = response_queue.get(timeout=timeout)
         except queue.Empty:
             raise CodexError(f"Codex {method} timed out") from None
         finally:
-            self._responses.pop(request_id, None)
+            with self._responses_lock:
+                self._responses.pop(request_id, None)
         if "error" in response:
             detail = response["error"].get("message", "unknown error")
             raise CodexError(f"Codex {method} failed: {detail}")
@@ -101,7 +107,20 @@ class CodexDaemon:
         with self._subscribers_lock:
             subscribers = list(self._subscribers)
         for subscriber in subscribers:
-            subscriber.put(event)
+            try:
+                subscriber.put_nowait(event)
+            except queue.Full:
+                # A disconnected or suspended browser must never be able to
+                # grow the Captain process without bound. Preserve the newest
+                # events; the UI can reconnect and inspect durable results.
+                try:
+                    subscriber.get_nowait()
+                except queue.Empty:
+                    pass
+                try:
+                    subscriber.put_nowait(event)
+                except queue.Full:
+                    pass
 
     def broadcast(self, event: dict) -> None:
         """Public entry point for external sources (e.g. the handoff inbox
@@ -118,8 +137,10 @@ class CodexDaemon:
             except json.JSONDecodeError:
                 continue
             request_id = message.get("id")
-            if request_id is not None and request_id in self._responses:
-                self._responses[request_id].put(message)
+            with self._responses_lock:
+                response_queue = self._responses.get(request_id)
+            if response_queue is not None:
+                response_queue.put(message)
             elif message.get("method"):
                 self._broadcast(
                     {
@@ -130,8 +151,14 @@ class CodexDaemon:
                     }
                 )
 
+        # The HTTP server cannot repair or replace its sole app-server child.
+        # Exiting non-zero lets systemd restart the complete commissioned unit
+        # instead of leaving a web shell that falsely appears operational.
+        if not self._closing:
+            os._exit(CHILD_EXIT_CODE)
+
     def subscribe(self) -> "queue.Queue[dict]":
-        listener: "queue.Queue[dict]" = queue.Queue()
+        listener: "queue.Queue[dict]" = queue.Queue(maxsize=SUBSCRIBER_QUEUE_SIZE)
         with self._subscribers_lock:
             self._subscribers.append(listener)
         return listener
@@ -185,5 +212,6 @@ class CodexDaemon:
         }
 
     def close(self) -> None:
+        self._closing = True
         if self._process.poll() is None:
             self._process.terminate()

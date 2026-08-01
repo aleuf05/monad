@@ -120,3 +120,44 @@ fn disabled_captain_cannot_replace_safe_deterministic_fallback() {
         .unwrap();
     assert_eq!(alpha.route.len(), 1, "legacy escort mode remains active");
 }
+
+#[test]
+fn agent_decision_history_is_bounded_to_the_newest_records() {
+    let mut world = seed_world();
+    world.agent_decision_retention = 2;
+
+    for sequence in 0..3 {
+        let mut command = alpha_intent("captain.bravo", sequence);
+        if let Command::SubmitEscortIntent {
+            observed_tick,
+            reconsider_at_tick,
+            ..
+        } = &mut command
+        {
+            *observed_tick = world.clock.tick;
+            *reconsider_at_tick = world.clock.tick + 120;
+        }
+        world.apply_command(command).unwrap();
+    }
+
+    assert_eq!(world.agent_decisions.len(), 2);
+    assert_eq!(world.agent_decisions[0].observed_event_sequence, 1);
+    assert_eq!(world.agent_decisions[1].observed_event_sequence, 2);
+}
+
+#[test]
+fn normalize_trims_legacy_oversized_agent_decision_history() {
+    let mut world = seed_world();
+    world.agent_decision_retention = 2;
+    for sequence in 0..3 {
+        world
+            .apply_command(alpha_intent("captain.bravo", sequence))
+            .unwrap();
+    }
+    world.agent_decision_retention = 1;
+
+    world.normalize();
+
+    assert_eq!(world.agent_decisions.len(), 1);
+    assert_eq!(world.agent_decisions[0].observed_event_sequence, 2);
+}

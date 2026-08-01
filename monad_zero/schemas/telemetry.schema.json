@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "mc0.telemetry.v1",
+  "type": "object",
+  "required": ["schema_version", "run_id", "seed", "tick", "sweep_direction", "sweep_rate", "q", "architecture_vector", "raw_closure_components", "nexus_closure_index", "state_regime_estimate", "perturbation_id", "recovery_time", "self_model_revision_id", "historical_parent_ids", "compute_used", "model_calls", "memory_bytes", "intervention_source", "welfare_flags", "control_mode"],
+  "properties": {
+    "schema_version": {"const": "mc0.telemetry.v1"},
+    "run_id": {"type": "string"}, "seed": {"type": "integer"}, "tick": {"type": "integer"},
+    "sweep_direction": {"type": "string"}, "sweep_rate": {"type": "string"}, "q": {"type": "number", "minimum": 0, "maximum": 1},
+    "architecture_vector": {"type": "object"},
+    "raw_closure_components": {"type": "object", "required": ["D", "R", "H", "K", "A", "L", "F", "T"]},
+    "nexus_closure_index": {"type": "number"}, "state_regime_estimate": {"type": ["string", "null"]},
+    "perturbation_id": {"type": ["string", "null"]}, "recovery_time": {"type": ["integer", "null"]},
+    "self_model_revision_id": {"type": ["string", "null"]}, "historical_parent_ids": {"type": "array"},
+    "compute_used": {"type": "number"}, "model_calls": {"type": "integer"}, "memory_bytes": {"type": "integer"},
+    "intervention_source": {"type": "string"}, "welfare_flags": {"type": "array"}, "control_mode": {"type": "string"}
+  }
+}

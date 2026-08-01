@@ -28,6 +28,7 @@ Two kinds of record, never blurred:
 
 from __future__ import annotations
 
+import copy
 import re
 import threading
 import time
@@ -239,9 +240,9 @@ class _DemoArc:
                 "leadingHypothesis": self.leading_hypothesis,
                 "strongestAlternative": self.strongest_alternative,
                 "unresolvedQuestion": self.unresolved_question,
-                "activeExperiment": self.active_experiment,
-                "recentGenerations": list(self.generations),
-                "captainAssessment": self.assessment,
+                "activeExperiment": copy.deepcopy(self.active_experiment),
+                "recentGenerations": copy.deepcopy(self.generations),
+                "captainAssessment": copy.deepcopy(self.assessment),
                 "dataMode": "MOCK",
                 "sourcePath": None,
                 "canonical": False,
@@ -250,7 +251,9 @@ class _DemoArc:
 
     def events(self) -> list[dict]:
         with self._lock:
-            return list(self.event_log)
+            # HTTP response construction must not hand callers references to
+            # the command machine's authoritative in-memory state.
+            return copy.deepcopy(self.event_log)
 
     def command(self, command: str) -> dict:
         with self._lock:
@@ -473,7 +476,7 @@ def _replay_frames() -> list[dict]:
     """
     global _replay_frames_cache
     if _replay_frames_cache is not None:
-        return _replay_frames_cache
+        return copy.deepcopy(_replay_frames_cache)
     arc = _DemoArc()
     frames = [{"event": e, "arc": arc.snapshot()} for e in arc.event_log]
     for step in range(1, 7):
@@ -484,4 +487,4 @@ def _replay_frames() -> list[dict]:
             snapshot = arc.snapshot()
             frames.append({"event": frame, "arc": snapshot})
     _replay_frames_cache = frames
-    return frames
+    return copy.deepcopy(frames)

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "monad.admiralty.project.v0.1",
+  "type": "object",
+  "required": ["id", "name", "status", "executive_summary", "evidence_quality", "last_reviewed"],
+  "properties": {
+    "id": {"type": "string"}, "name": {"type": "string"}, "status": {"type": "string"},
+    "executive_summary": {"type": "string"}, "purpose": {"type": "string"},
+    "current_state": {"type": "string"}, "known_artifacts": {"type": "array"},
+    "major_milestones": {"type": "array"}, "open_questions": {"type": "array"},
+    "risks": {"type": "array"}, "next_action": {"type": "string"},
+    "evidence_quality": {"type": "string"}, "last_reviewed": {"type": "string"}
+  }
+}

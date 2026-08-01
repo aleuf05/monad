@@ -20,9 +20,83 @@
 
   .lede { max-width: 560px; margin: 34px auto 6px; text-align: center; font-size: 12.5px; color: #8A9BB4; }
 
+  /* --- Active Queue ------------------------------------------------ */
+  .active-queue { margin-top: 28px; }
+  .aq-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .aq-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  .aq-actions { display: flex; gap: 8px; }
+  .aq-btn { background: #111A2B; border: 1px solid #1E2C42; color: #9AACBF; font: inherit; font-size: 10.5px; padding: 7px 11px; border-radius: 6px; cursor: pointer; letter-spacing: 0.02em; }
+  .aq-btn:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-btn.danger:hover { border-color: #E05252; color: #E05252; }
+  .aq-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+
+  .aq-current { position: relative; background: linear-gradient(120deg, #17283A, #111A2B 60%); border: 1px solid #E8A33D; border-radius: 10px; padding: 20px 22px; margin-bottom: 14px; }
+  .aq-current::before { content: "ACTIVE NOW"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #E8A33D; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .aq-current .aq-parent { color: #E8A33D; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  .aq-current .aq-item-title { font-family: 'Oswald', sans-serif; font-size: 21px; color: #F6C76D; margin: 5px 90px 6px 0; }
+  .aq-current .aq-summary { color: #9AACBF; font-size: 11.5px; line-height: 1.5; max-width: 640px; }
+  .aq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .aq-fields label { display: block; color: #6B7C93; font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; }
+  .aq-fields input, .aq-fields textarea, .aq-fields select { width: 100%; margin-top: 5px; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11.5px; padding: 7px 9px; border-radius: 5px; }
+  .aq-meta-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 10px; color: #6B7C93; }
+  .aq-row-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .aq-open { background: #E8A33D; color: #0B1220; border: none; font: inherit; font-weight: 700; font-size: 11px; padding: 9px 14px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
+
+  .aq-list { display: flex; flex-direction: column; gap: 8px; }
+  .aq-item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: #111A2B; border: 1px solid #1E2C42; border-radius: 7px; padding: 10px 12px; }
+  .aq-item .aq-item-title { font-size: 12.5px; color: #DCE6F2; }
+  .aq-item .aq-parent { color: #6B7C93; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; }
+  .aq-item .aq-next { color: #4FD1C5; font-size: 10.5px; margin-top: 3px; }
+  .aq-item.pinned { border-color: #4FD1C5; }
+  .aq-item-controls { display: flex; gap: 4px; align-items: center; }
+  .aq-mini { background: #0B1220; border: 1px solid #1E2C42; color: #9AACBF; font-size: 10px; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; }
+  .aq-mini:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-mini.on { border-color: #4FD1C5; color: #4FD1C5; background: #0F2A2C; }
+
+  .aq-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(560px, 92vw); max-height: 80vh; }
+  .aq-dialog::backdrop { background: #05080Ecc; }
+  .aq-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid #1E2C42; }
+  .aq-dialog-head h3 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: .04em; }
+  .aq-dialog-body { padding: 14px 18px; overflow-y: auto; max-height: 60vh; }
+  .aq-dialog input[type=search] { width: 100%; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; padding: 9px 11px; border-radius: 6px; margin-bottom: 12px; }
+  .aq-pick { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid #16202f; font-size: 11.5px; }
+  .aq-pick .aq-pick-name { color: #DCE6F2; }
+  .aq-pick .aq-pick-parent { color: #6B7C93; font-size: 9.5px; text-transform: uppercase; }
+  .aq-pick button { background: #10272a; border: 1px solid #4FD1C5; color: #4FD1C5; font: inherit; font-size: 10px; padding: 5px 9px; border-radius: 5px; cursor: pointer; }
+  .aq-pick button:disabled { border-color: #1E2C42; color: #6B7C93; cursor: default; }
+  .aq-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+
+  .archive-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 44px; }
+  .archive-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  #archiveSearch { background: #111A2B; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11px; padding: 7px 11px; border-radius: 6px; width: 200px; }
+  .cat-card.aq-hidden { display: none; }
+  @media (max-width: 560px) {
+    .aq-fields { grid-template-columns: 1fr; }
+    .aq-current .aq-item-title { margin-right: 0; }
+    #archiveSearch { width: 100%; }
+  }
+
+  .mike-berth { display: block; position: relative; overflow: hidden; margin: 26px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #17283A, #111A2B 55%, #103028); border: 1px solid #4FD1C5; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .mike-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #4FD1C522; }
+  .mike-berth::after { content: "NEW · VERBATIM SOURCE"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #4FD1C5; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .mike-berth .project-kicker { color: #4FD1C5; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
+  .basin-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #1E2416, #111A2B 55%, #1B2A1E); border: 1px solid #8FBF6E; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .basin-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #8FBF6E22; }
+  .basin-berth::after { content: "NEW · CAUSAL SIMULATION"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #8FBF6E; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .basin-berth .project-kicker { color: #8FBF6E; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .basin-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #C9E0A8; font-size: 23px; letter-spacing: .04em; }
+  .basin-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
+  .cat-card.mission-card { grid-column: 1 / -1; border-color: #E8A33D; background: linear-gradient(120deg, #171C2A, #111A2B 58%, #132A30); position: relative; overflow: hidden; }
+  .cat-card.mission-card::after { content: "LIVING DRAFT"; position: absolute; right: 18px; top: 16px; color: #E8A33D; border: 1px solid #E8A33D66; border-radius: 20px; padding: 3px 8px; font-size: 8px; letter-spacing: .1em; }
+  .cat-card.mission-card:hover { box-shadow: 0 0 24px #E8A33D18; }
+  .cat-card.mission-card .cat-desc { max-width: 660px; }
   .cat-eyebrow { font-size: 9.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 6px; }
   .cat-name { font-family: 'Oswald', sans-serif; font-size: 19px; letter-spacing: 0.02em; color: #DCE6F2; margin-bottom: 8px; }
   .cat-desc { font-size: 11.5px; color: #6B7C93; line-height: 1.55; }
@@ -53,8 +127,43 @@
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
+    <section class="active-queue" id="activeQueue">
+      <div class="aq-head">
+        <span class="aq-title">Active Now &amp; Up Next</span>
+        <div class="aq-actions">
+          <button class="aq-btn" id="aqAddBtn">+ Add from archive</button>
+          <button class="aq-btn" id="aqManageBtn">Manage queue</button>
+        </div>
+      </div>
+      <div id="aqBody"><p class="aq-empty">Loading queue&hellip;</p></div>
+    </section>
+
+    <dialog class="aq-dialog" id="aqDialog">
+      <div class="aq-dialog-head"><h3 id="aqDialogTitle">Add from archive</h3><button class="aq-dialog-close" id="aqDialogClose">Close</button></div>
+      <div class="aq-dialog-body">
+        <input type="search" id="aqSearch" placeholder="Search projects, tools, pages&hellip;">
+        <div id="aqPicks"><p class="aq-empty">Loading archive&hellip;</p></div>
+      </div>
+    </dialog>
+
+    <a class="mike-berth" href="toys/mike-rocketry-notebook/">
+      <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
+      <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
+      <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
+    </a>
+
+    <a class="basin-berth" href="toys/living-basin/">
+      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
+      <div class="project-title">THE LIVING BASIN</div>
+      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
+    </a>
+
     <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
 
+    <div class="archive-head">
+      <span class="archive-title">Project Archive</span>
+      <input type="search" id="archiveSearch" placeholder="Search sections&hellip;">
+    </div>
     <div class="categories">
       <a class="cat-card" href="command.html">
         <div class="cat-eyebrow">Act</div>
@@ -71,6 +180,11 @@
         <div class="cat-name">Build &amp; Research</div>
         <div class="cat-desc">Tools that make or study things — voices, shapes, assets, ideas. Not fleet control.</div>
       </a>
+      <a class="cat-card" href="toys/monad0-lab/" style="border-color:#71b7e6">
+        <div class="cat-eyebrow">NEW · Experiment</div>
+        <div class="cat-name">Monad-0 Nexus Laboratory</div>
+        <div class="cat-desc">Play the seeded strange-loop experiment: compare four architectures, inject probes, inspect hypotheses, and review bounded contracts.</div>
+      </a>
       <a class="cat-card" href="story.html">
         <div class="cat-eyebrow">Remember</div>
         <div class="cat-name">Story &amp; Records</div>
@@ -80,6 +194,11 @@
         <div class="cat-eyebrow">Who</div>
         <div class="cat-name">Crew</div>
         <div class="cat-desc">Who's aboard, and what each officer is responsible for.</div>
+      </a>
+      <a class="cat-card mission-card" href="core-mission.html">
+        <div class="cat-eyebrow">Why · Proposed</div>
+        <div class="cat-name">Core Mission</div>
+        <div class="cat-desc">Enter the living redefinition: Monad as a humane, evidence-bound restorative process—turning lived intent into testable intervention and preserving what reality teaches.</div>
       </a>
     </div>
 
@@ -92,7 +211,7 @@
     </div>
 
     <footer>
-      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
       <div class="footer-motto">Every artifact leaves a wake.</div>
     </footer>
   </div>
@@ -136,5 +255,6 @@
         });
     })();
   </script>
+  <script src="assets/js/active-queue.js" data-root=""></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
 {
   "schema_version": "monad.fleetStatus.v1",
-  "status": "green",
-  "summary": "All systems nominal.",
-  "checked_at": "2026-07-31T16:32:25.848413Z",
+  "status": "amber",
+  "summary": "fleetcore-serve restarted; living-fleet-memory restarted; living-fleet-memory endpoint unreachable; living-captain-status restarted; living-captain-status endpoint unreachable; living-fleet restarted; living-fleet stale",
+  "checked_at": "2026-08-01T19:29:14.884195Z",
   "hostname": "granite",
-  "git_commit": "7ab281c04d220434bf3fe2e375ce292f4de015a9"
+  "git_commit": "f5a0ff2c6acd37c41bb36b6eb9132f297a383584"
 }

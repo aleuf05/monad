@@ -13,8 +13,9 @@ server, matching the convention already used by tools/chat-captain.
 from __future__ import annotations
 
 import json
+import base64
+import binascii
 import queue
-import subprocess
 import sys
 import threading
 import time
@@ -34,22 +35,93 @@ PORT = 4792
 ROOT_DIR = Path(__file__).resolve().parent
 STATIC_DIR = ROOT_DIR / "static"
 REPO_ROOT = ROOT_DIR.parent.parent
+GENERATED_IMAGE_DIR = Path.home() / ".codex" / "generated_images"
+GENERATED_IMAGE_API_PREFIX = "/root-console-api/api/generated-image/"
+MAX_GENERATED_IMAGE_BYTES = 25 * 1024 * 1024
+IMAGE_TYPES = {
+    ".avif": "image/avif",
+    ".gif": "image/gif",
+    ".jpeg": "image/jpeg",
+    ".jpg": "image/jpeg",
+    ".png": "image/png",
+    ".webp": "image/webp",
+}
 SESSION_SECONDS = 12 * 60 * 60
 COMMISSIONING_TASK_ID = "CODEX-LIVE-CAPTAIN-1"
 AUTHORITY_MODE = "MAXIMUM-CAPABILITY COMMISSIONING"
 
-# The other live Monad services -- read-only visibility into the rest of
-# the fleet, since a Captain that only knows about itself isn't actually
-# more live than a bare Codex CLI session. (name shown in UI, systemd unit)
-FLEET_UNITS = [
-    ("chat-captain", "chat-captain-web.service"),
-    ("live-captain", "live-captain-web.service"),
-    ("living-fleet", "living-fleet.service"),
-    ("fleetcore", "fleetcore-serve.service"),
-    ("world-intake", "world-intake.service"),
-    ("watchman", "monad-watchman.service"),
-    ("public-root-auth", "public-root-auth.service"),
-]
+class GeneratedImageError(ValueError):
+    """A generated-image reference did not cross the browser trust boundary."""
+
+
+def generated_image_token(path: Path) -> str:
+    """Return an opaque, deterministic URL token for a contained image path."""
+    root = GENERATED_IMAGE_DIR.resolve()
+    candidate = path.resolve()
+    try:
+        relative = candidate.relative_to(root)
+    except ValueError as exc:
+        raise GeneratedImageError("image is outside the generated-image store") from exc
+    encoded = base64.urlsafe_b64encode(relative.as_posix().encode("utf-8")).decode("ascii")
+    return encoded.rstrip("=")
+
+
+def resolve_generated_image(token: str) -> tuple[Path, str, int]:
+    """Resolve and validate a browser token without permitting path traversal."""
+    if not token or len(token) > 2048:
+        raise GeneratedImageError("invalid image artifact id")
+    try:
+        padding = "=" * (-len(token) % 4)
+        relative_text = base64.b64decode(
+            token + padding, altchars=b"-_", validate=True
+        ).decode("utf-8")
+    except (binascii.Error, UnicodeDecodeError) as exc:
+        raise GeneratedImageError("invalid image artifact id") from exc
+    relative = Path(relative_text)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise GeneratedImageError("invalid image artifact id")
+    root = GENERATED_IMAGE_DIR.resolve()
+    candidate = (root / relative).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise GeneratedImageError("image is outside the generated-image store") from exc
+    if not candidate.is_file():
+        raise FileNotFoundError("generated image not found")
+    content_type = IMAGE_TYPES.get(candidate.suffix.lower())
+    if not content_type:
+        raise GeneratedImageError("unsupported generated-image type")
+    size = candidate.stat().st_size
+    if size <= 0 or size > MAX_GENERATED_IMAGE_BYTES:
+        raise GeneratedImageError("generated image has an invalid size")
+    return candidate, content_type, size
+
+
+def browser_generated_image_url(value: str) -> str | None:
+    """Translate an exact Codex artifact-store path into an authenticated URL."""
+    raw = value[7:] if value.startswith("file://") else value
+    if not raw.startswith("/"):
+        return None
+    path = Path(raw)
+    try:
+        token = generated_image_token(path)
+        resolve_generated_image(token)
+    except (GeneratedImageError, FileNotFoundError, OSError):
+        return None
+    return GENERATED_IMAGE_API_PREFIX + token
+
+
+def map_generated_images(value, depth: int = 0):
+    """Copy a Codex event while mapping structured local image artifacts."""
+    if depth > 12:
+        return value
+    if isinstance(value, str):
+        return browser_generated_image_url(value) or value
+    if isinstance(value, list):
+        return [map_generated_images(item, depth + 1) for item in value]
+    if isinstance(value, dict):
+        return {key: map_generated_images(item, depth + 1) for key, item in value.items()}
+    return value
 
 
 def commissioning_status(daemon: CodexDaemon) -> dict:
@@ -69,22 +141,6 @@ def commissioning_status(daemon: CodexDaemon) -> dict:
         "handoffPath": str(inbox),
     }
 
-
-def fleet_status() -> list[dict]:
-    result = []
-    for label, unit in FLEET_UNITS:
-        try:
-            proc = subprocess.run(
-                ["systemctl", "is-active", unit],
-                capture_output=True,
-                text=True,
-                timeout=3,
-            )
-            state = proc.stdout.strip() or "unknown"
-        except (subprocess.TimeoutExpired, OSError):
-            state = "unknown"
-        result.append({"name": label, "unit": unit, "state": state})
-    return result
 
 def watch_handoff_inbox(daemon: CodexDaemon, poll_seconds: float = 2.0) -> None:
     """Background loop broadcasting CAPTAIN_HANDOFF_AVAILABLE over the
@@ -184,7 +240,8 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
                     self.wfile.write(b": keepalive\n\n")
                     self.wfile.flush()
                     continue
-                self.wfile.write(f"data: {json.dumps(event)}\n\n".encode("utf-8"))
+                browser_event = map_generated_images(event)
+                self.wfile.write(f"data: {json.dumps(browser_event)}\n\n".encode("utf-8"))
                 self.wfile.flush()
         except (BrokenPipeError, ConnectionResetError):
             pass
@@ -214,11 +271,29 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
             status = self.daemon.status()
             status["commissioning"] = commissioning_status(self.daemon)
             self._send_json(status)
-        elif path == "/api/fleet":
+        elif path.startswith("/api/generated-image/"):
             if not self._authenticated():
-                self._send_json({"error": "authentication required"}, status=401)
+                self.send_error(401)
                 return
-            self._send_json({"fleet": fleet_status()})
+            token = path[len("/api/generated-image/"):]
+            try:
+                image_path, content_type, size = resolve_generated_image(token)
+            except FileNotFoundError:
+                self.send_error(404)
+                return
+            except (GeneratedImageError, OSError):
+                self.send_error(400)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(size))
+            self.send_header("Content-Disposition", f'inline; filename="{image_path.name}"')
+            self.send_header("Cache-Control", "private, no-store")
+            self.send_header("X-Content-Type-Options", "nosniff")
+            self.end_headers()
+            with image_path.open("rb") as image_file:
+                while chunk := image_file.read(64 * 1024):
+                    self.wfile.write(chunk)
         elif path == "/api/handoffs":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)

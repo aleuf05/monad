@@ -1,0 +1,35 @@
+[
+  {
+    "id": "CAP-ARI-001",
+    "title": "Continuous Strange-Loop Machine",
+    "record_path": "admiralty/archive/research/autonomous-inquiry/CAP-ARI-001.md",
+    "creation_timestamp": "2026-08-01T12:38:33Z",
+    "authoring_role": "Captain",
+    "authorizing_role": "Admiral",
+    "status": "AUTHORIZED_NOT_STARTED",
+    "content_hash": "0a0d67a36e7c73c60c6b174e078f18c14e5dd3bb05fec322d5ead366f6a20f04",
+    "later_links": []
+  },
+  {
+    "id": "CAP-ARI-002",
+    "title": "Monad Artificial Ecology",
+    "record_path": "admiralty/archive/research/autonomous-inquiry/CAP-ARI-002.md",
+    "creation_timestamp": "2026-08-01T12:38:33Z",
+    "authoring_role": "Captain",
+    "authorizing_role": "Admiral",
+    "status": "AUTHORIZED_NOT_STARTED",
+    "content_hash": "17be1630f24c3d5daddc566dcb36a690e3f457f37aac74cd8d76fb63e3ee19ea",
+    "later_links": []
+  },
+  {
+    "id": "CAP-ARI-003",
+    "title": "Bounded Automated Science Loop",
+    "record_path": "admiralty/archive/research/autonomous-inquiry/CAP-ARI-003.md",
+    "creation_timestamp": "2026-08-01T13:06:50Z",
+    "authoring_role": "Captain",
+    "authorizing_role": "Admiral",
+    "status": "AUTHORIZED_NOT_STARTED",
+    "content_hash": "049fe800c79f5b406dae70003243acd74c61fc9ffef3276ba8deadc9ec755194",
+    "later_links": []
+  }
+]

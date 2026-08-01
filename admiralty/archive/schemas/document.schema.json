@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "monad.admiralty.document.v0.1",
+  "type": "object",
+  "required": ["id", "title", "source_path", "document_type", "authority_status", "content_sha256"],
+  "properties": {
+    "id": {"type": "string"}, "title": {"type": "string"}, "source_path": {"type": "string"},
+    "document_type": {"type": "string"}, "domain": {"type": "string"}, "project": {"type": ["string", "null"]},
+    "created_date": {"type": ["string", "null"]}, "date_confidence": {"type": "string"},
+    "record_origin": {"enum": ["contemporaneous", "retrospective", "derived", "uncertain"]},
+    "authority_status": {"type": "string"}, "lifecycle_status": {"type": "string"},
+    "summary": {"type": "string"}, "requires_decision": {"type": "boolean"},
+    "content_sha256": {"type": "string"}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "monad.admiralty.brief.v0.1",
+  "type": "object",
+  "required": ["id", "title", "status", "summary", "source_documents"],
+  "properties": {
+    "id": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "string"},
+    "summary": {"type": "string"}, "source_documents": {"type": "array"},
+    "requires_review": {"type": "boolean"}
+  }
+}

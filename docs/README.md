@@ -7,12 +7,16 @@ Dated packets, reports, and logs retain their original paths and status.
 ## Mission
 
 - [Project Mission](mission.md) — current purpose and supporting mechanisms.
+- [Admiralty Archive](../admiralty/archive/README.md) — executive,
+  provenance-preserving layer over the documentary record.
 - [Highest-Priority Charter](../000_HIGHEST_PRIORITY_MONAD_CHARTER_2026-07-14.md)
   — standing duty to protect the human and the hull.
 
 ## Architecture
 
 - [`architecture/`](architecture/) — component and system designs.
+- [Admiralty Section UI Brief](architecture/ADMIRALTY_SECTION_FOUNDATIONAL_UI_BRIEF_2026-07-31.md)
+  — private strategic-command surface and initial page structure.
 - [Architecture map](reports/2026-07-15-architecture-map.md) — dated system map.
 - [Artifact registry and projections](architecture/artifact-registry-projections-v0.1.md)
   — provenance-preserving audience views.
@@ -80,6 +84,10 @@ substitute for source records.
   evolving conceptual models.
 - [Operational Topology — Packet 006](research/OPERATIONAL_TOPOLOGY_PACKET_006_2026-07-31.md)
   — candidate formalism for constrained human–AI operational flows.
+- [Monad-0 — Epistemic Mirror](research/MONAD0_EPISTEMIC_MIRROR_V0.1.md) —
+  implemented four-controller comparative research slice.
+- [Monad-0 Web Laboratory](../monad_zero/web_lab.md) — local operator surface
+  over the headless engine.
 - [Semantic Artifact Engineering](research/SEMANTIC_ARTIFACT_ENGINEERING.md) —
   intent, semantic refinement, projection, review, and knowledge capture.
 - [Monad Reality Program](research/MONAD_REALITY_PROGRAM_DRAFT_2026-07-28.md).

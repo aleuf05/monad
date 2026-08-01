@@ -24,6 +24,8 @@ individually, the mission itself.
   — the current intent-to-artifact research methodology.
 - [Historical archive](docs/history/README.md) — earlier formulations and the
   path by which the current architecture emerged.
+- [Admiralty Archive](admiralty/archive/README.md) — executive reading layer
+  over the repository record.
 
 ## Current system
 

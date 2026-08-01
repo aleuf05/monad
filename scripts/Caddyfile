@@ -74,6 +74,13 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4778
 		}
 
+		handle_path /root-console-api/* {
+			forward_auth 127.0.0.1:4779 {
+				uri /check
+			}
+			reverse_proxy 127.0.0.1:4792
+		}
+
 		handle_path /monad/portainer/* {
 			reverse_proxy https://localhost:9443 {
 				transport http {
@@ -115,6 +122,10 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4791
 		}
 
+		handle_path /monad0-lab-api/* {
+			reverse_proxy 127.0.0.1:4793
+		}
+
 		handle {
 			root * /home/cgl/dev/monad/web
 			file_server
@@ -129,5 +140,8 @@ cameronlampley.com {
 # web-lan/ pattern retired 2026-07-13 -- see docs/deployment.md for the
 # discussion that authorized this one instance.
 http://192.168.0.100:8080 {
+	handle_path /root-console-api/* {
+		reverse_proxy 127.0.0.1:4792
+	}
 	import console_routes
 }

@@ -1,0 +1,21 @@
+{
+  "schema_version": "monad.admiralty.decisions.v0.1",
+  "generated_at": "2026-07-31",
+  "decisions": [
+    {
+      "id": "decision-archive-as-executive-layer",
+      "title": "Establish the Admiralty Archive as an executive provenance layer",
+      "status": "proposed",
+      "decision_date": "2026-07-31",
+      "date_confidence": "explicit",
+      "authority": "Admiral",
+      "decision": "Build and seed the archive without moving or rewriting source documents.",
+      "rationale": "The archive performs the reading; the Admiral performs the judgment.",
+      "source_documents": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "implementation_state": "seeded",
+      "review_trigger": "Admiral review of initial classifications"
+    }
+  ]
+}

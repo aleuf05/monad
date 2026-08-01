@@ -21,7 +21,6 @@ const telThread = document.getElementById("tel-thread");
 const telTokens = document.getElementById("tel-tokens");
 const telRatelimit = document.getElementById("tel-ratelimit");
 const telSubs = document.getElementById("tel-subs");
-const fleetEl = document.getElementById("fleet");
 const imageStage = document.getElementById("image-stage");
 const imageStageImage = document.getElementById("image-stage-image");
 const imageStageTitle = document.getElementById("image-stage-title");
@@ -47,7 +46,6 @@ for (const el of document.querySelectorAll(".status-widget")) {
 
 let authenticated = false;
 let statusPollHandle = null;
-let fleetPollHandle = null;
 let streamSource = null;
 
 function timestamp() {
@@ -154,8 +152,16 @@ function imageArtifactsFrom(value, opts = {}, found = new Map(), depth = 0) {
   // anyway, so matching them can only ever produce a broken image, never
   // a real preview.
   const { scanFreeText = true } = opts;
+  const trustedImageUrl = (candidate) => /^(?:data:image\/|https?:\/\/|\/root-console-api\/api\/generated-image\/)/.test(candidate);
   if (depth > 5 || value == null) return found;
   if (typeof value === "string") {
+    // The generated-image endpoint is server-validated and single-purpose
+    // (server.py mints it only for paths resolved inside GENERATED_IMAGE_DIR),
+    // so it's safe to recognize wherever it appears -- not just under the
+    // known field-name allow-list below, and not just in agentMessage prose.
+    for (const match of value.matchAll(/\/root-console-api\/api\/generated-image\/[A-Za-z0-9_-]+/g)) {
+      if (!found.has(match[0])) found.set(match[0], "Captain image artifact");
+    }
     if (scanFreeText) {
       const markdownImages = value.matchAll(/!\[([^\]]*)\]\(([^\s)]+)(?:\s+["'][^"']*["'])?\)/g);
       for (const match of markdownImages) found.set(match[2], match[1] || "Captain image artifact");
@@ -172,7 +178,7 @@ function imageArtifactsFrom(value, opts = {}, found = new Map(), depth = 0) {
   if (typeof value === "object") {
     const label = value.output_hint || value.prompt || value.alt || value.title;
     for (const [key, entry] of Object.entries(value)) {
-      if (typeof entry === "string" && /^(image_url|imageUrl|url|src|data)$/.test(key) && /^(?:data:image\/|https?:\/\/)/.test(entry)) {
+      if (typeof entry === "string" && /^(image_url|imageUrl|url|src|data|path)$/.test(key) && trustedImageUrl(entry)) {
         found.set(entry, typeof label === "string" ? label : "Captain image artifact");
       } else {
         imageArtifactsFrom(entry, opts, found, depth + 1);
@@ -366,27 +372,6 @@ async function pollStatus() {
   }
 }
 
-async function pollFleet() {
-  try {
-    const response = await fetch(`${API_BASE}/fleet`);
-    if (response.status === 401) return; // pollStatus's own 401 handling covers the gate
-    const body = await response.json();
-    fleetEl.innerHTML = "";
-    for (const item of body.fleet || []) {
-      const el = document.createElement("span");
-      el.className = `fleet-item ${item.state === "active" ? "active" : "down"}`;
-      el.title = item.unit;
-      const dot = document.createElement("span");
-      dot.className = "dot";
-      el.appendChild(dot);
-      el.appendChild(document.createTextNode(item.name));
-      fleetEl.appendChild(el);
-    }
-  } catch (err) {
-    // fleet endpoint unreachable; strip just goes stale
-  }
-}
-
 function showLoginGate() {
   authenticated = false;
   loginGate.classList.remove("hidden");
@@ -398,10 +383,6 @@ function showLoginGate() {
     clearInterval(statusPollHandle);
     statusPollHandle = null;
   }
-  if (fleetPollHandle) {
-    clearInterval(fleetPollHandle);
-    fleetPollHandle = null;
-  }
 }
 
 function onAuthenticated() {
@@ -411,10 +392,6 @@ function onAuthenticated() {
   loginError.textContent = "";
   connect();
   if (!statusPollHandle) statusPollHandle = setInterval(pollStatus, 4000);
-  if (!fleetPollHandle) {
-    pollFleet();
-    fleetPollHandle = setInterval(pollFleet, 10000);
-  }
   pollHandoffs();
   input.focus();
 }
@@ -461,6 +438,54 @@ function categoryForItemType(type) {
 
 const streamingRows = new Map();
 
+// Image-gen status widget: separate from the generic tool/reasoning lights
+// because generation can run long, and the point is "still obviously
+// working," not a 2.4s blip like the other activity pulses.
+const imageGenWidget = document.querySelector('.status-widget[data-cat="image"]');
+const imageGenCaption = imageGenWidget.querySelector(".caption");
+const imageGenCountEl = imageGenWidget.querySelector(".count");
+let imageGenTimer = null;
+let imageGenActiveItemId = null;
+let imageGenDoneCount = 0;
+
+function looksLikeImageGen(item) {
+  if (!item) return false;
+  const haystack = JSON.stringify(item).toLowerCase();
+  return /image[_-]?gen|generate[_-]?image|gpt-image|generated_images/.test(haystack);
+}
+
+function startImageGenIndicator(itemId) {
+  imageGenActiveItemId = itemId || imageGenActiveItemId || true;
+  if (imageGenTimer) return;
+  imageGenWidget.classList.remove("done-flash");
+  imageGenWidget.classList.add("spinning");
+  let frame = 0;
+  imageGenCaption.textContent = `${SPINNER_FRAMES[0]} generating…`;
+  imageGenTimer = setInterval(() => {
+    frame = (frame + 1) % SPINNER_FRAMES.length;
+    imageGenCaption.textContent = `${SPINNER_FRAMES[frame]} generating…`;
+  }, 80);
+}
+
+function stopImageGenIndicator(doneLabel) {
+  if (imageGenTimer) {
+    clearInterval(imageGenTimer);
+    imageGenTimer = null;
+  }
+  const wasActive = imageGenActiveItemId != null;
+  imageGenActiveItemId = null;
+  imageGenWidget.classList.remove("spinning");
+  if (doneLabel && wasActive) {
+    imageGenDoneCount += 1;
+    imageGenCountEl.textContent = imageGenDoneCount;
+    imageGenCaption.textContent = doneLabel;
+    imageGenWidget.classList.add("done-flash");
+    setTimeout(() => imageGenWidget.classList.remove("done-flash"), 2400);
+  } else {
+    imageGenCaption.textContent = "";
+  }
+}
+
 function handleCodexEvent(event) {
   const method = event.method;
   const params = event.params || {};
@@ -493,8 +518,12 @@ function handleCodexEvent(event) {
     const artifacts = imageArtifactsFrom(item, { scanFreeText: false });
     if (artifacts.size) {
       stopThinking();
+      stopImageGenIndicator("✓ image ready");
       for (const [url, label] of artifacts) addImageArtifact(url, label);
       return;
+    }
+    if (imageGenActiveItemId != null && (item.id === imageGenActiveItemId || looksLikeImageGen(item))) {
+      stopImageGenIndicator();
     }
     recordActivity(categoryForItemType(item.type), item.type || "item", summarizeItem(item) || "(completed)");
     return;
@@ -503,7 +532,11 @@ function handleCodexEvent(event) {
   if (method === "item/started") {
     // The spinner already communicates liveness, and the completed event
     // for this same item lands moments later with an actual summary --
-    // logging both would double every tool call in the activity log.
+    // logging both would double every tool call in the activity log. The
+    // image-gen widget is the one exception: it needs the start signal
+    // because generation can run long and "still working" is the point.
+    const item = params.item || {};
+    if (looksLikeImageGen(item)) startImageGenIndicator(item.id);
     return;
   }
 
@@ -513,6 +546,7 @@ function handleCodexEvent(event) {
   }
   if (method === "turn/completed") {
     stopThinking();
+    stopImageGenIndicator();
     const status = (params.turn || {}).status || "completed";
     recordActivity("thread", "turn", `completed (${status})`);
     return;

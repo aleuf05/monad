@@ -1,0 +1,30 @@
+{
+  "schema_version": "monad.admiralty.claims.v0.1",
+  "generated_at": "2026-07-31",
+  "claims": [
+    {
+      "id": "claim-current-mission",
+      "claim": "Monad organizes Cameron's cognitive landscape so valuable engineering work is preserved, connected, refined, and recoverable instead of becoming fragmented or buried.",
+      "source_documents": ["doc-docs-mission-md", "doc-readme-md"],
+      "source_locations": [{"path": "docs/mission.md", "section": "Project Mission"}],
+      "claim_type": "mission",
+      "confidence": "high",
+      "authority_status": "reference",
+      "support": "direct",
+      "conflicts_with": [],
+      "requires_review": false
+    },
+    {
+      "id": "claim-human-canon-authority",
+      "claim": "The human retains final authority over canon, publication, deletion, and consequential external action.",
+      "source_documents": ["doc-docs-doctrine-005-captain-archive-stewardship-md", "doc-docs-command-structure-md"],
+      "source_locations": [{"path": "docs/doctrine/005-captain-archive-stewardship.md", "section": "Authority retained by the Admiral"}],
+      "claim_type": "authority",
+      "confidence": "high",
+      "authority_status": "canonical",
+      "support": "direct",
+      "conflicts_with": [],
+      "requires_review": false
+    }
+  ]
+}

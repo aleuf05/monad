@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "monad.admiralty.decision.v0.1",
+  "type": "object",
+  "required": ["id", "title", "status", "decision", "authority", "source_documents"],
+  "properties": {
+    "id": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "string"},
+    "decision_date": {"type": ["string", "null"]}, "date_confidence": {"type": "string"},
+    "authority": {"type": "string"}, "decision": {"type": "string"},
+    "rationale": {"type": ["string", "null"]}, "source_documents": {"type": "array"},
+    "implementation_state": {"type": "string"}
+  }
+}

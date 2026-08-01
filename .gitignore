@@ -28,6 +28,7 @@ data/image-intake/
 data/living-captain-workbench/
 data/mike-rocketry-intake/
 data/chat-captain/
+data/monad0-lab/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/watch-officer-fetch.log
