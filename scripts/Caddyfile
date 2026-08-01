@@ -1,6 +1,6 @@
 (console_routes) {
 	handle_path /chat-captain-api/* {
-		reverse_proxy 127.0.0.1:4778
+		respond `{"error":"legacy_chat_captain_parked"}` 410
 	}
 	handle {
 		root * /home/cgl/dev/monad/console
@@ -22,23 +22,13 @@ cameronlampley.com {
 	# exact sequence written, so every matcher below is evaluated
 	# top-to-bottom, first match wins, exactly as it reads.
 	route {
-		# LAN-direct branch: viable only once LAN clients resolve this
-		# hostname straight to 192.168.0.100 via router-side DNS (see
-		# docs/deployment.md). That path never touches the router's NAT
-		# hairpin, so remote_ip here is the client's real private address
-		# -- unlike the disproved same-hostname-via-hairpin attempt, where
-		# source was rewritten to the public WAN IP and looked identical
-		# to real internet traffic.
-		@lan remote_ip private_ranges
-		handle @lan {
-			import console_routes
-		}
-
-		# Public fallback so the Admiral can reach the console from
-		# anywhere (not just the LAN) without depending on the DNS
-		# override working. This path is reachable by anyone on the
-		# internet, so it is gated -- password-only (this page has
-		# exactly one intended user, no username field) by
+		# Single site, single path to the console: cameronlampley.com/root,
+		# for the Admiral from anywhere including the LAN. No separate
+		# bare-IP LAN site block and no split-horizon @lan branch -- both
+		# retired 2026-08-01 in favor of exactly one Caddy site. This path
+		# is reachable by anyone on the internet, so it is gated --
+		# password-only (this page has exactly one intended user, no
+		# username field) by
 		# tools/public-root-auth/server.py via forward_auth. That service
 		# issues a 1-year session cookie on successful login, so this
 		# reads as "log in once," not a per-visit prompt. /root-login
@@ -68,10 +58,7 @@ cameronlampley.com {
 		}
 
 		handle_path /chat-captain-api/* {
-			forward_auth 127.0.0.1:4779 {
-				uri /check
-			}
-			reverse_proxy 127.0.0.1:4778
+			respond `{"error":"legacy_chat_captain_parked"}` 410
 		}
 
 		handle_path /root-console-api/* {
@@ -131,17 +118,4 @@ cameronlampley.com {
 			file_server
 		}
 	}
-}
-
-# Monad Root Console -- LAN-only Chat Captain cockpit. Deliberately NOT part
-# of the public cameronlampley.com block above: matched by LAN IP, plain
-# HTTP (no public cert is obtainable for a bare LAN address), not reachable
-# from the public internet. Narrow, single-console exception to the
-# web-lan/ pattern retired 2026-07-13 -- see docs/deployment.md for the
-# discussion that authorized this one instance.
-http://192.168.0.100:8080 {
-	handle_path /root-console-api/* {
-		reverse_proxy 127.0.0.1:4792
-	}
-	import console_routes
 }

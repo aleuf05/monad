@@ -1,34 +1,32 @@
 {
   "schema": "monad.contextSteward.v0.1",
-  "generated_at": "2026-07-31T14:15:57+00:00",
-  "input_digest": "883f4932fd5e38f2",
+  "generated_at": "2026-08-01T19:46:09+00:00",
+  "input_digest": "7455260bc8689ae7",
   "projection": true,
   "active_course": {
     "mission": "Monad organizes Cameron's cognitive landscape so valuable engineering work is preserved, connected, refined, and recoverable instead of becoming fragmented or buried (docs/mission.md). Beastscape and sibling Live Captain instruments remain active parallel product threads within that mission.",
-    "goal": "Continuing the Root Console redesign begun after a prior-session crash recovery: shipped Chat Captain's first real Admiral-facing feature (Captain's Brief), then removed the console's application-level password entirely at the Admiral's explicit direction, since the LAN-only Caddy site block it lives behind is deliberately the whole access-control boundary. Both changes are committed, deployed, and verified live. Nothing is currently blocked or in flight; the Admiral flagged this as careful foundational work, not a rush.",
-    "next_action": "No committed next action from the Admiral yet beyond what's already landed. Open threads carried forward: (1) confirm with the Admiral whether the Root Console splash's remaining proposed panels (Project Formation/Design/Review/Associative Lab/Record mode chips, Harvest Tray Accept/Reject, the automatic containment/review queue) should move from mockup to real, and in what order -- Captain's Brief is a precedent for doing this incrementally; (2) reconcile with whatever the concurrent Codex doc-archive session lands; (3) visually verify the Root Console and Chat Captain UI (including the now-gateless load) in an actual browser on the LAN once available; (4) the anticipated-but-unscoped Admiral-facing archive section noted in docs/README.md remains open for future scoping."
+    "goal": "2026-08-01: legacy Chat Captain (tools/chat-captain/, port 4778) is parked -- stopped, disabled, data preserved, routes return 410 legacy_chat_captain_parked. It is not the governing design for the integrated Captain; its legacy modes, harvest workflow, context-compiler, and JSON ceremony are not requirements of the new Captain. The active objective is one coherent, maximum-capability Live Captain: root-console.service is already commissioned and active; next action is the clean Captain bootstrap on top of it. Separately, Caddy was consolidated to one site block: console reachable only at cameronlampley.com/root, same existing password check; the bare-IP LAN-only 192.168.0.100:8080 block is gone.",
+    "next_action": "Design and implement the clean Live Captain bootstrap on top of the already-commissioned root-console.service / console/index.html -- not a re-derivation of Chat Captain's legacy modes, harvest workflow, context-compiler, or structured-JSON ceremony. Chat Captain (parked 2026-08-01, see tools/chat-captain/PARKED.md) is preserved for later study only; reactivating it requires a separate explicit decision. Other open threads carried forward: (1) reconcile with whatever the concurrent Codex doc-archive/admiralty-archive work lands; (2) visually verify the Root Console in an actual browser once available -- this and the prior session have only ever verified it via curl/HTTP status and source inspection; (3) the anticipated-but-unscoped Admiral-facing archive section noted in docs/README.md remains open for future scoping."
   },
   "established_truth": [
-    "Chat Captain (tools/chat-captain/: server.py, engine.py, database.py, codex_provider.py, context_compiler.py, harvest.py, usage_budget.py, plus unittest coverage) is built and installed as chat-captain-web.service -- confirmed active and healthy on the host after the most recent redeploy, with no restarts or errors.",
-    "The Root Console is deliberately LAN-only by explicit prior Admiral authorization (docs/deployment.md's 2026-07-31 entry): served at http://192.168.0.100:8080/ via a dedicated Caddy site block in scripts/Caddyfile, plain HTTP (no public cert obtainable for a bare LAN address). This is narrower than the retired web-lan/ pattern -- one console, not a mirrored site.",
-    "As of 2026-07-31 (same day, later amendment), Chat Captain and the Root Console have NO application-level password. An earlier version carried a scrypt password + HMAC-signed session cookie (copied from tools/living-captain/web_service.py); the Admiral had it removed on the reasoning that the console's LAN-only Caddy site block already IS the access-control boundary -- only the Admiral has physical/network access to that LAN, so the boundary is already binary before any password is checked, and a password on top of it was a second access-control system solving a problem the first one already solved. configure_web_auth.py was deleted; the stale credential file at ~/.config/monad/chat-captain-web.env was removed from the host. The POST Origin allowlist check was kept -- that is ordinary CSRF hygiene, not an access-control gate, and costs the Admiral nothing.",
-    "The Root Console's first real (non-mockup) feature is Captain's Brief: an authenticated-by-nothing (no login needed, same as everything else now) GET /api/brief endpoint that reads docs/context/current-state.json directly and an interactive popup in console/app.html (also linked from console/index.html's splash via /app.html?brief=1, auto-opening once the app has loaded). This reuses the Context Steward's own projection rather than building a second summarization path -- full access by construction (nothing redacted), executive-level by construction (already curated), matching the Admiral-level access model requested.",
-    "console/index.html (the splash) explicitly labels itself a non-functional visual preview; two things on it are real: the Captain's Brief link and the Exit to Public Site link. console/app.html is the actual, working conversation UI (console/assets/js/chat-captain.js), now loading directly with no login screen.",
-    "The public site is unaffected and was verified after both this session's deploys: https://cameronlampley.com/ returns 200; https://cameronlampley.com/chat-captain-api/health returns 404 (no route exists there).",
-    "The full tools/chat-captain test suite (30 tests, including test_api.py rewritten to drop all login/session/password test scaffolding) passes after the auth removal.",
-    "docs/deployment.md carries two dated entries on this: the original 2026-07-31 LAN-only exception (network isolation as the security boundary), and a same-day amendment entry documenting the password removal and the reasoning above -- both are the authoritative record; this checkpoint summarizes, doesn't replace them.",
-    "Earlier the same day: this session recovered from a prior-session crash by reading disk/host state directly (not chat memory), found the LAN Root Console splash-plus-old-site-link redesign already fully built and deployed, committed it (52a1d10), then added Captain's Brief (3ae7bda) before this auth-removal change. README.md was substantially rewritten and docs/ restructured with new top-level entry points (docs/mission.md, docs/README.md, docs/command-structure.md, docs/safety/README.md, docs/history/README.md), preserving older material as marked historical/draft rather than deleting it.",
-    "A separate Codex agent session was reported mid-session as concurrently working on 'core doc archive' in this same repository. git fetch checks before each push this session found origin/agent/living-world-intake-v0-1 had not moved past this session's parent commit, so no conflicts occurred -- but the next Captain should still git pull and diff docs/history/, docs/README.md, docs/mission.md, docs/command-structure.md, and docs/safety/ against origin before trusting this checkpoint's description of them as current.",
-    "docs/README.md notes (added this session, still standing) that an Admiral-facing section of the historical archive is anticipated but not yet scoped, per the Admiral's own flag -- noted so neither the doc map nor related tooling like Captain's Brief forecloses it."
+    "PARKED 2026-08-01: chat-captain-web.service stopped and disabled (confirmed inactive/disabled, no listener on port 4778, removed from multi-user.target.wants). data/chat-captain/ left byte-for-byte untouched (captain.sqlite3 sha256 e3ba0653...970aa, usage.json sha256 6a7858e8...476a6, full sizes/mtimes recorded before the change). scripts/Caddyfile's two /chat-captain-api/* handlers now `respond` 410 with body {\"error\":\"legacy_chat_captain_parked\"} instead of reverse_proxy-ing to 127.0.0.1:4778, validated and deployed live via caddy validate + systemctl reload caddy, prior Caddyfile preserved at /etc/caddy/Caddyfile.pre-chat-captain-parked-2026-08-01. See tools/chat-captain/PARKED.md. Chat Captain's earlier build, auth-removal, and Captain's Brief feature are prior history, not current design -- see docs/context/archive/20260731-*.md and git history (52a1d10, 3ae7bda) for that record.",
+    "root-console.service (console/index.html) is the active, commissioned Live Captain -- a persistent Codex-backed daemon with a live SSE stream, password-authenticated at /root -- commissioned in commit f5a0ff2 (\"Commission Live Captain Root Console\"). This, not Chat Captain, is the governing architecture going forward.",
+    "2026-08-01: Caddy consolidated to one site block. The former bare-IP LAN-only 192.168.0.100:8080 block and its @lan remote_ip matcher were removed; the console is reachable only at https://cameronlampley.com/root, gated by the pre-existing forward_auth password check (tools/public-root-auth/server.py, port 4779) -- unchanged, not rotated. Prior live Caddyfile preserved at /etc/caddy/Caddyfile.pre-single-site-2026-08-01.",
+    "Public site and unrelated services verified healthy after both 2026-08-01 Caddy changes: https://cameronlampley.com/ returns 200; world-intake.service remains active.",
+    "A separate Codex agent session / concurrent work has touched this same repository the same day (admiralty archive, monad0-lab, research console, etc., swept into one commit on 2026-08-01) -- git pull and diff before trusting any single checkpoint's description of current state as exhaustive."
   ],
   "vocabulary": [
     {
       "term": "Root Console",
-      "meaning": "The private, LAN-only front door at http://192.168.0.100:8080/ -- console/index.html is a visual splash/preview of its future UI; console/app.html is the real working Chat Captain app. No application-level login on either."
+      "meaning": "The single, public front door at https://cameronlampley.com/root (one Caddy site block; the earlier bare-IP LAN-only 192.168.0.100:8080 block and its @lan matcher were retired 2026-08-01). Gated by a password check via tools/public-root-auth/server.py (forward_auth). console/index.html is the live Live Captain terminal (root-console.service), not a splash/preview."
     },
     {
       "term": "Chat Captain",
-      "meaning": "The Codex-backed, persistent Admiral-Captain conversation service (tools/chat-captain/), served only on the LAN console, never on the public domain. Access control is network isolation only, not a password."
+      "meaning": "PARKED 2026-08-01. The legacy Codex-backed conversational experiment (tools/chat-captain/, chat-captain-web.service, port 4778). Stopped, disabled, code and SQLite data preserved unchanged; its API routes return 410 legacy_chat_captain_parked. Not the governing design for the integrated Live Captain -- see tools/chat-captain/PARKED.md."
+    },
+    {
+      "term": "Live Captain",
+      "meaning": "The active, integrated Captain: root-console.service, a persistent Codex-backed daemon with a live SSE stream to console/index.html, password-authenticated at /root. Already commissioned and running (commit f5a0ff2, \"Commission Live Captain Root Console\"). The current bootstrap work builds on this, not on Chat Captain's legacy design."
     },
     {
       "term": "Captain's Brief",
@@ -52,9 +50,21 @@
     "console/app.html, console/assets/js/chat-captain.js -- login screen and all related markup/JS removed; app loads directly. Captain's Brief popup unaffected.",
     "console/index.html -- banner text updated to state plainly there is no password.",
     "scripts/chat-captain-web.service -- EnvironmentFile line (pointing at the now-deleted credential file) removed; installed live and restarted.",
-    "scripts/install-chat-captain-web.sh -- auth-file provisioning step removed."
+    "scripts/install-chat-captain-web.sh -- auth-file provisioning step removed.",
+    "cmds.sh -- new dated block added and executed recording the redeploy and the stale-credential-file cleanup.",
+    "docs/deployment.md -- new dated amendment entry documenting the removal and its reasoning.",
+    "tools/chat-captain/README.md, docs/README.md -- updated to match."
   ],
-  "verification": [],
+  "verification": [
+    "tools/chat-captain full test suite: 30/30 passing after the auth removal (python3 -m unittest discover -s tools/chat-captain -p 'test_*.py').",
+    "node --check and python3 ast.parse both passed on the changed JS/Python before deploy.",
+    "diff of scripts/chat-captain-web.service against the live /etc/systemd/system/chat-captain-web.service showed exactly the two expected lines (Description wording, EnvironmentFile removal) before redeploy.",
+    "After redeploy: GET /api/state against the live LAN endpoint with zero cookies returned 200 ok:true with real ship state (mode, project, session, usage) -- confirms no login is enforced anywhere in the real request path, not just in source.",
+    "curl against the live app.html found no loginScreen/loginForm/'Password required' markup.",
+    "Public https://cameronlampley.com/ still returns 200 and /chat-captain-api/health still 404s, confirmed after this redeploy too.",
+    "The stale credential file at ~/.config/monad/chat-captain-web.env was confirmed present before removal and confirmed gone after.",
+    "Live GET /api/brief was fetched and found to still describe the old scrypt-auth reality (established_truth entries from before this change) -- this checkpoint refresh is what corrects that; the Admiral's Brief was, until this refresh, actively serving stale/wrong information about its own access model."
+  ],
   "defects": [],
   "deferred_ideas": [],
   "historical_wake": [
@@ -70,6 +80,7 @@
     "docs/history/README.md",
     "docs/deployment.md",
     "tools/chat-captain/README.md",
+    "tools/chat-captain/PARKED.md",
     "console/index.html",
     "console/app.html",
     "tools/chat-captain/server.py",
@@ -80,9 +91,7 @@
   ],
   "omissions": [
     "deferred_ideas",
-    "defects",
-    "verification",
-    "changed_surfaces"
+    "defects"
   ],
   "limits_bytes": {
     "current-brief.md": 10000,
