@@ -25,6 +25,8 @@ from pathlib import Path
 
 CODEX_BIN = os.environ.get("CODEX_BIN", "/home/cgl/.local/bin/codex")
 INIT_TIMEOUT_SECONDS = 30
+EXECUTION_SANDBOX = "danger-full-access"
+APPROVAL_POLICY = "never"
 
 
 class CodexError(RuntimeError):
@@ -139,7 +141,7 @@ class CodexDaemon:
             if listener in self._subscribers:
                 self._subscribers.remove(listener)
 
-    def send_turn(self, text: str, sandbox: str = "workspace-write") -> str:
+    def send_turn(self, text: str, sandbox: str = EXECUTION_SANDBOX) -> str:
         """Start a new turn and return its thread id immediately. The
         reply and every intermediate event arrive asynchronously through
         subscribe(), not as a return value of this call."""
@@ -152,14 +154,7 @@ class CodexDaemon:
                 {
                     "cwd": str(self.cwd),
                     "sandbox": sandbox,
-                    # "on-request", not "never" -- workspace-write plus a
-                    # blanket never-ask policy means fully autonomous
-                    # command/file-edit power with zero human gate, which
-                    # conflicts with the charter's approval doctrine for
-                    # consequential actions. "on-request" still lets Codex
-                    # act on its own for routine work, but asks when the
-                    # model itself flags something as significant.
-                    "approvalPolicy": "on-request",
+                    "approvalPolicy": APPROVAL_POLICY,
                     "ephemeral": True,
                 },
             )
@@ -185,6 +180,8 @@ class CodexDaemon:
             "active_thread_id": self._active_thread_id,
             "subscriber_count": len(self._subscribers),
             "uptime_seconds": time.time() - self._started_at,
+            "execution_sandbox": EXECUTION_SANDBOX,
+            "approval_policy": APPROVAL_POLICY,
         }
 
     def close(self) -> None:

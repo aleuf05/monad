@@ -35,6 +35,8 @@ ROOT_DIR = Path(__file__).resolve().parent
 STATIC_DIR = ROOT_DIR / "static"
 REPO_ROOT = ROOT_DIR.parent.parent
 SESSION_SECONDS = 12 * 60 * 60
+COMMISSIONING_TASK_ID = "CODEX-LIVE-CAPTAIN-1"
+AUTHORITY_MODE = "MAXIMUM-CAPABILITY COMMISSIONING"
 
 # The other live Monad services -- read-only visibility into the rest of
 # the fleet, since a Captain that only knows about itself isn't actually
@@ -48,6 +50,24 @@ FLEET_UNITS = [
     ("watchman", "monad-watchman.service"),
     ("public-root-auth", "public-root-auth.service"),
 ]
+
+
+def commissioning_status(daemon: CodexDaemon) -> dict:
+    """Truthful, inspectable state for the Live Captain commission."""
+    inbox = handoff.ensure_inbox()
+    codex_active = daemon.status()["running"]
+    target_verified = REPO_ROOT == Path("/home/cgl/dev/monad") and (REPO_ROOT / ".git").exists()
+    handoff_connected = inbox.is_dir() and inbox.parent.is_dir()
+    return {
+        "liveCaptain": "OPERATIONAL" if codex_active else "DEGRADED",
+        "codexEmbodiment": "ACTIVE" if codex_active else "INACTIVE",
+        "rootConsoleTarget": "VERIFIED" if target_verified else "UNVERIFIED",
+        "handoffChannel": "CONNECTED" if handoff_connected else "DISCONNECTED",
+        "authorityMode": AUTHORITY_MODE,
+        "currentMission": COMMISSIONING_TASK_ID,
+        "repository": str(REPO_ROOT),
+        "handoffPath": str(inbox),
+    }
 
 
 def fleet_status() -> list[dict]:
@@ -191,7 +211,9 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
                 return
-            self._send_json(self.daemon.status())
+            status = self.daemon.status()
+            status["commissioning"] = commissioning_status(self.daemon)
+            self._send_json(status)
         elif path == "/api/fleet":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
