@@ -110,6 +110,27 @@
 
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
   .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
+
+  /* --- Captain's Images ---------------------------------------------- */
+  .captain-images { margin: 30px 0 34px; }
+  .ci-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .ci-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #4FD1C5; }
+  .ci-synced { font-size: 10px; color: #6B7C93; }
+  .ci-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+  .ci-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ci-thumb { display: block; position: relative; aspect-ratio: 1 / 1; overflow: hidden; border: 1px solid #1E2C42; border-radius: 8px; background: #111A2B; cursor: pointer; padding: 0; }
+  .ci-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 200ms ease; }
+  .ci-thumb:hover { border-color: #4FD1C5; }
+  .ci-thumb:hover img { transform: scale(1.04); }
+  .ci-thumb .ci-time { position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 6px; font-size: 9px; color: #DCE6F2; background: linear-gradient(0deg, #05080Edd, transparent); opacity: 0; transition: opacity 150ms ease; }
+  .ci-thumb:hover .ci-time { opacity: 1; }
+  .ci-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(720px, 94vw); max-height: 90vh; }
+  .ci-dialog::backdrop { background: #05080Ecc; }
+  .ci-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1E2C42; }
+  .ci-dialog-head span { font-size: 10.5px; color: #6B7C93; }
+  .ci-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+  .ci-dialog-body { padding: 12px 16px 16px; max-height: 76vh; overflow: auto; text-align: center; }
+  .ci-dialog-body img { max-width: 100%; max-height: 70vh; border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -126,6 +147,19 @@
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
+
+    <section class="captain-images" id="captainImages">
+      <div class="ci-head">
+        <span class="ci-title">Captain's Images</span>
+        <span class="ci-synced" id="ciSynced"></span>
+      </div>
+      <div id="ciBody"><p class="ci-empty">Loading&hellip;</p></div>
+    </section>
+
+    <dialog class="ci-dialog" id="ciDialog">
+      <div class="ci-dialog-head"><span id="ciDialogTime"></span><button class="ci-dialog-close" id="ciDialogClose">Close</button></div>
+      <div class="ci-dialog-body"><img id="ciDialogImg" src="" alt="Captain-generated image, full size"></div>
+    </dialog>
 
     <section class="active-queue" id="activeQueue">
       <div class="aq-head">
@@ -152,7 +186,7 @@
       <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
     </a>
 
-    <a class="basin-berth" href="toys/living-basin/">
+    <a class="basin-berth" href="toys/living-basin/" style="display:none"
       <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
       <div class="project-title">THE LIVING BASIN</div>
       <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
@@ -252,6 +286,72 @@
         })
         .catch(function () {
           setStatus("UNKNOWN", "val-unknown", "status feed unreachable");
+        });
+    })();
+  </script>
+  <script>
+    (function () {
+      // tools/root-console/sync_public_images.py copies the newest Codex
+      // generated images from ~/.codex/generated_images into
+      // web/captain-images/ and writes this manifest, every 10 minutes
+      // (cron). No backend involved -- same pattern as fleet-status.json.
+      var body = document.getElementById("ciBody");
+      var syncedEl = document.getElementById("ciSynced");
+      var dialog = document.getElementById("ciDialog");
+      var dialogImg = document.getElementById("ciDialogImg");
+      var dialogTime = document.getElementById("ciDialogTime");
+      if (!body) return;
+
+      document.getElementById("ciDialogClose").addEventListener("click", function () {
+        dialog.close();
+      });
+      dialog.addEventListener("click", function (event) {
+        if (event.target === dialog) dialog.close();
+      });
+
+      function timeAgo(iso) {
+        var ms = Date.now() - new Date(iso).getTime();
+        if (!(ms >= 0)) return "";
+        var min = Math.round(ms / 60000);
+        if (min < 1) return "just now";
+        if (min < 60) return min + "m ago";
+        var hr = Math.round(min / 60);
+        if (hr < 24) return hr + "h ago";
+        return Math.round(hr / 24) + "d ago";
+      }
+
+      fetch("data/captain-images.json", { cache: "no-store" })
+        .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
+        .then(function (data) {
+          var images = data.images || [];
+          if (data.synced_at) {
+            syncedEl.textContent = "synced " + timeAgo(data.synced_at);
+          }
+          if (!images.length) {
+            body.innerHTML = '<p class="ci-empty">No Captain-generated images yet.</p>';
+            return;
+          }
+          var grid = document.createElement("div");
+          grid.className = "ci-grid";
+          images.forEach(function (image) {
+            var btn = document.createElement("button");
+            btn.className = "ci-thumb";
+            btn.type = "button";
+            btn.innerHTML =
+              '<img src="' + image.url + '" alt="Captain-generated image" loading="lazy">' +
+              '<span class="ci-time">' + timeAgo(image.generated_at) + "</span>";
+            btn.addEventListener("click", function () {
+              dialogImg.src = image.url;
+              dialogTime.textContent = "generated " + timeAgo(image.generated_at);
+              dialog.showModal();
+            });
+            grid.appendChild(btn);
+          });
+          body.innerHTML = "";
+          body.appendChild(grid);
+        })
+        .catch(function () {
+          body.innerHTML = '<p class="ci-empty">Image feed unreachable.</p>';
         });
     })();
   </script>

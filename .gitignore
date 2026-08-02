@@ -37,8 +37,16 @@ logs/review-inbox-fetch.log
 logs/lan-web-server.log
 logs/bridge-station-2.1-server.log
 logs/bridge-station-3.0-server.log
+logs/captain-images-sync.log
 
 # Generated 3D assets -- live on disk where they're served (web/), not
 # tracked in git. Regenerate or re-copy onto whatever box serves them.
 web/assets/models/*.glb
 web/assets/libfive/*.stl
+
+# Captain's generated-image gallery -- synced from ~/.codex/generated_images
+# by tools/root-console/sync_public_images.py every 10 minutes (cron). Live
+# binaries, not source, same treatment as the 3D assets above. The manifest
+# (web/data/captain-images.json) is tracked, like the other cron-refreshed
+# web/data/*.json feeds.
+web/captain-images/*
