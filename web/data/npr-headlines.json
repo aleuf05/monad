@@ -1,8 +1,33 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-01T18:45:01.465810+00:00",
+  "fetched_at": "2026-08-02T08:15:01.406876+00:00",
   "items": [
+    {
+      "title": "Idaho fast food restaurant shooting leaves 3 dead, city spokesman says",
+      "link": "https://www.npr.org/2026/08/02/nx-s1-5917121/idaho-fast-food-restaurant-shooting-3-dead",
+      "pubDate": "Sun, 02 Aug 2026 04:01:27 -0400"
+    },
+    {
+      "title": "Trump says he's cancelling Iran strikes, deal pending",
+      "link": "https://www.npr.org/2026/08/02/nx-s1-5917113/trump-says-hes-cancelling-iran-strikes-deal-pending",
+      "pubDate": "Sun, 02 Aug 2026 03:34:27 -0400"
+    },
+    {
+      "title": "'Sopranos' actor Vincent Pastore, known for playing mobsters and tough guys, dead at 80",
+      "link": "https://www.npr.org/2026/08/01/nx-s1-5916418/vincent-pastore-sopranos-obit",
+      "pubDate": "Sat, 01 Aug 2026 18:32:44 -0400"
+    },
+    {
+      "title": "Avalanche in Pakistan kills famed mountaineer Nirmal Purja and his fellow climbers",
+      "link": "https://www.npr.org/2026/08/01/nx-s1-5916368/nirmal-purja-climbers-dead-avalanche",
+      "pubDate": "Sat, 01 Aug 2026 18:23:39 -0400"
+    },
+    {
+      "title": "Overnight Russian barrage kills nine in Kyiv, as air defense struggle with U.S. continues",
+      "link": "https://www.npr.org/2026/08/01/nx-s1-5916393/overnight-russia-kyiv-ukraine-strikes",
+      "pubDate": "Sat, 01 Aug 2026 16:27:32 -0400"
+    },
     {
       "title": "Spain's Pedro S\u00e1nchez was a hero of migrants. After Ceuta, he faces his biggest challenge",
       "link": "https://www.npr.org/2026/08/01/nx-s1-5916330/spain-sanchez-ceuta-migrants",
@@ -17,31 +42,6 @@
       "title": "How these slum dwellers went from one-room shacks to beautiful new apartments",
       "link": "https://www.npr.org/2026/08/01/g-s1-135362/slum-apartments-india-design",
       "pubDate": "Sat, 01 Aug 2026 07:14:58 -0400"
-    },
-    {
-      "title": "FDA weighs a new kind of flu shot based on technology RFK Jr. has questioned",
-      "link": "https://www.npr.org/2026/08/01/nx-s1-5897441/fda-mrna-moderna-flu-vaccine",
-      "pubDate": "Sat, 01 Aug 2026 07:00:00 -0400"
-    },
-    {
-      "title": "Lebanese who fled the Israeli invasion visit to see what's left",
-      "link": "https://www.npr.org/2026/08/01/nx-s1-5910555/lebanon-israel-war-hezbollah",
-      "pubDate": "Sat, 01 Aug 2026 06:00:00 -0400"
-    },
-    {
-      "title": "More than 25,000 children lose previous legal protections, as federal contract ends",
-      "link": "https://www.npr.org/2026/08/01/nx-s1-5913679/immgirant-children-lawyers-trump-administration",
-      "pubDate": "Sat, 01 Aug 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Death toll in Spain border crisis reaches 67 as tens of thousands cross back in to Morocco",
-      "link": "https://www.npr.org/2026/08/01/nx-s1-5916271/ceuta-spain-border-morocco",
-      "pubDate": "Sat, 01 Aug 2026 05:36:05 -0400"
-    },
-    {
-      "title": "Why did OpenAI's and Anthropic's AI models hack other companies?",
-      "link": "https://www.npr.org/2026/08/01/nx-s1-5914852/anthropic-openai-models-hack-cybersecurity",
-      "pubDate": "Sat, 01 Aug 2026 05:00:00 -0400"
     }
   ]
 }

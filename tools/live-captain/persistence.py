@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS messages (
     text TEXT NOT NULL,
     ts REAL NOT NULL,
     kernel_digest TEXT NOT NULL,
-    bearing_digest TEXT NOT NULL
+    bearing_digest TEXT NOT NULL,
+    ledger_digest TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE IF NOT EXISTS restarts (
@@ -46,12 +47,27 @@ class LiveCaptainStore:
             self._conn = sqlite3.connect(str(db_path), check_same_thread=False)
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.executescript(SCHEMA)
+            self._migrate_schema()
             self._conn.commit()
         except sqlite3.DatabaseError as exc:
             raise PersistenceError(f"live-captain persistence unavailable: {exc}") from exc
         self.session_id = uuid.uuid4().hex
         self._seq = self._next_seq()
         self._record_restart()
+
+    def _migrate_schema(self) -> None:
+        """Add provenance fields introduced after the bootstrap database.
+
+        Existing rows retain an empty ledger digest, which truthfully means
+        that no ledger version was recorded for those historical turns.
+        """
+        columns = {
+            row[1] for row in self._conn.execute("PRAGMA table_info(messages)").fetchall()
+        }
+        if "ledger_digest" not in columns:
+            self._conn.execute(
+                "ALTER TABLE messages ADD COLUMN ledger_digest TEXT NOT NULL DEFAULT ''"
+            )
 
     def _next_seq(self) -> int:
         row = self._conn.execute("SELECT MAX(seq) FROM messages").fetchone()
@@ -64,7 +80,14 @@ class LiveCaptainStore:
         )
         self._conn.commit()
 
-    def record_message(self, role: str, text: str, kernel_digest: str, bearing_digest: str) -> int:
+    def record_message(
+        self,
+        role: str,
+        text: str,
+        kernel_digest: str,
+        bearing_digest: str,
+        ledger_digest: str,
+    ) -> int:
         if role not in ("admiral", "captain"):
             raise PersistenceError(f"invalid message role: {role!r}")
         if not text or not text.strip():
@@ -73,9 +96,19 @@ class LiveCaptainStore:
         self._seq += 1
         try:
             self._conn.execute(
-                "INSERT INTO messages (session_id, seq, role, text, ts, kernel_digest, bearing_digest) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (self.session_id, seq, role, text, time.time(), kernel_digest, bearing_digest),
+                "INSERT INTO messages "
+                "(session_id, seq, role, text, ts, kernel_digest, bearing_digest, ledger_digest) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    self.session_id,
+                    seq,
+                    role,
+                    text,
+                    time.time(),
+                    kernel_digest,
+                    bearing_digest,
+                    ledger_digest,
+                ),
             )
             self._conn.commit()
         except sqlite3.DatabaseError as exc:
@@ -90,15 +123,42 @@ class LiveCaptainStore:
             raise PersistenceError("recent-message limit cannot be negative")
         total = self._conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0]
         rows = self._conn.execute(
-            "SELECT seq, role, text, ts FROM messages ORDER BY seq DESC LIMIT ?",
+            "SELECT seq, role, text, ts, kernel_digest, bearing_digest, ledger_digest "
+            "FROM messages ORDER BY seq DESC LIMIT ?",
             (limit,),
         ).fetchall()
         rows.reverse()
         messages = [
-            {"seq": seq, "role": role, "text": text, "ts": ts} for seq, role, text, ts in rows
+            {
+                "seq": seq,
+                "role": role,
+                "text": text,
+                "ts": ts,
+                "kernel_digest": kernel_digest,
+                "bearing_digest": bearing_digest,
+                "ledger_digest": ledger_digest,
+            }
+            for seq, role, text, ts, kernel_digest, bearing_digest, ledger_digest in rows
         ]
         omitted = max(0, total - len(messages))
         return messages, omitted
+
+    def load_admiral_attestation(self, seq: int) -> tuple[str, bytes]:
+        """Return immutable evidence bytes for one persisted Admiral command.
+
+        The reference is derived from stored role and sequence metadata rather
+        than accepted from a candidate envelope. Captain-authored rows and
+        missing sequences fail closed.
+        """
+        row = self._conn.execute(
+            "SELECT role, text FROM messages WHERE seq = ?", (seq,)
+        ).fetchone()
+        if row is None:
+            raise PersistenceError(f"message sequence {seq} does not exist")
+        role, message_text = row
+        if role != "admiral":
+            raise PersistenceError("only persisted Admiral messages can attest candidates")
+        return f"message:admiral:{seq}", message_text.encode("utf-8")
 
     def restart_count(self) -> int:
         return self._conn.execute("SELECT COUNT(*) FROM restarts").fetchone()[0]

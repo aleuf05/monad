@@ -13,13 +13,14 @@ sys.path.insert(0, str(ROOT))
 SPEC = importlib.util.spec_from_file_location("root_console_server", ROOT / "server.py")
 server = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(server)
+import generated_images
 
 
 class GeneratedImageTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.store = Path(self.temp.name)
-        self.patch = mock.patch.object(server, "GENERATED_IMAGE_DIR", self.store)
+        self.patch = mock.patch.object(generated_images, "GENERATED_IMAGE_DIR", self.store)
         self.patch.start()
 
     def tearDown(self):
@@ -62,7 +63,7 @@ class GeneratedImageTests(unittest.TestCase):
 
     def test_oversized_image_is_rejected(self):
         path = self.image()
-        with mock.patch.object(server, "MAX_GENERATED_IMAGE_BYTES", path.stat().st_size - 1):
+        with mock.patch.object(generated_images, "MAX_GENERATED_IMAGE_BYTES", path.stat().st_size - 1):
             token = server.generated_image_token(path)
             with self.assertRaises(server.GeneratedImageError):
                 server.resolve_generated_image(token)

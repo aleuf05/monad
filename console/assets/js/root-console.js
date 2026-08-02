@@ -9,6 +9,17 @@ const API_BASE = "/root-console-api/api";
 // LIVE-CAPTAIN-MINIMUM-CONTEXT-BOOTSTRAP-0.1. Login, status, and handoffs
 // stay on root-console.service above; only the actual Captain
 // conversation moved.
+//
+// NON-OBVIOUS AND COSTLY IF MISSED: these two services are not
+// independent. live-captain-bootstrap imports the SAME
+// tools/root-console/generated_images.py module root-console.service uses,
+// and every image URL it mints still points back at
+// root-console.service's /api/generated-image/ route -- root-console is
+// the ONLY service that ever serves the actual image bytes, even for a
+// conversation running entirely on live-captain-bootstrap. Restarting only
+// one of the two, or checking only one of the two before declaring
+// something broken/fixed, WILL produce misleading results. Always check
+// and restart both together.
 const LIVE_CAPTAIN_API_BASE = "/live-captain-bootstrap-api/api";
 
 const bearingIndicatorEl = document.getElementById("bearing-indicator");
@@ -85,6 +96,18 @@ function shortThread(threadId) {
   return threadId ? threadId.slice(0, 8) : "—";
 }
 
+// An image card that just rendered was getting shoved out of the visible
+// terminal within a second by the next chat row's own auto-scroll-to-
+// bottom -- still in the DOM, just immediately unseeable. Pin the view in
+// place for a few seconds after an image lands instead of always
+// snapping to the newest row.
+let imagePinnedUntil = 0;
+
+function followTerminalBottom() {
+  if (Date.now() < imagePinnedUntil) return;
+  terminalEl.scrollTop = terminalEl.scrollHeight;
+}
+
 function addRow(cssClass, src, body) {
   const row = document.createElement("div");
   row.className = `row ${cssClass}`;
@@ -99,7 +122,7 @@ function addRow(cssClass, src, body) {
   bodyEl.textContent = body;
   row.append(ts, srcEl, bodyEl);
   terminalEl.insertBefore(row, promptRowEl);
-  terminalEl.scrollTop = terminalEl.scrollHeight;
+  followTerminalBottom();
   return bodyEl;
 }
 
@@ -145,6 +168,8 @@ function addImageArtifact(url, label = "Captain image artifact") {
     openImageStage(url, label);
   });
   bodyEl.appendChild(button);
+  imagePinnedUntil = Date.now() + 5000;
+  bodyEl.closest(".row")?.scrollIntoView({ block: "center", behavior: "smooth" });
   return bodyEl;
 }
 
@@ -519,7 +544,7 @@ function handleCodexEvent(event) {
       streamingRows.set(params.itemId, bodyEl);
     }
     bodyEl.textContent += params.delta || "";
-    terminalEl.scrollTop = terminalEl.scrollHeight;
+    followTerminalBottom();
     return;
   }
 
@@ -532,7 +557,7 @@ function handleCodexEvent(event) {
       bodyEl.textContent = item.text || "";
       streamingRows.delete(item.id);
       for (const [url, label] of imageArtifactsFrom(item, { scanFreeText: true })) addImageArtifact(url, label);
-      terminalEl.scrollTop = terminalEl.scrollHeight;
+      followTerminalBottom();
       return;
     }
     if (item.type === "userMessage") return;
@@ -619,6 +644,13 @@ function connect() {
   streamSource.onopen = () => {
     connEl.classList.add("live");
     connTextEl.textContent = "live";
+    // A fresh connection (first load OR a reconnect after the backend
+    // restarted) means any "in progress" state we were tracking from the
+    // old connection is orphaned -- its completion event can never arrive,
+    // so left alone it spins forever. Clear it silently rather than lie
+    // about work still being done.
+    stopThinking();
+    stopImageGenIndicator();
   };
   streamSource.onerror = () => {
     connEl.classList.remove("live");

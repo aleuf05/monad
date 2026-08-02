@@ -51,6 +51,7 @@ def format_chronological_messages(messages: list[dict], omitted: int = 0) -> str
 def compile_live_captain_context(
     captain_kernel: str,
     current_bearing: str,
+    continuity_ledger: str,
     recent_messages: list[dict],
     current_admiral_message: str,
     omitted: int = 0,
@@ -59,13 +60,37 @@ def compile_live_captain_context(
         raise ContextCompilerError("captain kernel is required and was empty")
     if not current_bearing or not current_bearing.strip():
         raise ContextCompilerError("current bearing is required and was empty")
+    if not continuity_ledger or not continuity_ledger.strip():
+        raise ContextCompilerError("continuity ledger is required and was empty")
     if not current_admiral_message or not current_admiral_message.strip():
         raise ContextCompilerError("current Admiral message is required and was empty")
     return "\n\n---\n\n".join(
         [
             captain_kernel.strip(),
             current_bearing.strip(),
+            continuity_ledger.strip(),
             "# Recent conversation\n\n" + format_chronological_messages(recent_messages, omitted),
             "# Current Admiral message\n\n" + current_admiral_message.strip(),
         ]
     )
+
+
+def context_size_metrics(
+    captain_kernel: str,
+    current_bearing: str,
+    continuity_ledger: str,
+    recent_messages: list[dict],
+    current_admiral_message: str,
+    compiled_context: str,
+) -> dict[str, int]:
+    """Measure source sizes without adding a tokenizer dependency."""
+    conversation = format_chronological_messages(recent_messages)
+    return {
+        "kernel_chars": len(captain_kernel),
+        "bearing_chars": len(current_bearing),
+        "ledger_chars": len(continuity_ledger),
+        "conversation_chars": len(conversation),
+        "current_message_chars": len(current_admiral_message),
+        "compiled_chars": len(compiled_context),
+        "compiled_bytes": len(compiled_context.encode("utf-8")),
+    }

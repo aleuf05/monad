@@ -4,6 +4,15 @@ This is the enduring conceptual map of Monad's documentation. It organizes
 existing material by what it explains rather than by when it was implemented.
 Dated packets, reports, and logs retain their original paths and status.
 
+## Current commissioning result
+
+- [Live Captain Commissioning Report](../LIVE_CAPTAIN_COMMISSIONING_REPORT.md)
+  — static summary of demonstrated successes, shortcomings, evidence, and the
+  next bounded experiment.
+- [Live Captain Phone Analysis Packet](reports/2026-08-02-live-captain-phone-analysis-packet.md)
+  — GitHub Chat-ready evidence packet and exact Operator instructions for
+  phone-based post-analysis.
+
 ## Mission
 
 - [Project Mission](mission.md) — current purpose and supporting mechanisms.
