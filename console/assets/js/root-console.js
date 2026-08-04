@@ -921,6 +921,9 @@ function docxSay(message, kind) {
   docxResult.className = kind || "";
 }
 
+const docxCommitBtn = document.getElementById("docx-commit");
+const docxClearBtn = document.getElementById("docx-clear");
+
 async function loadDocxRecent() {
   try {
     const response = await fetch(`${DOCX_API_BASE}/recent`);
@@ -931,10 +934,47 @@ async function loadDocxRecent() {
       ? `<div class="docx-recent-item">staged: ${entries.length}</div>` +
         entries.slice(0, 4).map((e) => `<div class="docx-recent-item">· ${e.name}</div>`).join("")
       : "";
+    docxCommitBtn.disabled = entries.length === 0;
+    docxClearBtn.disabled = entries.length === 0;
   } catch (err) {
     /* panel is supplementary; a failed listing shouldn't shout */
   }
 }
+
+async function docxAction(endpoint, button, workingLabel) {
+  const original = button.textContent;
+  button.textContent = workingLabel;
+  docxCommitBtn.disabled = true;
+  docxClearBtn.disabled = true;
+  try {
+    const response = await fetch(`${DOCX_API_BASE}/${endpoint}`, { method: "POST" });
+    const body = await response.json().catch(() => ({}));
+    if (response.ok && body.ok) return body;
+    docxSay(`✗ ${body.error || `HTTP ${response.status}`}`, "err");
+    return null;
+  } catch (err) {
+    docxSay(`✗ ${String(err)}`, "err");
+    return null;
+  } finally {
+    button.textContent = original;
+    loadDocxRecent();
+  }
+}
+
+docxCommitBtn.addEventListener("click", async () => {
+  const result = await docxAction("commit", docxCommitBtn, "pushing…");
+  if (result) {
+    docxSay(`✓ Committed ${result.commit} (${result.count} packet(s)) and pushed to ${result.branch}`, "ok");
+  }
+});
+
+docxClearBtn.addEventListener("click", async () => {
+  if (!window.confirm("Delete all staged packets and their originals? Anything already committed stays in git history.")) return;
+  const result = await docxAction("clear", docxClearBtn, "clearing…");
+  if (result) {
+    docxSay(`✓ Cleared ${result.removed} staged packet(s)`, "ok");
+  }
+});
 
 async function uploadDocx(file) {
   if (!file) return;

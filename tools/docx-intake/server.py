@@ -31,6 +31,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import subprocess
 import time
 import xml.etree.ElementTree as ET
 import zipfile
@@ -114,6 +115,95 @@ def extract_markdown(docx_bytes: bytes) -> str:
     return "\n\n".join(l for l in out if l) + "\n"
 
 
+def _git(*args: str, timeout: int = 90) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        ["git", *args],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+
+
+def _staged_files() -> list[Path]:
+    if not INCOMING_DIR.is_dir():
+        return []
+    return sorted(p for p in INCOMING_DIR.glob("*.md") if p.name != "README.md")
+
+
+def commit_and_push() -> dict:
+    """Stage, commit, and push docs/incoming only.
+
+    Deliberately scoped with an explicit pathspec rather than `git add -A`:
+    the working tree routinely carries unrelated in-progress edits, and a
+    button on a web panel must never sweep those into a commit the operator
+    didn't look at.
+    """
+    pending = _staged_files()
+    if not pending:
+        return {"ok": False, "error": "nothing staged to commit"}
+
+    add = _git("add", "--", str(INCOMING_DIR.relative_to(REPO_ROOT)))
+    if add.returncode != 0:
+        return {"ok": False, "error": f"git add failed: {add.stderr.strip()}"}
+
+    status = _git("status", "--porcelain", "--", str(INCOMING_DIR.relative_to(REPO_ROOT)))
+    if not status.stdout.strip():
+        return {"ok": False, "error": "no changes in docs/incoming to commit"}
+
+    names = ", ".join(p.name for p in pending[:5])
+    if len(pending) > 5:
+        names += f", +{len(pending) - 5} more"
+    message = (
+        f"Stage {len(pending)} incoming packet(s) from Root Console drop box\n\n"
+        f"{names}\n\n"
+        "Staged material only -- transported into the repo, not yet evaluated\n"
+        "or filed per docs/doctrine/012-documentarian-packet-scheme.md."
+    )
+    commit = _git("commit", "-m", message)
+    if commit.returncode != 0:
+        return {"ok": False, "error": f"git commit failed: {commit.stderr.strip() or commit.stdout.strip()}"}
+
+    head = _git("rev-parse", "--short", "HEAD").stdout.strip()
+    branch = _git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
+
+    push = _git("push", "origin", "HEAD")
+    if push.returncode != 0:
+        return {
+            "ok": False,
+            "committed": True,
+            "commit": head,
+            "branch": branch,
+            "error": f"committed {head} but push failed: {push.stderr.strip()}",
+        }
+
+    return {
+        "ok": True,
+        "committed": True,
+        "pushed": True,
+        "commit": head,
+        "branch": branch,
+        "count": len(pending),
+    }
+
+
+def clear_staged() -> dict:
+    """Delete staged extracts and their originals.
+
+    Only touches files this drop box created. Anything already committed
+    stays in git history; this clears the staging tray, it does not rewrite
+    what was pushed.
+    """
+    removed = 0
+    for path in _staged_files():
+        path.unlink()
+        removed += 1
+    if ORIGINALS_DIR.is_dir():
+        for path in ORIGINALS_DIR.glob("*.docx"):
+            path.unlink()
+    return {"ok": True, "removed": removed}
+
+
 def _parse_multipart(body: bytes, boundary: bytes) -> dict[str, dict]:
     parts: dict[str, dict] = {}
     delimiter = b"--" + boundary
@@ -143,7 +233,21 @@ def _parse_multipart(body: bytes, boundary: bytes) -> dict[str, dict]:
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
-        if urlparse(self.path).path != "/api/upload":
+        path = urlparse(self.path).path
+
+        if path == "/api/commit":
+            try:
+                result = commit_and_push()
+            except subprocess.TimeoutExpired:
+                result = {"ok": False, "error": "git operation timed out"}
+            self._json(200 if result.get("ok") else 400, result)
+            return
+
+        if path == "/api/clear":
+            self._json(200, clear_staged())
+            return
+
+        if path != "/api/upload":
             self._json(404, {"ok": False, "error": "not found"})
             return
 

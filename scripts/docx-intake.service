@@ -15,7 +15,11 @@ NoNewPrivileges=true
 PrivateDevices=true
 PrivateTmp=true
 ProtectSystem=strict
+# .git as well as the staging dir: the panel's commit+push control writes
+# objects/refs/index. Still scoped to this repo, and the commit itself uses
+# an explicit docs/incoming pathspec rather than `git add -A`.
 ReadWritePaths=/home/cgl/dev/monad/docs/incoming
+ReadWritePaths=/home/cgl/dev/monad/.git
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
