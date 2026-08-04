@@ -261,6 +261,31 @@
   #handoffs-list .h-row .h-meta { color: var(--dim); font-size: 0.64rem; }
   #handoffs-list .h-row .h-path { color: var(--dim); font-size: 0.6rem; overflow-wrap: break-word; }
 
+  #ship-log-list { max-height: 320px; overflow-y: auto; font-size: 0.68rem; }
+  #ship-log-list .sl-empty { color: var(--dim); font-style: italic; }
+  #ship-log-list .sl-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.35rem 0.4rem;
+    margin-bottom: 0.3rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+  }
+  #ship-log-list .sl-row .sl-head { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; }
+  #ship-log-list .sl-row .sl-title { color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #ship-log-list .sl-row .sl-source {
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    padding: 0.05rem 0.35rem;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    flex-shrink: 0;
+  }
+  #ship-log-list .sl-row .sl-meta { color: var(--dim); font-size: 0.64rem; }
+  #ship-log-list .sl-row .sl-excerpt { color: var(--dim); font-size: 0.62rem; white-space: pre-wrap; word-break: break-word; max-height: 4.5em; overflow: hidden; }
+
   #handoff-detail {
     position: fixed;
     inset: 0;
@@ -308,8 +333,10 @@
     word-break: break-word;
   }
   .row .ts { color: var(--dim); flex-shrink: 0; }
-  .row .src { flex-shrink: 0; font-weight: 700; min-width: 6.5em; }
+  .row .src { display: inline-flex; align-items: center; gap: 0.35rem; flex-shrink: 0; font-weight: 700; min-width: 6.5em; }
+  .row .src .glyph { flex: none; }
   .row .body { flex: 1; color: var(--text); }
+  .metamorphosis-land-wrap { display: inline; }
 
   .row.lifecycle .src { color: var(--dim); font-weight: 500; }
   .row.lifecycle .body { color: var(--dim); }
@@ -478,6 +505,50 @@
     cursor: pointer;
   }
   #login-gate .error { color: var(--warn); font-size: 0.8rem; min-height: 1em; font-weight: 700; }
+
+  /* .docx drop box. Sits at the very top of the status panel and glows,
+     because a drop target nobody can find is the same as no drop target. */
+  #docx-panel { padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--border); }
+  #docx-panel .panel-title { display: flex; align-items: center; gap: 0.4rem; }
+  #docx-panel .new-badge {
+    background: var(--accent); color: #0b0d10; font-size: 0.58rem; font-weight: 700;
+    letter-spacing: 0.08em; padding: 0.05rem 0.3rem; border-radius: 3px;
+  }
+  #docx-drop {
+    margin-top: 0.4rem; padding: 0.9rem 0.6rem; text-align: center; cursor: pointer;
+    border: 2px dashed var(--accent); border-radius: 8px; background: rgba(79,209,165,0.06);
+    color: var(--dim); font-size: 0.76rem; line-height: 1.45;
+    box-shadow: 0 0 12px rgba(79,209,165,0.18); transition: background 0.15s, box-shadow 0.15s;
+  }
+  #docx-drop:hover, #docx-drop.dragover { background: rgba(79,209,165,0.16); box-shadow: 0 0 18px rgba(79,209,165,0.35); }
+  #docx-drop.dragover { border-style: solid; }
+  #docx-drop .docx-drop-main { color: var(--text); font-weight: 700; display: block; margin-bottom: 0.2rem; }
+  #docx-drop.busy { opacity: 0.6; pointer-events: none; }
+  #docx-result { margin-top: 0.45rem; font-size: 0.72rem; line-height: 1.5; word-break: break-word; }
+  #docx-result.ok { color: var(--accent); }
+  #docx-result.err { color: var(--warn); }
+  #docx-recent { margin-top: 0.45rem; font-size: 0.7rem; color: var(--dim); }
+  #docx-recent .docx-recent-item { padding: 0.12rem 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  #metamorphosis-panel { padding: 0.7rem 0.9rem; border-top: 1px solid var(--border); }
+  .metamorphosis-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  #metamorphosis-perform, #metamorphosis-cancel {
+    background: var(--tile); color: var(--text); border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.35rem 0.6rem; font: inherit; font-size: 0.76rem; cursor: pointer;
+  }
+  #metamorphosis-perform:hover { border-color: var(--accent); color: var(--accent); }
+  #metamorphosis-cancel:not(:disabled):hover { border-color: var(--warn); color: var(--warn); }
+  #metamorphosis-cancel:disabled { opacity: 0.4; cursor: default; }
+  .metamorphosis-reduced { font-size: 0.74rem; color: var(--dim); display: flex; align-items: center; gap: 0.3rem; }
+  .metamorphosis-landing { font-size: 0.76rem; color: var(--dim); margin-bottom: 0.4rem; }
+  #metamorphosis-land-target { font-size: 1.1rem; }
+  .metamorphosis-result-readout {
+    background: var(--tile); border: 1px solid var(--border); border-radius: 5px; padding: 0.5rem 0.6rem;
+    font-size: 0.72rem; color: var(--dim); white-space: pre-wrap; word-break: break-word; margin: 0; max-height: 9rem; overflow-y: auto;
+  }
+  mark.metamorphosis-source-lifted { background: none; color: inherit; transition: opacity 0.3s ease; }
+  .metamorphosis-result { color: var(--accent); font-weight: 700; }
+  .metamorphosis-actor, .metamorphosis-result-actor, .metamorphosis-anchor-glyph { text-shadow: 0 0 8px rgba(79,209,165,0.35); }
 </style>
 </head>
 <body>
@@ -495,6 +566,7 @@
     <div style="display:flex; align-items:center; gap:0.9rem;">
       <span id="bearing-indicator" style="color:var(--dim); font-size:0.72rem;">Live Captain — commissioning baseline</span>
       <a href="research.html" style="color:var(--dim); font-size:0.78rem; text-decoration:none;">Research cockpit →</a>
+      <a href="documents.html" style="color:#0b0d10; background:var(--accent); font-size:0.78rem; font-weight:700; text-decoration:none; padding:0.3rem 0.6rem; border-radius:5px;">📄 Document Viewer →</a>
       <div id="conn"><span class="dot"></span><span id="conn-text">connecting…</span></div>
     </div>
   </header>
@@ -514,6 +586,16 @@
       </div>
     </div>
     <aside id="status-panel">
+      <div id="docx-panel">
+        <div class="panel-title">Packet Drop <span class="new-badge">NEW</span></div>
+        <div id="docx-drop" tabindex="0" role="button" aria-label="Drop or choose a .docx packet to upload">
+          <span class="docx-drop-main">📄 Drop a .docx here</span>
+          or tap to choose a file — phone or Mac
+        </div>
+        <input id="docx-file" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+        <div id="docx-result"></div>
+        <div id="docx-recent"></div>
+      </div>
       <div class="panel-title">Live Status</div>
       <div class="status-widget" data-cat="image">
         <div class="head"><span class="dot"></span><span class="label">Image Gen</span><span class="count">0</span></div>
@@ -548,6 +630,21 @@
         <button id="handoffs-refresh" type="button">refresh ⟳</button>
         <div id="handoffs-list"><div class="h-empty">No handoffs yet.</div></div>
       </div>
+      <div id="ship-log-panel">
+        <div class="panel-title">Ship's Log</div>
+        <button id="ship-log-refresh" type="button">refresh ⟳</button>
+        <div id="ship-log-list"><div class="sl-empty">Loading…</div></div>
+      </div>
+      <div id="metamorphosis-panel">
+        <div class="panel-title">Semantic Text Metamorphosis</div>
+        <div class="metamorphosis-controls">
+          <button id="metamorphosis-perform" type="button">perform transformation</button>
+          <button id="metamorphosis-cancel" type="button" disabled>cancel</button>
+          <label class="metamorphosis-reduced"><input id="metamorphosis-reduced-toggle" type="checkbox"> reduced motion</label>
+        </div>
+        <div class="metamorphosis-landing">landing anchor <span id="metamorphosis-land-target">⚓</span></div>
+        <pre id="metamorphosis-result" class="metamorphosis-result-readout">no transformation run yet</pre>
+      </div>
     </aside>
   </div>
 </div>
@@ -569,6 +666,78 @@
   </div>
   <div id="handoff-detail-body"></div>
 </div>
+<script src="assets/js/semantic-metamorphosis.js"></script>
 <script src="assets/js/root-console.js"></script>
+<script>
+(function () {
+  "use strict";
+  var metamorphosis = new SemanticMetamorphosis(document.body);
+  // Exposed so handleCodexEvent() in root-console.js (loaded before this
+  // block, but only ever invoked later on a live SSE event) can trigger a
+  // real transformation from the Captain's own conversational text -- see
+  // runMetamorphosisTrigger() and the ⟦metamorphose: ...⟧ tag documented
+  // in tools/live-captain/prompts/captain-kernel.md.
+  window.liveCaptainMetamorphosis = metamorphosis;
+  var performBtn = document.getElementById("metamorphosis-perform");
+  var cancelBtn = document.getElementById("metamorphosis-cancel");
+  var reducedToggle = document.getElementById("metamorphosis-reduced-toggle");
+  var landTarget = document.getElementById("metamorphosis-land-target");
+  var resultReadout = document.getElementById("metamorphosis-result");
+  var terminal = document.getElementById("terminal");
+  var current = null;
+
+  performBtn.addEventListener("click", function () {
+    if (current) return;
+    // Demo source text: a real chat row, rendered through the same
+    // addRow() path every genuine Captain message uses -- the source
+    // phrases are located inside this actually-rendered DOM text, not a
+    // synthetic string handed directly to the component.
+    var bodyEl = addRow(
+      "agent",
+      "captain",
+      "Reviewing the trace, I keep circling the same confusion: is this recursion " +
+      "load-bearing, or incidental? I don't have evidence either way yet."
+    );
+
+    performBtn.disabled = true;
+    cancelBtn.disabled = false;
+    resultReadout.textContent = "running…";
+
+    current = metamorphosis.run(
+      [
+        { op: "scatter", args: { radius: 70 } },
+        { op: "orbit", args: { turns: 1.5 } },
+        { op: "trail", args: { on: true } },
+        { op: "shed", args: { fraction: 0.4 } },
+        { op: "converge", args: {} },
+        { op: "morph", args: { to: "testable recursive hypothesis" } },
+        { op: "pulse", args: { strength: 0.3, count: 2 } },
+        { op: "crystallize", args: { glyph: "◆" } },
+        { op: "land", args: {} },
+      ],
+      {
+        sourceContainer: bodyEl,
+        phrases: ["confusion", "recursion", "evidence"],
+        resultText: "testable recursive hypothesis",
+        anchorGlyph: "➰",
+        landTarget: landTarget.parentElement,
+        landGlyph: "⚓",
+        reducedMotion: reducedToggle.checked ? "force" : "auto",
+      }
+    );
+
+    current.done.then(function (result) {
+      resultReadout.textContent = JSON.stringify(result, null, 2);
+      performBtn.disabled = false;
+      cancelBtn.disabled = true;
+      current = null;
+    });
+  });
+
+  cancelBtn.addEventListener("click", function () {
+    if (current) current.cancel();
+  });
+})();
+</script>
 </body>
 </html>

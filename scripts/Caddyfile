@@ -3,6 +3,14 @@
 		respond `{"error":"legacy_chat_captain_parked"}` 410
 	}
 	handle {
+		# no-cache, not no-store: browsers still keep a local copy but must
+		# revalidate with the server (If-Modified-Since) on every load, so a
+		# live edit to this repo is guaranteed to reach the browser on the
+		# very next reload -- no hard-refresh, no stale JS ever again. This
+		# was the actual bug behind "I edited root-console.js and nothing
+		# changed": the fix was live on disk the whole time, the browser was
+		# just never told to check.
+		header Cache-Control "no-cache"
 		root * /home/cgl/dev/monad/console
 		file_server
 	}
@@ -118,6 +126,24 @@ cameronlampley.com {
 
 		handle_path /monad0-lab-api/* {
 			reverse_proxy 127.0.0.1:4793
+		}
+
+		handle_path /public-images-api/* {
+			reverse_proxy 127.0.0.1:4795
+		}
+
+		handle_path /gasket-upload-api/* {
+			reverse_proxy 127.0.0.1:4796
+		}
+
+		# .docx packet drop box on the Root Console. Gated by the same
+		# forward_auth check as the console page itself, so the panel
+		# doesn't need a second password of its own.
+		handle_path /docx-intake-api/* {
+			forward_auth 127.0.0.1:4779 {
+				uri /check
+			}
+			reverse_proxy 127.0.0.1:4797
 		}
 
 		handle {

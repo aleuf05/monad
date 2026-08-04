@@ -52,6 +52,8 @@ const activityLog = document.getElementById("activity-log");
 
 const handoffsList = document.getElementById("handoffs-list");
 const handoffsRefresh = document.getElementById("handoffs-refresh");
+const shipLogList = document.getElementById("ship-log-list");
+const shipLogRefresh = document.getElementById("ship-log-refresh");
 const handoffDetail = document.getElementById("handoff-detail");
 const handoffDetailTitle = document.getElementById("handoff-detail-title");
 const handoffDetailBody = document.getElementById("handoff-detail-body");
@@ -108,6 +110,36 @@ function followTerminalBottom() {
   terminalEl.scrollTop = terminalEl.scrollHeight;
 }
 
+// Deterministic per-message "living glyph" -- same 5x5 symmetric block
+// identicon already shipped in the Document Viewer (console/documents.html),
+// ported here so every Captain row carries its own hashed visual signature
+// instead of only the bare word "captain". Hashed from the row's own text,
+// not stored anywhere -- matches this console's live-off-disk rule.
+function hashString(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function identiconSvg(seed, size) {
+  const h = hashString(seed);
+  const hue = h % 360;
+  const color = `hsl(${hue}, 62%, 58%)`;
+  const cols = 3, rows = 5, cell = size / rows;
+  const cells = [];
+  let bit = 0;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      bit++;
+      if (((h >> bit) & 1) !== 1) continue;
+      cells.push([x, y]);
+      if (x < cols - 1) cells.push([2 * cols - 2 - x, y]);
+    }
+  }
+  const rects = cells.map(([x, y]) => `<rect x="${x * cell}" y="${y * cell}" width="${cell}" height="${cell}" fill="${color}"/>`).join("");
+  return `<svg class="glyph" width="${size}" height="${size}" viewBox="0 0 ${cell * 5} ${cell * rows}" style="border-radius:2px;background:rgba(255,255,255,0.06);flex:none;">${rects}</svg>`;
+}
+
 function addRow(cssClass, src, body) {
   const row = document.createElement("div");
   row.className = `row ${cssClass}`;
@@ -116,7 +148,8 @@ function addRow(cssClass, src, body) {
   ts.textContent = timestamp();
   const srcEl = document.createElement("span");
   srcEl.className = "src";
-  srcEl.textContent = src;
+  if (src === "captain") srcEl.innerHTML = identiconSvg(body || cssClass + ts.textContent, 13);
+  srcEl.append(document.createTextNode(src));
   const bodyEl = document.createElement("span");
   bodyEl.className = "body";
   bodyEl.textContent = body;
@@ -171,6 +204,105 @@ function addImageArtifact(url, label = "Captain image artifact") {
   imagePinnedUntil = Date.now() + 5000;
   bodyEl.closest(".row")?.scrollIntoView({ block: "center", behavior: "smooth" });
   return bodyEl;
+}
+
+// Live wiring for the Semantic Text Metamorphosis capability
+// (console/assets/js/semantic-metamorphosis.js, capability card
+// semantic-metamorphosis.capability.json): captain-kernel.md documents this
+// trigger syntax so the Captain itself can compose a real, physics-driven
+// choreography from plain conversational text -- not a single fixed
+// preset. The tag is stripped from the displayed message; phrases named in
+// it must already appear verbatim elsewhere in the same message (the
+// component locates and lifts real rendered text, it doesn't fabricate the
+// source words).
+//
+// General form: ⟦fx: phrases="a, b, c" | op1(args) | op2(args) | ...⟧
+// Legacy form (kept working): ⟦metamorphose: phrases="a, b, c" => "result"⟧
+const FX_TRIGGER = /⟦fx:\s*([^⟧]+)⟧\s*/i;
+const LEGACY_METAMORPHOSIS_TRIGGER = /⟦metamorphose:\s*phrases="([^"]+)"\s*=>\s*"([^"]+)"⟧\s*/i;
+
+const FX_POSITIONAL_KEY = { orbit: "turns", scatter: "radius", shed: "fraction", morph: "to", merge: "into", pulse: "strength", crystallize: "glyph", trail: "on" };
+
+function parseFxStepArgs(argsStr) {
+  const args = {};
+  const parts = (argsStr.match(/(?:[^,"]+|"[^"]*")+/g) || []).map((s) => s.trim()).filter(Boolean);
+  parts.forEach((part, i) => {
+    const kv = /^([a-zA-Z_]+)\s*=\s*(.+)$/.exec(part);
+    let key, raw;
+    if (kv) { key = kv[1]; raw = kv[2].trim(); } else { key = `_pos${i}`; raw = part; }
+    let val;
+    if (/^".*"$/.test(raw)) val = raw.slice(1, -1);
+    else if (raw !== "" && !isNaN(Number(raw))) val = Number(raw);
+    else val = raw;
+    args[key] = val;
+  });
+  return args;
+}
+
+function remapFxPositional(op, args) {
+  const posKey = FX_POSITIONAL_KEY[op];
+  if (posKey && args._pos0 !== undefined && args[posKey] === undefined) args[posKey] = args._pos0;
+  Object.keys(args).forEach((k) => { if (k.startsWith("_pos")) delete args[k]; });
+  return args;
+}
+
+function parseFxTrigger(text) {
+  const m = FX_TRIGGER.exec(text);
+  if (!m) return null;
+  const segments = m[1].split("|").map((s) => s.trim()).filter(Boolean);
+  const first = segments.length ? /^phrases\s*=\s*"([^"]*)"$/i.exec(segments[0]) : null;
+  if (!first) return null;
+  const phrases = first[1].split(",").map((p) => p.trim()).filter(Boolean).slice(0, 6);
+  const steps = [];
+  let resultText = "";
+  for (let i = 1; i < segments.length; i++) {
+    const seg = /^([a-zA-Z_]+)(?:\(([^)]*)\))?$/.exec(segments[i]);
+    if (!seg) continue;
+    const op = seg[1];
+    const args = remapFxPositional(op, parseFxStepArgs(seg[2] || ""));
+    if (args.to) resultText = args.to;
+    if (args.into) resultText = args.into;
+    steps.push({ op, args });
+  }
+  return { matchedText: m[0], phrases, steps, resultText };
+}
+
+function runMetamorphosisTrigger(bodyEl) {
+  if (!window.liveCaptainMetamorphosis) return;
+  const text = bodyEl.textContent || "";
+
+  const fx = parseFxTrigger(text);
+  if (fx) {
+    bodyEl.textContent = text.replace(fx.matchedText, "");
+    if (!fx.phrases.length || !fx.steps.length) return;
+    const landTarget = document.createElement("span");
+    landTarget.className = "metamorphosis-land-wrap";
+    bodyEl.parentElement.appendChild(landTarget);
+    // A trigger arriving while a previous metamorphosis is still animating
+    // is dropped, not queued (the component only runs one choreography at
+    // a time) -- catch that rejection so it doesn't surface as an
+    // unhandled promise error; the tag is still stripped from the message
+    // either way so the raw syntax never leaks into the visible transcript.
+    window.liveCaptainMetamorphosis.run(fx.steps, {
+      sourceContainer: bodyEl,
+      phrases: fx.phrases,
+      resultText: fx.resultText,
+      landTarget,
+    }).done.catch(() => {});
+    return;
+  }
+
+  const legacy = LEGACY_METAMORPHOSIS_TRIGGER.exec(text);
+  if (legacy) {
+    const phrases = legacy[1].split(",").map((p) => p.trim()).filter(Boolean).slice(0, 6);
+    const resultText = legacy[2].trim();
+    bodyEl.textContent = text.replace(LEGACY_METAMORPHOSIS_TRIGGER, "");
+    if (!phrases.length || !resultText) return;
+    const landTarget = document.createElement("span");
+    landTarget.className = "metamorphosis-land-wrap";
+    bodyEl.parentElement.appendChild(landTarget);
+    window.liveCaptainMetamorphosis.perform({ sourceContainer: bodyEl, phrases, resultText, landTarget }).done.catch(() => {});
+  }
 }
 
 function imageArtifactsFrom(value, opts = {}, found = new Map(), depth = 0) {
@@ -320,6 +452,63 @@ async function pollHandoffs() {
   }
 }
 
+function fmtShipLogTimestamp(epochSeconds) {
+  if (!epochSeconds) return "—";
+  const d = new Date(epochSeconds * 1000);
+  return d.toISOString().replace("T", " ").replace(/\.\d+Z$/, "Z");
+}
+
+function renderShipLog(entries) {
+  shipLogList.innerHTML = "";
+  if (!entries.length) {
+    const empty = document.createElement("div");
+    empty.className = "sl-empty";
+    empty.textContent = "Nothing on disk yet.";
+    shipLogList.appendChild(empty);
+    return;
+  }
+  for (const entry of entries) {
+    const row = document.createElement("div");
+    row.className = "sl-row";
+
+    const head = document.createElement("div");
+    head.className = "sl-head";
+    const title = document.createElement("span");
+    title.className = "sl-title";
+    title.textContent = entry.title || entry.file;
+    const source = document.createElement("span");
+    source.className = "sl-source";
+    source.textContent = entry.source;
+    head.appendChild(title);
+    head.appendChild(source);
+
+    const meta = document.createElement("div");
+    meta.className = "sl-meta";
+    meta.textContent = `${fmtShipLogTimestamp(entry.timestamp)} · ${entry.file}`;
+
+    const excerpt = document.createElement("div");
+    excerpt.className = "sl-excerpt";
+    excerpt.textContent = entry.excerpt || "";
+
+    row.appendChild(head);
+    row.appendChild(meta);
+    row.appendChild(excerpt);
+    shipLogList.appendChild(row);
+  }
+}
+
+async function pollShipLog() {
+  try {
+    const response = await fetch(`${API_BASE}/ship-log`);
+    if (response.status === 401) return;
+    const body = await response.json();
+    renderShipLog(body.entries || []);
+  } catch (err) {
+    // ship-log endpoint unreachable; list just goes stale
+  }
+}
+
+shipLogRefresh.addEventListener("click", pollShipLog);
 handoffsRefresh.addEventListener("click", pollHandoffs);
 dispatchViewLatest.addEventListener("click", () => {
   if (latestHandoffFile) openHandoffDetail(latestHandoffFile);
@@ -439,6 +628,7 @@ function onAuthenticated() {
   connect();
   if (!statusPollHandle) statusPollHandle = setInterval(pollStatus, 4000);
   pollHandoffs();
+  pollShipLog();
   input.focus();
 }
 
@@ -557,6 +747,7 @@ function handleCodexEvent(event) {
       bodyEl.textContent = item.text || "";
       streamingRows.delete(item.id);
       for (const [url, label] of imageArtifactsFrom(item, { scanFreeText: true })) addImageArtifact(url, label);
+      runMetamorphosisTrigger(bodyEl);
       followTerminalBottom();
       return;
     }
@@ -593,8 +784,18 @@ function handleCodexEvent(event) {
   if (method === "turn/completed") {
     stopThinking();
     stopImageGenIndicator();
-    const status = (params.turn || {}).status || "completed";
+    const turn = params.turn || {};
+    const status = turn.status || "completed";
     recordActivity("thread", "turn", `completed (${status})`);
+    if (status === "failed") {
+      // Turn.error is only populated when status is "failed" -- it's the
+      // one place the actual reason lives. Previously this branch discarded
+      // it and showed only the bare word "failed", making every failure
+      // unexplainable after the fact.
+      const error = turn.error || {};
+      const detail = [error.message, error.additionalDetails].filter(Boolean).join(" -- ") || "no error detail provided by Codex";
+      addRow("error", "error", `Turn failed: ${detail}`);
+    }
     return;
   }
   if (method === "thread/status/changed") {
@@ -695,6 +896,98 @@ input.addEventListener("keydown", (keyEvent) => {
   }
 });
 
-terminalEl.addEventListener("click", () => input.focus());
+terminalEl.addEventListener("click", () => {
+  // A drag-select ends with a click on this same element -- refocusing the
+  // input unconditionally stole focus the instant the mouse button was
+  // released and collapsed the selection (Chrome clears window selection
+  // when focus moves to a text input). Only steal focus back when the user
+  // isn't in the middle of selecting text.
+  if (window.getSelection().toString()) return;
+  input.focus();
+});
+
+// --- .docx packet drop box -------------------------------------------------
+// Uploads land in docs/incoming/ as staged material; the panel says so
+// explicitly, because "the file arrived" and "the packet is filed" are two
+// different states and the readout shouldn't blur them.
+const DOCX_API_BASE = "/docx-intake-api/api";
+const docxDrop = document.getElementById("docx-drop");
+const docxFileInput = document.getElementById("docx-file");
+const docxResult = document.getElementById("docx-result");
+const docxRecent = document.getElementById("docx-recent");
+
+function docxSay(message, kind) {
+  docxResult.textContent = message;
+  docxResult.className = kind || "";
+}
+
+async function loadDocxRecent() {
+  try {
+    const response = await fetch(`${DOCX_API_BASE}/recent`);
+    if (!response.ok) return;
+    const body = await response.json();
+    const entries = body.entries || [];
+    docxRecent.innerHTML = entries.length
+      ? `<div class="docx-recent-item">staged: ${entries.length}</div>` +
+        entries.slice(0, 4).map((e) => `<div class="docx-recent-item">· ${e.name}</div>`).join("")
+      : "";
+  } catch (err) {
+    /* panel is supplementary; a failed listing shouldn't shout */
+  }
+}
+
+async function uploadDocx(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith(".docx")) {
+    docxSay("That's not a .docx — Word documents only.", "err");
+    return;
+  }
+  docxDrop.classList.add("busy");
+  docxSay(`Uploading ${file.name}…`, "");
+  try {
+    const form = new FormData();
+    form.append("file", file, file.name);
+    const response = await fetch(`${DOCX_API_BASE}/upload`, { method: "POST", body: form });
+    const body = await response.json().catch(() => ({}));
+    if (response.ok && body.ok) {
+      docxSay(`✓ Staged ${body.words} words → ${body.markdown_path} (awaiting evaluation)`, "ok");
+      loadDocxRecent();
+    } else {
+      docxSay(`✗ ${body.error || `HTTP ${response.status}`}`, "err");
+    }
+  } catch (err) {
+    docxSay(`✗ ${String(err)}`, "err");
+  } finally {
+    docxDrop.classList.remove("busy");
+    docxFileInput.value = "";
+  }
+}
+
+docxDrop.addEventListener("click", () => docxFileInput.click());
+docxDrop.addEventListener("keydown", (keyEvent) => {
+  if (keyEvent.key === "Enter" || keyEvent.key === " ") {
+    keyEvent.preventDefault();
+    docxFileInput.click();
+  }
+});
+docxFileInput.addEventListener("change", () => uploadDocx(docxFileInput.files[0]));
+
+for (const eventName of ["dragenter", "dragover"]) {
+  docxDrop.addEventListener(eventName, (dragEvent) => {
+    dragEvent.preventDefault();
+    docxDrop.classList.add("dragover");
+  });
+}
+for (const eventName of ["dragleave", "drop"]) {
+  docxDrop.addEventListener(eventName, (dragEvent) => {
+    dragEvent.preventDefault();
+    docxDrop.classList.remove("dragover");
+  });
+}
+docxDrop.addEventListener("drop", (dropEvent) => {
+  uploadDocx(dropEvent.dataTransfer.files[0]);
+});
+
+loadDocxRecent();
 
 pollStatus();

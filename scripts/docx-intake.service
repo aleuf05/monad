@@ -1,0 +1,26 @@
+[Unit]
+Description=Monad .docx packet intake (Root Console drop box, extracts to docs/incoming, reachable via Caddy at cameronlampley.com/docx-intake-api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/docx-intake/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/cgl/dev/monad/docs/incoming
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
