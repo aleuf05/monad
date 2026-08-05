@@ -478,9 +478,13 @@ fn run_deform(raw: &[u8]) -> ! {
         .map(|r| {
             format!(
                 "{{\"collapsed\":{},\"inverted\":{},\"torn\":{},\"max_stretch\":{},\
-\"mean_stretch\":{},\"max_displacement\":{},\"clipping_pairs\":{},\"deep_clipping\":{}}}",
+\"mean_stretch\":{},\"max_displacement\":{},\"clipping_pairs\":{},\"deep_clipping\":{},\"hotspots\":[{}]}}",
                 r.collapsed, r.inverted, r.torn, r.max_stretch,
-                r.mean_stretch, r.max_displacement, r.clipping_pairs, r.deep_clipping
+                r.mean_stretch, r.max_displacement, r.clipping_pairs, r.deep_clipping,
+                r.hotspots.iter()
+                    .map(|h| format!("{{\"x\":{},\"y\":{},\"z\":{},\"joint\":{}}}",
+                                     h.x, h.y, h.z, h.joint))
+                    .collect::<Vec<_>>().join(",")
             )
         })
         .collect();

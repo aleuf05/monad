@@ -26,6 +26,8 @@ const STRETCH_LIMIT: f64 = 2.0;
 /// Overlap beyond this fraction of the smaller part's volume is real
 /// interpenetration rather than two parts legitimately closing on each other.
 const DEEP_OVERLAP: f64 = 0.5;
+/// Cap on hotspots reported per pose.
+const MAX_HOTSPOTS: usize = 48;
 
 pub struct DeformInput {
     pub positions: Vec<[f64; 3]>,
@@ -36,6 +38,18 @@ pub struct DeformInput {
     pub poses: Vec<Vec<[f64; 16]>>,
     pub labels: Vec<u32>,
     pub shell_count: usize,
+}
+
+/// Where a deep interpenetration happens, in **rest space**, tagged with the
+/// joint that region is bound to. Rest space rather than posed space so the
+/// browser can attach each hotspot to its bone and carry it through whatever
+/// pose the live rig is in — the probe's fixed test bends are not the pose
+/// anyone is looking at.
+pub struct Hotspot {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+    pub joint: u16,
 }
 
 pub struct PoseReport {
@@ -49,6 +63,9 @@ pub struct PoseReport {
     pub clipping_pairs: usize,
     /// Pairs genuinely interpenetrating. This is the defect count.
     pub deep_clipping: usize,
+    /// Locations of those interpenetrations, capped — enough to see the
+    /// pattern without shipping a megabyte of coordinates to a web page.
+    pub hotspots: Vec<Hotspot>,
 }
 
 fn apply(m: &[f64; 16], p: &[f64; 3]) -> [f64; 3] {
@@ -148,14 +165,26 @@ fn box_volume(a: &([f64; 3], [f64; 3])) -> f64 {
 ///
 /// So the number that means something is the deep count. `touching` is kept
 /// because it is a useful denominator, not because it is a defect count.
-fn clipping(rest: &[[f64; 3]], posed: &[[f64; 3]], labels: &[u32], shell_count: usize)
-    -> (usize, usize) {
+fn clipping(rest: &[[f64; 3]], posed: &[[f64; 3]], labels: &[u32], shell_count: usize,
+            joint_ids: &[u16]) -> (usize, usize, Vec<Hotspot>) {
     if shell_count < 2 {
-        return (0, 0);
+        return (0, 0, Vec::new());
     }
     let rest_boxes = shell_boxes(rest, labels, shell_count);
     let posed_boxes = shell_boxes(posed, labels, shell_count);
+
+    // First vertex seen for each shell, so a hotspot can name the joint its
+    // region is bound to.
+    let mut first_vertex = vec![usize::MAX; shell_count];
+    for (v, label) in labels.iter().enumerate() {
+        let s = *label as usize;
+        if first_vertex[s] == usize::MAX {
+            first_vertex[s] = v;
+        }
+    }
+
     let (mut touching, mut deep) = (0, 0);
+    let mut hotspots = Vec::new();
     for a in 0..shell_count {
         for b in (a + 1)..shell_count {
             if !overlaps(&posed_boxes[a], &posed_boxes[b])
@@ -169,10 +198,26 @@ fn clipping(rest: &[[f64; 3]], posed: &[[f64; 3]], labels: &[u32], shell_count: 
                 && overlap_volume(&posed_boxes[a], &posed_boxes[b]) / smaller > DEEP_OVERLAP
             {
                 deep += 1;
+                if hotspots.len() < MAX_HOTSPOTS {
+                    let mid = |i: usize| {
+                        [(rest_boxes[i].0[0] + rest_boxes[i].1[0]) / 2.0,
+                         (rest_boxes[i].0[1] + rest_boxes[i].1[1]) / 2.0,
+                         (rest_boxes[i].0[2] + rest_boxes[i].1[2]) / 2.0]
+                    };
+                    let (ca, cb) = (mid(a), mid(b));
+                    let v = first_vertex[a];
+                    let joint = if v == usize::MAX { 0 } else { joint_ids[4 * v] };
+                    hotspots.push(Hotspot {
+                        x: (ca[0] + cb[0]) / 2.0,
+                        y: (ca[1] + cb[1]) / 2.0,
+                        z: (ca[2] + cb[2]) / 2.0,
+                        joint,
+                    });
+                }
             }
         }
     }
-    (touching, deep)
+    (touching, deep, hotspots)
 }
 
 pub fn probe(input: &DeformInput) -> Vec<PoseReport> {
@@ -224,7 +269,8 @@ pub fn probe(input: &DeformInput) -> Vec<PoseReport> {
             max_displacement = max_displacement.max(norm(sub(posed[v], rest[v])));
         }
 
-        let clip = clipping(rest, &posed, &input.labels, input.shell_count);
+        let clip = clipping(rest, &posed, &input.labels, input.shell_count,
+                            &input.joint_ids);
         reports.push(PoseReport {
             collapsed,
             inverted,
@@ -234,6 +280,7 @@ pub fn probe(input: &DeformInput) -> Vec<PoseReport> {
             max_displacement,
             clipping_pairs: clip.0,
             deep_clipping: clip.1,
+            hotspots: clip.2,
         });
     }
 

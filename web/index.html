@@ -219,6 +219,10 @@
     color: #4FD1C5; text-shadow: 0 0 4px #0B1220, 0 0 8px #0B1220; }
   .rj.root .rj-dot { border-color: #E8A33D; background: rgba(232,163,61,0.22); box-shadow: 0 0 8px rgba(232,163,61,0.6); }
   .rj.root .rj-label { color: #E8A33D; }
+  .rh { position: absolute; transform: translate(-50%, -50%); width: 13px; height: 13px;
+    border-radius: 50%; border: 1.5px solid #E8746C; background: rgba(232,116,108,0.16);
+    box-shadow: 0 0 7px rgba(232,116,108,0.55); }
+  .rh::after { content: ""; position: absolute; inset: 3.5px; border-radius: 50%; background: #E8746C; opacity: 0.85; }
   .rig-bone { position: absolute; height: 1.5px; transform-origin: 0 50%;
     background: linear-gradient(90deg, rgba(79,209,197,0.75), rgba(79,209,197,0.25)); }
 
@@ -288,7 +292,7 @@
       <div class="gasket-frame">
         <canvas id="gasketCanvas"></canvas>
         <div class="gasket-hint" id="gasketHint">Loading rigged artifact&hellip;</div>
-        <div class="rig-overlay" id="rigOverlay"></div>
+        <div class="rig-overlay" id="rigOverlay"><div id="rigSkelLayer"></div><div id="rigHotLayer"></div></div>
       </div>
       <div class="gasket-caption">
         <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
@@ -314,6 +318,7 @@
           <span class="rb-deg" id="rigBendVal">24&deg;</span>
           <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
           <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
+          <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -764,6 +769,10 @@
       var rigOn = false;
 
       function collectBones(root) {
+        skinSkeleton = null;
+        root.traverse(function (node) {
+          if (node.isSkinnedMesh && node.skeleton) skinSkeleton = node.skeleton;
+        });
         var bones = [];
         root.traverse(function (node) {
           if (node.isBone) bones.push(node);
@@ -949,6 +958,8 @@
       // grows with that joint's angular velocity, so the wave travelling down
       // the chain is visible as light as well as motion.
       var overlayEl = document.getElementById("rigOverlay");
+      var skelLayer = document.getElementById("rigSkelLayer");
+      var hotLayer = document.getElementById("rigHotLayer");
       var jointMarkers = [];
       var boneLines = [];
       var skeletonOn = true;
@@ -956,14 +967,14 @@
 
       function buildSkeletonMarkers() {
         if (!overlayEl) return;
-        overlayEl.innerHTML = "";
+        skelLayer.innerHTML = "";
         jointMarkers = [];
         boneLines = [];
         rigBones.forEach(function (bone, i) {
           if (i > 0) {
             var line = document.createElement("div");
             line.className = "rig-bone";
-            overlayEl.appendChild(line);
+            skelLayer.appendChild(line);
             boneLines.push(line);
           }
           var marker = document.createElement("div");
@@ -974,15 +985,15 @@
             (i % 2 ? " flip" : "") + (i % 4 < 2 ? " lift" : " drop");
           marker.innerHTML = '<span class="rj-dot"></span><span class="rj-label">' +
             (bone.name || ("joint " + i)) + "</span>";
-          overlayEl.appendChild(marker);
+          skelLayer.appendChild(marker);
           jointMarkers.push(marker);
         });
       }
 
       function updateSkeletonOverlay() {
         if (!overlayEl) return;
-        if (!skeletonOn || !rigBones.length) { overlayEl.style.display = "none"; return; }
-        overlayEl.style.display = "";
+        skelLayer.style.display = (skeletonOn && rigBones.length) ? "" : "none";
+        if (!rigBones.length) return;
         if (jointMarkers.length !== rigBones.length) buildSkeletonMarkers();
 
         var rect = canvas.getBoundingClientRect();
@@ -1005,6 +1016,7 @@
           var dot = marker.firstChild;
           dot.style.transform = "scale(" + (1 + heat * 0.9) + ")";
         }
+        updateHotspots(w, h);
         for (var j = 0; j < boneLines.length; j++) {
           var a = pts[j], b = pts[j + 1];
           if (!a || !b) continue;
@@ -1016,6 +1028,67 @@
           line.style.transform = "rotate(" + Math.atan2(dy, dx) + "rad)";
           line.style.opacity = (a.behind || b.behind) ? 0.2 : 0.85;
         }
+      }
+
+      // --- interpenetration hotspots --------------------------------
+      // The probe reports "N shell pairs interpenetrating" as a number. These
+      // are the same defects, located. Positions come from the Rust probe in
+      // rest space tagged with the joint they belong to, so each one is
+      // carried through the live pose by its own bone rather than being
+      // pinned to the fixed test bend the probe measured at.
+      var hotspots = [];
+      var hotMarkers = [];
+      var clipOn = false;
+      var skinSkeleton = null;
+      var hotVec = new THREE.Vector3();
+
+      function buildHotspots(entry) {
+        hotspots = [];
+        hotMarkers.forEach(function (m) { m.remove(); });
+        hotMarkers = [];
+        var pose = (entry && entry.probe && entry.probe.poses && entry.probe.poses[0]) || null;
+        if (!pose || !pose.hotspots) return;
+        hotspots = pose.hotspots;
+        hotspots.forEach(function () {
+          var el = document.createElement("div");
+          el.className = "rh";
+          el.style.display = "none";
+          hotLayer.appendChild(el);
+          hotMarkers.push(el);
+        });
+      }
+
+      function updateHotspots(w, h) {
+        if (!clipOn || !hotspots.length || !skinSkeleton) {
+          hotMarkers.forEach(function (m) { m.style.display = "none"; });
+          return;
+        }
+        for (var i = 0; i < hotspots.length; i++) {
+          var spot = hotspots[i];
+          var j = Math.min(spot.joint, skinSkeleton.bones.length - 1);
+          var bone = skinSkeleton.bones[j];
+          if (!bone) continue;
+          hotVec.set(spot.x, spot.y, spot.z);
+          // rest position -> bone space -> world, i.e. the same skinning
+          // transform the GPU applies to the vertices around it.
+          hotVec.applyMatrix4(skinSkeleton.boneInverses[j]);
+          hotVec.applyMatrix4(bone.matrixWorld);
+          hotVec.project(camera);
+          var el = hotMarkers[i];
+          el.style.display = hotVec.z > 1 ? "none" : "";
+          el.style.left = ((hotVec.x * 0.5 + 0.5) * w) + "px";
+          el.style.top = ((-hotVec.y * 0.5 + 0.5) * h) + "px";
+        }
+      }
+
+      var clipBtn = document.getElementById("rigClip");
+      if (clipBtn) {
+        clipBtn.addEventListener("click", function () {
+          clipOn = !clipOn;
+          clipBtn.classList.toggle("on", clipOn);
+          clipBtn.innerHTML = "&#9888; Clipping: " + (clipOn ? "on" : "off") +
+            (clipOn && hotspots.length ? " (" + hotspots.length + ")" : "");
+        });
       }
 
       var skeletonBtn = document.getElementById("rigSkeleton");
@@ -1060,6 +1133,7 @@
         loadModel(entry.dest.replace(/^web\//, ""), function (root) {
           rigBones = collectBones(root);
           buildSkeletonMarkers();
+          buildHotspots(entry);
           rigStat.textContent = rigBones.length
             ? rigBones.length + " joints bound — spring chain driving them live"
             : "loaded, but no joints found";
@@ -1128,6 +1202,12 @@
             }
             assetsEl.appendChild(chip);
           });
+          // The first asset loads before this fetch resolves, so its hotspots
+          // are built here rather than in the load callback.
+          var initial = corpusAssets.filter(function (e) {
+            return e.dest === activeAsset;
+          })[0];
+          if (initial) buildHotspots(initial);
         })
         .catch(function (e) { console.error("asset picker failed:", e && e.message); });
 
