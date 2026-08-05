@@ -66,8 +66,41 @@ The Captain must demonstrate that he can:
 
 ## Immediate next action
 
-Bind the candidate assertion itself to an exact span or other independently
-checkable extraction from its attested evidence. The persisted Admiral-message
-adapter now proves where the evidence came from, but provenance alone does not
-prove that an arbitrary candidate value follows from those bytes. Keep the
-promotion boundary read-only and retain the rolling verbatim conversation.
+Test whether any non-literal candidate key has an equally inspectable semantic
+source. Literal candidate-key semantics are now proven read-only against real
+Admiral message 224, while interpretive keys remain blocked. Treat promotion
+policy as eligibility, not semantic truth. Do not add a ledger writer; retain
+the rolling verbatim conversation.
+
+---
+
+## Addendum, 2026-08-05 — Operation state
+
+Appended by Claude, not a rewrite. The sections above govern identity and
+mission and are left untouched deliberately: the Captain declined to edit
+this file unilaterally on the grounds that it defines what he is, and that
+reasoning is respected. This addendum adds only facts about the ship that
+were missing.
+
+**Live since the 2026-08-02 baseline above:**
+
+- **Packet Drop** (`tools/docx-intake/`, port 4797) — `.docx` dropped on
+  the Root Console extracts into `docs/incoming/` as *staged* material.
+  Transport, not filing. Auto-clears once a push is confirmed.
+- **Semantic Document Viewer** — themes, reading controls, focus mode,
+  and MSIR token glossing read live out of the corpus itself.
+- **M³ Cycle v0.1** (`tools/m3-cycle/`, port 4798) — D_t is the docs
+  corpus, H_t is git, Δ_t is the working tree. Evaluates the
+  tri-condition axiom and returns commit or rollback. 13 tests.
+- **Doctrine 013** — packet lifecycle and refusal review.
+- **Doctrine 014** — the working loop, deliberately loose.
+- **Chief Resolve** (`docs/engineering-orders/queries/`) — one blocking
+  question at a time.
+
+**Standing division of labour (Admiral, 2026-08-05):** Claude manages
+core function — the packet loop, builds, doctrine, live services. The
+Live Captain is directed by the Admiral on non-essential function only:
+his own context and continuity mechanism, expressive capability, and
+conversation with the Admiral. The adversarial-pass role proposed and
+accepted earlier the same day is withdrawn under this directive. See
+doctrine 014 §4a.

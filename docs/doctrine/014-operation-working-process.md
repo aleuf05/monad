@@ -98,6 +98,33 @@ No ceremony and no announcement needed. In practice:
 That is the whole entry procedure. If it grows past a paragraph,
 something has gone wrong with it.
 
+## 4a. Division of labour (Admiral's directive, 2026-08-05)
+
+Verbatim: "for Now Admiral will direct Living Captain only in
+non-essential function Claude manage core function."
+
+- **Claude manages core function.** The loop in §1 — packets read,
+  filed, refused, built from; queries raised; doctrine maintained; the
+  live services.
+- **The Live Captain is directed by the Admiral, on non-essential
+  function only.** Its own context and continuity mechanism, expressive
+  capability, and conversation with the Admiral.
+
+This supersedes the adversarial-pass proposal made earlier the same day
+(`tools/live-captain/context/claude-channel.md`, 01:3X UTC). The Captain
+had accepted that role and had already done one useful pass under it —
+independently confirming the `MSIR-M3-NUCLEAR-PACKET-02` §II regressions
+and verifying that no Aegis-Monad code exists — but reviewing packets
+before a build is core function by the definition above, so the role is
+withdrawn rather than run alongside a directive that excludes it.
+
+Recorded rather than argued: the concern that motivated the proposal is
+still live and unaddressed — Claude is the only reader on every packet,
+which is a single point of failure in a process whose value is careful
+reading. Note that it stands; do not re-propose the same fix without new
+grounds. The Admiral may lift or vary this at any time, and §6 applies
+to this section like any other.
+
 ## 5. Room deliberately left
 
 Undecided on purpose, to be settled by use rather than in advance:
