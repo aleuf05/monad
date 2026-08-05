@@ -7,8 +7,8 @@ and it never silently swallows a turn.
 """
 from __future__ import annotations
 
-import importlib
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -21,14 +21,15 @@ import pause_state  # noqa: E402
 class PauseStateTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        root = Path(self.tmp.name)
-        pause_state.STATE_DIR = root
-        pause_state.PAUSE_PATH = root / "paused.json"
-        pause_state.DB_PATH = root / "live-captain.db"
+        self._previous = os.environ.get("MONAD_LIVE_CAPTAIN_STATE_DIR")
+        os.environ["MONAD_LIVE_CAPTAIN_STATE_DIR"] = self.tmp.name
 
     def tearDown(self):
+        if self._previous is None:
+            os.environ.pop("MONAD_LIVE_CAPTAIN_STATE_DIR", None)
+        else:
+            os.environ["MONAD_LIVE_CAPTAIN_STATE_DIR"] = self._previous
         self.tmp.cleanup()
-        importlib.reload(pause_state)
 
     def test_default_is_running(self):
         self.assertFalse(pause_state.is_paused())
@@ -44,14 +45,14 @@ class PauseStateTests(unittest.TestCase):
         """The flag is a file precisely so a bounced service cannot silently
         lift a pause. This is the property that makes pause trustworthy."""
         pause_state.pause("held across restart")
-        reloaded = json.loads(pause_state.PAUSE_PATH.read_text())
+        reloaded = json.loads(pause_state.pause_path().read_text())
         self.assertTrue(reloaded["paused"])
         self.assertEqual(reloaded["reason"], "held across restart")
 
     def test_corrupt_flag_fails_open(self):
         """A damaged flag must not strand the Captain in a pause nobody
         asked for — unreadable means running."""
-        pause_state.PAUSE_PATH.write_text("{ this is not json")
+        pause_state.pause_path().write_text("{ this is not json")
         self.assertFalse(pause_state.is_paused())
 
     def test_missing_reason_is_explicit_not_blank(self):
@@ -68,7 +69,7 @@ class PauseStateTests(unittest.TestCase):
 
     def test_write_is_atomic_leaving_no_temp_files(self):
         pause_state.pause("atomic")
-        leftovers = list(pause_state.STATE_DIR.glob("*.tmp"))
+        leftovers = list(pause_state.state_dir().glob("*.tmp"))
         self.assertEqual(leftovers, [])
 
     def test_checkpoint_is_safe_without_a_database(self):
@@ -81,7 +82,7 @@ class PauseStateTests(unittest.TestCase):
         while a long-lived process keeps its connection open — which is
         exactly what the Live Captain service does."""
         import sqlite3
-        connection = sqlite3.connect(str(pause_state.DB_PATH))
+        connection = sqlite3.connect(str(pause_state.db_path()))
         try:
             connection.execute("pragma journal_mode=wal")
             connection.execute("create table t (a text)")
@@ -89,7 +90,7 @@ class PauseStateTests(unittest.TestCase):
                 connection.execute("insert into t values (?)", (f"row {i}" * 50,))
             connection.commit()
 
-            wal = pause_state.DB_PATH.with_suffix(".db-wal")
+            wal = pause_state.db_path().with_suffix(".db-wal")
             self.assertGreater(wal.stat().st_size, 0)
 
             result = pause_state.checkpoint_database()

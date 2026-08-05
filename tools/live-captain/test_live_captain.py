@@ -760,6 +760,7 @@ class ContextSourceReloadTests(unittest.TestCase):
 
 
 class EndToEndHttpBootTests(unittest.TestCase):
+
     """Closes the boot-audit gap named in
     docs/logs/2026-08-02-boot-process-audit.md: prior coverage was
     unit-level plus one historical live restart, never a test that actually
@@ -781,6 +782,20 @@ class EndToEndHttpBootTests(unittest.TestCase):
             return {"running": True, "pid": 0, "backend": "fake"}
 
     def setUp(self):
+        # Isolate from the operator's real pause flag. This suite boots a
+        # real server, which reads the real flag, so a legitimately paused
+        # Captain failed the tests. Operator state leaking into tests is a
+        # defect in the tests, not in the pause.
+        import os
+        self._pause_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self._pause_dir.cleanup)
+        _previous = os.environ.get("MONAD_LIVE_CAPTAIN_STATE_DIR")
+        os.environ["MONAD_LIVE_CAPTAIN_STATE_DIR"] = self._pause_dir.name
+        self.addCleanup(
+            lambda: os.environ.__setitem__("MONAD_LIVE_CAPTAIN_STATE_DIR", _previous)
+            if _previous is not None
+            else os.environ.pop("MONAD_LIVE_CAPTAIN_STATE_DIR", None))
+
         import threading
         from http.server import ThreadingHTTPServer
 

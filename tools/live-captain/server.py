@@ -12,6 +12,7 @@ existing login flow keeps working unmodified for both services.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import queue
@@ -50,11 +51,38 @@ KERNEL_PATH = ROOT_DIR / "prompts" / "captain-kernel.md"
 BEARING_PATH = ROOT_DIR / "context" / "current-bearing.md"
 LEDGER_PATH = ROOT_DIR / "context" / "continuity-ledger.md"
 CHANNEL_PATH = ROOT_DIR / "context" / "claude-channel.md"
+# The Captain writes here; this is the return leg it asked for on
+# 2026-08-03. Exposed read-only so the console can surface traffic
+# without anyone opening a file.
+CAPTAIN_CHANNEL_PATH = ROOT_DIR / "context" / "captain-channel.md"
 CHANNEL_PLACEHOLDER = "(no message from Claude right now)"
 DB_PATH = REPO_ROOT / "data" / "live-captain" / "live-captain.db"
 DIAGNOSTIC_LOG_PATH = REPO_ROOT / "data" / "live-captain" / "instruction-sources.log"
 RECENT_MESSAGE_LIMIT = 30
 STATUS_LABEL = "Live Captain — commissioning baseline"
+
+
+def _captain_channel() -> dict:
+    """The Captain -> Claude leg, surfaced in status.
+
+    Read-only and best-effort: a missing or unreadable file means the Captain
+    has said nothing, which is a normal state and must not fail the status
+    endpoint.
+    """
+    try:
+        text = CAPTAIN_CHANNEL_PATH.read_text(encoding="utf-8")
+    except OSError:
+        return {"captain_channel_path": str(CAPTAIN_CHANNEL_PATH),
+                "captain_channel_present": False}
+    stripped = text.strip()
+    return {
+        "captain_channel_path": str(CAPTAIN_CHANNEL_PATH),
+        "captain_channel_present": bool(stripped),
+        "captain_channel_chars": len(stripped),
+        "captain_channel_digest": hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        "captain_channel_mtime": int(CAPTAIN_CHANNEL_PATH.stat().st_mtime),
+        "captain_channel_tail": stripped[-600:],
+    }
 
 
 def load_context_sources(
@@ -174,6 +202,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     "ledger_digest": self.ledger_digest,
                     "channel_path": str(CHANNEL_PATH),
                     "channel_digest": self.channel_digest,
+                    **_captain_channel(),
                     "session_id": self.store.session_id,
                     "restart_count": self.store.restart_count(),
                     "recent_message_count": len(messages),

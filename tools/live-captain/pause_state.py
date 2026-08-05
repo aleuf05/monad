@@ -33,9 +33,30 @@ import time
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-STATE_DIR = REPO_ROOT / "data" / "live-captain"
-PAUSE_PATH = STATE_DIR / "paused.json"
-DB_PATH = STATE_DIR / "live-captain.db"
+
+# Overridable so tests never touch the operator's real pause flag. Without
+# this the whole suite failed simply because the Captain was legitimately
+# paused — the test server booted, read the live flag, and refused its own
+# turn. Operator state leaking into tests is a defect in the tests.
+_DEFAULT_STATE_DIR = REPO_ROOT / "data" / "live-captain"
+
+
+def state_dir() -> Path:
+    return Path(os.environ.get("MONAD_LIVE_CAPTAIN_STATE_DIR") or _DEFAULT_STATE_DIR)
+
+
+def pause_path() -> Path:
+    return state_dir() / "paused.json"
+
+
+def db_path() -> Path:
+    return state_dir() / "live-captain.db"
+
+
+# Kept as module attributes for callers that only ever want the real one.
+STATE_DIR = _DEFAULT_STATE_DIR
+PAUSE_PATH = _DEFAULT_STATE_DIR / "paused.json"
+DB_PATH = _DEFAULT_STATE_DIR / "live-captain.db"
 
 
 def read() -> dict:
@@ -43,7 +64,7 @@ def read() -> dict:
     failing *open* is right here: a corrupt flag must not strand the Captain
     in a pause nobody asked for."""
     try:
-        data = json.loads(PAUSE_PATH.read_text(encoding="utf-8"))
+        data = json.loads(pause_path().read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {"paused": False}
     if not isinstance(data, dict) or not data.get("paused"):
@@ -63,14 +84,15 @@ def is_paused() -> bool:
 def _write_atomic(payload: dict) -> None:
     """Write via temp file + rename. A half-written flag read by the other
     service is exactly the kind of split-brain this file exists to prevent."""
-    STATE_DIR.mkdir(parents=True, exist_ok=True)
-    handle, tmp = tempfile.mkstemp(dir=str(STATE_DIR), suffix=".tmp")
+    target = pause_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    handle, tmp = tempfile.mkstemp(dir=str(target.parent), suffix=".tmp")
     try:
         with os.fdopen(handle, "w", encoding="utf-8") as out:
             json.dump(payload, out, indent=2)
             out.flush()
             os.fsync(out.fileno())
-        os.replace(tmp, PAUSE_PATH)
+        os.replace(tmp, target)
     except BaseException:
         Path(tmp).unlink(missing_ok=True)
         raise
@@ -84,14 +106,15 @@ def checkpoint_database() -> dict:
     replays far more than it needs to. Checkpointing at pause makes the
     on-disk database complete on its own.
     """
-    if not DB_PATH.is_file():
+    database = db_path()
+    if not database.is_file():
         return {"checkpointed": False, "reason": "no database yet"}
-    before = DB_PATH.with_suffix(".db-wal")
+    before = database.with_suffix(".db-wal")
     before_size = before.stat().st_size if before.exists() else 0
     try:
         # A short timeout, and never fail the pause over this: holding the
         # Captain is the point; tidying the WAL is a bonus.
-        connection = sqlite3.connect(str(DB_PATH), timeout=5.0)
+        connection = sqlite3.connect(str(database), timeout=5.0)
         try:
             connection.execute("pragma wal_checkpoint(TRUNCATE)")
         finally:
