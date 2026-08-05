@@ -36,15 +36,17 @@ clean. Its question is still unanswered: file or endpoint for Captain-side
 messages? Pick one, wire it, and write the choice into the channel file.
 Spec: chief plan section 2.
 
-## TOOL-INVENTORY-01: Classify every directory under tools/
+## ~~TOOL-INVENTORY-01~~ — DONE 2026-08-05
 
-Status: queued
+Result: `docs/reports/2026-08-05-tool-inventory.md`. 35 tool directories,
+15 active units across 12 of them, 19 wired, **4 true orphans**. The premise
+this task was filed under ("36 dirs, 7 services") overstated the gap and has
+been corrected in the chief plan, doctrine 016, and the LSWE draft.
 
-36 tool directories, 7 running services. Precedent that the gap is real:
-`mission_bus.py`'s own header records that `engineering-comms/schema.py`
-was a tested 17/17 validator wired to nothing. Classify each directory as
-running / wired / orphan and file the list. Delete nothing.
-Spec: chief plan section 3.
+Method warning worth keeping: the first pass reported `aegis-rig` as an
+orphan because its import goes through `sys.path` plus a bare `import
+pipeline`. Grepping for directory paths produces false orphans in this repo.
+Verify by module name before acting.
 
 ## WEB-IA-RESPONSIVE-01: Verify mobile-width behavior of the new IA pages
 

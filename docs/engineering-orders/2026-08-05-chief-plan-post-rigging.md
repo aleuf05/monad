@@ -139,9 +139,11 @@ one and write the choice into the channel file so the Captain knows.
 
 ## 3. TOOL-INVENTORY-01 — find the orphans
 
-`ls -d tools/*/ | wc -l` returns **36**. Seven services run. That gap is
-the real architectural problem in this repo, and it is not an abstraction
-problem.
+35 tool directories; **15 active systemd units across 12 of them**, and
+4 true orphans. (Corrected 2026-08-05 by `TOOL-INVENTORY-01` — this section
+originally said "36 directories, seven services", which overstated the gap.
+See `docs/reports/2026-08-05-tool-inventory.md`.) The gap is real but
+smaller than argued, and it is not an abstraction problem.
 
 Precedent that this is worth an hour: the comment at the top of
 `tools/mission-bus/mission_bus.py` records that

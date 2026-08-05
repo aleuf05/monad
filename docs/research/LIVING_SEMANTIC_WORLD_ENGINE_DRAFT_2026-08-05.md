@@ -169,8 +169,10 @@ intent
 -> revised semantic representation
 ```
 
-**A measured symptom, not a rhetorical one.** `ls -d tools/*/` returns 36
-directories; 7 services run. The gap is not hypothetical: the header of
+**A measured symptom, not a rhetorical one.** 35 tool directories; 15
+active units across 12 of them; 4 true orphans. (This originally read "36
+directories, 7 services" — corrected by `TOOL-INVENTORY-01`, which found the
+ratio overstated. The diagnosis survives; the number was wrong.) The gap is not hypothetical: the header of
 `tools/mission-bus/mission_bus.py` records that
 `tools/engineering-comms/schema.py` was "a real, tested message validator
 (17/17 tests) that sat completely unused by anything else in this repo"
