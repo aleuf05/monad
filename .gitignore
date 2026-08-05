@@ -60,3 +60,4 @@ tools/aegis-rig/rust/target/
 # The two the live front page depends on are already tracked and stay tracked;
 # git ignores this rule for files it already follows.
 web/assets/rigged/*.glb
+web/assets/rigged/variants/

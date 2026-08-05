@@ -226,6 +226,9 @@
   .rig-bone { position: absolute; height: 1.5px; transform-origin: 0 50%;
     background: linear-gradient(90deg, rgba(79,209,197,0.75), rgba(79,209,197,0.25)); }
 
+  .rb-jointrow label { font-size: 0.74rem; color: #7B8CA6; }
+  .rb-jointrow input[type=range] { flex: 0 0 170px; }
+  .rb-jhint { font-size: 0.7rem; color: #9AACBF; }
   .rb-assets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
   .rb-asset { background: #0D1626; border: 1px solid #1E2C42; color: #9AACBF; font: inherit;
     font-size: 0.68rem; padding: 5px 9px; border-radius: 5px; cursor: pointer; line-height: 1.3; text-align: left; }
@@ -312,6 +315,12 @@
           <span class="rb-stat" id="rigStat">static model loaded</span>
         </div>
         <div class="rb-assets" id="rigAssets"></div>
+        <div class="rb-row rb-jointrow" id="rigJointRow" hidden>
+          <label for="rigJoints">Joints</label>
+          <input type="range" id="rigJoints" min="0" max="4" step="1" value="1">
+          <span class="rb-deg" id="rigJointsVal">8</span>
+          <span class="rb-jhint" id="rigJointHint"></span>
+        </div>
         <div class="rb-row rb-bendrow" id="rigBendRow" hidden>
           <label for="rigBend">Drive</label>
           <input type="range" id="rigBend" min="0" max="60" step="1" value="24">
@@ -1091,6 +1100,97 @@
         });
       }
 
+      // --- joint count ------------------------------------------------
+      // Bone density is the parameter that actually decides how much of a
+      // fragmented mesh can deform at all, and until now it was a CLI
+      // argument. Variants are pre-rigged, so switching is a model swap
+      // rather than a solve, and the page stays public.
+      var variantData = null;
+      var variants = [];
+      var jointRow = document.getElementById("rigJointRow");
+      var jointSlider = document.getElementById("rigJoints");
+      var jointVal = document.getElementById("rigJointsVal");
+      var jointHint = document.getElementById("rigJointHint");
+
+      fetch("data/rig-variants.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { variantData = d; syncVariants(); })
+        .catch(function (e) { console.error("variants failed:", e && e.message); });
+
+      function variantKeyFor(entry) {
+        if (!entry || !variantData) return null;
+        var stem = entry.name.replace(/\.glb$/, "");
+        return variantData.assets[stem] ? stem : null;
+      }
+
+      function syncVariants() {
+        var entry = corpusAssets.filter(function (e) { return e.dest === activeAsset; })[0];
+        var key = variantKeyFor(entry);
+        if (!key) {
+          variants = [];
+          if (jointRow) jointRow.hidden = true;
+          return;
+        }
+        variants = variantData.assets[key];
+        jointRow.hidden = false;
+        jointSlider.max = String(variants.length - 1);
+        var idx = 0;
+        for (var i = 0; i < variants.length; i++) {
+          if (variants[i].joints === 8) idx = i;
+        }
+        jointSlider.value = String(idx);
+        applyVariant(idx, true);
+      }
+
+      function applyVariant(index, quiet) {
+        var v = variants[index];
+        if (!v) return;
+        jointVal.textContent = v.joints;
+        jointHint.innerHTML = v.rigid.toLocaleString() + " rigid / " +
+          v.blended.toLocaleString() + " blended · <strong style=\"color:" +
+          (v.deep ? "#E8A33D" : "#4FD1C5") + "\">" + v.deep + " interpenetrating</strong>";
+        rigStat.textContent = "loading " + v.joints + "-joint rig…";
+        loadModel(v.dest, function (root) {
+          rigBones = collectBones(root);
+          buildSkeletonMarkers();
+          hotspots = v.hotspots || [];
+          hotMarkers.forEach(function (m) { m.remove(); });
+          hotMarkers = [];
+          hotspots.forEach(function () {
+            var el = document.createElement("div");
+            el.className = "rh";
+            el.style.display = "none";
+            hotLayer.appendChild(el);
+            hotMarkers.push(el);
+          });
+          if (clipBtn) {
+            clipBtn.innerHTML = "&#9888; Clipping: " + (clipOn ? "on" : "off") +
+              (clipOn && hotspots.length ? " (" + hotspots.length + ")" : "");
+          }
+          rigStat.textContent = rigBones.length + " joints bound — spring chain driving them live";
+          var sub = document.getElementById("rigBenchSub");
+          if (sub) {
+            sub.textContent = v.joints + " joints · " + v.shells.toLocaleString() +
+              " shells · bone span " + v.bone_span.toFixed(3);
+          }
+          applyBend(parseFloat(rigBend.value) || 24);
+          if (rigProbe) {
+            rigProbe.hidden = false;
+            rigProbe.innerHTML =
+              '<span class="rbp-v ' + v.verdict + '">' + v.verdict + "</span> at 15&deg; — " +
+              v.deep + " interpenetrating (of " + v.contact.toLocaleString() + " in contact)" +
+              "<br><code>" + v.inverted + " inverted · " + v.collapsed + " collapsed · " +
+              v.torn + " torn · solved in " + Math.round(v.solve_ms) + "ms</code>";
+          }
+        });
+      }
+
+      if (jointSlider) {
+        jointSlider.addEventListener("change", function () {
+          applyVariant(parseInt(jointSlider.value, 10));
+        });
+      }
+
       var skeletonBtn = document.getElementById("rigSkeleton");
       if (skeletonBtn) {
         skeletonBtn.addEventListener("click", function () {
@@ -1150,6 +1250,7 @@
           }
           applyBend(parseFloat(rigBend.value) || 24);
           showProbeFor(entry);
+          syncVariants();
         });
       }
 
@@ -1208,6 +1309,8 @@
             return e.dest === activeAsset;
           })[0];
           if (initial) buildHotspots(initial);
+          // Both fetches race; whichever lands second does the sync.
+          syncVariants();
         })
         .catch(function (e) { console.error("asset picker failed:", e && e.message); });
 

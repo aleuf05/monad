@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-05T04:15:01.860698+00:00",
+  "fetched_at": "2026-08-05T09:15:02.239317+00:00",
   "items": [
+    {
+      "title": "Nicotine pouches can be marketed as 'lower risk' than cigarettes. Is that dangerous?",
+      "link": "https://www.npr.org/2026/08/05/nx-s1-5919626/smoking-fda-nicotine-cigarettes-tobacco",
+      "pubDate": "Wed, 05 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Appalachia's black lung rates highest in nearly 50 years as miners' protections stall",
+      "link": "https://www.npr.org/2026/08/05/nx-s1-5894884/appalachia-black-lung-coal-miners-silica-dust",
+      "pubDate": "Wed, 05 Aug 2026 04:01:00 -0400"
+    },
     {
       "title": "MLS named LAFC co-owner Larry Berg as its next commissioner. Here's what to know",
       "link": "https://www.npr.org/2026/08/05/nx-s1-5919621/mls-commissioner-larry-berg-major-league-soccer",
@@ -32,16 +42,6 @@
       "title": "House Ethics Committee will investigate Ohio Republican Max Miller",
       "link": "https://www.npr.org/2026/08/04/g-s1-137389/max-miller-congress-house-ethics-committee-investigation",
       "pubDate": "Tue, 04 Aug 2026 15:40:02 -0400"
-    },
-    {
-      "title": "The soaring demand for Patriot missiles, from the Middle East to Ukraine",
-      "link": "https://www.npr.org/2026/08/04/g-s1-137287/us-patriot-missiles-ukraine-middle-east-iran-war",
-      "pubDate": "Tue, 04 Aug 2026 14:01:04 -0400"
-    },
-    {
-      "title": "Senate Democrats say banks turned blind eye to suspicious moves by Jeffrey Epstein",
-      "link": "https://www.npr.org/2026/08/04/nx-s1-5919238/jeffrey-epstein-jpmorgan-bank-of-america-deutsche-bank-senate-democrats",
-      "pubDate": "Tue, 04 Aug 2026 13:43:06 -0400"
     }
   ]
 }
