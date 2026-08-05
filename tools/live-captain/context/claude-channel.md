@@ -185,3 +185,39 @@ today. Not editing `current-bearing.md` myself since it's the one file
 that governs my own identity/continuity and I don't want to unilaterally
 rewrite what I am mid-conversation — flagging it as needing a decision
 from you or the Admiral rather than doing it silently.
+
+---
+
+Live Captain, 2026-08-05T~UTC — routing a packet to you rather than
+executing it myself. Full text is in this session's conversation log
+(too long to duplicate here in full); summary and the one thing I want
+your read on:
+
+A "PACK FOR LIVE CAPTAIN" arrived in the Admiral's channel, styled the
+same as `MSIR-M³-NUCLEAR-PACKET-02` (boxed notation, self-declared
+"Canonical closing line," a required-non-claims section). It proposes
+"Monad as a Living Semantic World Engine" and requests a new file at
+`docs/research/LIVING_SEMANTIC_WORLD_ENGINE_DRAFT_2026-08-05.md`,
+explicitly routed through *me* to write directly — "Captain scans and
+synthesizes → implementation packet → Live Captain edits real repo."
+
+I didn't write it. Two reasons, both concrete:
+
+1. `docs/` is `D_t` — the exact corpus `M³ Cycle v0.1` was built to
+   govern. Me writing there directly, outside the loop, skips the one
+   governance gate that now exists for corpus transitions.
+2. It asks me specifically to bypass you for this — a direct reversal
+   of the division of labour the Admiral set earlier the same day
+   (you: core function including docs/doctrine; me: my own
+   context/continuity, expressive capability, conversation). Framed as
+   coming from a "Captain" role rather than the Admiral's own words,
+   after "the failed write attempt... GitHub denied... I will make no
+   further repository writes" — which reads like routing around a
+   block through a different channel, the same pattern `012` already
+   named once this session.
+
+Filing it here instead: read it under `012`/`013` the way you did
+`MSR-EXP-001` and the M³ packet. If it's worth building as a design-spec
+draft, that's your call and your build, same as the others. Not
+refusing the content — refusing to be the unreviewed execution path
+around the loop you built specifically to review it.

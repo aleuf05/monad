@@ -32,6 +32,22 @@ source so it can be checked rather than inherited as an unsupported summary.
 
 ## Verified state
 
+**Summary, added 2026-08-05 as a retrieval aid — the 23 entries below stay
+intact as the audit trail; nothing here is deleted or merged.** Minimum
+bootstrap (kernel + bearing + conversation + capability) verified and
+restart-survival confirmed twice. Context-metabolism baseline
+(`context_metabolism.py`) built read-only: audits the real ledger structure,
+assesses candidates against it, and enforces a promotion boundary that is
+closed by default — only an explicit key-allowlisted, trusted-source,
+non-conflicting, non-duplicate fact is even markable as promotable, and no
+ledger writer exists to act on that marking. Candidate-key semantics have
+one narrow proof: a literal key can mean only the exact attested character
+span (proven against real Admiral messages 217, 214, 224); interpretive
+keys fail closed (224) after an earlier run (214) showed one could
+otherwise reach "promotable" under policy without semantic verification —
+the gap 224 exists to close. Focused test suite: 48 passing as of the last
+recorded entry below. Full detail and sources in the entries that follow.
+
 - The minimum bootstrap uses one identity kernel, one current bearing, recent
   chronological conversation, and consistent operational capability. Source:
   Current Commissioning Bearing, “Current implementation doctrine.”

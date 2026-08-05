@@ -31,6 +31,7 @@ from context_compiler import (
     load_required_text,
 )
 from persistence import LiveCaptainStore, PersistenceError
+import pause_state
 
 # Generated-image serving remains owned by root-console.service.  Reuse its
 # trust-boundary mapper here so the Live Captain stream emits the same
@@ -162,6 +163,8 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
             self._send_json(
                 {
                     "label": STATUS_LABEL,
+                    **{f"pause_{k}" if k != "paused" else k: v
+                       for k, v in pause_state.read().items()},
                     "codex": self.daemon.status(),
                     "kernel_path": str(KERNEL_PATH),
                     "kernel_digest": self.kernel_digest,
@@ -198,6 +201,12 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         text = payload.get("text", "")
         if not isinstance(text, str) or not text.strip():
             self._send_json({"error": "message is empty"}, status=400)
+            return
+
+        # Refuse *new* turns while paused. Nothing is recorded, no context is
+        # compiled, no model is called — continuity is left exactly as it was.
+        if pause_state.is_paused():
+            self._send_json(pause_state.refusal(), status=409)
             return
 
         try:

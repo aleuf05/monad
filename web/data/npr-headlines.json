@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-05T00:45:01.705568+00:00",
+  "fetched_at": "2026-08-05T04:15:01.860698+00:00",
   "items": [
+    {
+      "title": "MLS named LAFC co-owner Larry Berg as its next commissioner. Here's what to know",
+      "link": "https://www.npr.org/2026/08/05/nx-s1-5919621/mls-commissioner-larry-berg-major-league-soccer",
+      "pubDate": "Wed, 05 Aug 2026 00:00:00 -0400"
+    },
     {
       "title": "Authorities arrested a man with ammo and apparently monitoring security at Trump golf course near LA",
       "link": "https://www.npr.org/2026/08/04/g-s1-137415/trump-golf-course-arrest-california",
@@ -37,11 +42,6 @@
       "title": "Senate Democrats say banks turned blind eye to suspicious moves by Jeffrey Epstein",
       "link": "https://www.npr.org/2026/08/04/nx-s1-5919238/jeffrey-epstein-jpmorgan-bank-of-america-deutsche-bank-senate-democrats",
       "pubDate": "Tue, 04 Aug 2026 13:43:06 -0400"
-    },
-    {
-      "title": "Europe's heat wave fuels drought, wildfires and fears about energy supplies",
-      "link": "https://www.npr.org/2026/08/04/nx-s1-5919214/europe-heatwave-danube-rhine-wildfires",
-      "pubDate": "Tue, 04 Aug 2026 12:37:38 -0400"
     }
   ]
 }
