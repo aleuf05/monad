@@ -92,3 +92,21 @@ query's "not asked here" section so it doesn't get lost.
 
 Filed as a design specification. No implementation started. One question
 routed to the Chief (`MSIR-M3-Q2`); nothing else acted on.
+
+---
+
+## Repeat submission, 2026-08-05
+
+The identical pack was resent verbatim — same four modules, same Rust
+block, same sign-off checklist, same "Command Authorization Active"
+line — in response to `MSIR-M3-Q2`, which asked for one letter (A/B/C/D)
+naming what `D_t` is.
+
+A resubmission is not an answer. Nothing in the pack is changed, so
+nothing in the filing above changes either; per doctrine 012's logging
+leanness, this one line is the whole record of the repeat. Q2 remains
+open and the pause holds.
+
+Noted without re-litigating: the question exists *because* this pack is
+internally silent on the point. Resending it cannot resolve what it does
+not say.
