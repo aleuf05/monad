@@ -136,6 +136,113 @@ def describe(path: Path, repo_root: Path) -> dict:
             "state": state, "note": note}
 
 
+# --- VALIDATE ---------------------------------------------------------------
+# Packet Beta names "weight bleeding across disjoint meshes" as the failure
+# mode of proximity-based auto-weighting. Disjointness is the trigger, and it
+# is computable: two vertices belong to the same shell iff a path of shared
+# triangles connects them. A mesh that looks like one object but is twenty
+# unconnected shells is exactly where a proximity solver assigns a hand bone
+# to a shirt button.
+
+COMPONENT_FORMATS = {5121: ("B", 1), 5123: ("H", 2), 5125: ("I", 4)}
+
+
+def _read_indices(gltf: dict, blob: bytes, bin_offset: int, accessor_index: int):
+    accessor = gltf["accessors"][accessor_index]
+    fmt, size = COMPONENT_FORMATS[accessor["componentType"]]
+    view = gltf["bufferViews"][accessor["bufferView"]]
+    start = bin_offset + view.get("byteOffset", 0) + accessor.get("byteOffset", 0)
+    count = accessor["count"]
+    return struct.unpack_from(f"<{count}{fmt}", blob, start)
+
+
+def _bin_chunk_offset(data: bytes) -> int:
+    offset = 12
+    while offset + 8 <= len(data):
+        chunk_len, chunk_type = struct.unpack("<II", data[offset:offset + 8])
+        if chunk_type != CHUNK_JSON:
+            return offset + 8
+        offset += 8 + chunk_len + (-chunk_len % 4)
+    raise AssetError("no binary chunk")
+
+
+def shell_analysis(path: Path) -> dict:
+    """Count connected components per primitive. Union-find with path
+    compression; iterative, because a 2M-triangle mesh will not tolerate
+    recursion or anything clever."""
+    data = path.read_bytes()
+    parsed = parse_glb(path)
+    gltf = parsed["gltf"]
+    bin_offset = _bin_chunk_offset(data)
+
+    primitives, total_shells, largest_ratio = [], 0, 1.0
+    for mesh_index, mesh in enumerate(gltf.get("meshes", [])):
+        for prim_index, prim in enumerate(mesh.get("primitives", [])):
+            pos = prim.get("attributes", {}).get("POSITION")
+            idx = prim.get("indices")
+            if pos is None or idx is None:
+                continue
+            vertex_count = gltf["accessors"][pos]["count"]
+            indices = _read_indices(gltf, data, bin_offset, idx)
+
+            parent = list(range(vertex_count))
+
+            def find(x: int) -> int:
+                root = x
+                while parent[root] != root:
+                    root = parent[root]
+                while parent[x] != root:      # path compression
+                    parent[x], x = root, parent[x]
+                return root
+
+            for i in range(0, len(indices) - 2, 3):
+                a, b, c = indices[i], indices[i + 1], indices[i + 2]
+                ra, rb, rc = find(a), find(b), find(c)
+                if ra != rb:
+                    parent[rb] = ra
+                    rb = ra
+                if ra != rc:
+                    parent[rc] = ra
+
+            sizes: dict[int, int] = {}
+            for v in range(vertex_count):
+                root = find(v)
+                sizes[root] = sizes.get(root, 0) + 1
+
+            ordered = sorted(sizes.values(), reverse=True)
+            shells = len(ordered)
+            total_shells += shells
+            if ordered:
+                largest_ratio = min(largest_ratio, ordered[0] / vertex_count)
+            primitives.append({
+                "mesh": mesh_index, "primitive": prim_index,
+                "vertices": vertex_count, "triangles": len(indices) // 3,
+                "shells": shells,
+                "largest_shell": ordered[0] if ordered else 0,
+                "shell_sizes": ordered[:8],
+                "orphan_vertices": sum(1 for s in ordered if s == 1),
+            })
+
+    # Risk is about how *fragmented* the geometry is, not raw shell count:
+    # a two-shell mesh where both halves are large is far less dangerous to
+    # auto-weight than one dominant body plus 200 loose fragments.
+    if total_shells <= 1:
+        risk, note = "low", "single connected shell — proximity weighting has no disjoint gap to bleed across"
+    elif total_shells <= 8:
+        risk, note = "moderate", f"{total_shells} disjoint shells — weights must be solved per shell, not by global proximity"
+    else:
+        risk, note = "high", f"{total_shells} disjoint shells — proximity-based auto-weighting will bleed between unconnected parts"
+
+    return {
+        "ok": True,
+        "primitives": primitives,
+        "total_shells": total_shells,
+        "largest_shell_ratio": round(largest_ratio, 4),
+        "weight_bleed_risk": risk,
+        "note": note,
+    }
+
+
 def collect(repo_root: Path) -> dict:
     assets = []
     for path in sorted(repo_root.rglob("*.glb")):

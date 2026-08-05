@@ -15,6 +15,11 @@ import inspector  # noqa: E402
 HOST, PORT = "127.0.0.1", 4799
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
+# Shell analysis is seconds of CPU on a million-vertex mesh, and the answer
+# only changes when the file does. Keyed on mtime_ns so an edited asset
+# re-analyses automatically.
+_SHELL_CACHE: dict[str, tuple[int, dict]] = {}
+
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
@@ -24,12 +29,29 @@ class Handler(BaseHTTPRequestHandler):
             self._json(200, {"ok": True, **inspector.collect(REPO_ROOT)})
             return
 
+        if path.startswith("/api/validate/"):
+            target = self._safe_asset(path[len("/api/validate/"):])
+            if target is None:
+                self._json(404, {"ok": False, "error": "not found"})
+                return
+            key = str(target)
+            stamp = target.stat().st_mtime_ns
+            cached = _SHELL_CACHE.get(key)
+            if cached and cached[0] == stamp:
+                self._json(200, {**cached[1], "cached": True})
+                return
+            try:
+                result = inspector.shell_analysis(target)
+            except Exception as error:  # noqa: BLE001 - report, don't crash the panel
+                self._json(500, {"ok": False, "error": str(error)})
+                return
+            _SHELL_CACHE[key] = (stamp, result)
+            self._json(200, {**result, "cached": False})
+            return
+
         if path.startswith("/api/asset/"):
-            rel = unquote(path[len("/api/asset/"):])
-            target = (REPO_ROOT / rel).resolve()
-            # Containment check: a preview endpoint that accepts a path
-            # must not be talked out of the repo with ../
-            if not str(target).startswith(str(REPO_ROOT)) or target.suffix.lower() != ".glb" or not target.is_file():
+            target = self._safe_asset(path[len("/api/asset/"):])
+            if target is None:
                 self._json(404, {"ok": False, "error": "not found"})
                 return
             body = target.read_bytes()
@@ -42,6 +64,16 @@ class Handler(BaseHTTPRequestHandler):
             return
 
         self._json(404, {"ok": False, "error": "not found"})
+
+    def _safe_asset(self, rel: str) -> Path | None:
+        """Resolve a request path to a .glb inside the repo, or nothing.
+        An endpoint that takes a path must not be talked out of the repo."""
+        target = (REPO_ROOT / unquote(rel)).resolve()
+        if not str(target).startswith(str(REPO_ROOT) + "/"):
+            return None
+        if target.suffix.lower() != ".glb" or not target.is_file():
+            return None
+        return target
 
     def _json(self, status: int, payload: dict) -> None:
         body = json.dumps(payload).encode("utf-8")
