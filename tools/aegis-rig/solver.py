@@ -654,10 +654,32 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
         raise RigError("no node references the mesh")
     nodes[mesh_node]["skin"] = skin_index
 
+    # glTF: "the transform of the skinned mesh node MUST be ignored" — joints
+    # define placement entirely. So a mesh node carrying an orientation fix
+    # loses it the instant a skin is attached. The character asset has
+    # rotation [0.7071,0,0,0.7071] (+90 deg about X, the usual Z-up to Y-up
+    # correction); rigging it laid her on her back. Gasket has no node
+    # transform, which is why this went unnoticed until now.
+    #
+    # Fix: parent the joint root to a node carrying the mesh node's own TRS.
+    # Joints inherit it, inverse bind matrices stay translation-only in mesh
+    # space, and the rest pose reproduces exactly what the unrigged asset
+    # showed.
+    mesh_transform = {k: v for k, v in nodes[mesh_node].items()
+                      if k in ("rotation", "scale", "translation", "matrix")}
+    if mesh_transform:
+        nodes.append({**mesh_transform, "name": "@Orient",
+                      "children": [first_joint_node]})
+        skeleton_root = len(nodes) - 1
+        gltf["skins"][skin_index]["skeleton"] = skeleton_root
+    else:
+        skeleton_root = first_joint_node
+
+
     # The joint root has to be in the scene or the skin is unreachable.
     scenes = gltf.setdefault("scenes", [{"nodes": [mesh_node]}])
     scene = scenes[gltf.get("scene", 0)]
-    scene.setdefault("nodes", []).append(first_joint_node)
+    scene.setdefault("nodes", []).append(skeleton_root)
 
     generator = gltf.setdefault("asset", {}).get("generator", "unknown")
     gltf["asset"]["generator"] = f"{generator} + aegis-rig 0.1"

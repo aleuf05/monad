@@ -147,6 +147,19 @@ cameronlampley.com {
 		}
 
 		# Aegis INSPECT: reads the glTF corpus and serves assets for preview.
+		# Rich Voice (Gemini TTS). Gated like everything else. The engine
+		# caps spend at $0.10/day and 300s by default, never calls the
+		# provider on /status, /budget or /estimate, and releases its
+		# reservation on a failed render. Added 2026-08-05 after FLEETNET
+		# found the service active, configured, and unreachable — with
+		# character-voice-studio failing silently against a 404.
+		handle_path /voice-api/* {
+			forward_auth 127.0.0.1:4779 {
+				uri /check
+			}
+			reverse_proxy 127.0.0.1:4775
+		}
+
 		handle_path /aegis-inspect-api/* {
 			forward_auth 127.0.0.1:4779 {
 				uri /check
