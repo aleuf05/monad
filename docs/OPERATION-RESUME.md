@@ -102,27 +102,31 @@ real knob, not a cosmetic one — it is a slider on the console.
 
 ## 3. Next moves, in order of value
 
-The four items that were here on 2026-08-05 are done — solver, pipeline
-stages 3-6, refusal backlog, and the Rust/Python decision. What is left:
+**The plan is filed. Read
+[`docs/engineering-orders/2026-08-05-chief-plan-post-rigging.md`](engineering-orders/2026-08-05-chief-plan-post-rigging.md)** —
+it is written to be executed cold by a session with no memory of the build,
+with real paths, runnable commands, and acceptance criteria as numbers to
+beat. The same three tasks are in
+[`queue.md`](engineering-orders/queue.md) as `AEGIS-COLLISION-01`,
+`LC-CHANNEL-01`, `TOOL-INVENTORY-01`.
 
-1. **Deformation quality has never been looked at.** The solver proves
-   its weights sum to 1.0 and that no shell is split across bones. It
-   does *not* prove the rig deforms *well* — Packet Beta's Module 3
-   (clipping and pinching detection against test geometry) is the one
-   module still unbuilt. That needs a pose to test against, which needs
-   an animation, which nothing in the corpus has.
-2. **Linear blend vs dual-quaternion.** The solver does neither yet —
-   with two influences and no rotation in the rest pose the distinction
-   has not arisen. It will the moment a joint actually twists.
-3. **The eight sentences** (see
-   `docs/reports/2026-08-05-refusal-review-backlog.md`). Seven are the
-   Admiral's: two confirming the LUCA research is genuinely wanted, five
-   naming something concrete enough to build from.
-4. **Multi-primitive assets.** The solver refuses them at AUTHORIZE.
-   Most of the corpus is single-primitive so this has not bitten, but
-   `file_00000000a68c722f9cd2…` and friends should be checked.
+Short version, in order:
 
----
+1. **AEGIS-COLLISION-01** — the real engineering. Per-shell rigid binding
+   killed pinching completely (0 collapsed, 0 inverted, 0 torn at every
+   angle) and replaced it with collision: 334 newly-overlapping shell pairs
+   at 45 degrees on gasket. Group adjacent shells so neighbours share a
+   joint. Target: under 35, with pinching still at zero.
+2. **LC-CHANNEL-01** — the Live Captain wrote the Captain→Claude mirror leg
+   on 2026-08-03 and could not wire it in because the tree was dirty. The
+   tree is clean now. Its question is still unanswered.
+3. **TOOL-INVENTORY-01** — 36 tool directories, 7 running services. Find
+   the orphans before making any further architecture call.
+
+**Do not build the Semantic Kernel yet.** Chief plan section 4 gives three
+checkable reasons; the short one is that `MSIR-M3-Q2` already settled that
+the predicates differ in kind across documents and geometry, and the
+Charter predates that finding.
 
 ## 4. Settled — do not re-litigate
 
@@ -156,7 +160,14 @@ genuinely new terms, not repetition:
 ## 5. Map
 
 **Read first:** `docs/doctrine/012` (packet terms) → `013` (lifecycle +
-refusal review) → `014` (the working loop; §4a division of labour).
+refusal review) → `014` (the working loop; §4a division of labour) →
+`015` (Rust for maths) → `016` (Chief Conference — how to ask for an
+architectural read instead of an implementation report).
+
+**Verifying front-page work:** `node scripts/verify-live-page.mjs
+https://cameronlampley.com/` drives the real page in a real browser and
+reports console errors, failed requests, and horizontal overflow. It has
+already caught three bugs that reading the diff did not.
 
 **Mechanisms:**
 - `docs/engineering-orders/queries/` — **"Chief Resolve"**: one blocking
