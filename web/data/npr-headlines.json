@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-05T09:15:02.239317+00:00",
+  "fetched_at": "2026-08-05T10:15:01.986078+00:00",
   "items": [
+    {
+      "title": "Progressives and moderate Democrats both see wins in primary races while Trump flexes power over GOP",
+      "link": "https://www.npr.org/2026/08/05/g-s1-137422/primary-elections",
+      "pubDate": "Wed, 05 Aug 2026 06:08:28 -0400"
+    },
     {
       "title": "Nicotine pouches can be marketed as 'lower risk' than cigarettes. Is that dangerous?",
       "link": "https://www.npr.org/2026/08/05/nx-s1-5919626/smoking-fda-nicotine-cigarettes-tobacco",
@@ -37,11 +42,6 @@
       "title": "One Maine community's fight to save a birthing center",
       "link": "https://www.npr.org/2026/08/04/nx-s1-5910852/maine-birthing-center-fight",
       "pubDate": "Tue, 04 Aug 2026 16:16:26 -0400"
-    },
-    {
-      "title": "House Ethics Committee will investigate Ohio Republican Max Miller",
-      "link": "https://www.npr.org/2026/08/04/g-s1-137389/max-miller-congress-house-ethics-committee-investigation",
-      "pubDate": "Tue, 04 Aug 2026 15:40:02 -0400"
     }
   ]
 }

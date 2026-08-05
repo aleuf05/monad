@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# j — one cycle jump. Sound the ship, run every suite, report in one screen.
+#
+# Named by the Admiral, 2026-08-05. The point is that a full-state check
+# should cost one keystroke, because the day's errors all came from carrying
+# a figure forward instead of re-measuring it (doctrine 021).
+set -uo pipefail
+cd "$(dirname "$0")/.." || exit 2
+fail=0
+echo "── J  ·  $(date -u '+%Y-%m-%d %H:%M:%SZ')  ─────────────────────────"
+echo "FLEET"
+tot=$(ls /etc/systemd/system/*.service 2>/dev/null | while read -r u; do grep -ql "/dev/monad/" "$u" 2>/dev/null && echo x; done | wc -l)
+act=$(ls /etc/systemd/system/*.service 2>/dev/null | while read -r u; do grep -ql "/dev/monad/" "$u" 2>/dev/null && systemctl is-active "$(basename "$u" .service)" 2>/dev/null; done | grep -c '^active$')
+printf "  %s of %s units active   ·   %s ports held\n" "$act" "$tot" \
+  "$(ss -ltn 2>/dev/null | grep -coE ':(4[0-9]{3})\b')"
+echo "SUITES"
+for t in tools/aegis-rig/test_solver.py tools/aegis-rig/test_parity.py \
+         tools/live-captain/test_pause.py tools/live-captain/test_live_captain.py \
+         tools/voice-engine/test_buddy_router.py tools/m3-cycle/test_engine.py; do
+  r=$(python3 "$t" 2>&1 | tail -1)
+  [ "$r" = "OK" ] || fail=$((fail+1))
+  printf "  %-34s %s\n" "$(basename "$t")" "$r"
+done
+echo "HULL"
+bash scripts/sound-the-ship.sh 2>&1 | tail -1 | sed 's/^/  /'
+bash scripts/sound-the-ship.sh >/dev/null 2>&1 || fail=$((fail+1))
+echo "TREE"
+printf "  %s uncommitted   ·   %s\n" "$(git status --porcelain | wc -l)" \
+  "$(git rev-list --left-right --count @{u}...HEAD 2>/dev/null | awk '{print "behind "$1", ahead "$2}')"
+echo "CAPTAIN"
+python3 tools/live-captain/pause.py status 2>/dev/null | head -1 | sed 's/^/  /'
+echo "─────────────────────────────────────────────────────────"
+[ "$fail" -eq 0 ] && echo "ALL SOUND" || echo "$fail area(s) want attention"
+exit $(( fail > 0 ))

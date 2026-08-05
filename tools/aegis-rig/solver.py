@@ -527,7 +527,8 @@ def _inverse_bind_matrices(joints: list[tuple]) -> bytes:
 
 def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
                  engine: str = "auto",
-                 adjacency_factor: float = ADJACENCY_FACTOR) -> dict:
+                 adjacency_factor: float = ADJACENCY_FACTOR,
+                 shape: str = "chain") -> dict:
     data = source.read_bytes()
     gltf, blob, _ = _split_glb(data)
 
@@ -548,8 +549,33 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
     indices = inspector._read_indices(gltf, blob, 0, idx_accessor)
 
     started = time.perf_counter()
-    skeleton, skin, engine_used = solve_core(
-        positions, indices, joint_count, engine, adjacency_factor)
+    kind = "chain"
+    skeleton = skin = None
+    engine_used = "python"
+    if shape in ("auto", "tree"):
+        axis = best_axis(positions)
+        if shape == "tree" or not axis["fit"]["fits"]:
+            labels = inspector.connected_components(indices, len(positions))
+            try:
+                tree = solve_branching_skeleton(positions, labels)
+                tree_fit = branching_fit(positions, labels, tree)
+                # Only take the tree if it is actually better. On coherent
+                # geometry it is much worse — the-monad went 11% to 43% — so
+                # "the chain failed" is not by itself a reason to switch.
+                if tree_fit["off_bone_fraction"] < axis["fit"]["off_axis_fraction"]:
+                    tree.update({"axis": axis["axis"],
+                                 "axis_name": "XYZ"[axis["axis"]],
+                                 "bone_span": 0.0,
+                                 "axis_min": 0.0, "axis_max": 0.0,
+                                 "bounds": {"min": [0, 0, 0], "max": [0, 0, 0]}})
+                    skeleton = tree
+                    skin = solve_branching_weights(positions, labels, tree)
+                    kind, engine_used = "tree", "python-tree"
+            except RigError:
+                pass
+    if skeleton is None:
+        skeleton, skin, engine_used = solve_core(
+            positions, indices, joint_count, engine, adjacency_factor)
     solve_ms = (time.perf_counter() - started) * 1000
 
     if not skin["weights_sum_to_one"]:
@@ -604,8 +630,14 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
             "name": skeleton["names"][j],
             "translation": [point[i] - origin[i] for i in range(3)],
         }
-        if j + 1 < len(skeleton["joints"]):
-            node["children"] = [first_joint_node + j + 1]
+        # Children come from the parent table, not from j+1. A chain happens
+        # to be children[j] = [j+1]; a tree has a trunk with several. Writing
+        # the chain assumption into the writer would have silently flattened
+        # every branching rig into a line.
+        kids = [first_joint_node + k for k, parent in enumerate(skeleton["parents"])
+                if parent == j]
+        if kids:
+            node["children"] = kids
         nodes.append(node)
 
     joint_nodes = [first_joint_node + j for j in range(len(skeleton["joints"]))]
@@ -667,6 +699,7 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
         "max_weight_error": skin["max_weight_error"],
         "weights_sum_to_one": skin["weights_sum_to_one"],
         "engine": engine_used,
+        "skeleton_kind": kind,
         "solve_ms": round(solve_ms, 2),
     }
 
@@ -831,3 +864,61 @@ def branching_fit(positions, labels, skeleton: dict) -> dict:
     fraction = far / len(positions)
     return {"off_bone_fraction": round(fraction, 4), "fits": fraction <= OFF_AXIS_LIMIT,
             "joints": len(joints)}
+
+
+def solve_branching_weights(positions, labels, skeleton: dict) -> dict:
+    """Bind each vertex to the joints of its own lobe.
+
+    The chain solver's anti-bleed rule was "a shell too short to blend is
+    rigid". The tree's equivalent is stronger and simpler: **a vertex may
+    only be influenced by joints belonging to its own lobe, or by the root.**
+    A track cannot be pulled by a shoulder joint because a shoulder joint is
+    not in its list.
+    """
+    joints = skeleton["joints"]
+    lobe_of_joint = skeleton["lobe_of_joint"]
+    shell_lobe = skeleton["shell_lobe"]
+    trunk = skeleton["trunk"]
+
+    by_lobe: dict[int, list[int]] = {}
+    for index, lobe in enumerate(lobe_of_joint):
+        by_lobe.setdefault(lobe, []).append(index)
+    root_joints = by_lobe.get(trunk, [0])
+
+    joint_ids = array("H", bytes(8 * len(positions)))
+    weights = array("f", [0.0]) * (4 * len(positions))
+    rigid = blended = 0
+
+    for v, point in enumerate(positions):
+        lobe = shell_lobe.get(labels[v], trunk)
+        candidates = by_lobe.get(lobe) or root_joints
+        ranked = sorted(
+            candidates,
+            key=lambda j: sum((point[a] - joints[j][a]) ** 2 for a in range(3)))
+        first = ranked[0]
+        if len(ranked) == 1:
+            joint_ids[4 * v] = first
+            weights[4 * v] = 1.0
+            rigid += 1
+            continue
+        second = ranked[1]
+        d1 = sum((point[a] - joints[first][a]) ** 2 for a in range(3)) ** 0.5
+        d2 = sum((point[a] - joints[second][a]) ** 2 for a in range(3)) ** 0.5
+        total = d1 + d2
+        w1 = 1.0 if total <= 0 else d2 / total
+        joint_ids[4 * v], joint_ids[4 * v + 1] = first, second
+        weights[4 * v], weights[4 * v + 1] = w1, 1.0 - w1
+        blended += 1
+
+    worst = 0.0
+    for v in range(len(positions)):
+        s = sum(weights[4 * v + k] for k in range(4))
+        worst = max(worst, abs(s - 1.0))
+
+    return {"joint_ids": joint_ids, "weights": weights,
+            "shells": (max(labels) + 1) if labels else 0,
+            "groups": skeleton["lobes"],
+            "rigid_shells": rigid, "blended_shells": blended,
+            "rigid_vertices": rigid, "blended_vertices": blended,
+            "max_weight_error": worst, "unweighted_vertices": 0,
+            "weights_sum_to_one": worst <= WEIGHT_EPSILON}
