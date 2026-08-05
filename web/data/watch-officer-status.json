@@ -1,6 +1,6 @@
 {
   "schema_version": "monad.watchOfficerStatus.v1",
-  "checked_at": "2026-08-05T12:00:01.421857Z",
+  "checked_at": "2026-08-05T12:10:01.852191Z",
   "fleet": {
     "vessel_count": 15,
     "vessels_by_status": {
@@ -11,7 +11,7 @@
   },
   "world_intake": {
     "pending_count": 39,
-    "oldest_pending_age_hours": 535.3
+    "oldest_pending_age_hours": 535.5
   },
   "mission": {
     "mission_id": "mission.kraken-inquiry-001",
@@ -20,6 +20,6 @@
   },
   "notes": [
     "World Intake backlog: 39 pending proposals.",
-    "Oldest pending proposal is 535.3h old."
+    "Oldest pending proposal is 535.5h old."
   ]
 }

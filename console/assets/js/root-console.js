@@ -842,7 +842,12 @@ function handleCodexEvent(event) {
 // captain.monad / Kore — measured authority. Distinct from the front page
 // Buddy's captain.alpha / Puck, so you can tell who is talking.
 const CAPTAIN_VOICE_KEY = "monad.captainVoice";
-let captainVoiceOn = localStorage.getItem(CAPTAIN_VOICE_KEY) === "on";
+// Default ON. Admiral, 2026-08-05: "Allow live captain to speak." Off was
+// the cautious default while the render path was unproven; it is proven now
+// (28.8s of real WAV from live state), so silence is no longer the sensible
+// starting position. localStorage still wins if you have chosen either way.
+const captainVoiceStored = localStorage.getItem(CAPTAIN_VOICE_KEY);
+let captainVoiceOn = captainVoiceStored === null ? true : captainVoiceStored === "on";
 let captainAudio = null;
 
 function setCaptainVoice(on) {
@@ -887,12 +892,26 @@ async function speakCaptain(text) {
     };
     await captainAudio.play();
   } catch (err) {
-    // Budget exhausted, not logged in, render failed. Say so in the terminal
-    // rather than failing silently — a voice that goes quiet without
-    // explanation is indistinguishable from a broken one.
-    if (btn) btn.textContent = "⚓ Voice: on";
-    addRow("error", "voice", `captain voice unavailable: ${err.message}`);
+    // Budget exhausted, not logged in, render failed. SPEAK ANYWAY — the
+    // browser's own voice is free, local, and always available. A Captain
+    // that goes silent because a spend cap was reached is a worse outcome
+    // than a Captain that sounds plainer. Same rule the front-page Buddy
+    // already follows: silence is never an acceptable degradation.
+    if (btn) btn.textContent = "⚓ Voice: on (local)";
+    speakLocally(spoken);
+    addRow("error", "voice", `neural voice unavailable (${err.message}) — using local voice`);
   }
+}
+
+function speakLocally(text) {
+  if (!window.speechSynthesis || !text) return;
+  try {
+    window.speechSynthesis.cancel();          // a new reply supersedes the old
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.97;
+    utterance.pitch = 0.92;                   // lower: this is the Captain, not the Buddy
+    window.speechSynthesis.speak(utterance);
+  } catch (e) { /* no speech engine; nothing further to try */ }
 }
 
 function handleEvent(event) {

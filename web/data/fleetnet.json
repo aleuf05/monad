@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-05T12:02:46Z",
+  "generated": "2026-08-05T12:12:52Z",
   "units": {
     "installed": 24,
     "active": 19,
@@ -14,15 +14,15 @@
     "total": 5
   },
   "tree": {
-    "uncommitted": 8,
-    "head": "2bd98c4"
+    "uncommitted": 7,
+    "head": "a5637fa"
   },
   "captain": "running",
   "voice": {
     "day": "2026-08-05",
-    "seconds_used": 31.84,
+    "seconds_used": 199.76,
     "seconds_limit": 300.0,
-    "usd_used": 0.01592,
+    "usd_used": 0.09988,
     "usd_limit": 0.1
   },
   "sound": true,
@@ -41,11 +41,11 @@
     },
     {
       "priority": 3,
-      "text": "8 files uncommitted."
+      "text": "7 files uncommitted."
     },
     {
       "priority": 1,
-      "text": "Voice budget, 0.0159 of 0.1 dollars used."
+      "text": "Voice budget, 0.0999 of 0.1 dollars used."
     }
   ]
 }
