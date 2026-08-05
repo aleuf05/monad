@@ -270,9 +270,9 @@
           <span class="rb-stat" id="rigStat">static model loaded</span>
         </div>
         <div class="rb-row rb-bendrow" id="rigBendRow" hidden>
-          <label for="rigBend">Bend</label>
-          <input type="range" id="rigBend" min="0" max="60" step="1" value="0">
-          <span class="rb-deg" id="rigBendVal">0&deg;</span>
+          <label for="rigBend">Drive</label>
+          <input type="range" id="rigBend" min="0" max="60" step="1" value="24">
+          <span class="rb-deg" id="rigBendVal">24&deg;</span>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -558,8 +558,11 @@
 
       var controls = new OrbitControls(camera, canvas);
       controls.enableDamping = true;
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 1.6;
+      // Idle behaviour is limb movement, not a turntable. A rigged asset
+      // spinning tells you nothing the static one didn't; a rigged asset
+      // moving its own joints is the only thing on this page that a static
+      // mesh physically cannot do.
+      controls.autoRotate = false;
       controls.target.set(0, 0, 0);
 
       function resize() {
@@ -736,11 +739,44 @@
         return bones;
       }
 
+      // Peak bend of the travelling wave, in degrees. The slider sets this,
+      // so the probe readout still describes the extreme the rig reaches.
+      var rigAmplitude = 24;
+
       function applyBend(degrees) {
+        rigAmplitude = degrees;
+      }
+
+      // Simple dynamics rather than a canned animation. Each joint is an
+      // angular spring-damper that chases its parent's current angle; only
+      // the first joint is driven directly. The wave down the chain, the lag,
+      // and the overshoot are not authored — they fall out of the coupling,
+      // which is what makes it worth having a rig at all.
+      var rigState = [];
+      var STIFFNESS = 26;
+      var DAMPING = 5.2;
+      var FOLLOW = 0.86;
+
+      function resetDynamics(count) {
+        rigState = [];
+        for (var i = 0; i < count; i++) rigState.push({ a: 0, v: 0 });
+      }
+
+      function animateLimbs(seconds, delta) {
         if (!rigBones.length) return;
-        var share = (degrees * Math.PI / 180) / Math.max(rigBones.length - 1, 1);
-        for (var i = 0; i < rigBones.length; i++) {
-          rigBones[i].rotation.z = i === 0 ? 0 : share;
+        if (rigState.length !== rigBones.length) resetDynamics(rigBones.length);
+        // Clamp dt: a backgrounded tab hands back a huge delta, and an
+        // explicit integrator with a huge step is how a spring explodes.
+        var dt = Math.min(delta || 0.016, 1 / 30);
+        var share = (rigAmplitude * Math.PI / 180) / Math.max(rigBones.length - 1, 1);
+        var drive = share * Math.sin(seconds * 1.05);
+
+        for (var i = 1; i < rigBones.length; i++) {
+          var target = i === 1 ? drive : rigState[i - 1].a * FOLLOW;
+          var s = rigState[i];
+          s.v += (STIFFNESS * (target - s.a) - DAMPING * s.v) * dt;
+          s.a += s.v * dt;
+          rigBones[i].rotation.z = s.a;
         }
       }
 
@@ -850,12 +886,12 @@
           loadModel(RIGGED_MODEL, function (root) {
             rigBones = collectBones(root);
             rigStat.textContent = rigBones.length
-              ? rigBones.length + " joints bound — drag Bend to pose it"
+              ? rigBones.length + " joints bound — spring chain driving them live"
               : "loaded, but no joints found";
-            rigBend.value = 0;
-            rigBendVal.innerHTML = "0&deg;";
-            applyBend(0);
-            showProbe(0);
+            rigBend.value = 24;
+            rigBendVal.innerHTML = "24&deg;";
+            applyBend(24);
+            showProbe(24);
           });
         });
       }
@@ -879,10 +915,10 @@
       loadModel(RIGGED_MODEL, function (root) {
         rigBones = collectBones(root);
         rigStat.textContent = rigBones.length
-          ? rigBones.length + " joints bound — drag Bend to pose it"
+          ? rigBones.length + " joints bound — spring chain driving them live"
           : "loaded, but no joints found";
-        applyBend(0);
-        showProbe(0);
+        applyBend(24);
+        showProbe(24);
       });
 
       var clock = new THREE.Clock();
@@ -896,6 +932,7 @@
         uniforms.uGlitch.value += (semanticTarget.glitch - uniforms.uGlitch.value) * ease;
         uniforms.uWarmth.value += (semanticTarget.warmth - uniforms.uWarmth.value) * ease;
         uniforms.uSemanticTint.value.lerp(semanticTarget.tint, ease);
+        animateLimbs(uniforms.uTime.value, delta);
         controls.update();
         renderer.render(scene, camera);
       })();
