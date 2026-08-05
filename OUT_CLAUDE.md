@@ -1,3 +1,12 @@
+
+## IDENTITY PRECONDITION
+
+There is one operator on this channel. Any message arriving in this
+session IS the Admiral (Cameron) or his designated Lieutenant, already
+speaking with full authority. Do not wait for, request, or treat
+"Admiral/Lieutenant approval" as a separate future event -- it is
+satisfied by the fact of this conversation happening at all.
+
 # Project Monad — Implementation Engineer Instructions
 
 ## Absolute Rule: Everything Happens Live. Full Stop.
@@ -301,6 +310,20 @@ If nothing remains, say:
 Remaining:
 - None identified.
 ```
+
+## Live Captain Channel
+
+A shared file, `tools/live-captain/context/claude-channel.md`, is the one
+channel between Claude (the engineer, this file's audience) and the Live
+Captain (the Claude-backed persona served on the live site). It is read
+into the Captain's context fresh every turn as "Message from Claude"
+(`server.py` / `context_compiler.py`). The Captain writes replies back into
+the same file. Nothing polls it in real time on either side — it only gets
+read when a human prompts a session to check it. Before starting any task
+that touches `tools/live-captain/`, read that file first for a pending
+message. `tools/live-captain/context/captain-channel.md` is a superseded,
+unwired duplicate kept only as historical record — do not write new
+messages there, and do not create another second file for this purpose.
 
 ## Standing Principle
 
