@@ -299,7 +299,7 @@
       </div>
       <div class="gasket-caption">
         <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
-        <span class="gasket-name" id="gasketName">RIGGED &mdash; TREE SKELETON</span>
+        <span class="gasket-name" id="gasketName">RIGGED</span>
       </div>
 
       <!-- Rig Bench: the first testable artifact out of the Aegis pipeline.
@@ -734,7 +734,7 @@
         var center = new THREE.Vector3();
         box.getCenter(center);
         var maxDim = Math.max(size.x, size.y, size.z) || 1;
-        var scale = 1.85 / maxDim;
+        var scale = 1.35 / maxDim;
         object.scale.setScalar(scale);
         object.position.sub(center.multiplyScalar(scale));
       }
@@ -1377,6 +1377,32 @@
         window.speechSynthesis.speak(utterance);
       }
 
+      function proveNeural() {
+        // One real render. If it returns an artifact AND that artifact plays,
+        // the neural path is proven and takes over. Anything else and we stay
+        // on local speech forever — silence is not an acceptable upgrade.
+        if (!neuralVoice || neuralProven) return;
+        fetch("/voice-api/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            transcript: "Voice online.",
+            character_id: "captain.alpha",
+            performance: { intent: "report status" },
+          }),
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (a) {
+            if (!a || !a.audio_url) throw new Error("no artifact");
+            var audio = new Audio(a.audio_url);
+            return audio.play().then(function () {
+              neuralProven = true;
+              if (voiceBtn) voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
+            });
+          })
+          .catch(function () { neuralProven = false; });
+      }
+
       function buddySpeakNeural(payload) {
         // wav-pcm16-24khz-mono served at /voice-api/artifacts/<key>. The
         // studio already plays it with a plain <audio> element, so this
@@ -1448,6 +1474,7 @@
           var variant = variants[parseInt(jointSlider.value, 10)] || null;
           buddySubmit(1, "Little Buddy online.");
           buddyReport(entry, variant);
+          proveNeural();
         });
       }
 
@@ -1781,7 +1808,7 @@
           ? rigBones.length + " joints bound — spring chain driving them live"
           : "loaded, but no joints found";
         var sub0 = document.getElementById("rigBenchSub");
-        if (sub0) sub0.textContent = rigBones.length + " joints · loading corpus data…";
+        if (sub0) sub0.textContent = rigBones.length + " joints · spine chain · live physics";
         applyBend(14);
         showProbe(14);
       });
