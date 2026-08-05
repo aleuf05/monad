@@ -1,0 +1,24 @@
+[Unit]
+Description=Monad Aegis INSPECT (glTF geometry corpus inspection, via Caddy at cameronlampley.com/aegis-inspect-api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/aegis-inspect/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

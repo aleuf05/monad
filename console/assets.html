@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis INSPECT — Geometry Corpus</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  :root {
+    color-scheme: dark;
+    --font: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --bg: #14161a; --panel: #1f2329; --tile: #23272e; --border: #4a5361;
+    --text: #f2f4f7; --dim: #a9b2c0; --accent: #4fd1a5; --warn: #f0b95a;
+    --rigged: #4fd1a5; --static: #e8a87c;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13.5px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 0.04em; }
+  header a { color: var(--dim); text-decoration: none; font-size: 0.78rem; }
+  header a:hover { color: var(--accent); }
+
+  #layout { display: grid; grid-template-columns: 290px 1fr 250px; height: calc(100% - 46px); }
+  #left, #right { background: var(--panel); overflow-y: auto; }
+  #left { border-right: 1px solid var(--border); }
+  #right { border-left: 1px solid var(--border); }
+  #stage { position: relative; background: #0d0f12; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  #stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 0.82rem; text-align: center; padding: 2rem; }
+  #stage-loading { position: absolute; top: 0.7rem; left: 0.9rem; color: var(--accent); font-size: 0.76rem; }
+
+  .pane-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 0.7rem 0.8rem 0.4rem; }
+
+  /* The corpus headline: the single fact that decides what work is even
+     possible next. Rigged-vs-static is the whole question right now. */
+  #summary { padding: 0.55rem 0.8rem 0.7rem; border-bottom: 1px solid var(--border); }
+  #summary .big { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; }
+  #summary .stat { flex: 1; background: var(--tile); border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.4rem; text-align: center; }
+  #summary .stat .n { font-size: 1.15rem; font-weight: 700; }
+  #summary .stat .l { font-size: 0.58rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  #summary .stat.rig .n { color: var(--rigged); }
+  #summary .stat.sta .n { color: var(--static); }
+  #summary .totals { font-size: 0.68rem; color: var(--dim); line-height: 1.5; }
+
+  .asset-row { display: flex; align-items: center; gap: 0.45rem; width: 100%; text-align: left; background: none; border: none; color: var(--dim); font: inherit; padding: 0.4rem 0.8rem; cursor: pointer; }
+  .asset-row:hover { color: var(--text); background: var(--tile); }
+  .asset-row.active { color: var(--text); background: var(--tile); border-left: 2px solid var(--accent); }
+  .asset-row .pip { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .asset-row .pip.rigged { background: var(--rigged); }
+  .asset-row .pip.static { background: var(--static); }
+  .asset-row .pip.empty  { background: var(--dim); }
+  .asset-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .asset-row .sz { font-size: 0.65rem; color: var(--dim); flex: none; }
+
+  .fact { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.22rem 0.8rem; font-size: 0.75rem; }
+  .fact .k { color: var(--dim); }
+  .fact .v { color: var(--text); text-align: right; word-break: break-word; }
+  .fact.zero .v { color: var(--dim); }
+  .sect { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); padding: 0.7rem 0.8rem 0.25rem; border-top: 1px solid var(--border); margin-top: 0.4rem; }
+
+  .verdict { margin: 0.6rem 0.8rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.72rem; line-height: 1.5; }
+  .verdict.rigged { border-color: var(--rigged); color: var(--rigged); }
+  .verdict.static { border-color: var(--static); color: var(--static); }
+  .verdict .vw { display: block; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+
+  .check { display: flex; align-items: center; gap: 0.4rem; padding: 0.15rem 0.8rem; font-size: 0.72rem; }
+  .check .box { width: 12px; text-align: center; }
+  .check.pass { color: var(--rigged); }
+  .check.fail { color: var(--static); }
+</style>
+</head>
+<body>
+  <header>
+    <h1>🦴 Aegis INSPECT <span style="color:var(--dim);font-weight:400;">— geometry corpus</span></h1>
+    <div style="display:flex;gap:0.9rem;align-items:center;">
+      <a href="documents.html">📄 Documents</a>
+      <a href="index.html">&larr; Back to console</a>
+    </div>
+  </header>
+  <div id="layout">
+    <div id="left">
+      <div id="summary"><div class="totals">Loading corpus…</div></div>
+      <div class="pane-title">Assets</div>
+      <div id="list"></div>
+    </div>
+    <div id="stage">
+      <div id="stage-empty">Select an asset to preview.<br>Drag to orbit · scroll to zoom</div>
+      <div id="stage-loading" hidden></div>
+    </div>
+    <div id="right">
+      <div class="pane-title">Rig Status</div>
+      <div id="detail"><div class="fact"><span class="k">No asset selected.</span></div></div>
+    </div>
+  </div>
+
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const API = "/aegis-inspect-api/api";
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
+const summaryEl = document.getElementById("summary");
+const stageEl = document.getElementById("stage");
+const emptyEl = document.getElementById("stage-empty");
+const loadingEl = document.getElementById("stage-loading");
+
+let assets = [], activePath = null;
+
+// --- three.js stage ---------------------------------------------------------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+stageEl.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0f12);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x223044, 2.2));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(3, 6, 4);
+scene.add(key);
+const grid = new THREE.GridHelper(10, 10, 0x4a5361, 0x2a3038);
+scene.add(grid);
+
+let current = null;
+const loader = new GLTFLoader();
+
+function resize() {
+  const { clientWidth: w, clientHeight: h } = stageEl;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(h, 1);
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stageEl);
+resize();
+
+(function tick() {
+  requestAnimationFrame(tick);
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+function frameObject(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const extent = Math.max(size.x, size.y, size.z) || 1;
+  object.position.sub(center);
+  grid.scale.setScalar(extent / 5);
+  const dist = extent * 1.9;
+  camera.position.set(dist * 0.7, dist * 0.55, dist * 0.9);
+  camera.near = extent / 500;
+  camera.far = extent * 60;
+  camera.updateProjectionMatrix();
+  controls.target.set(0, 0, 0);
+  controls.update();
+}
+
+function disposeCurrent() {
+  if (!current) return;
+  scene.remove(current);
+  current.traverse((n) => {
+    if (n.geometry) n.geometry.dispose();
+    if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach((m) => m.dispose());
+  });
+  current = null;
+}
+
+async function preview(asset) {
+  emptyEl.hidden = true;
+  loadingEl.hidden = false;
+  loadingEl.textContent = `loading ${asset.name} (${fmtBytes(asset.bytes)})…`;
+  disposeCurrent();
+  try {
+    const gltf = await loader.loadAsync(`${API}/asset/${encodeURI(asset.path)}`);
+    current = gltf.scene;
+    scene.add(current);
+    frameObject(current);
+    // A skeleton is the thing we are looking for; if one exists, show it
+    // rather than making the operator infer it from a number.
+    let bones = 0;
+    current.traverse((n) => { if (n.isSkinnedMesh && n.skeleton) { scene.add(new THREE.SkeletonHelper(n)); bones += n.skeleton.bones.length; } });
+    loadingEl.hidden = true;
+  } catch (err) {
+    loadingEl.textContent = `✗ ${err.message || err}`;
+  }
+}
+
+// --- data -------------------------------------------------------------------
+const fmtBytes = (b) => b > 1e6 ? (b / 1048576).toFixed(1) + "MB" : (b / 1024).toFixed(0) + "KB";
+const fmtNum = (n) => n.toLocaleString();
+
+function renderSummary(s) {
+  summaryEl.innerHTML = `
+    <div class="big">
+      <div class="stat rig"><div class="n">${s.rigged}</div><div class="l">rigged</div></div>
+      <div class="stat sta"><div class="n">${s.static}</div><div class="l">static</div></div>
+      <div class="stat"><div class="n">${s.total}</div><div class="l">assets</div></div>
+    </div>
+    <div class="totals">
+      ${fmtNum(s.vertices)} vertices · ${fmtNum(s.triangles)} triangles<br>
+      ${fmtBytes(s.bytes)} on disk
+      ${s.rigged === 0 ? '<br><span style="color:var(--static)">No rigged asset exists — a solver would synthesise skeletons from scratch.</span>' : ""}
+    </div>`;
+}
+
+function renderList() {
+  listEl.innerHTML = "";
+  assets.forEach((a) => {
+    const btn = document.createElement("button");
+    btn.className = "asset-row" + (a.path === activePath ? " active" : "");
+    btn.innerHTML = `<span class="pip ${a.state || "empty"}"></span><span class="nm"></span><span class="sz">${fmtBytes(a.bytes)}</span>`;
+    btn.querySelector(".nm").textContent = a.name;
+    btn.title = a.path;
+    btn.addEventListener("click", () => select(a));
+    listEl.appendChild(btn);
+  });
+}
+
+function fact(k, v, zero) {
+  return `<div class="fact${zero ? " zero" : ""}"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+}
+
+function renderDetail(a) {
+  if (!a.ok) { detailEl.innerHTML = fact("error", a.error); return; }
+  const c = a.checks;
+  const check = (ok, label) =>
+    `<div class="check ${ok ? "pass" : "fail"}"><span class="box">${ok ? "✓" : "✗"}</span>${label}</div>`;
+
+  detailEl.innerHTML =
+    `<div class="verdict ${a.state}"><span class="vw">${a.state}</span>${a.note}</div>` +
+    `<div class="sect">Rig requirements</div>` +
+    check(c.has_mesh, "mesh geometry") +
+    check(c.has_skin, "skin binding") +
+    check(c.has_joints, "joint hierarchy") +
+    check(a.has_weights, "vertex weights (WEIGHTS_0)") +
+    `<div class="sect">Structure</div>` +
+    fact("meshes", a.meshes, !a.meshes) +
+    fact("primitives", a.primitives, !a.primitives) +
+    fact("nodes", a.nodes, !a.nodes) +
+    fact("skins", a.skins, !a.skins) +
+    fact("joints", a.joints, !a.joints) +
+    fact("animations", a.animations, !a.animations) +
+    (a.animation_names.length ? fact("names", a.animation_names.join(", ")) : "") +
+    `<div class="sect">Geometry</div>` +
+    fact("vertices", fmtNum(a.vertices)) +
+    fact("triangles", fmtNum(a.triangles)) +
+    fact("materials", a.materials, !a.materials) +
+    fact("textures", a.textures, !a.textures) +
+    `<div class="sect">Provenance</div>` +
+    fact("generator", a.generator) +
+    fact("glTF", a.gltf_version) +
+    fact("path", a.path);
+}
+
+function select(a) {
+  activePath = a.path;
+  renderList();
+  renderDetail(a);
+  if (a.ok && a.meshes > 0) preview(a);
+}
+
+fetch(`${API}/assets`)
+  .then((r) => r.json())
+  .then((d) => {
+    assets = d.assets || [];
+    renderSummary(d.summary);
+    renderList();
+  })
+  .catch((e) => { summaryEl.innerHTML = `<div class="totals" style="color:var(--warn)">Failed to load: ${e}</div>`; });
+</script>
+</body>
+</html>
