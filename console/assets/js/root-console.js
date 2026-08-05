@@ -964,7 +964,13 @@ async function docxAction(endpoint, button, workingLabel) {
 docxCommitBtn.addEventListener("click", async () => {
   const result = await docxAction("commit", docxCommitBtn, "pushing…");
   if (result) {
-    docxSay(`✓ Committed ${result.commit} (${result.count} packet(s)) and pushed to ${result.branch}`, "ok");
+    const cleared = result.auto_cleared || {};
+    let message = `✓ Committed ${result.commit} (${result.count} packet(s)) and pushed to ${result.branch}`;
+    if (cleared.cleared) {
+      message += ` · tray auto-cleared (${cleared.cleared} file(s), ${cleared.commit})`;
+    }
+    if (cleared.error) message += ` · ⚠ ${cleared.error}`;
+    docxSay(message, cleared.error ? "err" : "ok");
   }
 });
 

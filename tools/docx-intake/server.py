@@ -185,7 +185,22 @@ def commit_and_push() -> dict:
 
     status = _git("status", "--porcelain", "--", str(INCOMING_DIR.relative_to(REPO_ROOT)))
     if not status.stdout.strip():
-        return {"ok": False, "error": "no changes in docs/incoming to commit"}
+        # Nothing new to commit, but the tray isn't empty -- these were
+        # committed by an earlier run. They are already safe in history, so
+        # the honest action is to finish the job and clear, not to report a
+        # failure at a tray the operator can plainly see has files in it.
+        head = _git("rev-parse", "--short", "HEAD").stdout.strip()
+        cleared = _clear_committed(head)
+        return {
+            "ok": not cleared.get("error"),
+            "committed": False,
+            "already_committed": True,
+            "commit": head,
+            "branch": _git("rev-parse", "--abbrev-ref", "HEAD").stdout.strip(),
+            "count": len(pending),
+            "auto_cleared": cleared,
+            "error": cleared.get("error"),
+        }
 
     names = ", ".join(p.name for p in pending[:5])
     if len(pending) > 5:
@@ -213,6 +228,13 @@ def commit_and_push() -> dict:
             "error": f"committed {head} but push failed: {push.stderr.strip()}",
         }
 
+    # Push confirmed -- only now is it safe to empty the tray, because the
+    # packets exist on the remote and not merely on this disk. The clear is
+    # itself committed and pushed rather than left as a working-tree
+    # deletion: a tray emptied by `rm` would leave the repo permanently
+    # showing pending deletes of files that are still in HEAD.
+    cleared = _clear_committed(head)
+
     return {
         "ok": True,
         "committed": True,
@@ -220,6 +242,38 @@ def commit_and_push() -> dict:
         "commit": head,
         "branch": branch,
         "count": len(pending),
+        "auto_cleared": cleared,
+    }
+
+
+def _clear_committed(source_commit: str) -> dict:
+    """Remove the staging tray in git, after its contents are safely pushed."""
+    paths = [str(p.relative_to(REPO_ROOT)) for p in _staged_files()]
+    if ORIGINALS_DIR.is_dir():
+        paths += [str(p.relative_to(REPO_ROOT)) for p in sorted(ORIGINALS_DIR.glob("*.docx"))]
+    if not paths:
+        return {"cleared": 0}
+
+    removed = _git("rm", "--quiet", "--", *paths)
+    if removed.returncode != 0:
+        return {"cleared": 0, "error": f"git rm failed: {removed.stderr.strip()}"}
+
+    message = (
+        f"Clear staging tray ({len(paths)} file(s))\n\n"
+        f"Contents committed and pushed in {source_commit}; the tray is a\n"
+        "landing zone, not storage. History keeps the packets."
+    )
+    commit = _git("commit", "-m", message)
+    if commit.returncode != 0:
+        return {"cleared": 0, "error": f"clear commit failed: {commit.stderr.strip()}"}
+
+    clear_head = _git("rev-parse", "--short", "HEAD").stdout.strip()
+    push = _git("push", "origin", "HEAD")
+    return {
+        "cleared": len(paths),
+        "commit": clear_head,
+        "pushed": push.returncode == 0,
+        "error": None if push.returncode == 0 else f"cleared in {clear_head} but push failed",
     }
 
 
