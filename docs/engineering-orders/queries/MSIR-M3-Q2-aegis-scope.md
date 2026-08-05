@@ -77,6 +77,74 @@ separately once it is:
 ---
 
 **Filed:** `docs/engineering-orders/queries/MSIR-M3-Q2-aegis-scope.md`
-**Status:** open, awaiting response.
-**Parked on this:** all Aegis-Monad implementation. M³ cycle v0.1 keeps
-running under Q1's answer regardless of the outcome.
+**Status:** **answered** 2026-08-05.
+
+---
+
+## Response
+
+**Answer: D** — `D_t` is **3D assets**.
+
+**Answered by:** the Admiral directly, in chat, verbatim: "D". Given in
+direct reply to the explicit question *"Is D the answer? Is `D_t` 3D
+assets?"*, so the referent is unambiguous even though the letter alone
+would have been underspecified by this query's own stated bar. Recorded
+as the Admiral's ruling, not a Chief response packet.
+
+Corroborated by `AEGIS-MONAD` Packet Beta (filed
+`logs/captains/2026/2026-08-05_aegis-monad-packet-beta-rigging-solver.md`),
+whose operators act on meshes, skeletons, and vertex weights.
+
+### What this settles
+
+- **Aegis-Monad is a 3D asset pipeline** under M³ governance. Its
+  `D_t` is geometry: meshes, skeletons, skinning weights, rigged
+  assets.
+- **`MSIR-M3-Q1`'s answer A is not overturned** — it is scoped. M³
+  cycle v0.1 (`tools/m3-cycle/`) remains valid and running *over the
+  document corpus*. It is simply not the Aegis-Monad system.
+- **Two systems now exist by intent**, which is close to Q2's option C
+  in structure while being D in substance: one governing documents
+  (built), one governing geometry (not built).
+
+### What this costs
+
+Stated plainly because it was flagged in advance rather than discovered
+afterwards: **M³ cycle v0.1 does not transfer.** Over a mesh corpus the
+tri-condition predicates are different in kind, not degree —
+
+- `I` (identity) becomes topological, not titular. A mesh keeps its
+  identity through vertex-count changes; a title comparison is
+  meaningless.
+- `R` (recoverability) is not `git checkout` for large binary assets in
+  the general case, though it happens to be for the 9 GLBs currently
+  tracked.
+- `V` would have to value something like deformation quality or rig
+  usability, not link resolvability.
+
+The document engine is not wasted — it is a working reference
+implementation of the axiom, and the shape of `continuity()`,
+`valuation()`, and `constrained_improvement()` carries over even though
+every predicate inside them is replaced.
+
+### Now live, having been held back pending this answer
+
+The three questions Q2 deliberately deferred:
+
+1. **Rust vs Python.** Now a real decision: rigging maths is the one
+   domain in this repo where the choice is arguable rather than
+   ceremonial.
+2. **Whether Module 4's `Δ + ρ` duplicates git.** Partly moot under D —
+   binary geometry is a worse fit for git than markdown is, so a
+   dedicated provenance record has an argument it did not have under A.
+3. **The sign-off checklist** — now observed twice, recorded as a
+   property of the template.
+
+### Immediately blocking anything buildable
+
+There is no riggable geometry. All 9 GLBs in the repo parse to 0 skins,
+0 animations, 1 node — static meshes. A rigging solver has nothing to
+act on yet. First work therefore starts at `INSPECT` (Module 2's second
+pipeline stage), not at the solver.
+
+**Pause lifted.**
