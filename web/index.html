@@ -204,6 +204,24 @@
   .rb-bendrow label { font-size: 0.74rem; color: #7B8CA6; }
   .rb-bendrow input[type=range] { flex: 1; min-width: 150px; max-width: 320px; }
   .rb-deg { font-size: 0.76rem; color: #5ED6BE; min-width: 2.6rem; }
+  /* Skeleton overlay — the joints the solver synthesised, drawn where they
+     actually are. Pointer-events off so it never eats an orbit drag or poke. */
+  .rig-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .rj { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center;
+    gap: 5px; white-space: nowrap; transition: opacity 120ms linear; }
+  .rj.flip { flex-direction: row-reverse; }
+  .rj.flip .rj-label { text-align: right; }
+  .rj.lift { margin-top: -11px; }
+  .rj.drop { margin-top: 11px; }
+  .rj .rj-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #4FD1C5;
+    background: rgba(79,209,197,0.18); box-shadow: 0 0 6px rgba(79,209,197,0.5); flex: none; }
+  .rj .rj-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.04em;
+    color: #4FD1C5; text-shadow: 0 0 4px #0B1220, 0 0 8px #0B1220; }
+  .rj.root .rj-dot { border-color: #E8A33D; background: rgba(232,163,61,0.22); box-shadow: 0 0 8px rgba(232,163,61,0.6); }
+  .rj.root .rj-label { color: #E8A33D; }
+  .rig-bone { position: absolute; height: 1.5px; transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(79,209,197,0.75), rgba(79,209,197,0.25)); }
+
   .rb-assets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
   .rb-asset { background: #0D1626; border: 1px solid #1E2C42; color: #9AACBF; font: inherit;
     font-size: 0.68rem; padding: 5px 9px; border-radius: 5px; cursor: pointer; line-height: 1.3; text-align: left; }
@@ -270,6 +288,7 @@
       <div class="gasket-frame">
         <canvas id="gasketCanvas"></canvas>
         <div class="gasket-hint" id="gasketHint">Loading rigged artifact&hellip;</div>
+        <div class="rig-overlay" id="rigOverlay"></div>
       </div>
       <div class="gasket-caption">
         <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
@@ -294,6 +313,7 @@
           <input type="range" id="rigBend" min="0" max="60" step="1" value="24">
           <span class="rb-deg" id="rigBendVal">24&deg;</span>
           <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
+          <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -923,6 +943,90 @@
         }
       });
 
+      // --- skeleton overlay -----------------------------------------
+      // Projects each joint's world position to screen every frame and draws
+      // a marker there, with a bone line to its parent. The dot brightens and
+      // grows with that joint's angular velocity, so the wave travelling down
+      // the chain is visible as light as well as motion.
+      var overlayEl = document.getElementById("rigOverlay");
+      var jointMarkers = [];
+      var boneLines = [];
+      var skeletonOn = true;
+      var projected = new THREE.Vector3();
+
+      function buildSkeletonMarkers() {
+        if (!overlayEl) return;
+        overlayEl.innerHTML = "";
+        jointMarkers = [];
+        boneLines = [];
+        rigBones.forEach(function (bone, i) {
+          if (i > 0) {
+            var line = document.createElement("div");
+            line.className = "rig-bone";
+            overlayEl.appendChild(line);
+            boneLines.push(line);
+          }
+          var marker = document.createElement("div");
+          // Fan the labels out: alternate side and nudge up/down, otherwise
+          // adjacent joints stack their text into an unreadable pile wherever
+          // the chain bunches.
+          marker.className = "rj" + (i === 0 ? " root" : "") +
+            (i % 2 ? " flip" : "") + (i % 4 < 2 ? " lift" : " drop");
+          marker.innerHTML = '<span class="rj-dot"></span><span class="rj-label">' +
+            (bone.name || ("joint " + i)) + "</span>";
+          overlayEl.appendChild(marker);
+          jointMarkers.push(marker);
+        });
+      }
+
+      function updateSkeletonOverlay() {
+        if (!overlayEl) return;
+        if (!skeletonOn || !rigBones.length) { overlayEl.style.display = "none"; return; }
+        overlayEl.style.display = "";
+        if (jointMarkers.length !== rigBones.length) buildSkeletonMarkers();
+
+        var rect = canvas.getBoundingClientRect();
+        var w = rect.width, h = rect.height;
+        var pts = [];
+        for (var i = 0; i < rigBones.length; i++) {
+          rigBones[i].getWorldPosition(projected);
+          projected.project(camera);
+          var x = (projected.x * 0.5 + 0.5) * w;
+          var y = (-projected.y * 0.5 + 0.5) * h;
+          var behind = projected.z > 1;
+          pts.push({ x: x, y: y, behind: behind });
+
+          var speed = (rigState[i] && Math.abs(rigState[i].v)) || 0;
+          var heat = Math.min(speed * 0.9, 1);
+          var marker = jointMarkers[i];
+          marker.style.left = x + "px";
+          marker.style.top = y + "px";
+          marker.style.opacity = behind ? 0.25 : (0.55 + heat * 0.45);
+          var dot = marker.firstChild;
+          dot.style.transform = "scale(" + (1 + heat * 0.9) + ")";
+        }
+        for (var j = 0; j < boneLines.length; j++) {
+          var a = pts[j], b = pts[j + 1];
+          if (!a || !b) continue;
+          var dx = b.x - a.x, dy = b.y - a.y;
+          var line = boneLines[j];
+          line.style.left = a.x + "px";
+          line.style.top = a.y + "px";
+          line.style.width = Math.hypot(dx, dy) + "px";
+          line.style.transform = "rotate(" + Math.atan2(dy, dx) + "rad)";
+          line.style.opacity = (a.behind || b.behind) ? 0.2 : 0.85;
+        }
+      }
+
+      var skeletonBtn = document.getElementById("rigSkeleton");
+      if (skeletonBtn) {
+        skeletonBtn.addEventListener("click", function () {
+          skeletonOn = !skeletonOn;
+          skeletonBtn.classList.toggle("on", skeletonOn);
+          skeletonBtn.innerHTML = "&#9679; Skeleton: " + (skeletonOn ? "on" : "off");
+        });
+      }
+
       // --- asset switching ------------------------------------------
       // Every rigged asset the pipeline produced, smallest first. Size is on
       // the chip because two of these are 88MB and nobody should discover
@@ -955,6 +1059,7 @@
         rigState = [];
         loadModel(entry.dest.replace(/^web\//, ""), function (root) {
           rigBones = collectBones(root);
+          buildSkeletonMarkers();
           rigStat.textContent = rigBones.length
             ? rigBones.length + " joints bound — spring chain driving them live"
             : "loaded, but no joints found";
@@ -1198,6 +1303,7 @@
         uniforms.uSemanticTint.value.lerp(semanticTarget.tint, ease);
         animateLimbs(uniforms.uTime.value, delta);
         updateAudio();
+        updateSkeletonOverlay();
         controls.update();
         renderer.render(scene, camera);
       })();
