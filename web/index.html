@@ -196,6 +196,9 @@
   .rb-bendrow label { font-size: 0.74rem; color: #7B8CA6; }
   .rb-bendrow input[type=range] { flex: 1; min-width: 150px; max-width: 320px; }
   .rb-deg { font-size: 0.76rem; color: #5ED6BE; min-width: 2.6rem; }
+  .rb-sound { background: #0D1626; color: #7B8CA6; border: 1px solid #2F4258; border-radius: 5px; font: inherit; font-size: 0.72rem; padding: 5px 11px; cursor: pointer; }
+  .rb-sound:hover { border-color: #5ED6BE; color: #5ED6BE; }
+  .rb-sound.on { border-color: #5ED6BE; color: #5ED6BE; background: #0F2A2C; }
   .rb-probe { margin-top: 9px; padding-top: 9px; border-top: 1px solid #1E2C42; font-size: 0.72rem; color: #9FB3CC; line-height: 1.6; }
   .rb-probe .rbp-v { font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
   .rb-probe .pass { color: #5ED6BE; }
@@ -273,6 +276,7 @@
           <label for="rigBend">Drive</label>
           <input type="range" id="rigBend" min="0" max="60" step="1" value="24">
           <span class="rb-deg" id="rigBendVal">24&deg;</span>
+          <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -757,6 +761,66 @@
       var DAMPING = 5.2;
       var FOLLOW = 0.86;
 
+      // --- sonification -------------------------------------------------
+      // One voice per joint, loudness driven by that joint's angular
+      // velocity. Nothing is sampled or sequenced: the sound is read from
+      // the same integrator state that moves the mesh, so the cascade you
+      // hear as the wave travels outward is the wave, not an impression of
+      // it. A joint at rest is silent because its velocity is zero.
+      var audio = null;
+
+      // Pentatonic, so a chain of eight simultaneous voices stays consonant
+      // whatever phase the joints happen to be in.
+      var SCALE = [196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+
+      function startAudio(count) {
+        // Must be called from a click: browsers refuse to start an
+        // AudioContext without a user gesture, and that is the only genuinely
+        // awkward part of wiring sound into a page.
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        var ctx = new Ctx();
+        var master = ctx.createGain();
+        master.gain.value = 0.0001;
+
+        // Rolls the top off the sines so a cascade reads as motion rather
+        // than a test tone.
+        var filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 1800;
+        filter.Q.value = 0.7;
+        filter.connect(master);
+        master.connect(ctx.destination);
+
+        var voices = [];
+        for (var i = 0; i < count; i++) {
+          var osc = ctx.createOscillator();
+          osc.type = i % 2 ? "sine" : "triangle";
+          osc.frequency.value = SCALE[i % SCALE.length];
+          var gain = ctx.createGain();
+          gain.gain.value = 0;
+          osc.connect(gain);
+          gain.connect(filter);
+          osc.start();
+          voices.push({ osc: osc, gain: gain });
+        }
+        master.gain.setTargetAtTime(0.5, ctx.currentTime, 0.25);
+        return { ctx: ctx, master: master, voices: voices };
+      }
+
+      function updateAudio() {
+        if (!audio || !rigState.length) return;
+        var now = audio.ctx.currentTime;
+        for (var i = 0; i < audio.voices.length; i++) {
+          var s = rigState[i];
+          var speed = s ? Math.abs(s.v) : 0;
+          // setTargetAtTime rather than .value: stepping a gain once per
+          // frame is what zipper noise sounds like.
+          var level = Math.min(speed * 0.55, 1) * 0.16;
+          audio.voices[i].gain.gain.setTargetAtTime(level, now, 0.06);
+        }
+      }
+
       function resetDynamics(count) {
         rigState = [];
         for (var i = 0; i < count; i++) rigState.push({ a: 0, v: 0 });
@@ -896,6 +960,24 @@
         });
       }
 
+      var rigSound = document.getElementById("rigSound");
+      if (rigSound) {
+        rigSound.addEventListener("click", function () {
+          if (audio) {
+            audio.master.gain.setTargetAtTime(0.0001, audio.ctx.currentTime, 0.1);
+            audio.ctx.close();
+            audio = null;
+            rigSound.classList.remove("on");
+            rigSound.innerHTML = "&#9834; Sound: off";
+            return;
+          }
+          audio = startAudio(rigBones.length || 8);
+          if (!audio) { rigSound.innerHTML = "&#9834; no audio support"; return; }
+          rigSound.classList.add("on");
+          rigSound.innerHTML = "&#9834; Sound: on";
+        });
+      }
+
       if (rigBend) {
         rigBend.addEventListener("input", function () {
           var degrees = parseFloat(rigBend.value);
@@ -933,6 +1015,7 @@
         uniforms.uWarmth.value += (semanticTarget.warmth - uniforms.uWarmth.value) * ease;
         uniforms.uSemanticTint.value.lerp(semanticTarget.tint, ease);
         animateLimbs(uniforms.uTime.value, delta);
+        updateAudio();
         controls.update();
         renderer.render(scene, camera);
       })();
