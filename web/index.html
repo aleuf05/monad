@@ -258,7 +258,7 @@
         <div class="gasket-hint" id="gasketHint">Loading rigged artifact&hellip;</div>
       </div>
       <div class="gasket-caption">
-        <span>Live Render &middot; rigged output, drag to orbit</span>
+        <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
         <span class="gasket-name" id="gasketName">GASKET &mdash; RIGGED</span>
       </div>
 
@@ -845,6 +845,68 @@
           rigBones[i].rotation.z = s.a;
         }
       }
+
+      // --- poke ---------------------------------------------------------
+      // Clicking the robot kicks the spring chain. It is worth having because
+      // the dynamics are real: an impulse propagates outward and settles on
+      // its own, so a poke looks different every time depending on where the
+      // chain already was. A canned animation could not do that.
+      var raycaster = new THREE.Raycaster();
+      var pointer = new THREE.Vector2();
+      var downAt = null;
+
+      function pointerAt(event) {
+        var rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        return pointer;
+      }
+
+      function overRobot(event) {
+        if (!current) return false;
+        raycaster.setFromCamera(pointerAt(event), camera);
+        return raycaster.intersectObject(current, true).length > 0;
+      }
+
+      function poke() {
+        if (!rigBones.length) return false;
+        if (rigState.length !== rigBones.length) resetDynamics(rigBones.length);
+        // Alternating kick, decaying down the chain — a shove near the root
+        // that the spring coupling turns into a travelling wobble.
+        for (var i = 1; i < rigState.length; i++) {
+          rigState[i].v += (i % 2 ? 1 : -1) * (5.5 / i);
+        }
+        return true;
+      }
+
+      canvas.style.cursor = "grab";
+      canvas.addEventListener("pointermove", function (event) {
+        if (downAt) return;
+        canvas.style.cursor = overRobot(event) ? "pointer" : "grab";
+      });
+      canvas.addEventListener("pointerdown", function (event) {
+        downAt = { x: event.clientX, y: event.clientY };
+        canvas.style.cursor = "grabbing";
+      });
+      canvas.addEventListener("pointerup", function (event) {
+        var moved = downAt
+          ? Math.hypot(event.clientX - downAt.x, event.clientY - downAt.y)
+          : 99;
+        downAt = null;
+        canvas.style.cursor = "grab";
+        // Under 5px is a click, not an orbit drag — otherwise every camera
+        // move would also poke it.
+        if (moved < 5 && overRobot(event) && poke()) {
+          if (rigStat) {
+            var was = rigStat.textContent;
+            rigStat.textContent = "poked — watch it settle";
+            clearTimeout(rigStat._pokeTimer);
+            rigStat._pokeTimer = setTimeout(function () {
+              rigStat.textContent = was;
+            }, 1800);
+          }
+        }
+      });
 
       var rigToggle = document.getElementById("rigToggle");
       var rigStat = document.getElementById("rigStat");
