@@ -541,6 +541,37 @@
      doc the operator would have to go read first. */
   #docx-push-note { margin-top: 0.3rem; font-size: 0.63rem; color: var(--warn); opacity: 0.85; line-height: 1.4; }
 
+  /* M³ cycle. The verdict is the point, so it is the biggest thing in
+     the panel; the three conditions underneath say why. */
+  #m3-panel { padding: 0.7rem 0.9rem; border-top: 1px solid var(--border); }
+  #m3-panel .panel-title { display: flex; align-items: center; gap: 0.4rem; }
+  #m3-panel .new-badge { background: #8fb3e8; color: #0b0d10; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; padding: 0.05rem 0.3rem; border-radius: 3px; }
+  #m3-verdict { margin-top: 0.4rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); background: var(--tile); }
+  #m3-verdict .v-word { font-size: 1.05rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  #m3-verdict .v-sub { font-size: 0.7rem; color: var(--dim); margin-top: 0.15rem; }
+  #m3-verdict.v-commit { border-color: var(--accent); }
+  #m3-verdict.v-commit .v-word { color: var(--accent); }
+  #m3-verdict.v-rollback { border-color: var(--warn); }
+  #m3-verdict.v-rollback .v-word { color: var(--warn); }
+  #m3-verdict.v-noop .v-word { color: var(--dim); font-size: 0.85rem; }
+  #m3-conds { display: flex; gap: 0.3rem; margin-top: 0.45rem; }
+  #m3-conds .cond {
+    flex: 1; text-align: center; font-size: 0.62rem; padding: 0.22rem 0.1rem;
+    border-radius: 4px; border: 1px solid var(--border); color: var(--dim);
+  }
+  #m3-conds .cond.pass { border-color: var(--accent); color: var(--accent); }
+  #m3-conds .cond.fail { border-color: var(--warn); color: var(--warn); background: rgba(240,185,90,0.1); }
+  #m3-why { margin-top: 0.4rem; font-size: 0.68rem; color: var(--warn); line-height: 1.45; }
+  #m3-metrics { margin-top: 0.4rem; font-size: 0.68rem; color: var(--dim); line-height: 1.5; }
+  #m3-actions { margin-top: 0.5rem; display: flex; gap: 0.35rem; }
+  #m3-actions button {
+    flex: 1; background: var(--tile); color: var(--text); border: 1px solid var(--border);
+    border-radius: 5px; font: inherit; font-size: 0.7rem; padding: 0.35rem 0.3rem; cursor: pointer;
+  }
+  #m3-actions button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  #m3-actions #m3-rollback:hover:not(:disabled) { border-color: var(--warn); color: var(--warn); }
+  #m3-actions button:disabled { opacity: 0.4; cursor: default; }
+
   #metamorphosis-panel { padding: 0.7rem 0.9rem; border-top: 1px solid var(--border); }
   .metamorphosis-controls { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
   #metamorphosis-perform, #metamorphosis-cancel {
@@ -650,6 +681,25 @@
         <div class="panel-title">Ship's Log</div>
         <button id="ship-log-refresh" type="button">refresh ⟳</button>
         <div id="ship-log-list"><div class="sl-empty">Loading…</div></div>
+      </div>
+      <div id="m3-panel">
+        <div class="panel-title">M³ Cycle <span class="new-badge">NEW</span></div>
+        <div id="m3-verdict" class="v-noop"><div class="v-word">…</div><div class="v-sub">evaluating</div></div>
+        <div id="m3-conds">
+          <div class="cond" data-c="I" title="Identity invariants preserved">I</div>
+          <div class="cond" data-c="T" title="Causal/historical traceability">T</div>
+          <div class="cond" data-c="R" title="Bounded recoverability">R</div>
+          <div class="cond" data-c="G" title="Governance constraints satisfied">G</div>
+          <div class="cond" data-c="V" title="Value of the lawfully reachable future increased">V</div>
+          <div class="cond" data-c="Q" title="Revision capacity improved without protected regression">Q</div>
+        </div>
+        <div id="m3-why"></div>
+        <div id="m3-metrics"></div>
+        <div id="m3-actions">
+          <button id="m3-refresh" type="button">re-evaluate</button>
+          <button id="m3-commit" type="button" disabled>commit</button>
+          <button id="m3-rollback" type="button" disabled>rollback</button>
+        </div>
       </div>
       <div id="metamorphosis-panel">
         <div class="panel-title">Semantic Text Metamorphosis</div>

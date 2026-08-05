@@ -146,6 +146,15 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4797
 		}
 
+		# M³ cycle: evaluates proposed changes to the docs corpus against
+		# the tri-condition axiom, and commits or rolls them back.
+		handle_path /m3-cycle-api/* {
+			forward_auth 127.0.0.1:4779 {
+				uri /check
+			}
+			reverse_proxy 127.0.0.1:4798
+		}
+
 		handle {
 			root * /home/cgl/dev/monad/web
 			file_server

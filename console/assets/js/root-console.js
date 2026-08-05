@@ -1030,4 +1030,110 @@ docxDrop.addEventListener("drop", (dropEvent) => {
 
 loadDocxRecent();
 
+// --- M³ cycle --------------------------------------------------------------
+// D_t is the docs corpus, H_t is git, and Δ_t is whatever the working tree
+// currently proposes (MSIR-M3-Q1, answered A). The panel shows the verdict
+// and, when it fails, which condition failed and why -- a verdict without a
+// reason is just an opinion.
+const M3_API_BASE = "/m3-cycle-api/api";
+const m3Verdict = document.getElementById("m3-verdict");
+const m3Conds = document.getElementById("m3-conds");
+const m3Why = document.getElementById("m3-why");
+const m3Metrics = document.getElementById("m3-metrics");
+const m3CommitBtn = document.getElementById("m3-commit");
+const m3RollbackBtn = document.getElementById("m3-rollback");
+const m3RefreshBtn = document.getElementById("m3-refresh");
+
+function m3SetCond(name, state) {
+  const el = m3Conds.querySelector(`[data-c="${name}"]`);
+  if (el) el.className = "cond" + (state === null ? "" : state ? " pass" : " fail");
+}
+
+function m3Render(result) {
+  if (!result.proposed) {
+    m3Verdict.className = "v-noop";
+    m3Verdict.innerHTML = '<div class="v-word">no change</div><div class="v-sub">docs/ matches HEAD — no Δ to evaluate</div>';
+    ["I", "T", "R", "G", "V", "Q"].forEach((c) => m3SetCond(c, null));
+    m3Why.textContent = "";
+    m3Metrics.textContent = "";
+    m3CommitBtn.disabled = true;
+    m3RollbackBtn.disabled = true;
+    return;
+  }
+
+  const commit = result.verdict === "commit";
+  m3Verdict.className = commit ? "v-commit" : "v-rollback";
+  m3Verdict.innerHTML = '<div class="v-word">' + result.verdict + "</div>" +
+    '<div class="v-sub">' + result.changed.length + " document(s) changed of " + result.documents + "</div>";
+
+  ["I", "T", "R", "G"].forEach((c) => m3SetCond(c, result.continuity[c]));
+  m3SetCond("V", result.valuation.holds);
+  m3SetCond("Q", result.q_rev.holds);
+
+  const why = [];
+  Object.keys(result.continuity.reasons || {}).forEach((k) => {
+    result.continuity.reasons[k].slice(0, 2).forEach((r) => why.push(k + ": " + r));
+  });
+  if (!result.valuation.holds) {
+    why.push("V: " + result.valuation.before + " → " + result.valuation.after + " (must increase)");
+  }
+  if (!result.q_rev.holds) {
+    const regressed = result.q_rev.protected_regressed;
+    why.push(regressed.length
+      ? "Q: protected capacity regressed — " + regressed.join(", ")
+      : "Q: no capacity improved");
+  }
+  m3Why.textContent = why.join(" · ");
+
+  m3Metrics.textContent =
+    "V " + result.valuation.before + "→" + result.valuation.after +
+    " · Q↑ " + (result.q_rev.improved.join(", ") || "none");
+
+  m3CommitBtn.disabled = !commit;
+  m3RollbackBtn.disabled = false;
+}
+
+async function m3Evaluate() {
+  try {
+    const response = await fetch(`${M3_API_BASE}/evaluate`);
+    const body = await response.json();
+    if (body.ok) m3Render(body.result);
+    else m3Why.textContent = "✗ " + (body.error || "evaluate failed");
+  } catch (err) {
+    m3Why.textContent = "✗ " + String(err);
+  }
+}
+
+async function m3Act(endpoint, button, label) {
+  const original = button.textContent;
+  button.textContent = label;
+  m3CommitBtn.disabled = true;
+  m3RollbackBtn.disabled = true;
+  try {
+    const response = await fetch(`${M3_API_BASE}/${endpoint}`, { method: "POST" });
+    const body = await response.json().catch(() => ({}));
+    if (response.ok && body.ok) {
+      m3Why.textContent = body.action === "commit"
+        ? "✓ committed " + body.commit
+        : "✓ rolled back " + body.restored + " document(s)";
+    } else {
+      m3Why.textContent = "✗ " + (body.error || `HTTP ${response.status}`);
+    }
+  } catch (err) {
+    m3Why.textContent = "✗ " + String(err);
+  } finally {
+    button.textContent = original;
+    m3Evaluate();
+  }
+}
+
+m3RefreshBtn.addEventListener("click", m3Evaluate);
+m3CommitBtn.addEventListener("click", () => m3Act("commit", m3CommitBtn, "committing…"));
+m3RollbackBtn.addEventListener("click", () => {
+  if (!window.confirm("Roll back all uncommitted changes under docs/? Tracked files are restored to HEAD; untracked additions are left alone.")) return;
+  m3Act("rollback", m3RollbackBtn, "rolling back…");
+});
+
+m3Evaluate();
+
 pollStatus();

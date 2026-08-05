@@ -1,0 +1,28 @@
+[Unit]
+Description=Monad M³ cycle (tri-condition evaluation over the docs corpus, reachable via Caddy at cameronlampley.com/m3-cycle-api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/m3-cycle/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+# Commit writes git objects/refs; rollback restores files under docs/.
+ReadWritePaths=/home/cgl/dev/monad/.git
+ReadWritePaths=/home/cgl/dev/monad/docs
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
