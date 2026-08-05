@@ -100,17 +100,24 @@ reconstructed here.**
 
 | Item | Status |
 |---|---|
-| The seven fields `S, T, P, O, I, L, V` | `UNDEFINED` — no expansion given for any of the seven |
-| `Valid(E)` | `UNDEFINED` — the discipline is named, its conditions are not stated |
-| ECR-001, the specimen itself | `UNDEFINED` — its status is recorded (§5); what it observed is not |
-| The inference rule `{ECR₁…ECRₙ} ⇒ Support(CAP-EVID-001)` | `UNDEFINED` — the form is given, the rule is not |
+| The seven fields `S, T, P, O, I, L, V` | **TRANSFERRED 2026-08-05** — source, time and duration, provenance, observation, interpretation, limitations, verdict |
+| `Valid(E)` | **TRANSFERRED 2026-08-05** — full conditions given |
+| ECR-001, the specimen itself | **PARTIAL** — its nature transferred ("a short video as evidence concerning immediate safety"); the record's own content still not relayed |
+| The inference rule `{ECR₁…ECRₙ} ⇒ Support(CAP-EVID-001)` | `UNDEFINED` — still not stated |
 
-**ECR-002 is blocked on the first two.** A second specimen cannot be
-recorded under a specification whose fields have no definitions, and cannot
-be validated against a `Valid(E)` whose conditions are unstated.
+Transferred by the ECR-002 packet, captured verbatim at
+`docs/incoming/2026-08-05_ECR-002-evidence-about-evidence.md`. The frozen
+content in §1–§5 above is unchanged; only this provenance section is
+updated, which is what it exists for.
 
-To unblock: relay the seven field expansions and the conditions of
-`Valid(E)`. Nothing else is needed.
+~~**ECR-002 is blocked on the first two.**~~ **Unblocked 2026-08-05.** Both
+were relayed with the ECR-002 packet. ECR-002 itself has since been captured
+as a provisional second specimen.
+
+One item remains outstanding: the capability-level inference rule. §7 of the
+ECR-002 packet gives a three-state capability *status* notation, which may
+be the intended form, but the rule is not stated and has not been
+reconstructed.
 
 ---
 
