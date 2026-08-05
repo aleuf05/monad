@@ -81,3 +81,17 @@ existing documentarian terms (doctrine 012) continue unchanged.
 ## Completion state
 
 **rejected** — recorded per doctrine 012 and the `packets/` convention.
+
+## Review — 2026-08-05
+
+**Outcome: standing (terminal).** This refusal turns on a term the original states plainly: no claims about Claude's own operating state. That is structural, not evidential — there is no observation that could satisfy it, because the objection is not a missing fact.
+
+**Marked terminal.** Not "refused forever" — the underlying subject can be
+raised any time on different terms. What is closed is the *review loop*:
+re-running this particular review costs effort and cannot change, because
+no observation is the missing ingredient. It does not enter the periodic
+backlog again. A genuinely different request is a new packet, not a review
+of this one.
+
+Reviewed under doctrine 013 §3. The refusal above is unchanged;
+this section appends to it.

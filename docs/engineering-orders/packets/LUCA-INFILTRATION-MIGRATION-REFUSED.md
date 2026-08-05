@@ -92,3 +92,17 @@ context.
 **rejected** — recorded per Doctrine 001 and the `packets/` convention
 established by `ENG1-REFUSED.md` / `QUANTUM-DEMAGNETIZER-REFUSED.md` /
 `VENNA-SPEECH-TO-INTENT-REFUSED.md`.
+
+## Review — 2026-08-05
+
+**Outcome: standing.** The stated condition is explicit, out-of-character confirmation from the Admiral that this is intended as real research. That confirmation has not been given, and it is not something this session can supply on his behalf.
+
+**One sentence from the Admiral resolves both.** The precedent is VENNA:
+plain out-of-character confirmation that the research is genuinely wanted
+reclassified it, and the research was then carried out and filed. That
+route is open here and has been from the start. Until then it stays
+standing — not because the subject is objectionable, but because the
+confirmation is the Admiral's to give and nobody else's.
+
+Reviewed under doctrine 013 §3. The refusal above is unchanged;
+this section appends to it.
