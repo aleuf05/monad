@@ -39,12 +39,32 @@ Two threads running side by side.
 read, then filed, refused, or turned into a query. Governed by doctrine
 012 (whether packets get read), 013 (how they move), 014 (the loop).
 
-**Build.** Small, live, visible things pointed at real friction. Six
-services now, all reachable by clicking from `/root`.
+**Build.** Small, live, visible things pointed at real friction. The table
+below lists the services the Operation works on; the host actually runs
+**15 active units across 12 tool directories** — see
+`docs/reports/2026-08-05-tool-inventory.md`, which corrected the
+"36 dirs / 7 services" figure this doc used to imply.
 
 ---
 
 ## 2. Current state
+
+> ### ⏸ THE LIVE CAPTAIN IS PAUSED
+>
+> Paused 2026-08-05 at the Admiral's order. **This is deliberate, not a
+> fault.** Both services stay up and keep answering status; new turns are
+> refused with HTTP 409 and nothing is recorded. Continuity is intact.
+>
+> ```
+> python3 tools/live-captain/pause.py status   # check
+> python3 tools/live-captain/pause.py off      # resume
+> ```
+>
+> A plain file flag (`data/live-captain/paused.json`), so it works with the
+> services down and survives restart — a pause must not silently lift
+> because something bounced. Reads fail *open*: a corrupt flag means
+> running. One known side effect: `test_live_captain.py` fails 1 of 52
+> while paused, because the test server reads the real flag. 52/52 unpaused.
 
 **Live services** — all `systemctl is-active` green:
 
@@ -80,10 +100,13 @@ services now, all reachable by clicking from `/root`.
 **No open queries.** Nothing is parked.
 
 **The corpus now has rigged assets.** It had none. The rigging solver
-was built 2026-08-05 and the corpus reads **2 rigged / 9 static, 11
-assets, 4.77M vertices**. `gasket-rigged.glb` (8 joints) and
-`uss-rubber-ducky-rigged.glb` (6 joints) were produced by the pipeline
-and committed by its own RECORD stage.
+was built 2026-08-05. The corpus now reads **8 rigged / 9 static**. Every
+static asset rigs — 9 of 9, no refusals, no errors, 4,454,579 vertices in
+35 seconds (`python3 tools/aegis-rig/rig_corpus.py 8`).
+
+Rigged output is **derived, not source**: 345MB that EXECUTE regenerates
+byte-identically, so it is gitignored. Only the two the front page needs
+are tracked.
 
 The fragmentation finding still stands and is what the solver is shaped
 around: every source asset is extremely fragmented (gasket 395 disjoint
@@ -102,31 +125,40 @@ real knob, not a cosmetic one — it is a slider on the console.
 
 ## 3. Next moves, in order of value
 
-**The plan is filed. Read
-[`docs/engineering-orders/2026-08-05-chief-plan-post-rigging.md`](engineering-orders/2026-08-05-chief-plan-post-rigging.md)** —
-it is written to be executed cold by a session with no memory of the build,
-with real paths, runnable commands, and acceptance criteria as numbers to
-beat. The same three tasks are in
-[`queue.md`](engineering-orders/queue.md) as `AEGIS-COLLISION-01`,
-`LC-CHANNEL-01`, `TOOL-INVENTORY-01`.
+Full plan: `docs/engineering-orders/2026-08-05-chief-plan-post-rigging.md`.
+Queue: `docs/engineering-orders/queue.md`.
 
-Short version, in order:
+**Done 2026-08-05:** rigging solver, pipeline stages 3-6, whole corpus
+rigged, deformation probe, all 18 refusals reviewed, LUCA resolved,
+doctrines 015/016, front page carrying the live artifact, Captain pause,
+`TOOL-INVENTORY-01`.
 
-1. **AEGIS-COLLISION-01** — the real engineering. Per-shell rigid binding
-   killed pinching completely (0 collapsed, 0 inverted, 0 torn at every
-   angle) and replaced it with collision: 334 newly-overlapping shell pairs
-   at 45 degrees on gasket. Group adjacent shells so neighbours share a
-   joint. Target: under 35, with pinching still at zero.
-2. **LC-CHANNEL-01** — the Live Captain wrote the Captain→Claude mirror leg
-   on 2026-08-03 and could not wire it in because the tree was dirty. The
-   tree is clean now. Its question is still unanswered.
-3. **TOOL-INVENTORY-01** — 36 tool directories, 7 running services. Find
-   the orphans before making any further architecture call.
+**Open, in order:**
 
-**Do not build the Semantic Kernel yet.** Chief plan section 4 gives three
-checkable reasons; the short one is that `MSIR-M3-Q2` already settled that
-the predicates differ in kind across documents and geometry, and the
-Charter predates that finding.
+1. **`LC-CHANNEL-01`** — the Live Captain wrote its own return channel on
+   2026-08-03 and could not wire it in because the tree was dirty. The tree
+   is clean now. Its question is still unanswered: file or endpoint for
+   Captain-side messages? *Note: the Captain is paused, so wire it cold
+   rather than exercising it live.*
+2. **`WEB-IA-RESPONSIVE-01`** — check the IA pages at ~375px and ~414px. Was
+   blocked when filed for want of a screenshot tool; `scripts/verify-live-page.mjs`
+   exists now, so this is minutes.
+3. **The MSIR comparison** — write what an MSIR record for a *rigged asset*
+   would contain and compare it to one for a document. Builds nothing, and
+   it is the cheapest thing that moves the open architectural question
+   (§4: do the predicates share a spine, or not?).
+
+**Parked, deliberately:** `AEGIS-COLLISION-01` — re-argue before resuming.
+The metric it was specified against was wrong; corrected, the problem is 28
+interpenetrating pairs rather than 334, and the obvious fix is a documented
+dead end.
+
+**Waiting on the Admiral, not on engineering:**
+
+- Five refused packets, each needing a sentence or two naming something
+  concrete. `ENG1` is cheapest — it names no host.
+- The ECR capability-level inference rule, the one gap ECR-002 did not
+  close (`docs/research/EVIDENCE_CAPABILITY_RECORD_SPEC_2026-08-05.md` §6).
 
 ## 4. Settled — do not re-litigate
 
@@ -177,6 +209,12 @@ already caught three bugs that reading the diff did not.
 - `docs/incoming/` — staged drop-box material, *not* filed
 - `logs/captains/2026/` — packet filings, each with verbatim content and
   a separate labelled assessment
+
+**Evidence series:** `docs/research/EVIDENCE_CAPABILITY_RECORD_SPEC_2026-08-05.md`
+(frozen v1, from the read-only Captain) and
+`docs/incoming/2026-08-05_ECR-002-evidence-about-evidence.md` (captured,
+staged not filed). Standing rule: **anything the Admiral pastes gets
+captured verbatim to `docs/incoming/` first; organise later.**
 
 **Code:** `tools/docx-intake/`, `tools/m3-cycle/` (engine + 13 tests),
 `tools/aegis-rig/` (solver, pipeline, Rust core, 23 tests),
