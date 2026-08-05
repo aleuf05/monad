@@ -682,3 +682,152 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
+
+
+# --- branching skeletons ----------------------------------------------------
+# The corpus said a single chain is the wrong shape for 7 of 9 assets, and
+# choosing a better axis barely helped: gasket's best axis still leaves 58%
+# of mass off-spine, because a robot with two arms and two tracks is not a
+# chain at any orientation. This fits a *tree* instead — a trunk with one
+# limb chain per lobe of mass.
+
+#: Shell centroids closer than this fraction of span are one lobe. Found by
+#: sweeping: at 0.12 the robot is one blob, at 0.02 it is 306 fragments, and
+#: at 0.05 five masses appear with a 3.6x gap to the next — two low and
+#: paired, two higher and paired, one centred on top. Anatomy, not tuning.
+LOBE_RADIUS = 0.05
+#: A lobe smaller than this fraction of the mesh is debris, not a limb.
+LOBE_MIN_FRACTION = 0.02
+
+
+def find_lobes(positions, labels, radius_fraction: float = LOBE_RADIUS) -> dict:
+    """Group shells into lobes of mass by centroid proximity."""
+    count = (max(labels) + 1) if labels else 0
+    sums = [[0.0, 0.0, 0.0] for _ in range(count)]
+    sizes = [0] * count
+    for index, label in enumerate(labels):
+        point = positions[index]
+        for axis in range(3):
+            sums[label][axis] += point[axis]
+        sizes[label] += 1
+    centroids = [tuple(sums[s][a] / sizes[s] for a in range(3)) for s in range(count)]
+
+    lo = [min(p[i] for p in positions) for i in range(3)]
+    hi = [max(p[i] for p in positions) for i in range(3)]
+    span = max(hi[i] - lo[i] for i in range(3))
+    radius = span * radius_fraction
+
+    parent = list(range(count))
+
+    def find(x):
+        while parent[x] != x:
+            parent[x] = parent[parent[x]]
+            x = parent[x]
+        return x
+
+    for a in range(count):
+        for b in range(a + 1, count):
+            gap = sum((centroids[a][i] - centroids[b][i]) ** 2 for i in range(3)) ** 0.5
+            if gap < radius:
+                ra, rb = find(a), find(b)
+                if ra != rb:
+                    parent[rb] = ra
+
+    groups: dict[int, list[int]] = {}
+    for shell in range(count):
+        groups.setdefault(find(shell), []).append(shell)
+
+    total = len(positions)
+    lobes = []
+    for shells in groups.values():
+        verts = sum(sizes[s] for s in shells)
+        weight = verts / total
+        centre = [0.0, 0.0, 0.0]
+        for s in shells:
+            for a in range(3):
+                centre[a] += centroids[s][a] * sizes[s]
+        centre = tuple(c / verts for c in centre)
+        lobes.append({"shells": set(shells), "vertices": verts,
+                      "fraction": round(weight, 4), "centre": centre,
+                      "major": weight >= LOBE_MIN_FRACTION})
+    lobes.sort(key=lambda l: -l["vertices"])
+    return {"lobes": lobes, "major": [l for l in lobes if l["major"]],
+            "shell_lobe": {s: i for i, l in enumerate(lobes) for s in l["shells"]},
+            "radius": radius}
+
+
+def solve_branching_skeleton(positions, labels, joints_per_limb: int = 3,
+                             radius_fraction: float = LOBE_RADIUS) -> dict:
+    """Fit a trunk plus one chain per limb.
+
+    The trunk is the most *central* lobe, not the largest — on the gasket
+    robot the largest lobe is a track, and rooting a skeleton in a foot is
+    how you get a body that swings from its own ankle.
+    """
+    found = find_lobes(positions, labels, radius_fraction)
+    major = found["major"]
+    if len(major) < 2:
+        raise RigError("only one lobe of mass — use the chain solver")
+
+    def gap(a, b):
+        return sum((a[i] - b[i]) ** 2 for i in range(3)) ** 0.5
+
+    trunk_index = min(
+        range(len(major)),
+        key=lambda i: sum(gap(major[i]["centre"], other["centre"]) for other in major))
+    trunk = major[trunk_index]
+
+    nodes = [{"name": "@Root", "point": trunk["centre"], "parent": -1,
+              "lobe": trunk_index}]
+    limb = 0
+    for index, lobe in enumerate(major):
+        if index == trunk_index:
+            continue
+        limb += 1
+        previous = 0
+        for step in range(1, joints_per_limb + 1):
+            t = step / joints_per_limb
+            point = tuple(trunk["centre"][a] + (lobe["centre"][a] - trunk["centre"][a]) * t
+                          for a in range(3))
+            nodes.append({"name": f"@Limb{limb}.{step:02d}", "point": point,
+                          "parent": previous, "lobe": index})
+            previous = len(nodes) - 1
+
+    parents = [n["parent"] for n in nodes]
+    if not verify_acyclic(parents):
+        raise RigError("branching hierarchy is not acyclic")
+
+    return {
+        "kind": "branching",
+        "joints": [n["point"] for n in nodes],
+        "parents": parents,
+        "names": [n["name"] for n in nodes],
+        "lobe_of_joint": [n["lobe"] for n in nodes],
+        "trunk": trunk_index,
+        "lobes": len(major),
+        "lobe_fractions": [l["fraction"] for l in major],
+        "shell_lobe": found["shell_lobe"],
+    }
+
+
+def branching_fit(positions, labels, skeleton: dict) -> dict:
+    """How much mass sits far from *any* bone of the tree.
+
+    The single-chain fit gate measures distance from one axis. This measures
+    distance to the nearest joint, which is the honest comparison: a tree is
+    allowed to reach mass that no straight line could.
+    """
+    joints = skeleton["joints"]
+    lo = [min(p[i] for p in positions) for i in range(3)]
+    hi = [max(p[i] for p in positions) for i in range(3)]
+    span = max(hi[i] - lo[i] for i in range(3))
+    limit = span * OFF_AXIS_RADIUS
+    far = 0
+    for point in positions:
+        nearest = min(
+            sum((point[a] - j[a]) ** 2 for a in range(3)) for j in joints) ** 0.5
+        if nearest > limit:
+            far += 1
+    fraction = far / len(positions)
+    return {"off_bone_fraction": round(fraction, 4), "fits": fraction <= OFF_AXIS_LIMIT,
+            "joints": len(joints)}
