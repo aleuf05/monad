@@ -198,7 +198,8 @@ one file before working here, read that one.
 Then: `012` (packet terms) → `013` (lifecycle + refusal review) → `014` (the
 working loop; §4a division of labour) → `015` (Rust for maths) → `016`
 (Chief Conference) → `017` (scope gaps surface when you ask to delegate) →
-`018` (instruments that agree by accident).
+`018` (instruments that agree by accident) → `020` (authority is
+permission, not correctness).
 
 **Sound the ship before trusting its status:** `bash scripts/sound-the-ship.sh`
 checks python syntax, that every unit points at a real file, that installed
