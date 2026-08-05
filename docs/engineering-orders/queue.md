@@ -48,6 +48,21 @@ orphan because its import goes through `sys.path` plus a bare `import
 pipeline`. Grepping for directory paths produces false orphans in this repo.
 Verify by module name before acting.
 
+## CONSOLE-LAYOUT-01: Tabbed rail for /root
+
+Status: queued — planned, Admiral chose the option
+
+The `/root` right rail carries seven unrelated widgets stacked vertically in
+260px; two are badged NEW and one of those sits sixth, below the fold. They
+are four kinds of thing (converse / glance / act / review) presented as
+peers. Group them into three tabs — Do / See / Log — with Do as default.
+
+Full plan, rejected alternatives, and acceptance criteria:
+[`2026-08-05-root-console-layout-plan.md`](2026-08-05-root-console-layout-plan.md).
+
+Claude's to execute, not the Captain's: `console/` is served live at /root
+and is on the Captain's `never` list (doctrine 017).
+
 ## WEB-IA-RESPONSIVE-01: Verify mobile-width behavior of the new IA pages
 
 Status: queued
