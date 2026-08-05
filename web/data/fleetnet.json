@@ -1,10 +1,11 @@
 {
-  "generated": "2026-08-05T11:46:30Z",
+  "generated": "2026-08-05T12:02:46Z",
   "units": {
-    "installed": 23,
+    "installed": 24,
     "active": 19,
     "down": [],
-    "expected_down": 4
+    "expected_down": 4,
+    "oneshot": 2
   },
   "ports": 17,
   "suites": {
@@ -13,15 +14,15 @@
     "total": 5
   },
   "tree": {
-    "uncommitted": 10,
-    "head": "3951b35"
+    "uncommitted": 8,
+    "head": "2bd98c4"
   },
-  "captain": "paused",
+  "captain": "running",
   "voice": {
     "day": "2026-08-05",
-    "seconds_used": 28.44,
+    "seconds_used": 31.84,
     "seconds_limit": 300.0,
-    "usd_used": 0.01422,
+    "usd_used": 0.01592,
     "usd_limit": 0.1
   },
   "sound": true,
@@ -32,7 +33,7 @@
     },
     {
       "priority": 2,
-      "text": "19 of 23 units running on 17 ports."
+      "text": "19 of 24 units running on 17 ports."
     },
     {
       "priority": 2,
@@ -40,11 +41,11 @@
     },
     {
       "priority": 3,
-      "text": "10 files uncommitted."
+      "text": "8 files uncommitted."
     },
     {
       "priority": 1,
-      "text": "Voice budget, 0.0142 of 0.1 dollars used."
+      "text": "Voice budget, 0.0159 of 0.1 dollars used."
     }
   ]
 }

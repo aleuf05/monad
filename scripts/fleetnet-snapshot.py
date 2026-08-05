@@ -46,6 +46,7 @@ def units() -> dict:
     """Installed units belonging to this repo, and which are active."""
     installed = active = 0
     down = []
+    oneshot = []
     for path in Path("/etc/systemd/system").glob("*.service"):
         try:
             if "/dev/monad/" not in path.read_text(errors="replace"):
@@ -53,6 +54,17 @@ def units() -> dict:
         except OSError:
             continue
         name = path.stem
+        text = path.read_text(errors="replace")
+        # A oneshot is INACTIVE between firings — that is what oneshot means.
+        # Reporting it as down is the same misread as `inactive` meaning "never
+        # installed". Detected from the unit file rather than kept in a list,
+        # because the list is what failed: living-fleet-memory-reflect was in
+        # EXPECTED_DOWN and then this script's OWN timer service was added and
+        # immediately announced itself as a fault.
+        if "Type=oneshot" in text:
+            oneshot.append(name)
+            installed += 1
+            continue
         installed += 1
         state = run("systemctl", "is-active", name)
         if state == "active":
@@ -60,7 +72,7 @@ def units() -> dict:
         elif name not in EXPECTED_DOWN:
             down.append({"unit": name, "state": state or "unknown"})
     return {"installed": installed, "active": active, "down": down,
-            "expected_down": len(EXPECTED_DOWN)}
+            "expected_down": len(EXPECTED_DOWN), "oneshot": len(oneshot)}
 
 
 def ports() -> int:

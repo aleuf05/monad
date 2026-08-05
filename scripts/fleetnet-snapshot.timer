@@ -1,0 +1,13 @@
+[Unit]
+Description=Refresh the FleetNet snapshot so the live stream has something new to say
+
+[Timer]
+# 30s is the liveness floor: fast enough that a service dying is noticed
+# while you are still looking at the page, slow enough that running five
+# test suites every tick does not become the load it is measuring.
+OnBootSec=45s
+OnUnitActiveSec=30s
+AccuracySec=5s
+
+[Install]
+WantedBy=timers.target
