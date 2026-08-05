@@ -1,8 +1,9 @@
 # OPERATION RESUME — start here in a clean context
 
 Single entry point for picking this up in a new session or a new
-terminal. Written 2026-08-05. If anything below contradicts the repo,
-the repo is right — verify before asserting.
+terminal. Written 2026-08-05, updated the same day after the rigging
+build. If anything below contradicts the repo, the repo is right —
+verify before asserting.
 
 ---
 
@@ -51,7 +52,7 @@ services now, all reachable by clicking from `/root`.
 |---|---|---|
 | `docx-intake` | 4797 | `.docx` drop box → `docs/incoming/` |
 | `m3-cycle` | 4798 | M³ tri-condition evaluation over the docs corpus |
-| `aegis-inspect` | 4799 | glTF corpus INSPECT + VALIDATE |
+| `aegis-inspect` | 4799 | glTF corpus: INSPECT, VALIDATE, AUTHORIZE, EXECUTE, RECORD |
 | `root-console` | 4792 | console + document corpus API |
 | `public-root-auth` | 4779 | forward_auth for everything above |
 | `live-captain-web` | — | the Live Captain |
@@ -61,8 +62,13 @@ services now, all reachable by clicking from `/root`.
 - Right panel: **Packet Drop** (drop a `.docx`), **M³ Cycle** (verdict +
   six condition chips)
 - Header: **📄 Document Viewer** (themes, MSIR token glossing, queries
-  and packets browsable), **🦴 Aegis INSPECT** (asset list, 3D preview,
-  rig readout, VALIDATE button)
+  and packets browsable), **🦴 Aegis Pipeline** (asset list, 3D preview,
+  rig readout, VALIDATE, and the rig pipeline itself)
+- The rig pipeline is in the right-hand panel directly under the
+  asset's verdict: a five-stage strip, a joint-count slider, then
+  **AUTHORIZE** → **EXECUTE** → **RECORD**. Pick a static asset from the
+  left list to see it. The corpus summary at top-left names the active
+  solver engine (`rust`).
 
 **Answered, settled:**
 
@@ -73,38 +79,48 @@ services now, all reachable by clicking from `/root`.
 
 **No open queries.** Nothing is parked.
 
-**The fact that shapes the next move:** the geometry corpus is 9 GLBs,
-4.45M vertices, 342MB — and **0 are rigged**. All static, single-node,
-no skins, no joints. Every one measures **high weight-bleed risk**
-(gasket 395 disjoint shells, the-monad 4,676, kraken 1,831 with the
-largest shell only 3.8% of the mesh). A proximity-based rigging solver
-run today would bleed weights across unconnected parts on every asset.
+**The corpus now has rigged assets.** It had none. The rigging solver
+was built 2026-08-05 and the corpus reads **2 rigged / 9 static, 11
+assets, 4.77M vertices**. `gasket-rigged.glb` (8 joints) and
+`uss-rubber-ducky-rigged.glb` (6 joints) were produced by the pipeline
+and committed by its own RECORD stage.
+
+The fragmentation finding still stands and is what the solver is shaped
+around: every source asset is extremely fragmented (gasket 395 disjoint
+shells, the-monad 4,676, kraken 1,831). The solver's answer is to solve
+weights **per shell** — a shell too short to contain a blend is bound
+rigidly to one joint. On gasket at 8 joints that is 374 rigid shells and
+21 blended. Naive proximity weighting would have bled across all 395.
+
+One measured consequence worth keeping: the corpus's fragmentation scale
+(~0.18 on gasket's dominant axis) bounds useful bone density. Below it
+skinning degenerates to rigid part binding; above it you start blending
+shells smaller than the blend, which is bleed. Bone count is therefore a
+real knob, not a cosmetic one — it is a slider on the console.
 
 ---
 
 ## 3. Next moves, in order of value
 
-1. **Get one riggable asset in.** Everything downstream of the rigging
-   spec is blocked on having a single GLB with a skin and joints. Either
-   drop one through an intake, or make the solver's first job
-   synthesising a skeleton for `gasket.glb` (smallest at 29K verts, so
-   iteration is fast).
-2. **Aegis pipeline stages 3-6.** INSPECT and VALIDATE exist.
-   AUTHORIZE / EXECUTE / RECORD do not. RECORD should probably reuse
-   git rather than reimplement provenance — that question has come up
-   in three packets and is still unsettled.
-3. **Refusal review backlog** (doctrine 013 §3). 18 refusals, triaged
-   into four buckets:
-   - 2 resolvable by one Admiral sentence (the LUCA pair — both ask for
-     out-of-character confirmation that they're real research)
-   - 7 hardware/host claims — one `lsusb` paste clears several, or they
-     go `moot`
-   - 4 that only need restating concretely
-   - 4 permanently standing (Crystal Ledger ×2, special-mode,
-     input-override) — could be closed out as terminal in one pass
-4. **Rust vs Python** for rigging maths. Real decision, unstated so far.
-   This repo is Python; rigging is the one place the argument is
-   genuine rather than ceremonial.
+The four items that were here on 2026-08-05 are done — solver, pipeline
+stages 3-6, refusal backlog, and the Rust/Python decision. What is left:
+
+1. **Deformation quality has never been looked at.** The solver proves
+   its weights sum to 1.0 and that no shell is split across bones. It
+   does *not* prove the rig deforms *well* — Packet Beta's Module 3
+   (clipping and pinching detection against test geometry) is the one
+   module still unbuilt. That needs a pose to test against, which needs
+   an animation, which nothing in the corpus has.
+2. **Linear blend vs dual-quaternion.** The solver does neither yet —
+   with two influences and no rotation in the rest pose the distinction
+   has not arisen. It will the moment a joint actually twists.
+3. **The eight sentences** (see
+   `docs/reports/2026-08-05-refusal-review-backlog.md`). Seven are the
+   Admiral's: two confirming the LUCA research is genuinely wanted, five
+   naming something concrete enough to build from.
+4. **Multi-primitive assets.** The solver refuses them at AUTHORIZE.
+   Most of the corpus is single-primitive so this has not bitten, but
+   `file_00000000a68c722f9cd2…` and friends should be checked.
 
 ---
 
@@ -126,6 +142,14 @@ genuinely new terms, not repetition:
 - **Division of labour** (doctrine 014 §4a, Admiral 2026-08-05): Claude
   manages core function. The Live Captain is directed by the Admiral on
   non-essential function only.
+- **Rust for the maths, Python for I/O** (doctrine 015, Admiral
+  2026-08-05). Measured, not preferred: 7.2× on the million-vertex
+  kraken. Parity tests hold the two implementations to identical output.
+- **RECORD reuses git.** Asked in three packets, settled in
+  `tools/aegis-rig/pipeline.py`: git already stores content-addressed
+  history with authorship and timestamps, and a second provenance ledger
+  would be a copy of git that can disagree with git. Telemetry goes in
+  the commit message.
 
 ---
 
@@ -144,6 +168,7 @@ refusal review) → `014` (the working loop; §4a division of labour).
   a separate labelled assessment
 
 **Code:** `tools/docx-intake/`, `tools/m3-cycle/` (engine + 13 tests),
+`tools/aegis-rig/` (solver, pipeline, Rust core, 23 tests),
 `tools/aegis-inspect/` (inspector + server), `console/` (index,
 documents, assets).
 

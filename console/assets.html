@@ -34,6 +34,9 @@
   #stage { position: relative; background: #0d0f12; }
   #stage canvas { display: block; width: 100%; height: 100%; }
   #stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 0.82rem; text-align: center; padding: 2rem; }
+  /* The id selector beats the UA's [hidden] rule, so the placeholder stayed
+     painted over every loaded model until this was added. */
+  #stage-empty[hidden] { display: none; }
   #stage-loading { position: absolute; top: 0.7rem; left: 0.9rem; color: var(--accent); font-size: 0.76rem; }
 
   .pane-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 0.7rem 0.8rem 0.4rem; }
@@ -268,8 +271,12 @@ function renderDetail(a) {
   const check = (ok, label) =>
     `<div class="check ${ok ? "pass" : "fail"}"><span class="box">${ok ? "✓" : "✗"}</span>${label}</div>`;
 
+  // The rig pipeline sits directly under the verdict rather than at the
+  // bottom of the panel: it is the thing to act on, and burying it below
+  // four sections of facts meant scrolling to find the only buttons here.
   detailEl.innerHTML =
     `<div class="verdict ${a.state}"><span class="vw">${a.state}</span>${a.note}</div>` +
+    rigPanel(a) +
     `<div class="sect">Rig requirements</div>` +
     check(c.has_mesh, "mesh geometry") +
     check(c.has_skin, "skin binding") +
@@ -293,8 +300,7 @@ function renderDetail(a) {
     fact("glTF", a.gltf_version) +
     fact("path", a.path) +
     `<button id="validate-btn" data-p="${a.path}">VALIDATE — find disjoint shells</button>` +
-    `<div id="validate-out"></div>` +
-    rigPanel(a);
+    `<div id="validate-out"></div>`;
 
   const btn = document.getElementById("validate-btn");
   if (btn) btn.addEventListener("click", () => validate(a, btn));
