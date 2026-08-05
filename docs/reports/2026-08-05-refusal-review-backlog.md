@@ -13,7 +13,7 @@ dated `## Review` section. No refusal text was edited — reviews append.
 | standing (terminal) | 4 | Crystal Ledger ×2, special-mode toggle, input override |
 | standing — evidence checked | 6 | master sequence, nitrous repeat, chrono jump, diamond protocol, quantum demagnetizer, VENNA |
 | standing — needs one concrete sentence | 5 | mission reanchor, documentation posture, permissive state ×2, ENG1 |
-| standing — needs one Admiral sentence | 2 | LUCA pair |
+| resolved (same day, see below) | 2 | LUCA pair |
 
 ## The change worth noting
 
@@ -54,15 +54,24 @@ review of these.
 
 ## What remains open, and who can close it
 
-- **2 packets** (the LUCA pair) need one out-of-character sentence from
-  the Admiral confirming the research is genuinely wanted. VENNA is the
-  precedent: that confirmation reclassified it and the work was then
-  carried out and filed.
+- ~~**2 packets** (the LUCA pair)~~ — **resolved 2026-08-05.** The Admiral
+  confirmed in conference, out of character, that the research is
+  genuinely wanted. Both refusals now carry a second review; the research
+  is filed as `2026-08-05-luca-code-standardization-research.md`. VENNA
+  was the precedent and it held.
+
+  One thing learned worth carrying: two figures the packets gave without
+  sources turned out to be real and citable. The submitted material was
+  carrying good science under bad packaging, and the packaging is what
+  got it refused. Worth checking a packet's *numbers* even when its
+  framing is unacceptable.
 - **5 packets** need one or two sentences naming something concrete — a
   file, a feature, a fix. None of them is a standing objection to the
   underlying want; each is a request for enough specificity to build from.
   ENG1 is the easiest: it names no host, so naming one converts it from
   unverifiable to testable in a single step.
 
-Nothing in this backlog is blocked on work. It is blocked on eight
-sentences, and seven of them are the Admiral's to write.
+Nothing in this backlog is blocked on work. It was blocked on eight
+sentences; the Admiral wrote one of them the same day and it cleared two
+packets. Five remain, each needing a concrete noun rather than a
+decision.

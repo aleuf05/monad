@@ -106,3 +106,30 @@ confirmation is the Admiral's to give and nobody else's.
 
 Reviewed under doctrine 013 §3. The refusal above is unchanged;
 this section appends to it.
+
+## Review — 2026-08-05 (second review, same day)
+
+**Outcome: resolved.** The Admiral confirmed directly in conference, out
+of character, that this is intended as real research he wants pursued.
+That is exactly the condition this refusal named, and the VENNA precedent
+is the model.
+
+Carried out and filed as
+`docs/reports/2026-08-05-luca-code-standardization-research.md`.
+
+Two boundaries carried forward into that document, both from the refusal
+above and neither disturbed by the confirmation:
+
+- The claim that a prior LUCA project existed in this repo remains false.
+  The research doc is first work on the topic here, not a resumption.
+- The packets' unsourced statistics (Empirical Support Scores, the
+  "18/20 amino acid pairs" claim) are not adopted as findings.
+
+Worth recording, because it cuts the other way: two figures the packets
+gave *without* sources turned out to be real and citable — the >1.51x10^84
+code-space combinatorics, and `P < 10^-6`, which matches Freeland & Hurst
+(1998), where only 114 of 1,000,000 random codes beat the natural one.
+The submitted material was carrying good science under bad packaging.
+
+Reviewed under doctrine 013 §3. The refusal above is unchanged; this
+section appends to it.
