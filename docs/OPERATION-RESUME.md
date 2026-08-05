@@ -191,10 +191,20 @@ genuinely new terms, not repetition:
 
 ## 5. Map
 
-**Read first:** `docs/doctrine/012` (packet terms) → `013` (lifecycle +
-refusal review) → `014` (the working loop; §4a division of labour) →
-`015` (Rust for maths) → `016` (Chief Conference — how to ask for an
-architectural read instead of an implementation report).
+**Read first:** `docs/doctrine/019` — **General Orders.** Six standing
+orders, each paid for on 2026-08-05, each naming what it cost. If you read
+one file before working here, read that one.
+
+Then: `012` (packet terms) → `013` (lifecycle + refusal review) → `014` (the
+working loop; §4a division of labour) → `015` (Rust for maths) → `016`
+(Chief Conference) → `017` (scope gaps surface when you ask to delegate) →
+`018` (instruments that agree by accident).
+
+**Sound the ship before trusting its status:** `bash scripts/sound-the-ship.sh`
+checks python syntax, that every unit points at a real file, that installed
+units match the repo, and which units the repo defines but the host never
+installed. It found on its first run what a human missed five times in a
+day.
 
 **Verifying front-page work:** `node scripts/verify-live-page.mjs
 https://cameronlampley.com/` drives the real page in a real browser and
