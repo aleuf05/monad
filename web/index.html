@@ -329,6 +329,7 @@
           <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
           <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
           <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
+          <button type="button" class="rb-sound" id="rigRadio">&#128251; FleetNet Radio</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -1449,6 +1450,55 @@
           buddyReport(entry, variant);
         });
       }
+
+      // --- FleetNet Radio ---------------------------------------------
+      // The Lady speaks the ship's real condition. Every figure is counted
+      // from the host by scripts/fleetnet-snapshot.py — units from systemd,
+      // ports from sockets, suites actually run — never carried forward from
+      // a document. Doctrine 021, given a voice.
+      //
+      // Priorities come from the snapshot and go through the same router
+      // contract the Buddy already uses: a fault speaks first and interrupts,
+      // a sound ship reports calmly.
+      var fleetnet = null;
+      var radioBtn = document.getElementById("rigRadio");
+
+      function loadFleetnet() {
+        return fetch("data/fleetnet.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { fleetnet = d; return d; })
+          .catch(function () { return null; });
+      }
+      loadFleetnet();
+
+      function radioReport() {
+        var speak = function (d) {
+          if (!d) { buddySubmit(8, "FleetNet unreachable. No snapshot."); return; }
+          if (!buddyOn && voiceBtn) voiceBtn.click();   // radio implies sound
+          buddySubmit(d.sound ? 3 : 8,
+            d.sound ? "FleetNet. Ship is sound." : "FleetNet. Faults detected.");
+          d.lines.forEach(function (line) {
+            buddySubmit(line.priority, line.text);
+          });
+          if (d.captain === "paused") {
+            buddySubmit(2, "Live Captain is paused, by order.");
+          }
+          if (radioBtn) {
+            radioBtn.classList.add("on");
+            radioBtn.innerHTML = "&#128251; " + (d.sound ? "SOUND" : "FAULTS") +
+              " · " + d.units.active + "/" + d.units.installed;
+            setTimeout(function () {
+              radioBtn.classList.remove("on");
+              radioBtn.innerHTML = "&#128251; FleetNet Radio";
+            }, 9000);
+          }
+        };
+        // Always re-read before speaking. A radio that reports a cached fleet
+        // is the document-not-host error with a speaker attached.
+        loadFleetnet().then(speak);
+      }
+
+      if (radioBtn) radioBtn.addEventListener("click", radioReport);
 
       var skeletonBtn = document.getElementById("rigSkeleton");
       if (skeletonBtn) {
