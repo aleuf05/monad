@@ -749,6 +749,7 @@ function handleCodexEvent(event) {
       for (const [url, label] of imageArtifactsFrom(item, { scanFreeText: true })) addImageArtifact(url, label);
       runMetamorphosisTrigger(bodyEl);
       followTerminalBottom();
+      speakCaptain(item.text || "");
       return;
     }
     if (item.type === "userMessage") return;
@@ -824,6 +825,76 @@ function handleCodexEvent(event) {
   recordActivity("thread", method, JSON.stringify(params));
 }
 
+
+// --- Captain speech --------------------------------------------------------
+// The Captain's own replies, spoken in its own voice. Wired 2026-08-05.
+//
+// Everything this needs already existed: /api/turn returns the reply over
+// SSE, /voice-api/render makes a 24kHz WAV, the browser plays it. This
+// connects four working things; it builds no new machinery.
+//
+// Both endpoints sit behind the same forward_auth as the rest of /root, so
+// this works for a logged-in operator and simply does nothing for anyone
+// else. That boundary is deliberate: turns cost model budget and renders
+// cost money, and an ungated endpoint is the only thing between a cap and a
+// bill.
+//
+// captain.monad / Kore — measured authority. Distinct from the front page
+// Buddy's captain.alpha / Puck, so you can tell who is talking.
+const CAPTAIN_VOICE_KEY = "monad.captainVoice";
+let captainVoiceOn = localStorage.getItem(CAPTAIN_VOICE_KEY) === "on";
+let captainAudio = null;
+
+function setCaptainVoice(on) {
+  captainVoiceOn = on;
+  localStorage.setItem(CAPTAIN_VOICE_KEY, on ? "on" : "off");
+  const btn = document.getElementById("captain-voice-toggle");
+  if (btn) {
+    btn.classList.toggle("on", on);
+    btn.textContent = on ? "⚓ Voice: on" : "⚓ Voice: off";
+  }
+  if (!on && captainAudio) { captainAudio.pause(); captainAudio = null; }
+}
+
+async function speakCaptain(text) {
+  if (!captainVoiceOn || !text) return;
+  // Long replies are expensive and tiring to listen to. Speak the opening,
+  // which is where a Captain puts the answer, and leave the rest on screen.
+  const spoken = text.trim().replace(/\s+/g, " ").slice(0, 600);
+  const btn = document.getElementById("captain-voice-toggle");
+  try {
+    if (btn) btn.textContent = "⚓ rendering…";
+    const response = await fetch("/voice-api/render", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: spoken,
+        character_id: "captain.monad",
+        performance: {
+          intent: "reporting to the Admiral",
+          affect: "measured, grounded, restrained warmth",
+        },
+      }),
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const artifact = await response.json();
+    if (!artifact.audio_url) throw new Error("no artifact");
+    if (captainAudio) captainAudio.pause();      // a new reply supersedes the old
+    captainAudio = new Audio(artifact.audio_url);
+    if (btn) btn.textContent = "⚓ speaking…";
+    captainAudio.onended = captainAudio.onerror = () => {
+      if (btn) btn.textContent = "⚓ Voice: on";
+    };
+    await captainAudio.play();
+  } catch (err) {
+    // Budget exhausted, not logged in, render failed. Say so in the terminal
+    // rather than failing silently — a voice that goes quiet without
+    // explanation is indistinguishable from a broken one.
+    if (btn) btn.textContent = "⚓ Voice: on";
+    addRow("error", "voice", `captain voice unavailable: ${err.message}`);
+  }
+}
+
 function handleEvent(event) {
   if (event.type === "turn_started") {
     addRow("injected", "you", event.text);
@@ -838,6 +909,13 @@ function handleEvent(event) {
     return;
   }
 }
+
+(function wireCaptainVoiceToggle() {
+  const btn = document.getElementById("captain-voice-toggle");
+  if (!btn) return;
+  btn.addEventListener("click", () => setCaptainVoice(!captainVoiceOn));
+  setCaptainVoice(captainVoiceOn);   // restore the remembered choice
+})();
 
 function connect() {
   if (streamSource) return;

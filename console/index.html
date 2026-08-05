@@ -97,6 +97,14 @@
     color: var(--dim);
     margin-bottom: 0.6rem;
   }
+  #captain-voice-toggle {
+    background: var(--panel); color: var(--dim); border: 1px solid var(--border);
+    border-radius: 5px; font: inherit; font-size: 0.68rem; padding: 3px 9px;
+    margin-left: 0.6rem; cursor: pointer; white-space: nowrap;
+  }
+  #captain-voice-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  #captain-voice-toggle.on { border-color: var(--accent); color: var(--accent); background: #0F2A2C; }
+
   .status-widget {
     position: relative;
     display: flex;
@@ -611,6 +619,7 @@
       <a href="documents.html" style="color:#0b0d10; background:var(--accent); font-size:0.78rem; font-weight:700; text-decoration:none; padding:0.3rem 0.6rem; border-radius:5px;">📄 Document Viewer →</a>
       <a href="assets.html" style="color:#0b0d10; background:#e8a87c; font-size:0.78rem; font-weight:700; text-decoration:none; padding:0.3rem 0.6rem; border-radius:5px;">🦴 Aegis Pipeline — RIG NEW →</a>
       <div id="conn"><span class="dot"></span><span id="conn-text">connecting…</span></div>
+      <button type="button" id="captain-voice-toggle" title="Speak the Captain's replies aloud (captain.monad / Kore)">⚓ Voice: off</button>
     </div>
   </header>
   <div id="stats">
