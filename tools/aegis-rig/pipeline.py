@@ -73,6 +73,24 @@ def authorize(source: Path, joint_count: int = solver.DEFAULT_JOINTS) -> dict:
             f"{facts['primitives']} primitive"
             + ("" if facts["primitives"] == 1 else " — solver v0.1 handles one")))
 
+    # Skeleton fit — asked before rigging, not inferred afterwards from
+    # interpenetration statistics.
+    fit = None
+    if facts.get("ok") and facts.get("meshes"):
+        try:
+            gltf, blob, _ = solver._split_glb(source.read_bytes())
+            prim = gltf["meshes"][0]["primitives"][0]
+            positions = solver._read_positions(gltf, blob, prim["attributes"]["POSITION"])
+            fit = solver.skeleton_fit(positions, solver.dominant_axis(positions))
+            gates.append(_gate(
+                "skeleton fit", fit["fits"],
+                f"{fit['off_axis_fraction'] * 100:.0f}% of mass sits off the "
+                f"{fit['axis_name']} axis"
+                + ("" if fit["fits"] else
+                   " — a single chain is the wrong shape for this geometry")))
+        except Exception as error:  # noqa: BLE001 - a gate result, not a crash
+            gates.append(_gate("skeleton fit", False, str(error)))
+
     shells = None
     if facts.get("ok") and facts.get("meshes"):
         try:
@@ -99,6 +117,7 @@ def authorize(source: Path, joint_count: int = solver.DEFAULT_JOINTS) -> dict:
         "joint_count": joint_count,
         "gates": gates,
         "facts": facts,
+        "fit": fit,
         "shells": shells,
         "engine": "rust" if solver.core_available() else "python",
         "issued_at": int(time.time()),

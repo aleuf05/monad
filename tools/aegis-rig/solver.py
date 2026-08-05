@@ -54,6 +54,14 @@ RIGID_SPAN_FACTOR = 1.0
 # a spatial grid), not box overlap. Until then the honest setting is off.
 ADJACENCY_FACTOR = 0.0
 
+# Mass further than this fraction of the span from the spine counts as "off
+# axis". Not tuned — it is the radius at which a limb is plainly not part of
+# the trunk.
+OFF_AXIS_RADIUS = 0.15
+# Above this fraction off-axis, the spine does not pass through the object's
+# mass and a single chain is the wrong shape for it.
+OFF_AXIS_LIMIT = 0.35
+
 DEFAULT_JOINTS = 5
 WEIGHT_EPSILON = 1e-5
 
@@ -186,6 +194,53 @@ def solve_skeleton(positions: list[tuple], joint_count: int = DEFAULT_JOINTS) ->
         "names": _joint_names(joint_count),
         "bounds": {"min": lo, "max": hi},
     }
+
+
+def skeleton_fit(positions: list[tuple], axis: int) -> dict:
+    """How much of the mass sits *off* the proposed spine.
+
+    Everything else in this pipeline measures how a rig behaves — pinching,
+    tearing, interpenetration. Nothing asked whether the skeleton belonged on
+    the geometry at all, so hours of careful reasoning ran downstream of an
+    unchecked assumption.
+
+    This is that check, and it is one pass. `solve_skeleton` picks the spine
+    by bounding-box extent. That is right for a genuinely elongated object
+    and wrong for anything holding its limbs out: the gasket robot measures
+    1.00 across the arms and 0.68 head-to-track, so the chain was fitted
+    along the arm span and threaded sideways through the chest.
+
+    Measured 2026-08-05: robot 0.56, rocket 0.21. The rocket is the only
+    asset in the corpus with no deep interpenetration, and it is also the
+    only one whose bounding box and anatomy agree. That is not a
+    coincidence worth ignoring.
+    """
+    lo = [min(p[i] for p in positions) for i in range(3)]
+    hi = [max(p[i] for p in positions) for i in range(3)]
+    span = hi[axis] - lo[axis]
+    if span <= 0:
+        return {"off_axis_fraction": 0.0, "fits": True, "span": 0.0}
+    mid = [(lo[i] + hi[i]) / 2 for i in range(3)]
+    limit = span * OFF_AXIS_RADIUS
+    far = 0
+    for p in positions:
+        distance = sum((p[i] - mid[i]) ** 2 for i in range(3) if i != axis) ** 0.5
+        if distance > limit:
+            far += 1
+    fraction = far / len(positions)
+    return {
+        "off_axis_fraction": round(fraction, 4),
+        "fits": fraction <= OFF_AXIS_LIMIT,
+        "span": round(span, 4),
+        "axis_name": "XYZ"[axis],
+    }
+
+
+def dominant_axis(positions: list[tuple]) -> int:
+    lo = [min(p[i] for p in positions) for i in range(3)]
+    hi = [max(p[i] for p in positions) for i in range(3)]
+    extent = [hi[i] - lo[i] for i in range(3)]
+    return extent.index(max(extent))
 
 
 # --- Module 2: shell-aware skinning ----------------------------------------
