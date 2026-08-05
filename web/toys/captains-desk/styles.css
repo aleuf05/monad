@@ -1,0 +1,277 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  color: #3A2A1A;
+  background:
+    radial-gradient(ellipse at 20% 0%, #4a3420 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 100%, #3a2814 0%, transparent 55%),
+    repeating-linear-gradient(90deg, #6b4a2c 0px, #6b4a2c 2px, #5f4126 2px, #5f4126 4px),
+    linear-gradient(160deg, #5c3f24, #3f2a17);
+  background-blend-mode: normal;
+  overflow-x: hidden;
+}
+
+.desk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 54px 28px 18px 28px;
+  color: #F0E3CC;
+}
+
+.desk-header h1 {
+  margin: 0 0 4px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 3px rgba(0,0,0,0.45);
+}
+
+.desk-header p {
+  margin: 0;
+  font-size: 11.5px;
+  color: #C9B48F;
+  max-width: 520px;
+}
+
+.desk-header-actions button {
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #F0E3CC;
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(240,227,204,0.35);
+  border-radius: 4px;
+  padding: 7px 12px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.desk-header-actions button:hover {
+  background: rgba(0,0,0,0.45);
+  border-color: #E8A33D;
+}
+
+.desk-surface {
+  position: relative;
+  margin: 0 28px 220px 28px;
+  min-height: 60vh;
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse at center, rgba(255,220,170,0.06), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.05) 0px, transparent 3px, transparent 46px, rgba(0,0,0,0.05) 49px);
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55), inset 0 0 2px rgba(0,0,0,0.8);
+  border: 1px solid rgba(0,0,0,0.4);
+  touch-action: none;
+}
+
+.desk-empty-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(240,227,204,0.35);
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+  max-width: 260px;
+}
+
+/* Sticky note cards */
+.desk-card {
+  position: absolute;
+  width: 210px;
+  min-height: 130px;
+  padding: 12px 12px 10px;
+  background: linear-gradient(165deg, #FBEFA0, #F3DD6B);
+  border-radius: 2px;
+  box-shadow: 3px 6px 14px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.4) inset;
+  cursor: grab;
+  user-select: none;
+  transform-origin: center;
+}
+
+.desk-card.dragging {
+  cursor: grabbing;
+  box-shadow: 6px 14px 28px rgba(0,0,0,0.65);
+  z-index: 50;
+  transition: none;
+}
+
+.desk-card-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #2E2410;
+  min-height: 48px;
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.desk-card-text:empty::before {
+  content: "Type a thought...";
+  color: #8A7940;
+}
+
+.desk-card-delete {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: #7A6222;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.55;
+  line-height: 1;
+}
+.desk-card-delete:hover { opacity: 1; color: #8B2E2E; }
+
+.desk-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 3px;
+  padding: 2px 6px 2px 4px;
+  cursor: default;
+}
+.card-badge .badge-remove {
+  cursor: pointer;
+  opacity: 0.5;
+  font-size: 9px;
+}
+.card-badge .badge-remove:hover { opacity: 1; }
+
+.desk-card-log {
+  margin-top: 6px;
+  font-size: 9.5px;
+  color: #5A4B22;
+  border-top: 1px dashed rgba(0,0,0,0.15);
+  padding-top: 5px;
+  max-height: 60px;
+  overflow-y: auto;
+}
+.desk-card-log div { margin-bottom: 2px; }
+
+/* Loose tokens dropped directly on the desk */
+.loose-token {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: grab;
+  user-select: none;
+}
+
+/* Tray */
+.token-tray {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14px 28px 20px;
+  background: linear-gradient(180deg, rgba(20,13,6,0) 0%, rgba(20,13,6,0.92) 22%, #140d06 100%);
+  backdrop-filter: blur(2px);
+}
+
+.tray-label {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #C9B48F;
+  margin-bottom: 8px;
+}
+
+.tray-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Tokens: circular "carved wood / brass" tactile look, tilted for a 3D feel */
+.token {
+  --tilt: -6deg;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: radial-gradient(circle at 32% 28%, #f2d9a0, #b8863f 60%, #8a5f28 100%);
+  border: 2px solid #6b4720;
+  box-shadow:
+    0 3px 0 #4a3115,
+    0 6px 10px rgba(0,0,0,0.55),
+    inset 0 1px 2px rgba(255,255,255,0.5);
+  cursor: grab;
+  user-select: none;
+  transform: perspective(200px) rotateX(8deg) rotate(var(--tilt));
+  transition: transform 120ms ease;
+  touch-action: none;
+  position: relative;
+}
+.token:hover { transform: perspective(200px) rotateX(8deg) rotate(0deg) scale(1.06); }
+.token:active, .token.dragging { cursor: grabbing; }
+
+.token-tooltip {
+  position: absolute;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a120a;
+  color: #F0E3CC;
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+  border: 1px solid rgba(240,227,204,0.25);
+}
+.token:hover .token-tooltip { opacity: 1; }
+
+.drag-ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: radial-gradient(circle at 32% 28%, #f2d9a0, #b8863f 60%, #8a5f28 100%);
+  border: 2px solid #6b4720;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.6);
+  pointer-events: none;
+  z-index: 999;
+  transform: translate(-50%, -50%) scale(1.08) rotate(-4deg);
+}
+
+.desk-card.drop-target {
+  outline: 2px solid #4FD1C5;
+  outline-offset: 2px;
+}

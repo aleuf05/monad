@@ -1,0 +1,65 @@
+{
+  "id": "semantic-text-metamorphosis",
+  "version": "0.2",
+  "kind": "expressive-ui-capability",
+  "summary": "Lift phrases out of the Captain's own rendered text and choreograph them through a physics-simulated (not keyframed) sequence of composable primitives, ending in a synthesized result landing permanently near an anchor.",
+  "whenToUse": [
+    "Synthesizing 2-4 related concepts already visible in recent conversation into one crystallized insight.",
+    "Expressive emphasis moments, not routine responses -- this is a deliberate rhetorical/visual act, not default UI behavior.",
+    "When the result text is already decided -- this capability does not generate or infer the synthesis itself."
+  ],
+  "whenNotToUse": [
+    "Do not use for content the Captain hasn't already decided on -- result text is always a required input, never computed here.",
+    "Do not use more than once in quick succession -- it is a deliberate emphasis device; overuse dilutes it."
+  ],
+  "invocation": {
+    "method": "SemanticMetamorphosis#run(steps, opts)",
+    "legacyMethod": "SemanticMetamorphosis#perform(spec) -- sugar for orbit->shed->morph->crystallize->land, unchanged signature",
+    "primitives": {
+      "lift": "implicit first step; args: { phrases: string[] }",
+      "orbit": "args: { turns?: number=1, radius?: number=54 } -- bodies spring-chase a continuously-advancing point on a circle, per-body phase/speed/radius jitter",
+      "scatter": "args: { radius?: number=90 } -- each body springs to an independent random point",
+      "converge": "args: {} -- all bodies spring toward the shared anchor point",
+      "shed": "args: { fraction?: number=0.35 } -- that fraction of characters fly off as independent impulse-driven fragments and fade",
+      "morph": "args: { to: string } -- the actor's text is swapped mid-transition, body continuity preserved",
+      "merge": "args: { into: string } -- all actors converge and combine into one new actor carrying the group's mean velocity",
+      "pulse": "args: { strength?: number=0.25, count?: number=1 } -- scale/brightness impulse, springs back",
+      "crystallize": "args: { glyph?: string='◆' } -- appends the glyph with a stronger pulse",
+      "trail": "args: { on?: boolean=true } -- toggles fading motion-trail ghosts on subsequent steps",
+      "land": "args: {} -- (auto-merges if >1 actor remains) settles onto landTarget and becomes a permanent plain DOM node"
+    },
+    "opts": {
+      "sourceContainer": "Element -- contains the rendered text the source phrases will be located within",
+      "phrases": "string[] -- 1-6 phrases to locate (case-insensitive, first match each) and lift out",
+      "resultText": "string -- fallback synthesized text for steps that don't specify their own",
+      "anchorGlyph": "string, default '⟰'",
+      "landTarget": "Element -- where the final result is permanently inserted",
+      "landGlyph": "string, default '⚓'",
+      "reducedMotion": "'auto'|'force'|'off', default 'auto'"
+    },
+    "returns": "{ cancel(): void, done: Promise<ExecutionResult> }"
+  },
+  "executionResult": {
+    "cancelled": "boolean",
+    "sourcePhrases": "string[]",
+    "stepsRun": "string[]",
+    "resultText": "string",
+    "durationMs": "number",
+    "accessibleDescription": "string",
+    "timestamp": "ISO 8601 string"
+  },
+  "example": {
+    "phrases": ["confusion", "recursion", "evidence"],
+    "steps": [
+      { "op": "orbit", "args": { "turns": 1.5 } },
+      { "op": "shed", "args": { "fraction": 0.4 } },
+      { "op": "morph", "args": { "to": "testable recursive hypothesis" } },
+      { "op": "crystallize", "args": { "glyph": "◆" } },
+      { "op": "land", "args": {} }
+    ]
+  },
+  "triggerSyntax": {
+    "general": "⟦fx: phrases=\"a, b, c\" | op1(args) | op2(args) | ...⟧",
+    "legacy": "⟦metamorphose: phrases=\"a, b, c\" => \"result\"⟧"
+  }
+}

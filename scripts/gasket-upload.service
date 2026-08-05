@@ -1,0 +1,27 @@
+[Unit]
+Description=Monad Gasket GLB upload (password-gated live write into web/assets/models/gasket, reachable via Caddy at cameronlampley.com/gasket-upload-api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+EnvironmentFile=/home/cgl/.config/monad/public-root-auth.env
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/gasket-upload/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/cgl/dev/monad/web/assets/models/gasket
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
