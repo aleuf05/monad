@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-05T10:30:01.759441+00:00",
+  "fetched_at": "2026-08-05T12:15:02.500416+00:00",
   "items": [
+    {
+      "title": "U.S. missile stockpiles dwindle. And, FDA weighs approval of flu shots with mRNA tech",
+      "link": "https://www.npr.org/2026/08/05/g-s1-137429/up-first-newsletter-us-missiles-iran-war-michigan-primaries-moderna-flu-shot-black-lung",
+      "pubDate": "Wed, 05 Aug 2026 07:54:57 -0400"
+    },
     {
       "title": "Russian missile and drone barrage in Ukrainian capital region kills 17",
       "link": "https://www.npr.org/2026/08/05/nx-s1-5921194/russian-missile-drone-barrage",
@@ -37,11 +42,6 @@
       "title": "Authorities arrested a man with ammo and apparently monitoring security at Trump golf course near LA",
       "link": "https://www.npr.org/2026/08/04/g-s1-137415/trump-golf-course-arrest-california",
       "pubDate": "Tue, 04 Aug 2026 20:30:48 -0400"
-    },
-    {
-      "title": "SpaceX's revenue rises as its once-soaring stock price drifts back to Earth",
-      "link": "https://www.npr.org/2026/08/04/nx-s1-5918536/spacex-first-earnings-report-since-ipo",
-      "pubDate": "Tue, 04 Aug 2026 18:02:03 -0400"
     }
   ]
 }

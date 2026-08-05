@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-05T12:12:52Z",
+  "generated": "2026-08-05T12:24:22Z",
   "units": {
     "installed": 24,
     "active": 19,
@@ -15,15 +15,15 @@
   },
   "tree": {
     "uncommitted": 7,
-    "head": "a5637fa"
+    "head": "8ca15f0"
   },
   "captain": "running",
   "voice": {
     "day": "2026-08-05",
-    "seconds_used": 199.76,
-    "seconds_limit": 300.0,
-    "usd_used": 0.09988,
-    "usd_limit": 0.1
+    "seconds_used": 204.2,
+    "seconds_limit": 20000.0,
+    "usd_used": 0.10210000000000001,
+    "usd_limit": 10.0
   },
   "sound": true,
   "lines": [
@@ -45,7 +45,7 @@
     },
     {
       "priority": 1,
-      "text": "Voice budget, 0.0999 of 0.1 dollars used."
+      "text": "Voice budget, 0.1021 of 10.0 dollars used."
     }
   ]
 }

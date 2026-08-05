@@ -1694,7 +1694,14 @@
             if (fleetMuted || !news.length) return;
             if (!buddyOn && voiceBtn) voiceBtn.click();   // something happened
             chime(news.some(function (n) { return n.priority >= 8; }) ? "alert" : "ping");
+            // Local voice ONLY for stream announcements, regardless of what
+            // the Buddy is otherwise using. This fires unattended every 15s;
+            // a loop with a metered voice behind it spends money nobody
+            // decided to spend. Deliberate spend is a button press.
+            var wasNeural = neuralVoice;
+            neuralVoice = false;
             news.forEach(function (n) { buddySubmit(n.priority, n.text); });
+            setTimeout(function () { neuralVoice = wasNeural; }, 50);
           })
           .catch(function () { if (fleetDot) fleetDot.className = "rb-live stale"; });
       }
