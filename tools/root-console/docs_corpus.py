@@ -29,6 +29,7 @@ STAGED_PATTERN = re.compile(r"Status:\s*\**\s*staged, awaiting evaluation", re.I
 
 SOURCES = (
     ("incoming", "docs/incoming"),
+    ("query", "docs/engineering-orders/queries"),
     ("packet", "docs/engineering-orders/packets"),
     ("chronicle", "docs/reports"),
     ("notes", "docs/logs"),

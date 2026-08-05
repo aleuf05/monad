@@ -108,6 +108,7 @@
   }
   #center.status-staged #docBody h1 { color: #e8a87c; }
   .cat-label.cat-incoming { color: #e8a87c; }
+  .cat-label.cat-query { color: #8fb3e8; }
 
   #center.status-refused #docBody { opacity: 0.82; }
   #center.status-refused #docBody h1 { color: var(--warn); }
@@ -246,8 +247,8 @@
 
   <script>
     (function () {
-      var CATEGORY_LABEL = { incoming: "Incoming (staged)", packet: "Packets", chronicle: "Chronicle", notes: "Engineering Notes", doctrine: "Doctrine" };
-      var CATEGORY_ORDER = ["incoming", "packet", "chronicle", "notes", "doctrine"];
+      var CATEGORY_LABEL = { incoming: "Incoming (staged)", query: "Queries (open)", packet: "Packets", chronicle: "Chronicle", notes: "Engineering Notes", doctrine: "Doctrine" };
+      var CATEGORY_ORDER = ["incoming", "query", "packet", "chronicle", "notes", "doctrine"];
 
       var entries = [];
       var byId = {};
