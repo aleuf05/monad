@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-05T10:15:01.986078+00:00",
+  "fetched_at": "2026-08-05T10:30:01.759441+00:00",
   "items": [
+    {
+      "title": "Russian missile and drone barrage in Ukrainian capital region kills 17",
+      "link": "https://www.npr.org/2026/08/05/nx-s1-5921194/russian-missile-drone-barrage",
+      "pubDate": "Wed, 05 Aug 2026 06:15:44 -0400"
+    },
     {
       "title": "Progressives and moderate Democrats both see wins in primary races while Trump flexes power over GOP",
       "link": "https://www.npr.org/2026/08/05/g-s1-137422/primary-elections",
@@ -12,6 +17,11 @@
       "title": "Nicotine pouches can be marketed as 'lower risk' than cigarettes. Is that dangerous?",
       "link": "https://www.npr.org/2026/08/05/nx-s1-5919626/smoking-fda-nicotine-cigarettes-tobacco",
       "pubDate": "Wed, 05 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "House Ethics Committee opens investigation into Ohio Republican Max Miller",
+      "link": "https://www.npr.org/2026/08/05/nx-s1-5918342/house-ethics-committee-opens-investigation-into-ohio-republican-max-miller",
+      "pubDate": "Wed, 05 Aug 2026 04:45:42 -0400"
     },
     {
       "title": "Appalachia's black lung rates highest in nearly 50 years as miners' protections stall",
@@ -32,16 +42,6 @@
       "title": "SpaceX's revenue rises as its once-soaring stock price drifts back to Earth",
       "link": "https://www.npr.org/2026/08/04/nx-s1-5918536/spacex-first-earnings-report-since-ipo",
       "pubDate": "Tue, 04 Aug 2026 18:02:03 -0400"
-    },
-    {
-      "title": "Oregon's wildfire season is pushing ranchers to evacuate their cattle",
-      "link": "https://www.npr.org/2026/08/04/nx-s1-5919329/ranchers-evacuate-cattle",
-      "pubDate": "Tue, 04 Aug 2026 16:16:43 -0400"
-    },
-    {
-      "title": "One Maine community's fight to save a birthing center",
-      "link": "https://www.npr.org/2026/08/04/nx-s1-5910852/maine-birthing-center-fight",
-      "pubDate": "Tue, 04 Aug 2026 16:16:26 -0400"
     }
   ]
 }

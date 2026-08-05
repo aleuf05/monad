@@ -56,6 +56,20 @@ for unit in scripts/*.service; do
   [ -f "/etc/systemd/system/$name.service" ] || note "not installed: $name"
 done
 
+echo "=== 5. plumbing: services listening with no public route ==="
+# Deliberately narrow. An earlier version probed each Caddy handle_path and
+# faulted on 404 — and reported ten faults that were almost all wrong, because
+# a bare prefix returns 404 when the service simply has no handler at "/".
+# /gasket-upload-api/ is 404 while /gasket-upload-api/api/status is 200: the
+# route is fine. Status codes cannot distinguish "no route" from "no root
+# handler", so this checks only the thing that IS unambiguous — a listening
+# port with nothing pointing at it.
+for port in $(ss -ltn 2>/dev/null | grep -oE ':(4[0-9]{3})' | tr -d ':' | sort -u); do
+  grep -q "reverse_proxy 127.0.0.1:$port" scripts/Caddyfile 2>/dev/null \
+    || note "port $port listening, no public route"
+done
+note "reachability of individual endpoints is not inferable from a prefix probe"
+
 echo
 if [ "$problems" -eq 0 ]; then
   echo "SHIP IS SOUND — no faults found."

@@ -299,7 +299,7 @@
       </div>
       <div class="gasket-caption">
         <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
-        <span class="gasket-name" id="gasketName">GASKET &mdash; RIGGED</span>
+        <span class="gasket-name" id="gasketName">RIGGED &mdash; TREE SKELETON</span>
       </div>
 
       <!-- Rig Bench: the first testable artifact out of the Aegis pipeline.
@@ -774,7 +774,7 @@
       // artifact. Today that is the first rigged asset the Aegis pipeline
       // produced. The bend slider drives its real joints, so what the
       // Admiral moves here is the actual rig, not a preview of one.
-      var RIGGED_MODEL = "assets/rigged/gasket-rigged.glb";
+      var RIGGED_MODEL = "assets/rigged/file_00000000a68c722f9cd29e1996dba4cf-rigged.glb";
       var rigBones = [];
       var rigOn = false;
 
@@ -1396,7 +1396,7 @@
               '<span class="rb-a-size">' + fmtBytes(entry.bytes) + " · " +
               entry.vertices.toLocaleString() + "v</span>";
             chip.addEventListener("click", function () { loadRigged(entry, chip); });
-            if (entry.dest.indexOf("gasket") !== -1) {
+            if (entry.dest.indexOf("file_00000000a68c") !== -1) {
               chip.classList.add("on");
               activeAsset = entry.dest;
             }
@@ -1565,9 +1565,12 @@
       rigStat.textContent = "loading rigged asset…";
       loadModel(RIGGED_MODEL, function (root) {
         rigBones = collectBones(root);
+        buildSkeletonMarkers();
         rigStat.textContent = rigBones.length
           ? rigBones.length + " joints bound — spring chain driving them live"
           : "loaded, but no joints found";
+        var sub0 = document.getElementById("rigBenchSub");
+        if (sub0) sub0.textContent = rigBones.length + " joints · loading corpus data…";
         applyBend(24);
         showProbe(24);
       });
