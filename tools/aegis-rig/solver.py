@@ -139,7 +139,8 @@ def verify_acyclic(parents: list[int]) -> bool:
     return True
 
 
-def solve_skeleton(positions: list[tuple], joint_count: int = DEFAULT_JOINTS) -> dict:
+def solve_skeleton(positions: list[tuple], joint_count: int = DEFAULT_JOINTS,
+                   axis: int | None = None) -> dict:
     """Fit a joint chain to the geometry's dominant axis.
 
     Joints sit at the centroid of their axial slice rather than on the
@@ -151,7 +152,7 @@ def solve_skeleton(positions: list[tuple], joint_count: int = DEFAULT_JOINTS) ->
     lo = [min(p[i] for p in positions) for i in range(3)]
     hi = [max(p[i] for p in positions) for i in range(3)]
     extent = [hi[i] - lo[i] for i in range(3)]
-    axis = extent.index(max(extent))
+    axis = best_axis(positions)["axis"] if axis is None else axis
     if extent[axis] <= 0:
         raise RigError("degenerate geometry — zero extent on every axis")
 
@@ -219,7 +220,12 @@ def skeleton_fit(positions: list[tuple], axis: int) -> dict:
     hi = [max(p[i] for p in positions) for i in range(3)]
     span = hi[axis] - lo[axis]
     if span <= 0:
-        return {"off_axis_fraction": 0.0, "fits": True, "span": 0.0}
+        # A spine with no length fits nothing. Returning 0.0 here scored a
+        # flat axis as a *perfect* fit and best_axis duly selected it —
+        # doctrine 019 order I, violated inside the code that implements the
+        # gate, within the hour. Worst score, not best.
+        return {"off_axis_fraction": 1.0, "fits": False, "span": 0.0,
+                "axis_name": "XYZ"[axis], "degenerate": True}
     mid = [(lo[i] + hi[i]) / 2 for i in range(3)]
     limit = span * OFF_AXIS_RADIUS
     far = 0
@@ -237,10 +243,46 @@ def skeleton_fit(positions: list[tuple], axis: int) -> dict:
 
 
 def dominant_axis(positions: list[tuple]) -> int:
+    """The v0.1 heuristic: longest bounding-box side. Kept because the fit
+    gate reports against it and because it is what produced the corpus
+    measured on 2026-08-05."""
     lo = [min(p[i] for p in positions) for i in range(3)]
     hi = [max(p[i] for p in positions) for i in range(3)]
     extent = [hi[i] - lo[i] for i in range(3)]
     return extent.index(max(extent))
+
+
+def best_axis(positions: list[tuple]) -> dict:
+    """Pick the spine by mass distribution rather than bounding-box extent.
+
+    The v0.1 heuristic asked "which side of the box is longest". For a robot
+    holding its arms out that is the arm span, so the chain was threaded
+    sideways through the chest — measured 58% of mass off-axis, and 7 of 9
+    corpus assets failed the same way.
+
+    This asks the question the fit gate actually scores: of the three axes,
+    which one has the most mass close to it. One pass per axis, three passes
+    total, and it optimises the metric we already decided to gate on rather
+    than a proxy for it.
+
+    Cheap enough to stay in Python. The hot loop is union-find over the index
+    buffer, not three centroid passes — doctrine 015.
+    """
+    candidates = []
+    for axis in range(3):
+        fit = skeleton_fit(positions, axis)
+        candidates.append((fit["off_axis_fraction"], axis, fit))
+    candidates.sort()
+    best_fraction, axis, fit = candidates[0]
+    extent_axis = dominant_axis(positions)
+    return {
+        "axis": axis,
+        "fit": fit,
+        "changed": axis != extent_axis,
+        "extent_axis": extent_axis,
+        "extent_axis_fraction": next(c[0] for c in candidates if c[1] == extent_axis),
+        "all": {"XYZ"[c[1]]: c[0] for c in candidates},
+    }
 
 
 # --- Module 2: shell-aware skinning ----------------------------------------
