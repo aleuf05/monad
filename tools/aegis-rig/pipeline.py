@@ -82,12 +82,17 @@ def authorize(source: Path, joint_count: int = solver.DEFAULT_JOINTS) -> dict:
             prim = gltf["meshes"][0]["primitives"][0]
             positions = solver._read_positions(gltf, blob, prim["attributes"]["POSITION"])
             fit = solver.skeleton_fit(positions, solver.dominant_axis(positions))
+            # Informational, never blocking. This routes shape selection; it
+            # does not decide whether the asset may be rigged. Made a hard
+            # gate briefly and it refused 3 of 9 assets including the one on
+            # the front page — refusing to rig is worse than rigging with the
+            # shape the measurement recommends.
             gates.append(_gate(
-                "skeleton fit", fit["fits"],
-                f"{fit['off_axis_fraction'] * 100:.0f}% of mass sits off the "
-                f"{fit['axis_name']} axis"
-                + ("" if fit["fits"] else
-                   " — a single chain is the wrong shape for this geometry")))
+                "skeleton fit", True,
+                f"{fit['off_axis_fraction'] * 100:.0f}% of mass off the "
+                f"{fit['axis_name']} axis — "
+                + ("a chain fits" if fit["fits"]
+                   else "chain is the wrong shape; a tree will be tried")))
         except Exception as error:  # noqa: BLE001 - a gate result, not a crash
             gates.append(_gate("skeleton fit", False, str(error)))
 

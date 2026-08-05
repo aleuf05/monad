@@ -50,7 +50,12 @@ def run(joints: int = DEFAULT_JOINTS, probe_angles=(15.0, 45.0)) -> dict:
                 results.append(row)
                 continue
 
-            report = pipeline.execute(auth["token"])
+            # shape="auto" lets the fit gate choose chain or tree per asset,
+            # and keeps the tree only when it actually scores better.
+            report = solver.write_rigged(
+                REPO_ROOT / auth["source"], REPO_ROOT / auth["dest"],
+                joints, shape="auto")
+            report.update({"source": auth["source"], "dest": auth["dest"]})
             row.update({
                 "status": "rigged",
                 "dest": report["dest"],
@@ -61,6 +66,7 @@ def run(joints: int = DEFAULT_JOINTS, probe_angles=(15.0, 45.0)) -> dict:
                 "rigged_bytes": report["rigged_bytes"],
                 "solve_ms": report["solve_ms"],
                 "engine": report["engine"],
+                "skeleton_kind": report.get("skeleton_kind", "chain"),
                 "max_weight_error": report["max_weight_error"],
             })
 

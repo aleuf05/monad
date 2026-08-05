@@ -35,10 +35,15 @@ struct Input {
     /// Shell-grouping radius, as a fraction of bone_span. 0 disables
     /// grouping and reproduces the v0.1 per-shell solver exactly.
     adjacency_factor: f64,
+    /// Spine axis chosen by the caller, or u32::MAX to pick by extent.
+    /// Python decides this by mass distribution; the Rust core used to pick
+    /// by bounding-box extent regardless, which threaded a robot's spine
+    /// through its shoulders and ignored the caller entirely.
+    forced_axis: Option<usize>,
 }
 
 fn parse_input(raw: &[u8]) -> io::Result<Input> {
-    if raw.len() < 24 || &raw[0..4] != MAGIC {
+    if raw.len() < 28 || &raw[0..4] != MAGIC {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "bad magic"));
     }
     let u32_at = |o: usize| -> u32 {
@@ -51,8 +56,10 @@ fn parse_input(raw: &[u8]) -> io::Result<Input> {
     let index_count = u32_at(12) as usize;
     let joint_count = u32_at(16) as usize;
     let adjacency_factor = f32::from_le_bytes([raw[20], raw[21], raw[22], raw[23]]) as f64;
+    let axis_field = u32_at(24);
+    let forced_axis = if axis_field < 3 { Some(axis_field as usize) } else { None };
 
-    let mut offset = 24;
+    let mut offset = 28;
     let mut positions = Vec::with_capacity(vertex_count);
     for _ in 0..vertex_count {
         let mut p = [0f64; 3];
@@ -71,7 +78,7 @@ fn parse_input(raw: &[u8]) -> io::Result<Input> {
         ]));
         offset += 4;
     }
-    Ok(Input { positions, indices, joint_count, adjacency_factor })
+    Ok(Input { positions, indices, joint_count, adjacency_factor, forced_axis })
 }
 
 /// Union-find with path halving and union by size. Same shells the Python
@@ -129,7 +136,8 @@ struct Skeleton {
     axis_max: f64,
 }
 
-fn solve_skeleton(positions: &[[f64; 3]], joint_count: usize) -> Result<Skeleton, String> {
+fn solve_skeleton(positions: &[[f64; 3]], joint_count: usize,
+                  forced_axis: Option<usize>) -> Result<Skeleton, String> {
     if joint_count < 2 {
         return Err("a chain needs at least two joints".into());
     }
@@ -147,6 +155,9 @@ fn solve_skeleton(positions: &[[f64; 3]], joint_count: usize) -> Result<Skeleton
         if extent[i] > extent[axis] {
             axis = i;
         }
+    }
+    if let Some(forced) = forced_axis {
+        axis = forced;   // caller measured mass; extent is only the fallback
     }
     if extent[axis] <= 0.0 {
         return Err("degenerate geometry — zero extent on every axis".into());
@@ -515,7 +526,8 @@ fn main() {
     }
 
     let (labels, shell_count) = connected_components(&input.indices, input.positions.len());
-    let skeleton = match solve_skeleton(&input.positions, input.joint_count) {
+    let skeleton = match solve_skeleton(&input.positions, input.joint_count,
+                                        input.forced_axis) {
         Ok(skeleton) => skeleton,
         Err(error) => fail(&error),
     };

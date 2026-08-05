@@ -330,6 +330,8 @@
           <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
           <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
           <button type="button" class="rb-sound" id="rigRadio">&#128251; FleetNet Radio</button>
+          <button type="button" class="rb-sound" id="rigChime">&#128266; Test Sound</button>
+          <button type="button" class="rb-sound" id="rigCaptain">&#9875; Captain Speaks</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -1058,6 +1060,7 @@
         // Under 5px is a click, not an orbit drag — otherwise every camera
         // move would also poke it.
         if (moved < 5 && overRobot(event) && poke()) {
+          chime("low");
           buddySubmit(0, "Ow.");
           if (rigStat) {
             var was = rigStat.textContent;
@@ -1312,6 +1315,39 @@
       // {timestamp, priority_level, text_payload}, priority ordering, and a
       // hard preempt at DUCK_PRIORITY. Kept deliberately identical so the
       // Python router stays the canonical implementation.
+      // --- chime --------------------------------------------------------
+      // The most reliable sound the browser can make: two oscillators, an
+      // envelope, no speech engine, no network, no artifact to fetch. If
+      // anything audible is going to work, this is it — so it is what every
+      // control fires, and speech is layered on top rather than depended on.
+      var chimeCtx = null;
+      function chime(kind) {
+        try {
+          var Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return false;
+          if (!chimeCtx) chimeCtx = new Ctx();
+          if (chimeCtx.state === "suspended") chimeCtx.resume();
+          var now = chimeCtx.currentTime;
+          // ping = confirm, alert = something wrong, low = acknowledge
+          var notes = kind === "alert" ? [880, 660]
+                    : kind === "low"   ? [330, 247]
+                    :                    [660, 990];
+          notes.forEach(function (freq, i) {
+            var osc = chimeCtx.createOscillator();
+            var gain = chimeCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, now + i * 0.09);
+            gain.gain.setValueAtTime(0.0001, now + i * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.09 + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.09 + 0.34);
+            osc.connect(gain); gain.connect(chimeCtx.destination);
+            osc.start(now + i * 0.09);
+            osc.stop(now + i * 0.09 + 0.36);
+          });
+          return true;
+        } catch (e) { return false; }
+      }
+
       var DUCK_PRIORITY = 7;
       // Two tiers, decided by who is asking. /voice-api sits behind the same
       // forward_auth as every other API, so a logged-in operator reaches it
@@ -1365,7 +1401,12 @@
         // schema was guessed (text/plan) rather than read (transcript/
         // performance). A voice that can be silenced by a network call is not
         // a voice. Neural is opt-in and additive now, never in the path.
-        if (neuralVoice && neuralProven) { buddySpeakNeural(next); return; }
+        // Use the good voice. The no-silence guarantee is a DEADLINE, not a
+        // refusal to try: attempt neural, and if audio is not actually
+        // playing within the window, speak locally instead. Earlier this was
+        // gated behind a proving render, which was over-cautious now that the
+        // schema is correct and verified rendering real WAV.
+        if (neuralVoice) { buddySpeakNeural(next); return; }
         var utterance = new SpeechSynthesisUtterance(next.text_payload);
         utterance.rate = next.priority_level >= DUCK_PRIORITY ? 1.05 : 0.95;
         utterance.pitch = next.priority_level >= DUCK_PRIORITY ? 1.15 : 1.0;
@@ -1404,11 +1445,30 @@
       }
 
       function buddySpeakNeural(payload) {
+        var settled = false;
+        var speakLocally = function () {
+          if (settled) return;
+          settled = true;
+          buddySpeaking = false;
+          buddyQueue.unshift(payload);
+          neuralVoice = false;                 // stop trying for this session
+          if (voiceBtn && buddyOn) voiceBtn.innerHTML = "&#128266; Buddy: on";
+          buddyPump();
+        };
+        // Hard deadline. If nothing is audibly playing by now, the local
+        // voice takes the line. Silence is never an outcome.
+        var deadline = setTimeout(speakLocally, 5000);
         // wav-pcm16-24khz-mono served at /voice-api/artifacts/<key>. The
         // studio already plays it with a plain <audio> element, so this
         // reuses that rather than decoding anything.
         buddySpeaking = true;
-        var done = function () { buddySpeaking = false; buddyPump(); };
+        var done = function () {
+          if (settled) return;
+          settled = true;
+          clearTimeout(deadline);
+          buddySpeaking = false;
+          buddyPump();
+        };
         fetch("/voice-api/render", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1424,14 +1484,19 @@
             if (!artifact || !artifact.audio_url) throw new Error("no artifact");
             var audio = new Audio(artifact.audio_url);
             audio.onended = audio.onerror = done;
+            audio.onplaying = function () {
+              clearTimeout(deadline);          // it is audibly playing; stand down
+              neuralProven = true;
+              if (voiceBtn && buddyOn) {
+                voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
+              }
+            };
             return audio.play();
           })
           .catch(function () {
-            // Budget exhausted, render failed, or gate said no. Speak anyway.
-            buddySpeaking = false;
-            neuralVoice = false;
-            buddyQueue.unshift(payload);
-            buddyPump();
+            // Budget exhausted, render failed, gate said no, autoplay blocked.
+            clearTimeout(deadline);
+            speakLocally();
           });
       }
 
@@ -1472,6 +1537,7 @@
             return e.dest === activeAsset;
           })[0];
           var variant = variants[parseInt(jointSlider.value, 10)] || null;
+          chime("ping");
           buddySubmit(1, "Little Buddy online.");
           buddyReport(entry, variant);
           proveNeural();
@@ -1489,6 +1555,65 @@
       // a sound ship reports calmly.
       var fleetnet = null;
       var radioBtn = document.getElementById("rigRadio");
+      // --- the Captain speaks -------------------------------------------
+      // Not the Buddy. The Live Captain's OWN words — the mirror-leg message
+      // it wrote to captain-channel.md on 2026-08-03 — rendered in its own
+      // voice (captain.monad / Kore, measured authority) rather than the
+      // Buddy's (captain.alpha / Puck). It is paused, so this is its record
+      // speaking, not the running service. Said plainly rather than implied.
+      var captainBtn = document.getElementById("rigCaptain");
+      if (captainBtn) {
+        captainBtn.addEventListener("click", function () {
+          chime("low");
+          captainBtn.classList.add("on");
+          captainBtn.innerHTML = "&#9875; rendering…";
+          var restore = function (label) {
+            captainBtn.classList.remove("on");
+            captainBtn.innerHTML = label || "&#9875; Captain Speaks";
+          };
+          fetch("/voice-api/render", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              transcript: "This is the Live Captain. This file is the mirror "
+                + "leg, Captain to Claude, written by me. If you are polling "
+                + "this path, the loop is closed. I remain paused, by order "
+                + "of the Admiral. Continuity is intact.",
+              character_id: "captain.monad",
+              performance: { intent: "reporting to the Admiral",
+                             affect: "measured, grounded, restrained warmth" },
+            }),
+          })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (a) {
+              if (!a || !a.audio_url) throw new Error("no artifact");
+              captainBtn.innerHTML = "&#9875; speaking…";
+              var audio = new Audio(a.audio_url);
+              audio.onended = function () { restore(); };
+              audio.onerror = function () { restore("&#9875; playback failed"); };
+              return audio.play();
+            })
+            .catch(function () {
+              // Not logged in, or the render failed. Say so out loud rather
+              // than going quiet — the Buddy's local voice always works.
+              restore("&#9875; needs /root login");
+              buddySubmit(3, "Captain voice unavailable. Log in at root to hear it.");
+            });
+        });
+      }
+
+      var chimeBtn = document.getElementById("rigChime");
+      if (chimeBtn) {
+        chimeBtn.addEventListener("click", function () {
+          var ok = chime("ping");
+          chimeBtn.classList.toggle("on", ok);
+          chimeBtn.innerHTML = ok ? "&#128266; heard it?" : "&#128266; no audio";
+          setTimeout(function () {
+            chimeBtn.classList.remove("on");
+            chimeBtn.innerHTML = "&#128266; Test Sound";
+          }, 2500);
+        });
+      }
 
       function loadFleetnet() {
         return fetch("data/fleetnet.json", { cache: "no-store" })
@@ -1500,6 +1625,7 @@
 
       function radioReport() {
         var speak = function (d) {
+          chime(d && d.sound ? "ping" : "alert");
           if (!d) { buddySubmit(8, "FleetNet unreachable. No snapshot."); return; }
           if (!buddyOn && voiceBtn) voiceBtn.click();   // radio implies sound
           buddySubmit(d.sound ? 3 : 8,

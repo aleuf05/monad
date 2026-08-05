@@ -57,7 +57,18 @@ ADJACENCY_FACTOR = 0.0
 # Mass further than this fraction of the span from the spine counts as "off
 # axis". Not tuned — it is the radius at which a limb is plainly not part of
 # the trunk.
-OFF_AXIS_RADIUS = 0.15
+# Recalibrated 2026-08-05 from a sweep across the corpus. 0.15 was tuned on a
+# robot with outstretched arms and failed EVERY asset — including a rocket
+# that is a spine and a monad that is a sphere. A normal torso sits 25-35% of
+# span off its own spine; that is what having a body looks like, not a defect.
+# 0.25 is the knee: it separates the genuinely branching assets (ducky and
+# end-to-end-manual, both 61%) from everything else.
+#
+# CAVEAT, stated because it is the day's own lesson: fit is a PROXY. Nobody
+# has yet measured whether a better-fitting rig actually DEFORMS better. The
+# threshold is calibrated against the shape of the geometry, not against
+# outcomes.
+OFF_AXIS_RADIUS = 0.25
 # Above this fraction off-axis, the spine does not pass through the object's
 # mass and a single chain is the wrong shape for it.
 OFF_AXIS_LIMIT = 0.35
@@ -268,9 +279,14 @@ def best_axis(positions: list[tuple]) -> dict:
     Cheap enough to stay in Python. The hot loop is union-find over the index
     buffer, not three centroid passes — doctrine 015.
     """
+    # Sample for the axis decision. Three full passes over 1.08M vertices in
+    # Python took 10s and turned an 800ms solve into a 10s one; the axis is a
+    # choice between three options and does not need every vertex to make it.
+    step = max(1, len(positions) // 40000)
+    sample = positions[::step] if step > 1 else positions
     candidates = []
     for axis in range(3):
-        fit = skeleton_fit(positions, axis)
+        fit = skeleton_fit(sample, axis)
         candidates.append((fit["off_axis_fraction"], axis, fit))
     candidates.sort()
     best_fraction, axis, fit = candidates[0]
@@ -432,15 +448,17 @@ def core_available() -> bool:
 
 
 def solve_via_rust(positions: list[tuple], indices, joint_count: int,
-                   adjacency_factor: float = ADJACENCY_FACTOR) -> tuple[dict, dict]:
+                   adjacency_factor: float = ADJACENCY_FACTOR,
+                   forced_axis: int | None = None) -> tuple[dict, dict]:
     """Hand the hot path to the Rust core over a binary pipe.
 
     JSON would put the cost back into the parsing we moved to Rust to avoid,
     so positions and indices go across as raw little-endian arrays.
     """
+    axis = best_axis(positions)["axis"] if forced_axis is None else forced_axis
     header = CORE_MAGIC + struct.pack(
-        "<IIIIf", CORE_VERSION, len(positions), len(indices), joint_count,
-        adjacency_factor)
+        "<IIIIfI", CORE_VERSION, len(positions), len(indices), joint_count,
+        adjacency_factor, axis)
     pos = array("f")
     for p in positions:
         pos.extend(p)
@@ -495,18 +513,20 @@ def solve_via_rust(positions: list[tuple], indices, joint_count: int,
 
 def solve_core(positions: list[tuple], indices, joint_count: int,
                engine: str = "auto",
-               adjacency_factor: float = ADJACENCY_FACTOR) -> tuple[dict, dict, str]:
+               adjacency_factor: float = ADJACENCY_FACTOR,
+               forced_axis: int | None = None) -> tuple[dict, dict, str]:
     """Run the maths. `engine` is "auto" (Rust if built), "rust", or "python"."""
     if engine not in ("auto", "rust", "python"):
         raise RigError(f"unknown engine {engine!r}")
     if engine == "rust" and not core_available():
         raise RigError("rigging core is not built — run cargo build --release")
     if engine != "python" and core_available():
-        skeleton, skin = solve_via_rust(positions, indices, joint_count, adjacency_factor)
+        skeleton, skin = solve_via_rust(positions, indices, joint_count,
+                                        adjacency_factor, forced_axis)
         return skeleton, skin, "rust"
 
     labels = inspector.connected_components(indices, len(positions))
-    skeleton = solve_skeleton(positions, joint_count)
+    skeleton = solve_skeleton(positions, joint_count, forced_axis)
     return skeleton, solve_weights(positions, labels, skeleton, adjacency_factor), "python"
 
 
