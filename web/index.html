@@ -17,6 +17,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* The UA's [hidden] rule loses to any class or id that sets display, so
+     `hidden` silently did nothing on the gasket chrome — the upload form,
+     shader deck and terminal all stayed on screen after being hidden. Fixed
+     once here for the whole page rather than per-element; this is the second
+     time this exact trap has bitten (see #stage-empty). */
+  [hidden] { display: none !important; }
   body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
   .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
   .banner { text-align: center; padding: 56px 0 28px; }
