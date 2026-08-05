@@ -142,11 +142,25 @@ class CodexDaemon:
             if response_queue is not None:
                 response_queue.put(message)
             elif message.get("method"):
+                method = message["method"]
+                params = message.get("params", {})
+                if method == "turn/completed" and (params.get("turn") or {}).get("status") == "failed":
+                    # The SSE broadcast below only reaches a browser that
+                    # happens to be attached at this instant. Print to
+                    # stdout too (captured by journalctl) so a failed turn
+                    # is still explainable after the tab is gone or the
+                    # service has restarted.
+                    error = (params.get("turn") or {}).get("error") or {}
+                    print(
+                        f"turn/completed FAILED thread={params.get('threadId')} "
+                        f"message={error.get('message')!r} additionalDetails={error.get('additionalDetails')!r}",
+                        flush=True,
+                    )
                 self._broadcast(
                     {
                         "type": "codex_event",
-                        "method": message["method"],
-                        "params": message.get("params", {}),
+                        "method": method,
+                        "params": params,
                         "ts": time.time(),
                     }
                 )

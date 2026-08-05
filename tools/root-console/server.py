@@ -13,6 +13,7 @@ server, matching the convention already used by tools/chat-captain.
 from __future__ import annotations
 
 import json
+import os
 import queue
 import sys
 import threading
@@ -25,8 +26,11 @@ from urllib.parse import parse_qs, urlsplit
 
 from auth import COOKIE_NAME, AuthConfig, LoginLimiter
 from codex_daemon import CodexDaemon, CodexError
+from claude_daemon import ClaudeDaemon
+import docs_corpus
 import handoff
 import research
+import ship_log
 from generated_images import (
     GENERATED_IMAGE_API_PREFIX,
     GENERATED_IMAGE_DIR,
@@ -233,6 +237,23 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
                 self._send_json({"error": str(exc)}, status=404)
                 return
             self._send_json({"file": filename, "content": content})
+        elif path == "/api/ship-log":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json({"entries": ship_log.collect(REPO_ROOT)})
+        elif path == "/api/docs-corpus":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json({"entries": docs_corpus.collect(REPO_ROOT)})
+        elif path == "/api/docs-corpus/related":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            entry_id = (query.get("id") or [""])[0]
+            entries = docs_corpus.collect(REPO_ROOT)
+            self._send_json({"related": docs_corpus.related(entries, entry_id)})
         elif path == "/api/research/packets":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
@@ -350,7 +371,8 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    daemon = CodexDaemon(cwd=REPO_ROOT)
+    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
+    daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
     RootConsoleHandler.daemon = daemon
     RootConsoleHandler.auth = AuthConfig.from_environment()
     RootConsoleHandler.login_limiter = LoginLimiter()

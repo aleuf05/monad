@@ -13,6 +13,7 @@ existing login flow keeps working unmodified for both services.
 from __future__ import annotations
 
 import json
+import os
 import queue
 import sys
 import time
@@ -26,6 +27,7 @@ from context_compiler import (
     ContextCompilerError,
     compile_live_captain_context,
     context_size_metrics,
+    load_optional_text,
     load_required_text,
 )
 from persistence import LiveCaptainStore, PersistenceError
@@ -37,6 +39,7 @@ ROOT_CONSOLE_DIR = Path(__file__).resolve().parent.parent / "root-console"
 if str(ROOT_CONSOLE_DIR) not in sys.path:
     sys.path.append(str(ROOT_CONSOLE_DIR))
 from generated_images import map_generated_images  # noqa: E402
+from claude_daemon import ClaudeDaemon  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = 4778
@@ -45,6 +48,8 @@ REPO_ROOT = ROOT_DIR.parent.parent
 KERNEL_PATH = ROOT_DIR / "prompts" / "captain-kernel.md"
 BEARING_PATH = ROOT_DIR / "context" / "current-bearing.md"
 LEDGER_PATH = ROOT_DIR / "context" / "continuity-ledger.md"
+CHANNEL_PATH = ROOT_DIR / "context" / "claude-channel.md"
+CHANNEL_PLACEHOLDER = "(no message from Claude right now)"
 DB_PATH = REPO_ROOT / "data" / "live-captain" / "live-captain.db"
 DIAGNOSTIC_LOG_PATH = REPO_ROOT / "data" / "live-captain" / "instruction-sources.log"
 RECENT_MESSAGE_LIMIT = 30
@@ -55,16 +60,20 @@ def load_context_sources(
     kernel_path: Path = KERNEL_PATH,
     bearing_path: Path = BEARING_PATH,
     ledger_path: Path = LEDGER_PATH,
+    channel_path: Path = CHANNEL_PATH,
 ) -> dict[str, str]:
     """Load one internally consistent context-source set.
 
     Context documents are deliberately editable operating state. Reloading
     them for each turn lets the Captain improve that state without requiring a
     service restart; validation still fails closed before a turn is recorded.
+    The Claude channel is the one exception -- it is allowed to be silent, so
+    it loads optionally rather than failing closed.
     """
     kernel_text, kernel_digest = load_required_text(kernel_path, "Captain kernel")
     bearing_text, bearing_digest = load_required_text(bearing_path, "Current bearing")
     ledger_text, ledger_digest = load_required_text(ledger_path, "Continuity ledger")
+    channel_text, channel_digest = load_optional_text(channel_path, CHANNEL_PLACEHOLDER)
     return {
         "kernel_text": kernel_text,
         "kernel_digest": kernel_digest,
@@ -72,6 +81,8 @@ def load_context_sources(
         "bearing_digest": bearing_digest,
         "ledger_text": ledger_text,
         "ledger_digest": ledger_digest,
+        "channel_text": channel_text,
+        "channel_digest": channel_digest,
     }
 
 
@@ -158,6 +169,8 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     "bearing_digest": self.bearing_digest,
                     "ledger_path": str(LEDGER_PATH),
                     "ledger_digest": self.ledger_digest,
+                    "channel_path": str(CHANNEL_PATH),
+                    "channel_digest": self.channel_digest,
                     "session_id": self.store.session_id,
                     "restart_count": self.store.restart_count(),
                     "recent_message_count": len(messages),
@@ -209,6 +222,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                 messages,
                 text,
                 omitted,
+                sources["channel_text"],
             )
         except ContextCompilerError as exc:
             self._send_json({"error": str(exc)}, status=500)
@@ -235,6 +249,22 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         try:
             result = self.daemon.send_and_wait(compiled)
         except (CodexError, ValueError) as exc:
+            failed_inference_ms = round((time.monotonic() - inference_started) * 1000, 3)
+            log_diagnostic(
+                {
+                    "ts": time.time(),
+                    "session_id": self.store.session_id,
+                    "kernel_digest": sources["kernel_digest"],
+                    "bearing_digest": sources["bearing_digest"],
+                    "ledger_digest": sources["ledger_digest"],
+                    "recent_message_count": len(messages),
+                    "omitted_older_messages": omitted,
+                    "context_metrics": context_metrics,
+                    "context_assembly_ms": context_assembly_ms,
+                    "failed_inference_ms": failed_inference_ms,
+                    "turn_error": str(exc),
+                }
+            )
             self._send_json({"error": str(exc)}, status=502)
             return
         inference_ms = round((time.monotonic() - inference_started) * 1000, 3)
@@ -302,7 +332,8 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
 def main() -> None:
     sources = load_context_sources()
     store = LiveCaptainStore(DB_PATH)
-    daemon = CodexDaemon(cwd=REPO_ROOT)
+    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
+    daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
 
     LiveCaptainHandler.daemon = daemon
     LiveCaptainHandler.store = store

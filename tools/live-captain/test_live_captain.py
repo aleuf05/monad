@@ -11,6 +11,7 @@ import tempfile
 import unittest
 import json
 import hashlib
+import sqlite3
 import subprocess
 from pathlib import Path
 from unittest import mock
@@ -24,13 +25,20 @@ from context_compiler import (
     format_chronological_messages,
     load_required_text,
 )
-from persistence import LiveCaptainStore, PersistenceError
+from persistence import (
+    LiveCaptainStore,
+    PersistenceError,
+    load_admiral_attestation_read_only,
+)
 from run_tests import append_report, build_report
-from server import browser_sse_payload, load_context_sources
+from server import LiveCaptainHandler, browser_sse_payload, load_context_sources
+from auth import COOKIE_NAME, AuthConfig
 import generated_images
 from context_metabolism import (
     ContinuityFact,
+    LiteralKeyContract,
     PromotionPolicy,
+    assess_literal_key_semantics,
     assess_candidate,
     audit_ledger,
     consolidate,
@@ -40,6 +48,134 @@ from context_metabolism import (
     promotion_decision,
     ingest_attested_candidate,
 )
+
+# server's import of claude_daemon (tools/root-console) appends that
+# directory to sys.path as a side effect; import it directly here too.
+import claude_daemon  # noqa: E402
+
+
+class _FakeStdin:
+    def __init__(self, on_line):
+        self._on_line = on_line
+
+    def write(self, line):
+        self._on_line(line)
+
+    def flush(self):
+        pass
+
+
+class _FakeStdout:
+    """Blocking line iterator fed by the test, standing in for the real
+    `claude` subprocess's stdout pipe."""
+
+    def __init__(self):
+        self._queue: "__import__('queue').Queue[str | None]" = __import__("queue").Queue()
+
+    def push(self, line):
+        self._queue.put(line)
+
+    def close(self):
+        self._queue.put(None)
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = self._queue.get()
+        if line is None:
+            raise StopIteration
+        return line
+
+
+class _FakeProcess:
+    def __init__(self, on_stdin_line):
+        self.stdin = _FakeStdin(on_stdin_line)
+        self.stdout = _FakeStdout()
+
+    def poll(self):
+        return None
+
+
+class ClaudeDaemonConcurrencyTests(unittest.TestCase):
+    """Regression test for the concurrency-stress-test finding (2026-08-02):
+    two /api/turn requests arriving close together produced two identical
+    persisted Captain replies. Root cause was `send_and_wait` subscribing
+    to the broadcast stream *before* acquiring `_turn_lock`, so a waiting
+    caller's queue silently accumulated another caller's completion events
+    and returned them as its own. Fix: subscribe only after the lock is
+    held, immediately before writing this call's own turn."""
+
+    def _make_daemon(self):
+        self.fake_process = None
+
+        def fake_popen(*args, **kwargs):
+            self.fake_process = _FakeProcess(self._on_stdin_line)
+            return self.fake_process
+
+        self.stdin_lines: list[str] = []
+        self._stdin_lock = __import__("threading").Lock()
+
+        with mock.patch.object(claude_daemon.subprocess, "Popen", side_effect=fake_popen):
+            daemon = claude_daemon.ClaudeDaemon(cwd=Path("."))
+        return daemon
+
+    def _on_stdin_line(self, line):
+        with self._stdin_lock:
+            self.stdin_lines.append(line)
+
+    def _push_reply(self, process, text):
+        process.stdout.push(json.dumps({"type": "assistant", "message": {"content": [{"type": "text", "text": text}]}}))
+        process.stdout.push(json.dumps({"type": "result", "is_error": False, "usage": {}}))
+
+    def test_concurrent_turns_do_not_cross_deliver_replies(self):
+        import threading
+        import time
+
+        daemon = self._make_daemon()
+        process = self.fake_process
+
+        a_write_seen = threading.Event()
+        results: dict[str, dict] = {}
+        errors: list[Exception] = []
+
+        original_write_turn = daemon._write_turn
+
+        def instrumented_write_turn(text):
+            thread_id = original_write_turn(text)
+            a_write_seen.set()
+            return thread_id
+
+        def run_a():
+            try:
+                daemon._write_turn = instrumented_write_turn
+                results["a"] = daemon.send_and_wait("TURN-A")
+            except Exception as exc:  # noqa: BLE001
+                errors.append(exc)
+
+        thread_a = threading.Thread(target=run_a)
+        thread_a.start()
+        self.assertTrue(a_write_seen.wait(timeout=2), "turn A was never written")
+
+        # Turn A now holds _turn_lock and is blocked reading its own
+        # completion events. Start turn B; under the fixed code it cannot
+        # subscribe until it acquires the lock, so it must not see what we
+        # broadcast next.
+        thread_b = threading.Thread(target=lambda: results.__setitem__("b", daemon.send_and_wait("TURN-B")))
+        thread_b.start()
+        time.sleep(0.1)  # give B a chance to (incorrectly) subscribe early if the bug regresses
+
+        self._push_reply(process, "REPLY-A")
+        thread_a.join(timeout=2)
+        self.assertFalse(thread_a.is_alive(), "turn A did not complete")
+
+        self._push_reply(process, "REPLY-B")
+        thread_b.join(timeout=2)
+        self.assertFalse(thread_b.is_alive(), "turn B did not complete")
+
+        self.assertFalse(errors, f"unexpected errors: {errors}")
+        self.assertEqual(results["a"]["text"], "REPLY-A")
+        self.assertEqual(results["b"]["text"], "REPLY-B")
 
 
 class LedgerAuditTests(unittest.TestCase):
@@ -253,11 +389,13 @@ class ContextMetabolismTests(unittest.TestCase):
         digest = hashlib.sha256(evidence).hexdigest()
         payload = json.dumps(
             {
-                "schema": "live-captain-candidate/v1",
+                "schema": "live-captain-candidate/v2",
                 "key": "conference.token",
                 "value": "Conference",
                 "evidence_ref": "command:157",
                 "evidence_sha256": digest,
+                "evidence_start": 17,
+                "evidence_end": 27,
             }
         )
         candidate = ingest_attested_candidate(payload, {"command:157": evidence})
@@ -281,11 +419,13 @@ class ContextMetabolismTests(unittest.TestCase):
         evidence = b"external command record"
         payload = json.dumps(
             {
-                "schema": "live-captain-candidate/v1",
+                "schema": "live-captain-candidate/v2",
                 "key": "conference.token",
                 "value": "Conference",
                 "evidence_ref": "command:157",
                 "evidence_sha256": "0" * 64,
+                "evidence_start": 0,
+                "evidence_end": 8,
             }
         )
         with self.assertRaisesRegex(ValueError, "independently available"):
@@ -296,11 +436,13 @@ class ContextMetabolismTests(unittest.TestCase):
     def test_candidate_ingestion_rejects_schema_drift(self):
         payload = json.dumps(
             {
-                "schema": "live-captain-candidate/v1",
+                "schema": "live-captain-candidate/v2",
                 "key": "conference.token",
                 "value": "Conference",
                 "evidence_ref": "command:157",
                 "evidence_sha256": "0" * 64,
+                "evidence_start": 0,
+                "evidence_end": 8,
                 "model_confidence": 1.0,
             }
         )
@@ -316,11 +458,13 @@ class ContextMetabolismTests(unittest.TestCase):
             evidence_ref, evidence = store.load_admiral_attestation(seq)
             payload = json.dumps(
                 {
-                    "schema": "live-captain-candidate/v1",
+                    "schema": "live-captain-candidate/v2",
                     "key": "conference.token",
                     "value": "Conference",
                     "evidence_ref": evidence_ref,
                     "evidence_sha256": hashlib.sha256(evidence).hexdigest(),
+                    "evidence_start": 0,
+                    "evidence_end": 10,
                 }
             )
             candidate = ingest_attested_candidate(payload, {evidence_ref: evidence})
@@ -334,12 +478,101 @@ class ContextMetabolismTests(unittest.TestCase):
             )
             self.assertEqual(decision.action, "promote")
 
+    def test_candidate_ingestion_binds_value_to_exact_evidence_span(self):
+        evidence = "Admiral says: café is ready".encode("utf-8")
+        base = {
+            "schema": "live-captain-candidate/v2",
+            "key": "studio.state",
+            "value": "café",
+            "evidence_ref": "command:span",
+            "evidence_sha256": hashlib.sha256(evidence).hexdigest(),
+            "evidence_start": 14,
+            "evidence_end": 18,
+        }
+        candidate = ingest_attested_candidate(
+            json.dumps(base), {"command:span": evidence}
+        )
+        self.assertEqual(candidate.value, "café")
+        self.assertTrue(candidate.source.endswith("#chars:14-18"))
+
+        forged = dict(base, value="done")
+        with self.assertRaisesRegex(ValueError, "does not match"):
+            ingest_attested_candidate(json.dumps(forged), {"command:span": evidence})
+
+    def test_candidate_ingestion_rejects_invalid_evidence_span(self):
+        evidence = b"Conference"
+        payload = {
+            "schema": "live-captain-candidate/v2",
+            "key": "conference.token",
+            "value": "Conference",
+            "evidence_ref": "command:span",
+            "evidence_sha256": hashlib.sha256(evidence).hexdigest(),
+            "evidence_start": 0,
+            "evidence_end": 99,
+        }
+        with self.assertRaisesRegex(ValueError, "out of range"):
+            ingest_attested_candidate(json.dumps(payload), {"command:span": evidence})
+
+    def test_literal_key_semantics_proves_only_declared_admiral_span(self):
+        evidence = b"be bold Captain"
+        payload = json.dumps(
+            {
+                "schema": "live-captain-candidate/v2",
+                "key": "admiral.message.literal",
+                "value": "be bold Captain",
+                "evidence_ref": "message:admiral:218",
+                "evidence_sha256": hashlib.sha256(evidence).hexdigest(),
+                "evidence_start": 0,
+                "evidence_end": len(evidence),
+            }
+        )
+        candidate = ingest_attested_candidate(
+            payload, {"message:admiral:218": evidence}
+        )
+        assessment = assess_literal_key_semantics(
+            candidate, LiteralKeyContract("admiral.message.literal")
+        )
+        self.assertTrue(assessment.supported)
+        self.assertIn("only the exact", assessment.reason)
+
+    def test_literal_key_semantics_rejects_interpretive_key_and_source(self):
+        contract = LiteralKeyContract("admiral.message.literal")
+        interpreted = ContinuityFact(
+            "commissioning.authorization.scope",
+            "be bold Captain",
+            "attested:message:admiral:218#sha256:digest#chars:0-15",
+        )
+        wrong_source = ContinuityFact(
+            "admiral.message.literal",
+            "be bold Captain",
+            "attested:command:218#sha256:digest#chars:0-15",
+        )
+        self.assertFalse(assess_literal_key_semantics(interpreted, contract).supported)
+        self.assertFalse(assess_literal_key_semantics(wrong_source, contract).supported)
+
     def test_captain_message_cannot_attest_candidate(self):
         with tempfile.TemporaryDirectory() as tmp:
             store = LiveCaptainStore(Path(tmp) / "test.db")
             seq = store.record_message("captain", "Conference", "kd", "bd", "ld")
             with self.assertRaisesRegex(PersistenceError, "only persisted Admiral"):
                 store.load_admiral_attestation(seq)
+
+    def test_read_only_attestation_does_not_record_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.db"
+            store = LiveCaptainStore(db_path)
+            seq = store.record_message("admiral", "Keep the session light", "kd", "bd", "ld")
+            restart_count = store.restart_count()
+            store.close()
+
+            evidence_ref, evidence = load_admiral_attestation_read_only(db_path, seq)
+
+            self.assertEqual(evidence_ref, f"message:admiral:{seq}")
+            self.assertEqual(evidence, b"Keep the session light")
+            connection = sqlite3.connect(db_path)
+            observed_count = connection.execute("SELECT COUNT(*) FROM restarts").fetchone()[0]
+            connection.close()
+            self.assertEqual(observed_count, restart_count)
 
 
 class PersistenceTests(unittest.TestCase):
@@ -524,6 +757,103 @@ class ContextSourceReloadTests(unittest.TestCase):
 
             with self.assertRaises(ContextCompilerError):
                 load_context_sources(kernel, bearing, ledger)
+
+
+class EndToEndHttpBootTests(unittest.TestCase):
+    """Closes the boot-audit gap named in
+    docs/logs/2026-08-02-boot-process-audit.md: prior coverage was
+    unit-level plus one historical live restart, never a test that actually
+    starts this server and talks to it over a real HTTP socket. The Codex
+    daemon is stubbed (subprocess spawn is not what this gap is about); the
+    HTTP server, auth, and request/response wiring are all real."""
+
+    class _FakeDaemon:
+        def send_and_wait(self, compiled_text, sandbox=None, timeout=180):
+            return {
+                "text": "fake reply",
+                "thread_id": "test-thread-id",
+                "sandbox": "workspace-write",
+                "approval_policy": "never",
+                "thread_start_result": {},
+            }
+
+        def status(self):
+            return {"running": True, "pid": 0, "backend": "fake"}
+
+    def setUp(self):
+        import threading
+        from http.server import ThreadingHTTPServer
+
+        self.auth = AuthConfig(
+            salt=b"0" * 16,
+            password_hash=hashlib.scrypt(b"unused", salt=b"0" * 16, n=2**14, r=8, p=1, dklen=32),
+            session_secret=b"1" * 32,
+        )
+        self._tmpdir = tempfile.TemporaryDirectory()
+        self.store = LiveCaptainStore(Path(self._tmpdir.name) / "test.db")
+
+        LiveCaptainHandler.daemon = self._FakeDaemon()
+        LiveCaptainHandler.store = self.store
+        LiveCaptainHandler.auth = self.auth
+        for name, value in load_context_sources().items():
+            setattr(LiveCaptainHandler, name, value)
+
+        self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), LiveCaptainHandler)
+        self.port = self.httpd.server_address[1]
+        self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
+        self.thread.start()
+
+    def tearDown(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
+        self.thread.join(timeout=5)
+        self._tmpdir.cleanup()
+
+    def _url(self, path):
+        return f"http://127.0.0.1:{self.port}{path}"
+
+    def test_status_over_real_socket_requires_authentication(self):
+        import urllib.error
+        import urllib.request
+
+        with self.assertRaises(urllib.error.HTTPError) as ctx:
+            urllib.request.urlopen(urllib.request.Request(self._url("/api/status")), timeout=5)
+        self.assertEqual(ctx.exception.code, 401)
+
+    def test_status_over_real_socket_with_valid_session(self):
+        import urllib.request
+
+        cookie = self.auth.issue_session()
+        request = urllib.request.Request(
+            self._url("/api/status"), headers={"Cookie": f"{COOKIE_NAME}={cookie}"}
+        )
+        with urllib.request.urlopen(request, timeout=5) as response:
+            self.assertEqual(response.status, 200)
+            body = json.loads(response.read())
+        self.assertIn("kernel_digest", body)
+        self.assertIn("bearing_digest", body)
+        self.assertIn("ledger_digest", body)
+        self.assertEqual(body["session_id"], self.store.session_id)
+
+    def test_turn_over_real_socket_persists_and_returns_reply(self):
+        import urllib.request
+
+        cookie = self.auth.issue_session()
+        payload = json.dumps({"text": "end-to-end boot test message"}).encode("utf-8")
+        request = urllib.request.Request(
+            self._url("/api/turn"),
+            data=payload,
+            method="POST",
+            headers={"Cookie": f"{COOKIE_NAME}={cookie}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=5) as response:
+            self.assertEqual(response.status, 200)
+            body = json.loads(response.read())
+        self.assertEqual(body["text"], "fake reply")
+        self.assertEqual(body["thread_id"], "test-thread-id")
+
+        messages, _ = self.store.load_recent_messages(10)
+        self.assertTrue(any(m["text"] == "end-to-end boot test message" for m in messages))
 
 
 if __name__ == "__main__":

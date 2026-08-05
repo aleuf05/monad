@@ -78,6 +78,21 @@ class PromotionDecision:
 
 
 @dataclass(frozen=True)
+class LiteralKeyContract:
+    """A narrow, mechanically checkable meaning for a literal-span key."""
+
+    key: str
+    trusted_source_prefix: str = "attested:message:admiral:"
+
+
+@dataclass(frozen=True)
+class KeySemanticAssessment:
+    candidate: ContinuityFact
+    supported: bool
+    reason: str
+
+
+@dataclass(frozen=True)
 class CandidateEnvelope:
     """A candidate whose provenance was checked outside model-authored prose."""
 
@@ -86,6 +101,8 @@ class CandidateEnvelope:
     value: str
     evidence_ref: str
     evidence_sha256: str
+    evidence_start: int
+    evidence_end: int
 
 
 def ingest_attested_candidate(
@@ -107,13 +124,21 @@ def ingest_attested_candidate(
         "value",
         "evidence_ref",
         "evidence_sha256",
+        "evidence_start",
+        "evidence_end",
     }
     if not isinstance(raw, dict) or set(raw) != required:
         raise ValueError("candidate envelope has unknown or missing fields")
-    if not all(isinstance(raw[field], str) and raw[field].strip() for field in required):
+    text_fields = required - {"evidence_start", "evidence_end"}
+    if not all(isinstance(raw[field], str) and raw[field].strip() for field in text_fields):
         raise ValueError("candidate envelope fields must be non-empty strings")
+    if not all(
+        isinstance(raw[field], int) and not isinstance(raw[field], bool)
+        for field in ("evidence_start", "evidence_end")
+    ):
+        raise ValueError("candidate evidence span must use integer character offsets")
     envelope = CandidateEnvelope(**raw)
-    if envelope.schema != "live-captain-candidate/v1":
+    if envelope.schema != "live-captain-candidate/v2":
         raise ValueError("unsupported candidate schema")
     evidence = attestations.get(envelope.evidence_ref)
     if evidence is None:
@@ -121,10 +146,44 @@ def ingest_attested_candidate(
     actual_digest = hashlib.sha256(evidence).hexdigest()
     if envelope.evidence_sha256 != actual_digest:
         raise ValueError("candidate evidence digest mismatch")
+    try:
+        evidence_text = evidence.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise ValueError("candidate evidence must be valid UTF-8") from exc
+    if not 0 <= envelope.evidence_start < envelope.evidence_end <= len(evidence_text):
+        raise ValueError("candidate evidence span is out of range")
+    extracted = evidence_text[envelope.evidence_start : envelope.evidence_end]
+    if extracted != envelope.value:
+        raise ValueError("candidate value does not match its exact evidence span")
     return ContinuityFact(
         envelope.key,
         envelope.value,
-        f"attested:{envelope.evidence_ref}#sha256:{actual_digest}",
+        (
+            f"attested:{envelope.evidence_ref}#sha256:{actual_digest}"
+            f"#chars:{envelope.evidence_start}-{envelope.evidence_end}"
+        ),
+    )
+
+
+def assess_literal_key_semantics(
+    candidate: ContinuityFact, contract: LiteralKeyContract
+) -> KeySemanticAssessment:
+    """Prove only that a key denotes an exact span from a trusted source class.
+
+    The candidate must come from ``ingest_attested_candidate``. This check does
+    not infer that the quote is an order, preference, durable commitment, or
+    any other interpretation.
+    """
+    if candidate.key != contract.key:
+        return KeySemanticAssessment(candidate, False, "key has no matching literal contract")
+    if not candidate.source.startswith(contract.trusted_source_prefix):
+        return KeySemanticAssessment(candidate, False, "source is outside literal contract")
+    if re.search(r"#chars:\d+-\d+$", candidate.source) is None:
+        return KeySemanticAssessment(candidate, False, "source lacks a verified character span")
+    return KeySemanticAssessment(
+        candidate,
+        True,
+        "key denotes only the exact attested Admiral-authored character span",
     )
 
 

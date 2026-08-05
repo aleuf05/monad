@@ -24,11 +24,10 @@ source so it can be checked rather than inherited as an unsupported summary.
 
 ## Unresolved proofs
 
-- Bind candidate assertions to an exact span or other independently checkable
-  extraction from attested evidence before permitting any automatic edit of
-  governing context. The live persistence adapter proves evidence origin, but
-  a genuine source can still be paired with a candidate value not entailed by
-  its bytes. Source: First Metacircular Address, sections 6, 7, and 13;
+- Literal extraction still does not prove that a candidate key is the correct
+  interpretation of the extracted value. Keep promotion read-only until that
+  semantic boundary has a comparably inspectable proof. Source: First
+  Metacircular Address, sections 6, 7, and 13;
   `tools/live-captain/context_metabolism.py`; `tools/live-captain/persistence.py`.
 
 ## Verified state
@@ -130,3 +129,39 @@ source so it can be checked rather than inherited as an unsupported summary.
   `tools/live-captain/persistence.py`, `tools/live-captain/test_live_captain.py`,
   and verification record in `data/live-captain/test-runs.jsonl` at
   2026-08-02T08:34:23Z.
+- Candidate schema v2 now requires an exact character range in independently
+  attested UTF-8 evidence. Ingestion fails closed when offsets are invalid or
+  the extracted text differs from the candidate value; the attested source
+  retains the verified range. Two added tests bring the focused suite to 45
+  passing tests. The boundary remains read-only and no ledger writer was added.
+  Source: 2026-08-02 Cognitive Jiu-Jitsu session;
+  `tools/live-captain/context_metabolism.py` and
+  `tools/live-captain/test_live_captain.py`; verification record in
+  `data/live-captain/test-runs.jsonl` at 2026-08-02T09:08:22Z.
+- A read-only live dry run ingested persisted Admiral message 217 using its full
+  character range `0-52`. It reproduced the literal order, retained the message
+  reference, SHA-256 digest, and range, and made no ledger mutation. The
+  provisional key was deliberately not promoted, preserving the distinction
+  between verified extraction and semantic interpretation. Source:
+  `data/live-captain/live-captain.db`, message 217; dry run and evidence record
+  in `docs/logs/2026-08-02-cognitive-jiu-jitsu-exact-span.md` on 2026-08-02.
+- A read-only loader now retrieves persisted Admiral evidence without running
+  migrations or recording a service restart. Against real message 214, exact
+  span `773-795` reproduced `Keep the session light`; restart rows remained
+  `5` before and after. The candidate nevertheless reached the policy action
+  `promote` under an explicitly allowlisted key, demonstrating that this action
+  proves policy eligibility rather than the semantic correctness of the key.
+  No ledger writer exists. One added test brings the focused suite to 46
+  passing tests. Source: `tools/live-captain/persistence.py`,
+  `tools/live-captain/test_live_captain.py`, persisted message 214, and
+  `docs/logs/2026-08-02-cognitive-jiu-jitsu-exact-span.md` on 2026-08-02.
+- Candidate-key semantics now have one narrow, executable proof: a declared
+  literal key can mean only the exact character span retained from an attested
+  Admiral-message source. Interpretive keys and other source classes fail
+  closed. A live read-only dry run proved `admiral.message.literal` for message
+  224 (`be bold Captain`, range `0-15`) and rejected an interpretive contract
+  for the same candidate. No promotion or ledger mutation occurred. Two added
+  tests bring the focused suite to 48 passing tests. Source:
+  `tools/live-captain/context_metabolism.py`,
+  `tools/live-captain/test_live_captain.py`, persisted Admiral message 224, and
+  `docs/logs/2026-08-02-cognitive-jiu-jitsu-exact-span.md` on 2026-08-02.
