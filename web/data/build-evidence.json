@@ -32,8 +32,8 @@
   "metrics": [
     {
       "k": "rigged assets",
-      "v": "2",
-      "note": "corpus had 0 this morning"
+      "v": "9 / 9",
+      "note": "whole corpus, 4,454,579 vertices, 0 refused, 0 errors"
     },
     {
       "k": "solver engine",
@@ -59,12 +59,101 @@
       "k": "weight error",
       "v": "2.98e-8",
       "note": "max deviation from a weight sum of exactly 1.0"
+    },
+    {
+      "k": "corpus solve",
+      "v": "35s",
+      "note": "every static asset rigged and deformation-probed end to end"
     }
   ],
   "findings": [
     "Per-shell weight solving eliminates pinching completely \u2014 0 collapsed, 0 inverted, 0 torn faces at every bend angle tested.",
+    "Every static asset in the corpus rigs: 9 of 9, no refusals, no errors. The multi-primitive limit never bit \u2014 the whole corpus is single-primitive.",
     "What it does not eliminate is collision: 160 shell pairs newly overlap at 15 degrees, 399 at 60. Rigid parts swing into each other.",
     "The corpus's fragmentation scale (~0.18 on gasket's axis) bounds useful bone density. Below it, skinning degenerates to rigid part binding.",
     "Two figures in the LUCA packets, given without sources, turned out real and citable \u2014 the material was carrying good science under bad packaging."
+  ],
+  "corpus": [
+    {
+      "name": "kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 798.08,
+      "verdict": "warn"
+    },
+    {
+      "name": "21ddb560-0090-40e0-a0df-948e99dcd171_5fc12f696f79cffe6e53a5ddbc992b3f.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 760.1,
+      "verdict": "warn"
+    },
+    {
+      "name": "20260729T123905Z-21751df24fbb.glb",
+      "vertices": 28586,
+      "shells": 133,
+      "rigid": 103,
+      "blended": 30,
+      "ms": 30.48,
+      "verdict": "warn"
+    },
+    {
+      "name": "kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 924.67,
+      "verdict": "warn"
+    },
+    {
+      "name": "end-to-end-manual.glb",
+      "vertices": 282840,
+      "shells": 1764,
+      "rigid": 1677,
+      "blended": 87,
+      "ms": 197.43,
+      "verdict": "warn"
+    },
+    {
+      "name": "file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "vertices": 284844,
+      "shells": 3634,
+      "rigid": 3590,
+      "blended": 44,
+      "ms": 188.63,
+      "verdict": "warn"
+    },
+    {
+      "name": "gasket.glb",
+      "vertices": 29378,
+      "shells": 395,
+      "rigid": 374,
+      "blended": 21,
+      "ms": 20.68,
+      "verdict": "warn"
+    },
+    {
+      "name": "the-monad.glb",
+      "vertices": 315157,
+      "shells": 4676,
+      "rigid": 4609,
+      "blended": 67,
+      "ms": 213.97,
+      "verdict": "warn"
+    },
+    {
+      "name": "uss-rubber-ducky.glb",
+      "vertices": 282840,
+      "shells": 1764,
+      "rigid": 1677,
+      "blended": 87,
+      "ms": 196.68,
+      "verdict": "warn"
+    }
   ]
 }

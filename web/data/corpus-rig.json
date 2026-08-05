@@ -1,0 +1,623 @@
+{
+  "generated": "2026-08-05",
+  "joints_requested": 8,
+  "attempted": 9,
+  "rigged": 9,
+  "refused": 0,
+  "errors": 0,
+  "total_vertices": 4454579,
+  "assets": [
+    {
+      "asset": "kraken_tripo_v1.glb",
+      "path": "assets/intake/kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "bytes": 62131344,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 1,076,978 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "1831 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/kraken_tripo_v1-rigged.glb",
+      "joints": 8,
+      "shells": 1831,
+      "rigid_shells": 1811,
+      "blended_shells": 20,
+      "rigged_bytes": 87980752,
+      "solve_ms": 798.08,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "182 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 182,
+            "max_stretch": 1.1051276630301403
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 419,
+            "max_stretch": 1.3160050033807833
+          }
+        ]
+      },
+      "elapsed_ms": 8021.1
+    },
+    {
+      "asset": "21ddb560-0090-40e0-a0df-948e99dcd171_5fc12f696f79cffe6e53a5ddbc992b3f.glb",
+      "path": "assets/intake/originals/21ddb560-0090-40e0-a0df-948e99dcd171_5fc12f696f79cffe6e53a5ddbc992b3f.glb",
+      "vertices": 1076978,
+      "bytes": 62131344,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 1,076,978 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "1831 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/21ddb560-0090-40e0-a0df-948e99dcd171_5fc12f696f79cffe6e53a5ddbc992b3f-rigged.glb",
+      "joints": 8,
+      "shells": 1831,
+      "rigid_shells": 1811,
+      "blended_shells": 20,
+      "rigged_bytes": 87980752,
+      "solve_ms": 760.1,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "182 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 182,
+            "max_stretch": 1.1051276630301403
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 419,
+            "max_stretch": 1.3160050033807833
+          }
+        ]
+      },
+      "elapsed_ms": 7961.7
+    },
+    {
+      "asset": "20260729T123905Z-21751df24fbb.glb",
+      "path": "data/mike-rocketry-intake/20260729T123905Z-21751df24fbb.glb",
+      "vertices": 28586,
+      "bytes": 1926500,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 28,586 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "133 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/20260729T123905Z-21751df24fbb-rigged.glb",
+      "joints": 8,
+      "shells": 133,
+      "rigid_shells": 103,
+      "blended_shells": 30,
+      "rigged_bytes": 2614388,
+      "solve_ms": 30.48,
+      "engine": "rust",
+      "max_weight_error": 0,
+      "probe": {
+        "verdict": "warn",
+        "note": "17 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 17,
+            "max_stretch": 1.0990051622456147
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 29,
+            "max_stretch": 1.3004829817470929
+          }
+        ]
+      },
+      "elapsed_ms": 218.2
+    },
+    {
+      "asset": "kraken_tripo_v1.glb",
+      "path": "web/assets/intake/kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "bytes": 62131344,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 1,076,978 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "1831 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/kraken_tripo_v1-rigged.glb",
+      "joints": 8,
+      "shells": 1831,
+      "rigid_shells": 1811,
+      "blended_shells": 20,
+      "rigged_bytes": 87980752,
+      "solve_ms": 924.67,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "182 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 182,
+            "max_stretch": 1.1051276630301403
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 419,
+            "max_stretch": 1.3160050033807833
+          }
+        ]
+      },
+      "elapsed_ms": 8663.8
+    },
+    {
+      "asset": "end-to-end-manual.glb",
+      "path": "web/assets/models/end-to-end-manual.glb",
+      "vertices": 282840,
+      "bytes": 30705172,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 282,840 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "1764 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/end-to-end-manual-rigged.glb",
+      "joints": 8,
+      "shells": 1764,
+      "rigid_shells": 1677,
+      "blended_shells": 87,
+      "rigged_bytes": 37495276,
+      "solve_ms": 197.43,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "720 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 720,
+            "max_stretch": 1.163335814699253
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 3,
+            "collapsed": 2,
+            "torn": 0,
+            "clipping_pairs": 1571,
+            "max_stretch": 1.4905682480483047
+          }
+        ]
+      },
+      "elapsed_ms": 2214.6
+    },
+    {
+      "asset": "file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "path": "web/assets/models/file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "vertices": 284844,
+      "bytes": 57445144,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 284,844 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "3634 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/file_00000000a68c722f9cd29e1996dba4cf-rigged.glb",
+      "joints": 8,
+      "shells": 3634,
+      "rigid_shells": 3590,
+      "blended_shells": 44,
+      "rigged_bytes": 64283332,
+      "solve_ms": 188.63,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "1,702 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 1,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 1702,
+            "max_stretch": 1.0954191735856151
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 3,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 4329,
+            "max_stretch": 1.2886107657613348
+          }
+        ]
+      },
+      "elapsed_ms": 2605.9
+    },
+    {
+      "asset": "gasket.glb",
+      "path": "web/assets/models/gasket/gasket.glb",
+      "vertices": 29378,
+      "bytes": 2491644,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 29,378 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "395 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/gasket-rigged.glb",
+      "joints": 8,
+      "shells": 395,
+      "rigid_shells": 374,
+      "blended_shells": 21,
+      "rigged_bytes": 3198532,
+      "solve_ms": 20.68,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "160 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 160,
+            "max_stretch": 1.0329494047138519
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 334,
+            "max_stretch": 1.1019646560202259
+          }
+        ]
+      },
+      "elapsed_ms": 178.3
+    },
+    {
+      "asset": "the-monad.glb",
+      "path": "web/assets/models/the-monad.glb",
+      "vertices": 315157,
+      "bytes": 32560820,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 315,157 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "4676 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/the-monad-rigged.glb",
+      "joints": 8,
+      "shells": 4676,
+      "rigid_shells": 4609,
+      "blended_shells": 67,
+      "rigged_bytes": 40126532,
+      "solve_ms": 213.97,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "4,838 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 3,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 4838,
+            "max_stretch": 1.0356933162164024
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 8,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 10095,
+            "max_stretch": 1.109722600715238
+          }
+        ]
+      },
+      "elapsed_ms": 2436.5
+    },
+    {
+      "asset": "uss-rubber-ducky.glb",
+      "path": "web/assets/models/uss-rubber-ducky.glb",
+      "vertices": 282840,
+      "bytes": 30705172,
+      "gates": [
+        {
+          "gate": "parses",
+          "passed": true,
+          "detail": "readable binary glTF"
+        },
+        {
+          "gate": "has geometry",
+          "passed": true,
+          "detail": "1 mesh, 282,840 vertices"
+        },
+        {
+          "gate": "not already rigged",
+          "passed": true,
+          "detail": "static \u2014 a skeleton will be synthesised"
+        },
+        {
+          "gate": "single primitive",
+          "passed": true,
+          "detail": "1 primitive"
+        },
+        {
+          "gate": "shell analysis",
+          "passed": true,
+          "detail": "1764 disjoint shells, weight-bleed risk high"
+        }
+      ],
+      "status": "rigged",
+      "dest": "web/assets/rigged/uss-rubber-ducky-rigged.glb",
+      "joints": 8,
+      "shells": 1764,
+      "rigid_shells": 1677,
+      "blended_shells": 87,
+      "rigged_bytes": 37495276,
+      "solve_ms": 196.68,
+      "engine": "rust",
+      "max_weight_error": 2.9802322387695312e-08,
+      "probe": {
+        "verdict": "warn",
+        "note": "720 shell pairs newly overlapping \u2014 parts driven into each other",
+        "poses": [
+          {
+            "degrees": 15.0,
+            "verdict": "warn",
+            "inverted": 0,
+            "collapsed": 0,
+            "torn": 0,
+            "clipping_pairs": 720,
+            "max_stretch": 1.163335814699253
+          },
+          {
+            "degrees": 45.0,
+            "verdict": "warn",
+            "inverted": 3,
+            "collapsed": 2,
+            "torn": 0,
+            "clipping_pairs": 1571,
+            "max_stretch": 1.4905682480483047
+          }
+        ]
+      },
+      "elapsed_ms": 2284.6
+    }
+  ]
+}

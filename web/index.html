@@ -174,6 +174,12 @@
   .be-c .be-sha { color: #E8A33D; flex: none; }
   .be-c .be-subj { color: #C6D5E8; }
   .be-diff { font-size: 10.5px; color: #6B7C93; margin-top: 8px; }
+  .be-table { width: 100%; border-collapse: collapse; font-size: 10.5px; display: block; overflow-x: auto; }
+  .be-table th { text-align: right; color: #6B7C93; font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; padding: 5px 8px; border-bottom: 1px solid #1E2C42; white-space: nowrap; }
+  .be-table th:first-child, .be-table td:first-child { text-align: left; }
+  .be-table td { text-align: right; padding: 5px 8px; border-bottom: 1px solid #131E2E; color: #9AACBF; white-space: nowrap; }
+  .be-table td:first-child { color: #C6D5E8; }
+  .be-table td.pass { color: #4FD1C5; } .be-table td.warn { color: #E8A33D; } .be-table td.fail { color: #E05252; }
 
   /* Rig Bench — deliberately the loudest panel on the stage. It is the first
      thing out of the rigging pipeline that a visitor can actually operate. */
@@ -768,6 +774,21 @@
           d.findings.forEach(function (f) {
             html += '<div class="be-find">' + f + "</div>";
           });
+
+          if (d.corpus && d.corpus.length) {
+            html += '<div class="be-sect">Corpus — every static asset, rigged and probed</div>';
+            html += '<table class="be-table"><thead><tr><th>asset</th><th>vertices</th>' +
+              "<th>shells</th><th>rigid</th><th>blended</th><th>solve</th><th>probe</th>" +
+              "</tr></thead><tbody>";
+            d.corpus.forEach(function (a) {
+              html += "<tr><td>" + a.name + "</td><td>" + a.vertices.toLocaleString() +
+                "</td><td>" + a.shells.toLocaleString() + "</td><td>" +
+                a.rigid.toLocaleString() + "</td><td>" + a.blended.toLocaleString() +
+                "</td><td>" + a.ms.toFixed(0) + "ms</td>" +
+                '<td class="' + a.verdict + '">' + a.verdict + "</td></tr>";
+            });
+            html += "</tbody></table>";
+          }
 
           html += '<div class="be-sect">Commits</div><div class="be-commits">';
           d.commits.forEach(function (c) {

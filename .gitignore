@@ -51,3 +51,12 @@ web/assets/libfive/*.stl
 # web/data/*.json feeds.
 web/captain-images/*
 tools/aegis-rig/rust/target/
+
+# Rigged assets are derived artifacts: EXECUTE regenerates them byte-identically
+# from source + solver (test_parity proves the sha256 matches). 345MB of GLB
+# does not delta-compress, so committing all of it would near-triple the repo
+# for data one command reproduces:
+#     python3 tools/aegis-rig/rig_corpus.py 8
+# The two the live front page depends on are already tracked and stay tracked;
+# git ignores this rule for files it already follows.
+web/assets/rigged/*.glb
