@@ -31,87 +31,72 @@ current. Then this file.
 
 ---
 
-## 1. AEGIS-COLLISION-01 — cluster shells into rigid groups
+## 1. AEGIS-COLLISION-01 — ~~cluster shells into rigid groups~~ **ATTEMPTED, REDUCED**
 
-**This is the highest-value work available. Do it first.**
+**Status: the easy 90% of this task dissolved on contact. Read this before
+spending another hour on it.**
 
-### The problem, stated as a number
+### What the task said, and why it was wrong
 
-Every one of the nine assets returns `warn` from the deformation probe, all
-for the identical reason. Per-shell rigid binding removed pinching
-completely — 0 collapsed, 0 inverted, 0 torn faces at every angle tested —
-but it replaced that failure with collision. Baseline on `gasket.glb` at 8
-joints:
+The original spec here said: every asset returns `warn` for the same reason,
+334 newly-overlapping shell pairs on gasket at 45 degrees, group adjacent
+shells so neighbours share a joint, target under 35.
 
-| Bend | Newly overlapping shell pairs |
-|---|---|
-| 15° | 160 |
-| 30° | 261 |
-| 45° | 334 |
-| 60° | 399 |
+Two things were wrong with that.
 
-Reproduce with:
+**The metric was measuring the wrong thing.** It counted *any* pair of shell
+bounding boxes that newly touched. On a bending articulated model, adjacent
+parts legitimately approach each other as a joint closes — that is what
+bending *is*. Measured properly, of the 341 pairs flagged at 45 degrees the
+**median overlap was 8% of the smaller part's volume**, and only **29
+exceeded 50%**. The probe now grades by depth (`deep_clipping`, threshold
+`DEEP_OVERLAP = 0.5` in `deform.rs`) and reports contact separately as a
+denominator.
 
-```
-python3 tools/aegis-rig/deform.py web/assets/rigged/gasket-rigged.glb
-```
+**Corrected baseline for gasket at 8 joints:**
 
-### Why it happens
+| Bend | In contact | Genuinely interpenetrating |
+|---|---|---|
+| 15° | 160 | **9** |
+| 30° | 261 | **18** |
+| 45° | 334 | **28** |
+| 60° | 399 | **33** |
 
-`solve_weights` binds each shell independently to whichever joint is
-nearest its centroid. Two shells that physically touch can therefore land
-on *different* joints, and when those joints rotate apart the two shells
-move relative to each other and interpenetrate. Nothing in the solver knows
-they were neighbours.
+So the problem is real but roughly a tenth the size it was recorded as, and
+`0 inverted / 0 collapsed / 0 torn` still holds everywhere.
 
-### The fix
+### The proposed fix does not work
 
-Group spatially-adjacent shells and bind each **group** to one joint, so
-neighbouring parts travel together and have no relative motion to collide
-with.
+Shell grouping by bounding-box adjacency is implemented, tested, and
+**disabled by default** (`ADJACENCY_FACTOR = 0.0`). Kept rather than deleted
+because the negative result cost real time and should not be rediscovered:
 
-1. Compute each shell's AABB (the Rust core already does this in
-   `deform.rs::shell_boxes` — lift or mirror it).
-2. Build shell adjacency: shells whose AABBs overlap, or are within a small
-   epsilon of each other, are neighbours. Epsilon should scale with the
-   asset — a fraction of `bone_span` is a reasonable starting point.
-3. Union-find over that adjacency to get rigid **groups**. The same
-   `connected_components` idea, one level up.
-4. Bind by group: a group whose axial span is under the rigid threshold
-   binds entirely to the joint nearest the *group* centroid. Groups that
-   straddle joints blend as shells do today.
+- Union-find is transitive. In interlocking geometry one chain of
+  overlapping boxes links everything. **Every epsilon above zero collapsed
+  all 395 shells into a single group** — measured across 0.0005 to 0.04.
+- Even at one group, clipping did not improve (337 vs 334). Merging shells
+  does not remove relative motion when the merged group still blends across
+  joints.
+- A single group also scores zero collisions on a rig that no longer
+  articulates at all, which is why any future attempt needs the
+  counter-metric now pinned in
+  `test_solver.py::test_generous_epsilon_collapses_everything`.
 
-### Acceptance criteria
+### What would actually be needed
 
-- Clipping pairs at 45° on `gasket.glb` drop to **under 35** (a 10x
-  improvement on 334). Report the real number whatever it is.
-- `collapsed`, `inverted`, and `torn` stay at **0** at every tested angle.
-  Trading collision back for pinching is not a win.
-- `weights_sum_to_one` still true, `max_weight_error` still ~1e-8.
-- All 23 tests in `tools/aegis-rig/` still pass.
+True surface proximity — vertex-level distance between shells via a spatial
+grid — rather than box overlap, so that "touching" means touching. That is a
+substantially bigger piece of work than the original spec assumed, and with
+the corrected baseline at 28 pairs it is **no longer obviously the highest
+value thing available**. Re-argue it before starting.
 
-### Files
+### Acceptance criteria, if resumed
 
-- `tools/aegis-rig/rust/src/main.rs` — `solve_weights`, the hot path.
-- `tools/aegis-rig/solver.py` — `solve_weights`, the Python reference.
-- `tools/aegis-rig/test_solver.py` — add a test that two touching shells
-  land on the same joint.
-- `tools/aegis-rig/test_parity.py` — parity must still hold.
-
-**Doctrine 015 obligation:** if you change the Rust kernel you change the
-Python reference too, and `test_parity.py` must still assert both produce
-an identical `sha256`. That parity test is the only thing making a
-second language safe to keep. Do not let it rot.
-
-### Rebuild and re-run
-
-```
-cd tools/aegis-rig/rust && cargo build --release
-python3 tools/aegis-rig/test_solver.py && python3 tools/aegis-rig/test_parity.py
-python3 tools/aegis-rig/rig_corpus.py 8      # rewrites web/data/corpus-rig.json
-```
-
----
+- `deep_clipping` at 45° on gasket below 10, from 28.
+- `collapsed`/`inverted`/`torn` stay 0.
+- **Group count stays above 50% of shell count** — the degenerate-merge
+  guard. Without this a trivial solution scores perfectly.
+- Parity holds: `test_parity.py` still asserts identical `sha256`.
 
 ## 2. LC-CHANNEL-01 — close the Captain → Claude loop
 

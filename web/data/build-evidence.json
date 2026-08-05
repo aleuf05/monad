@@ -25,10 +25,46 @@
     {
       "sha": "fb02dfa",
       "subject": "LUCA resolved: research carried out and filed"
+    },
+    {
+      "sha": "81fea0f",
+      "subject": "Front page carries tonight's build: deformation probe + Rig Bench"
+    },
+    {
+      "sha": "b09a4ab",
+      "subject": "Rig the whole corpus: 9 of 9, no refusals, no errors"
+    },
+    {
+      "sha": "f8e7419",
+      "subject": "Commit outstanding Live Captain and root-console work"
+    },
+    {
+      "sha": "9f4ccbb",
+      "subject": "Commit gasket upload service, semantic metamorphosis, and site work"
+    },
+    {
+      "sha": "5cc8de5",
+      "subject": "Commit captain logs, the no-CLAUDE.md experiment state, and live data"
+    },
+    {
+      "sha": "a80b0e0",
+      "subject": "Replace the turntable spin with a coupled spring chain on the rig"
+    },
+    {
+      "sha": "3b94941",
+      "subject": "Sonify the rig: one voice per joint, driven by angular velocity"
+    },
+    {
+      "sha": "6748293",
+      "subject": "File the chief plan, name Chief Conference, add the live-page verifier"
+    },
+    {
+      "sha": "4ac17bd",
+      "subject": "Live data snapshot: fleet status, review inbox, watch officer"
     }
   ],
-  "diffstat": "52 files changed, 5321 insertions(+), 68 deletions(-)",
-  "files_touched": 52,
+  "diffstat": "102 files changed, 12187 insertions(+), 470 deletions(-)",
+  "files_touched": 102,
   "metrics": [
     {
       "k": "rigged assets",
@@ -56,22 +92,22 @@
       "note": "first full pass; 1 moot, 4 terminal, 2 resolved"
     },
     {
-      "k": "weight error",
-      "v": "2.98e-8",
-      "note": "max deviation from a weight sum of exactly 1.0"
-    },
-    {
       "k": "corpus solve",
       "v": "35s",
       "note": "every static asset rigged and deformation-probed end to end"
+    },
+    {
+      "k": "deep interpenetration",
+      "v": "28",
+      "note": "gasket at 45 degrees, was reported as 334 before the metric was corrected"
     }
   ],
   "findings": [
     "Per-shell weight solving eliminates pinching completely \u2014 0 collapsed, 0 inverted, 0 torn faces at every bend angle tested.",
     "Every static asset in the corpus rigs: 9 of 9, no refusals, no errors. The multi-primitive limit never bit \u2014 the whole corpus is single-primitive.",
-    "What it does not eliminate is collision: 160 shell pairs newly overlap at 15 degrees, 399 at 60. Rigid parts swing into each other.",
-    "The corpus's fragmentation scale (~0.18 on gasket's axis) bounds useful bone density. Below it, skinning degenerates to rigid part binding.",
-    "Two figures in the LUCA packets, given without sources, turned out real and citable \u2014 the material was carrying good science under bad packaging."
+    "The collision metric was wrong and got fixed. Counting any new bounding-box contact reported 334 'collisions' on gasket at 45 degrees; measuring overlap depth shows a median of 8% of a part's volume. That is articulation, not clipping. The real interpenetration count is 28.",
+    "Grouping touching shells was the obvious fix and it fails: union-find is transitive, so any epsilon above zero collapsed all 395 shells into one group \u2014 and clipping did not improve even then. Kept as a documented negative result, disabled by default.",
+    "The corpus's fragmentation scale (~0.18 on gasket's axis) bounds useful bone density. Below it, skinning degenerates to rigid part binding."
   ],
   "corpus": [
     {
@@ -80,7 +116,7 @@
       "shells": 1831,
       "rigid": 1811,
       "blended": 20,
-      "ms": 798.08,
+      "ms": 817.5,
       "verdict": "warn"
     },
     {
@@ -89,7 +125,7 @@
       "shells": 1831,
       "rigid": 1811,
       "blended": 20,
-      "ms": 760.1,
+      "ms": 814.19,
       "verdict": "warn"
     },
     {
@@ -98,7 +134,7 @@
       "shells": 133,
       "rigid": 103,
       "blended": 30,
-      "ms": 30.48,
+      "ms": 22.97,
       "verdict": "warn"
     },
     {
@@ -107,7 +143,7 @@
       "shells": 1831,
       "rigid": 1811,
       "blended": 20,
-      "ms": 924.67,
+      "ms": 806.3,
       "verdict": "warn"
     },
     {
@@ -116,7 +152,7 @@
       "shells": 1764,
       "rigid": 1677,
       "blended": 87,
-      "ms": 197.43,
+      "ms": 187.44,
       "verdict": "warn"
     },
     {
@@ -125,7 +161,7 @@
       "shells": 3634,
       "rigid": 3590,
       "blended": 44,
-      "ms": 188.63,
+      "ms": 198.14,
       "verdict": "warn"
     },
     {
@@ -134,7 +170,7 @@
       "shells": 395,
       "rigid": 374,
       "blended": 21,
-      "ms": 20.68,
+      "ms": 19.93,
       "verdict": "warn"
     },
     {
@@ -143,7 +179,7 @@
       "shells": 4676,
       "rigid": 4609,
       "blended": 67,
-      "ms": 213.97,
+      "ms": 198.46,
       "verdict": "warn"
     },
     {
@@ -152,7 +188,7 @@
       "shells": 1764,
       "rigid": 1677,
       "blended": 87,
-      "ms": 196.68,
+      "ms": 191.28,
       "verdict": "warn"
     }
   ]

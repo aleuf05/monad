@@ -42,6 +42,18 @@ CHUNK_BIN = 0x004E4942
 # bleed by definition.
 RIGID_SPAN_FACTOR = 1.0
 
+# Shell-grouping radius, as a fraction of bone_span. **Default 0.0 —
+# disabled.** Kept as a documented negative result rather than deleted:
+# grouping touching shells was the obvious fix for inter-part collision and
+# it does not work with bounding-box adjacency. Union-find is transitive, and
+# in interlocking geometry one chain of overlapping boxes links everything —
+# measured on gasket, every epsilon above zero collapsed all 395 shells into
+# a single group, and clipping did not improve even then (337 vs 334).
+#
+# Making this useful needs true surface proximity (vertex-level distance via
+# a spatial grid), not box overlap. Until then the honest setting is off.
+ADJACENCY_FACTOR = 0.0
+
 DEFAULT_JOINTS = 5
 WEIGHT_EPSILON = 1e-5
 
@@ -178,7 +190,53 @@ def solve_skeleton(positions: list[tuple], joint_count: int = DEFAULT_JOINTS) ->
 
 # --- Module 2: shell-aware skinning ----------------------------------------
 
-def solve_weights(positions: list[tuple], labels: list[int], skeleton: dict) -> dict:
+def group_shells(positions: list[tuple], labels: list[int], shell_count: int,
+                 epsilon: float) -> tuple[list[int], int]:
+    """Merge shells whose bounding boxes sit within epsilon into rigid groups.
+
+    Python reference for the Rust kernel; same result, O(S^2) either way.
+    """
+    lo = [[float("inf")] * 3 for _ in range(shell_count)]
+    hi = [[float("-inf")] * 3 for _ in range(shell_count)]
+    for index, label in enumerate(labels):
+        p = positions[index]
+        for i in range(3):
+            if p[i] < lo[label][i]:
+                lo[label][i] = p[i]
+            if p[i] > hi[label][i]:
+                hi[label][i] = p[i]
+
+    parent = list(range(shell_count))
+
+    def find(x: int) -> int:
+        root = x
+        while parent[root] != root:
+            root = parent[root]
+        while parent[x] != root:
+            parent[x], x = root, parent[x]
+        return root
+
+    for a in range(shell_count):
+        for b in range(a + 1, shell_count):
+            if all(lo[a][i] - epsilon <= hi[b][i] and lo[b][i] - epsilon <= hi[a][i]
+                   for i in range(3)):
+                ra, rb = find(a), find(b)
+                if ra != rb:
+                    parent[rb] = ra
+
+    dense: dict[int, int] = {}
+    group_of = [0] * shell_count
+    for s in range(shell_count):
+        root = find(s)
+        label = dense.get(root)
+        if label is None:
+            label = dense[root] = len(dense)
+        group_of[s] = label
+    return group_of, len(dense)
+
+
+def solve_weights(positions: list[tuple], labels: list[int], skeleton: dict,
+                  adjacency_factor: float = ADJACENCY_FACTOR) -> dict:
     """Assign at most two influences per vertex, never across a shell that
     cannot support a blend. Returns joint indices, weights, and the evidence
     for what it decided."""
@@ -187,9 +245,16 @@ def solve_weights(positions: list[tuple], labels: list[int], skeleton: dict) -> 
     joint_axis = [j[axis] for j in joints]
     rigid_threshold = skeleton["bone_span"] * RIGID_SPAN_FACTOR
 
+    shell_count = (max(labels) + 1) if labels else 0
+    if adjacency_factor > 0.0:
+        group_of, group_count = group_shells(
+            positions, labels, shell_count, skeleton["bone_span"] * adjacency_factor)
+    else:
+        group_of, group_count = list(range(shell_count)), shell_count
+
     shells: dict[int, list[int]] = {}
     for index, label in enumerate(labels):
-        shells.setdefault(label, []).append(index)
+        shells.setdefault(group_of[label], []).append(index)
 
     joint_ids = array("H", bytes(8 * len(positions)))
     weights = array("f", [0.0]) * (4 * len(positions))
@@ -251,7 +316,8 @@ def solve_weights(positions: list[tuple], labels: list[int], skeleton: dict) -> 
     return {
         "joint_ids": joint_ids,
         "weights": weights,
-        "shells": len(shells),
+        "shells": shell_count,
+        "groups": group_count,
         "rigid_shells": rigid_shells,
         "blended_shells": blended_shells,
         "rigid_vertices": rigid_vertices,
@@ -268,14 +334,16 @@ def core_available() -> bool:
     return CORE_BINARY.is_file()
 
 
-def solve_via_rust(positions: list[tuple], indices, joint_count: int) -> tuple[dict, dict]:
+def solve_via_rust(positions: list[tuple], indices, joint_count: int,
+                   adjacency_factor: float = ADJACENCY_FACTOR) -> tuple[dict, dict]:
     """Hand the hot path to the Rust core over a binary pipe.
 
     JSON would put the cost back into the parsing we moved to Rust to avoid,
     so positions and indices go across as raw little-endian arrays.
     """
     header = CORE_MAGIC + struct.pack(
-        "<IIII", CORE_VERSION, len(positions), len(indices), joint_count)
+        "<IIIIf", CORE_VERSION, len(positions), len(indices), joint_count,
+        adjacency_factor)
     pos = array("f")
     for p in positions:
         pos.extend(p)
@@ -315,6 +383,7 @@ def solve_via_rust(positions: list[tuple], indices, joint_count: int) -> tuple[d
         "joint_ids": joint_ids,
         "weights": weights,
         "shells": report["shells"],
+        "groups": report.get("groups", report["shells"]),
         "rigid_shells": report["rigid_shells"],
         "blended_shells": report["blended_shells"],
         "rigid_vertices": report["rigid_vertices"],
@@ -328,19 +397,20 @@ def solve_via_rust(positions: list[tuple], indices, joint_count: int) -> tuple[d
 
 
 def solve_core(positions: list[tuple], indices, joint_count: int,
-               engine: str = "auto") -> tuple[dict, dict, str]:
+               engine: str = "auto",
+               adjacency_factor: float = ADJACENCY_FACTOR) -> tuple[dict, dict, str]:
     """Run the maths. `engine` is "auto" (Rust if built), "rust", or "python"."""
     if engine not in ("auto", "rust", "python"):
         raise RigError(f"unknown engine {engine!r}")
     if engine == "rust" and not core_available():
         raise RigError("rigging core is not built — run cargo build --release")
     if engine != "python" and core_available():
-        skeleton, skin = solve_via_rust(positions, indices, joint_count)
+        skeleton, skin = solve_via_rust(positions, indices, joint_count, adjacency_factor)
         return skeleton, skin, "rust"
 
     labels = inspector.connected_components(indices, len(positions))
     skeleton = solve_skeleton(positions, joint_count)
-    return skeleton, solve_weights(positions, labels, skeleton), "python"
+    return skeleton, solve_weights(positions, labels, skeleton, adjacency_factor), "python"
 
 
 # --- writing ----------------------------------------------------------------
@@ -359,7 +429,8 @@ def _inverse_bind_matrices(joints: list[tuple]) -> bytes:
 
 
 def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
-                 engine: str = "auto") -> dict:
+                 engine: str = "auto",
+                 adjacency_factor: float = ADJACENCY_FACTOR) -> dict:
     data = source.read_bytes()
     gltf, blob, _ = _split_glb(data)
 
@@ -380,7 +451,8 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
     indices = inspector._read_indices(gltf, blob, 0, idx_accessor)
 
     started = time.perf_counter()
-    skeleton, skin, engine_used = solve_core(positions, indices, joint_count, engine)
+    skeleton, skin, engine_used = solve_core(
+        positions, indices, joint_count, engine, adjacency_factor)
     solve_ms = (time.perf_counter() - started) * 1000
 
     if not skin["weights_sum_to_one"]:
@@ -489,6 +561,8 @@ def write_rigged(source: Path, dest: Path, joint_count: int = DEFAULT_JOINTS,
         "axis": skeleton["axis_name"],
         "bone_span": round(skeleton["bone_span"], 6),
         "shells": skin["shells"],
+        "groups": skin.get("groups", skin["shells"]),
+        "adjacency_factor": adjacency_factor,
         "rigid_shells": skin["rigid_shells"],
         "blended_shells": skin["blended_shells"],
         "rigid_vertices": skin["rigid_vertices"],

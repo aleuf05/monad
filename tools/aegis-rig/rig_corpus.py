@@ -70,7 +70,8 @@ def run(joints: int = DEFAULT_JOINTS, probe_angles=(15.0, 45.0)) -> dict:
                 "note": probe["note"],
                 "poses": [{k: p[k] for k in
                            ("degrees", "verdict", "inverted", "collapsed",
-                            "torn", "clipping_pairs", "max_stretch")}
+                            "torn", "clipping_pairs", "deep_clipping",
+                            "max_stretch")}
                           for p in probe["poses"]],
             }
         except Exception as error:  # noqa: BLE001 - one bad asset must not stop the run

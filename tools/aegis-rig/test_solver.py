@@ -178,6 +178,48 @@ class SkinningTests(unittest.TestCase):
         self.assertGreater(dense["blended_shells"], sparse["blended_shells"])
 
 
+class GroupingTests(unittest.TestCase):
+    """Shell grouping is off by default and these tests say why.
+
+    Grouping touching shells was the obvious fix for inter-part collision.
+    It does not work with bounding-box adjacency, and the failure is worth
+    pinning so nobody re-enables it without re-reading this."""
+
+    def _skeleton_and_labels(self, spacing):
+        points, faces = [], []
+        for n in range(12):
+            p, f = tetra((n * spacing, 0.0, 0.0), spacing * 0.4)
+            base = len(points)
+            points += p
+            faces += [(i + base, j + base, k + base) for i, j, k in f]
+        indices = [v for face in faces for v in face]
+        labels = inspector.connected_components(indices, len(points))
+        return points, labels, solver.solve_skeleton(points, 5)
+
+    def test_grouping_is_disabled_by_default(self):
+        self.assertEqual(solver.ADJACENCY_FACTOR, 0.0)
+
+    def test_zero_factor_leaves_every_shell_its_own_group(self):
+        points, labels, skeleton = self._skeleton_and_labels(0.1)
+        skin = solver.solve_weights(points, labels, skeleton, adjacency_factor=0.0)
+        self.assertEqual(skin["groups"], skin["shells"])
+
+    def test_generous_epsilon_collapses_everything(self):
+        """The degenerate case. Union-find is transitive, so one chain of
+        overlapping boxes swallows the whole model — and a single group scores
+        zero collisions on a rig that no longer articulates. Any future
+        acceptance criterion for grouping has to check this."""
+        points, labels, skeleton = self._skeleton_and_labels(0.1)
+        skin = solver.solve_weights(points, labels, skeleton, adjacency_factor=5.0)
+        self.assertEqual(skin["groups"], 1)
+
+    def test_grouping_preserves_the_weight_sum_invariant(self):
+        points, labels, skeleton = self._skeleton_and_labels(0.1)
+        for factor in (0.0, 0.05, 0.5):
+            skin = solver.solve_weights(points, labels, skeleton, adjacency_factor=factor)
+            self.assertTrue(skin["weights_sum_to_one"], f"factor {factor}")
+
+
 class ShellTests(unittest.TestCase):
     def test_two_tetrahedra_are_two_shells(self):
         pa, fa = tetra((0, 0, 0))

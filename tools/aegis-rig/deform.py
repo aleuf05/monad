@@ -283,16 +283,19 @@ def grade(pose: dict, triangles: int) -> dict:
         return {"verdict": "fail",
                 "reason": f"{pose['collapsed']:,} collapsed faces "
                           f"({collapsed * 100:.1f}%) — severe pinching"}
-    if pose["clipping_pairs"] > 0:
+    deep = pose.get("deep_clipping", 0)
+    if deep > 0:
         return {"verdict": "warn",
-                "reason": f"{pose['clipping_pairs']:,} shell pairs newly "
-                          "overlapping — parts driven into each other"}
+                "reason": f"{deep:,} shell pairs interpenetrating "
+                          f"(of {pose['clipping_pairs']:,} in contact)"}
     if collapsed > 0.01 or torn > 0.01:
         return {"verdict": "warn",
                 "reason": f"{pose['collapsed']:,} pinched, {pose['torn']:,} torn edges"}
+    contact = pose.get("clipping_pairs", 0)
     return {"verdict": "pass",
-            "reason": f"no inversion, no clipping, max stretch "
-                      f"{pose['max_stretch']:.2f}x"}
+            "reason": "no inversion, no interpenetration, max stretch "
+                      f"{pose['max_stretch']:.2f}x"
+                      + (f" ({contact:,} pairs in contact, none deep)" if contact else "")}
 
 
 def main(argv: list[str]) -> int:

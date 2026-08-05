@@ -11,6 +11,7 @@
 //! the parsing we came here to avoid.
 //!
 //! stdin:  "ARIG" | u32 version | u32 vertices | u32 indices | u32 joints
+//!         | f32 adjacency_factor
 //!         | f32[vertices*3] positions | u32[indices] index buffer
 //! stdout: u32 json_len | json | u16[vertices*4] joint ids | f32[vertices*4] weights
 
@@ -31,10 +32,13 @@ struct Input {
     positions: Vec<[f64; 3]>,
     indices: Vec<u32>,
     joint_count: usize,
+    /// Shell-grouping radius, as a fraction of bone_span. 0 disables
+    /// grouping and reproduces the v0.1 per-shell solver exactly.
+    adjacency_factor: f64,
 }
 
 fn parse_input(raw: &[u8]) -> io::Result<Input> {
-    if raw.len() < 20 || &raw[0..4] != MAGIC {
+    if raw.len() < 24 || &raw[0..4] != MAGIC {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "bad magic"));
     }
     let u32_at = |o: usize| -> u32 {
@@ -46,8 +50,9 @@ fn parse_input(raw: &[u8]) -> io::Result<Input> {
     let vertex_count = u32_at(8) as usize;
     let index_count = u32_at(12) as usize;
     let joint_count = u32_at(16) as usize;
+    let adjacency_factor = f32::from_le_bytes([raw[20], raw[21], raw[22], raw[23]]) as f64;
 
-    let mut offset = 20;
+    let mut offset = 24;
     let mut positions = Vec::with_capacity(vertex_count);
     for _ in 0..vertex_count {
         let mut p = [0f64; 3];
@@ -66,7 +71,7 @@ fn parse_input(raw: &[u8]) -> io::Result<Input> {
         ]));
         offset += 4;
     }
-    Ok(Input { positions, indices, joint_count })
+    Ok(Input { positions, indices, joint_count, adjacency_factor })
 }
 
 /// Union-find with path halving and union by size. Same shells the Python
@@ -176,9 +181,76 @@ fn solve_skeleton(positions: &[[f64; 3]], joint_count: usize) -> Result<Skeleton
     Ok(Skeleton { axis, joints, bone_span: step, axis_min: lo[axis], axis_max: hi[axis] })
 }
 
+/// Axis-aligned bounds per shell.
+fn shell_aabbs(positions: &[[f64; 3]], labels: &[u32], shell_count: usize)
+    -> Vec<([f64; 3], [f64; 3])> {
+    let mut boxes = vec![([f64::INFINITY; 3], [f64::NEG_INFINITY; 3]); shell_count];
+    for (v, p) in positions.iter().enumerate() {
+        let s = labels[v] as usize;
+        for i in 0..3 {
+            boxes[s].0[i] = boxes[s].0[i].min(p[i]);
+            boxes[s].1[i] = boxes[s].1[i].max(p[i]);
+        }
+    }
+    boxes
+}
+
+/// Merge shells that sit within `epsilon` of each other into rigid groups.
+///
+/// The collision the deformation probe measures comes from two shells that
+/// physically touch being bound to *different* joints and then rotating
+/// apart. Grouping neighbours and binding the group as a unit removes the
+/// relative motion, which removes the interpenetration at its source rather
+/// than resolving it afterwards.
+///
+/// O(S^2) box tests. 4,676 shells is ~11M comparisons of three floats, which
+/// is nothing next to the per-vertex work already happening.
+fn group_shells(boxes: &[([f64; 3], [f64; 3])], epsilon: f64) -> (Vec<u32>, usize) {
+    let n = boxes.len();
+    let mut parent: Vec<u32> = (0..n as u32).collect();
+
+    fn find(parent: &mut [u32], mut x: u32) -> u32 {
+        while parent[x as usize] != x {
+            let grand = parent[parent[x as usize] as usize];
+            parent[x as usize] = grand;
+            x = grand;
+        }
+        x
+    }
+
+    let near = |a: &([f64; 3], [f64; 3]), b: &([f64; 3], [f64; 3])| -> bool {
+        (0..3).all(|i| a.0[i] - epsilon <= b.1[i] && b.0[i] - epsilon <= a.1[i])
+    };
+
+    for a in 0..n {
+        for b in (a + 1)..n {
+            if near(&boxes[a], &boxes[b]) {
+                let (ra, rb) = (find(&mut parent, a as u32), find(&mut parent, b as u32));
+                if ra != rb {
+                    parent[rb as usize] = ra;
+                }
+            }
+        }
+    }
+
+    let mut dense = vec![u32::MAX; n];
+    let mut group_of = vec![0u32; n];
+    let mut next = 0u32;
+    for s in 0..n {
+        let root = find(&mut parent, s as u32) as usize;
+        if dense[root] == u32::MAX {
+            dense[root] = next;
+            next += 1;
+        }
+        group_of[s] = dense[root];
+    }
+    (group_of, next as usize)
+}
+
 struct Skinning {
     joint_ids: Vec<u16>,
     weights: Vec<f32>,
+    group_count: usize,
     rigid_shells: usize,
     blended_shells: usize,
     rigid_vertices: usize,
@@ -192,24 +264,39 @@ fn solve_weights(
     labels: &[u32],
     shell_count: usize,
     skeleton: &Skeleton,
+    adjacency_factor: f64,
 ) -> Skinning {
     let axis = skeleton.axis;
     let joint_axis: Vec<f64> = skeleton.joints.iter().map(|j| j[axis]).collect();
     let rigid_threshold = skeleton.bone_span * RIGID_SPAN_FACTOR;
 
-    // Bucket vertices by shell in one pass rather than a map of vectors.
-    let mut lo = vec![f64::INFINITY; shell_count];
-    let mut hi = vec![f64::NEG_INFINITY; shell_count];
-    let mut sum = vec![0f64; shell_count];
-    let mut count = vec![0usize; shell_count];
+    // Group touching shells first. Binding a *group* as a unit is what stops
+    // neighbouring parts being handed to different joints and swung into each
+    // other. A factor of 0 disables grouping and reproduces the v0.1 solver
+    // exactly, which is how the parity and regression tests pin the old
+    // behaviour while the new one is tuned.
+    let (group_of_shell, group_count) = if adjacency_factor > 0.0 {
+        let boxes = shell_aabbs(positions, labels, shell_count);
+        group_shells(&boxes, skeleton.bone_span * adjacency_factor)
+    } else {
+        ((0..shell_count as u32).collect(), shell_count)
+    };
+    let group_of_vertex = |v: usize| group_of_shell[labels[v] as usize] as usize;
+
+    // Bucket vertices by group in one pass rather than a map of vectors.
+    let mut lo = vec![f64::INFINITY; group_count];
+    let mut hi = vec![f64::NEG_INFINITY; group_count];
+    let mut sum = vec![0f64; group_count];
+    let mut count = vec![0usize; group_count];
     for (v, p) in positions.iter().enumerate() {
-        let s = labels[v] as usize;
+        let s = group_of_vertex(v);
         let t = p[axis];
         lo[s] = lo[s].min(t);
         hi[s] = hi[s].max(t);
         sum[s] += t;
         count[s] += 1;
     }
+    let shell_count = group_count;
 
     // Per shell: rigid (one bone, weight 1.0) or blended. This is the
     // anti-bleed rule — a shell too short to contain a blend never gets one.
@@ -243,7 +330,7 @@ fn solve_weights(
     let mut joint_ids = vec![0u16; n * 4];
     let mut weights = vec![0f32; n * 4];
     for (v, p) in positions.iter().enumerate() {
-        let s = labels[v] as usize;
+        let s = group_of_vertex(v);
         if shell_rigid[s] {
             joint_ids[4 * v] = shell_joint[s];
             weights[4 * v] = 1.0;
@@ -290,6 +377,7 @@ fn solve_weights(
     Skinning {
         joint_ids,
         weights,
+        group_count,
         rigid_shells,
         blended_shells,
         rigid_vertices,
@@ -390,9 +478,9 @@ fn run_deform(raw: &[u8]) -> ! {
         .map(|r| {
             format!(
                 "{{\"collapsed\":{},\"inverted\":{},\"torn\":{},\"max_stretch\":{},\
-\"mean_stretch\":{},\"max_displacement\":{},\"clipping_pairs\":{}}}",
+\"mean_stretch\":{},\"max_displacement\":{},\"clipping_pairs\":{},\"deep_clipping\":{}}}",
                 r.collapsed, r.inverted, r.torn, r.max_stretch,
-                r.mean_stretch, r.max_displacement, r.clipping_pairs
+                r.mean_stretch, r.max_displacement, r.clipping_pairs, r.deep_clipping
             )
         })
         .collect();
@@ -427,7 +515,7 @@ fn main() {
         Ok(skeleton) => skeleton,
         Err(error) => fail(&error),
     };
-    let skin = solve_weights(&input.positions, &labels, shell_count, &skeleton);
+    let skin = solve_weights(&input.positions, &labels, shell_count, &skeleton, input.adjacency_factor);
 
     let joints: Vec<String> = skeleton
         .joints
@@ -436,7 +524,7 @@ fn main() {
         .collect();
     let json = format!(
         "{{\"ok\":true,\"engine\":\"rust\",\"axis\":{},\"axis_min\":{},\"axis_max\":{},\
-\"bone_span\":{},\"joints\":[{}],\"shells\":{},\"rigid_shells\":{},\"blended_shells\":{},\
+\"bone_span\":{},\"joints\":[{}],\"shells\":{},\"groups\":{},\"rigid_shells\":{},\"blended_shells\":{},\
 \"rigid_vertices\":{},\"blended_vertices\":{},\"max_weight_error\":{},\"unweighted_vertices\":{}}}",
         skeleton.axis,
         skeleton.axis_min,
@@ -444,6 +532,7 @@ fn main() {
         skeleton.bone_span,
         joints.join(","),
         shell_count,
+        skin.group_count,
         skin.rigid_shells,
         skin.blended_shells,
         skin.rigid_vertices,

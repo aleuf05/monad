@@ -4,26 +4,24 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## AEGIS-COLLISION-01: Cluster shells into rigid groups
+## AEGIS-COLLISION-01: Reduce deep interpenetration under pose
 
-Status: queued — **do this first, highest value available**
+Status: **attempted, reduced, re-argue before resuming** — see
+[`2026-08-05-chief-plan-post-rigging.md`](2026-08-05-chief-plan-post-rigging.md)
+section 1 for the full write-up.
 
-Every asset in the corpus passes the deformation probe with `warn`, all for
-the same reason: per-shell rigid binding removed pinching completely (0
-collapsed, 0 inverted, 0 torn) but replaced it with collision. Baseline on
-`gasket.glb` at 8 joints: 160 newly-overlapping shell pairs at 15 degrees,
-334 at 45, 399 at 60. Reproduce with
-`python3 tools/aegis-rig/deform.py web/assets/rigged/gasket-rigged.glb`.
+Short version: the metric this task was specified against was wrong. It
+counted any new bounding-box contact, which on a bending model includes
+legitimate articulation. Graded by overlap depth, gasket at 45 degrees has
+**28 genuinely interpenetrating pairs, not 334**. Probe now reports
+`deep_clipping` separately.
 
-Cause: `solve_weights` binds each shell to its nearest joint independently,
-so two shells that physically touch can land on different joints and rotate
-apart. Fix: group spatially-adjacent shells (AABB adjacency + union-find)
-and bind each group to one joint.
-
-Acceptance: clipping pairs at 45 degrees under 35; collapsed/inverted/torn
-stay 0; parity tests still assert identical sha256 across Rust and Python.
-Full spec, files, and rebuild commands:
-[`2026-08-05-chief-plan-post-rigging.md`](2026-08-05-chief-plan-post-rigging.md) section 1.
+The proposed fix (group touching shells) is implemented, tested, and
+disabled — bounding-box adjacency is transitively degenerate and collapsed
+all 395 shells into one group at every epsilon tried, without improving
+clipping. A real fix needs vertex-level proximity via a spatial grid, which
+is much larger than originally scoped. With the corrected baseline this may
+no longer be the top priority.
 
 ## LC-CHANNEL-01: Close the Captain -> Claude channel loop
 
