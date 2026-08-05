@@ -328,6 +328,7 @@
           <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
           <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
           <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
+          <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
         </div>
         <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
@@ -950,6 +951,7 @@
         // Under 5px is a click, not an orbit drag — otherwise every camera
         // move would also poke it.
         if (moved < 5 && overRobot(event) && poke()) {
+          buddySubmit(0, "Ow.");
           if (rigStat) {
             var was = rigStat.textContent;
             rigStat.textContent = "poked — watch it settle";
@@ -1174,6 +1176,7 @@
               " shells · bone span " + v.bone_span.toFixed(3);
           }
           applyBend(parseFloat(rigBend.value) || 24);
+          buddyReport(null, v);
           if (rigProbe) {
             rigProbe.hidden = false;
             rigProbe.innerHTML =
@@ -1188,6 +1191,101 @@
       if (jointSlider) {
         jointSlider.addEventListener("change", function () {
           applyVariant(parseInt(jointSlider.value, 10));
+        });
+      }
+
+      // --- Little Buddy voice ---------------------------------------
+      // The software path to the packet's feature. §2A wants an ESP32 and an
+      // I2S DAC; none exists on this host and hardware is deprioritised. But
+      // the browser already *is* a DAC, and speechSynthesis is a local
+      // synthesiser with no API cost — so the same pipeline runs today and
+      // actually makes sound.
+      //
+      // Contract and rules are the ones in tools/voice-engine/buddy_router.py:
+      // {timestamp, priority_level, text_payload}, priority ordering, and a
+      // hard preempt at DUCK_PRIORITY. Kept deliberately identical so the
+      // Python router stays the canonical implementation.
+      var DUCK_PRIORITY = 7;
+      var buddyOn = false;
+      var buddyQueue = [];
+      var buddySpeaking = false;
+
+      function buddySubmit(priority, text) {
+        if (!buddyOn || !window.speechSynthesis) return { status: "DROPPED_QUEUE_FULL" };
+        var payload = { timestamp: Date.now(), priority_level: priority,
+                        text_payload: text, seq: buddyQueue.length };
+        if (priority >= DUCK_PRIORITY) {
+          // Critical cuts off whatever is *sounding* — an alert that waits
+          // its turn is not an alert. It does not discard what is queued:
+          // the Python router defers ambient rather than dropping it, and
+          // two implementations of one contract must not disagree about
+          // whether a message survives. Sorting puts the critical first
+          // anyway, so the ambient simply speaks afterwards.
+          window.speechSynthesis.cancel();
+          buddySpeaking = false;
+        }
+        buddyQueue.push(payload);
+        buddyQueue.sort(function (a, b) {
+          return (b.priority_level - a.priority_level) || (a.timestamp - b.timestamp);
+        });
+        var status = buddyQueue.length === 1 ? "READY" : "BUFFERING";
+        buddyPump();
+        return { status: status, queued: buddyQueue.length };
+      }
+
+      function buddyPump() {
+        if (buddySpeaking || !buddyQueue.length || !buddyOn) return;
+        var next = buddyQueue.shift();
+        var utterance = new SpeechSynthesisUtterance(next.text_payload);
+        utterance.rate = next.priority_level >= DUCK_PRIORITY ? 1.05 : 0.95;
+        utterance.pitch = next.priority_level >= DUCK_PRIORITY ? 1.15 : 1.0;
+        buddySpeaking = true;
+        utterance.onend = utterance.onerror = function () {
+          buddySpeaking = false;
+          buddyPump();
+        };
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function buddyReport(entry, variant) {
+        // What the buddy actually says: the rig it is wearing and what the
+        // probe found. Interpenetration is the fault condition, so it goes
+        // out at critical priority and preempts the routine line.
+        var joints = (variant && variant.joints) || (rigBones.length || 0);
+        buddySubmit(2, "Rig loaded. " + joints + " joints, " +
+          ((variant && variant.shells) || (entry && entry.shells) || 0) + " shells.");
+        var deep = variant ? variant.deep
+          : ((entry && entry.probe && entry.probe.poses && entry.probe.poses[0]
+              && entry.probe.poses[0].deep_clipping) || 0);
+        if (deep > 0) {
+          buddySubmit(8, "Warning. " + deep + " shell pairs interpenetrating.");
+        } else {
+          buddySubmit(3, "Deformation clean. No interpenetration detected.");
+        }
+      }
+
+      var voiceBtn = document.getElementById("rigVoice");
+      if (voiceBtn) {
+        voiceBtn.addEventListener("click", function () {
+          if (!window.speechSynthesis) {
+            voiceBtn.innerHTML = "&#128266; no speech support";
+            return;
+          }
+          buddyOn = !buddyOn;
+          voiceBtn.classList.toggle("on", buddyOn);
+          voiceBtn.innerHTML = "&#128266; Buddy: " + (buddyOn ? "on" : "off");
+          if (!buddyOn) {
+            window.speechSynthesis.cancel();
+            buddyQueue = [];
+            buddySpeaking = false;
+            return;
+          }
+          var entry = corpusAssets.filter(function (e) {
+            return e.dest === activeAsset;
+          })[0];
+          var variant = variants[parseInt(jointSlider.value, 10)] || null;
+          buddySubmit(1, "Little Buddy online.");
+          buddyReport(entry, variant);
         });
       }
 
@@ -1251,6 +1349,7 @@
           applyBend(parseFloat(rigBend.value) || 24);
           showProbeFor(entry);
           syncVariants();
+          buddyReport(entry, null);
         });
       }
 
