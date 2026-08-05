@@ -80,4 +80,31 @@ working one.
 ---
 
 **Filed:** `docs/engineering-orders/queries/MSIR-M3-Q1-object-identity.md`
-**Status:** open, awaiting response packet.
+**Status:** **answered** 2026-08-05.
+
+---
+
+## Response
+
+**Answer: A** — `D_t` is the document corpus.
+
+**Answered by:** the Admiral directly, in chat, verbatim: "A". Recorded
+as the Admiral's ruling rather than a Chief response packet, since that
+is what actually arrived — the distinction matters for provenance and
+the answer is authoritative either way.
+
+**Therefore:**
+
+- `D_t` = the corpus under `docs/` (146 files at time of answer), as
+  already collected by `tools/root-console/docs_corpus.py` and rendered
+  by the Semantic Document Viewer.
+- `H_t` = git. Content-addressed history with verified parent lineage
+  already exists; §IV's "State Drift Interlock" describes approximately
+  what git does, so it is not rebuilt.
+- A transition `Δ_t` = a proposed change to that corpus.
+- M³ is therefore **a system that governs revisions to its own
+  documentation** — the loopy property the method claimed for itself in
+  `M3-METHOD-001` §8, now made literal rather than analogical.
+
+Build proceeds on this basis. First cycle only: one named object, crude
+predicates, visible on the console.
