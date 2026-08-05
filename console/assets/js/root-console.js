@@ -936,6 +936,97 @@ function handleEvent(event) {
   setCaptainVoice(captainVoiceOn);   // restore the remembered choice
 })();
 
+// --- microphone: hold to speak --------------------------------------------
+// The browser is the microphone, exactly as it is already the DAC. This is
+// SpeechRecognition, the twin of the speechSynthesis the Captain already
+// speaks through — same API, same page, no server, no model, no GPU, no
+// install, no spend. Researched in
+// docs/reports/2026-08-05-speech-to-text-two-way-captain.md.
+//
+// HOLD to talk, not always-listening. An open microphone in a room is a
+// decision somebody should make deliberately, not inherit from a feature.
+//
+// Chrome streams audio to Google's recogniser. For a single-operator console
+// behind a password that is an acceptable trade, and it is named here rather
+// than left to be discovered.
+(function wireMicrophone() {
+  const btn = document.getElementById("mic-btn");
+  if (!btn) return;
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!Recognition) {
+    // Graceful absence: the button says so and typing is unaffected.
+    btn.classList.add("unsupported");
+    btn.title = "This browser has no speech recognition — typing still works";
+    btn.disabled = true;
+    return;
+  }
+
+  let recognition = null;
+  let listening = false;
+  let committed = "";        // finalised text so far this press
+
+  function stop() {
+    listening = false;
+    btn.classList.remove("listening");
+    btn.textContent = "🎙";
+    if (recognition) { try { recognition.stop(); } catch (e) {} }
+  }
+
+  function start() {
+    if (listening) return;
+    committed = "";
+    recognition = new Recognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;   // paint it as you speak
+    recognition.lang = "en-GB";
+
+    recognition.onresult = (event) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const chunk = event.results[i][0].transcript;
+        if (event.results[i].isFinal) committed += chunk;
+        else interim += chunk;
+      }
+      // Show the live transcript in the real input, so you can see it hearing
+      // you and correct before it goes anywhere.
+      input.value = (committed + interim).trim();
+    };
+    recognition.onerror = (event) => {
+      stop();
+      if (event.error !== "aborted" && event.error !== "no-speech") {
+        addRow("error", "mic", `speech recognition: ${event.error}`);
+      }
+    };
+    recognition.onend = () => {
+      // Release fires stop(); whatever was heard is now in the input and is
+      // sent from the pointerup handler, not from here — so a dropped
+      // connection cannot silently submit something you did not finish.
+      if (listening) stop();
+    };
+
+    listening = true;
+    btn.classList.add("listening");
+    btn.textContent = "●";
+    try { recognition.start(); }
+    catch (e) { stop(); addRow("error", "mic", String(e)); }
+  }
+
+  // Hold anywhere on the button; release sends. Pointer events cover mouse,
+  // pen and touch in one path.
+  btn.addEventListener("pointerdown", (e) => { e.preventDefault(); start(); });
+  const release = () => {
+    if (!listening) return;
+    stop();
+    // Give the recogniser a moment to flush its final result before sending.
+    setTimeout(() => {
+      if (input.value.trim()) submitDirective();
+      else input.focus();
+    }, 350);
+  };
+  btn.addEventListener("pointerup", release);
+  btn.addEventListener("pointerleave", () => { if (listening) release(); });
+})();
+
 function connect() {
   if (streamSource) return;
   streamSource = new EventSource(`${LIVE_CAPTAIN_API_BASE}/stream`);
