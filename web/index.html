@@ -337,6 +337,7 @@
           <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
           <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
           <button type="button" class="rb-sound on" id="rigRadio">&#128251; FleetNet <span id="rigRadioDot" class="rb-live"></span> live</button>
+          <button type="button" class="rb-sound" id="rigRich">&#127908; Rich voice</button>
           <button type="button" class="rb-sound" id="rigMute">&#128263; Mute</button>
           <button type="button" class="rb-sound" id="rigChime">&#128266; Test Sound</button>
           <button type="button" class="rb-sound" id="rigCaptain">&#9875; Captain Speaks</button>
@@ -1643,8 +1644,47 @@
       // noticing.
       var fleetLast = null;
       var fleetMuted = false;
+      // RICH MODE — the Admiral wants to hear everything, in the good voice.
+      // The stream was pinned to the free voice because an unattended 15s
+      // loop with a metered voice behind it is how a budget disappears.
+      // Rich mode lifts that, so it carries its own governor instead:
+      //   · opt-in, never the default
+      //   · a hard ceiling on renders per session
+      //   · a floor between renders, so a burst of changes cannot chain
+      //   · falls back to the free voice the moment either is hit
+      var fleetRich = false;
+      var richRenders = 0;
+      var richLastAt = 0;
+      var RICH_MAX_RENDERS = 40;      // ~$0.20 at typical line length
+      var RICH_MIN_GAP_MS = 20000;
       var fleetDot = document.getElementById("rigRadioDot");
       var muteBtn = document.getElementById("rigMute");
+
+      // The full picture, spoken. Used by rich mode, which reports
+      // EVERYTHING rather than only what changed — the Admiral asked to hear
+      // it all before deciding whether it needs filtering. If it turns out
+      // spammy, the filter goes here: drop the lines that repeat unchanged.
+      function fleetFullReport(d) {
+        if (!d) return [];
+        return [
+          { priority: d.sound ? 3 : 8,
+            text: d.sound ? "FleetNet sound." : "FleetNet showing faults." },
+          { priority: 2, text: d.units.active + " units active of " +
+                              d.units.installed + ". " + d.units.expected_down +
+                              " parked by design, " + (d.units.oneshot || 0) +
+                              " one-shot." },
+          { priority: 2, text: d.ports + " ports held." },
+          { priority: 2, text: "All " + d.suites.passed + " test suites green." },
+          { priority: 2, text: d.tree.uncommitted
+              ? d.tree.uncommitted + " files uncommitted, head " + d.tree.head + "."
+              : "Working tree clean, head " + d.tree.head + "." },
+          { priority: 1, text: "Live Captain " + d.captain + "." },
+          { priority: 1, text: d.voice
+              ? "Voice budget " + d.voice.usd_used.toFixed(4) + " of " +
+                d.voice.usd_limit + " dollars."
+              : "Voice budget unreadable." },
+        ];
+      }
 
       function fleetChanges(prev, now) {
         if (!now) return [];
@@ -1680,6 +1720,36 @@
         return out;
       }
 
+      // The wire: messages from Claude and the Captain, spoken as they land.
+      // Each entry carries an id derived from its content, so the stream says
+      // a thing once and then leaves it alone.
+      var wireSeen = {};
+      var wireFirstPass = true;
+
+      function wireTick() {
+        fetch("data/fleetnet-wire.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) {
+            if (!d || !d.entries) return;
+            var fresh = d.entries.filter(function (e) { return !wireSeen[e.id]; });
+            d.entries.forEach(function (e) { wireSeen[e.id] = 1; });
+            // The first pass only learns what is already there. Otherwise a
+            // page load reads out the entire backlog.
+            if (wireFirstPass) { wireFirstPass = false; return; }
+            if (fleetMuted || !fresh.length) return;
+            if (!buddyOn && voiceBtn) voiceBtn.click();
+            chime("ping");
+            fresh.forEach(function (e) {
+              var who = e.from === "captain" ? "Captain" :
+                        e.from === "claude" ? "Claude" : e.from;
+              buddySubmit(e.priority, who + " on the wire. " + e.text);
+            });
+          })
+          .catch(function () {});
+      }
+      wireTick();
+      setInterval(wireTick, 12000);
+
       function fleetTick() {
         fetch("data/fleetnet.json", { cache: "no-store" })
           .then(function (r) { return r.ok ? r.json() : null; })
@@ -1690,24 +1760,65 @@
               fleetDot.className = "rb-live" + (d.sound ? "" : " fault");
             }
             var news = fleetChanges(fleetLast, d);
+            // Rich mode hears EVERYTHING: the whole state each time the
+            // snapshot moves, not only the deltas. Keyed on `generated` so a
+            // poll that finds the same snapshot stays quiet — otherwise the
+            // 15s poller would talk over a 30s timer.
+            var moved = !fleetLast || fleetLast.generated !== d.generated;
+            if (fleetRich && moved) news = fleetFullReport(d).concat(news);
             fleetLast = d;
             if (fleetMuted || !news.length) return;
             if (!buddyOn && voiceBtn) voiceBtn.click();   // something happened
             chime(news.some(function (n) { return n.priority >= 8; }) ? "alert" : "ping");
-            // Local voice ONLY for stream announcements, regardless of what
-            // the Buddy is otherwise using. This fires unattended every 15s;
-            // a loop with a metered voice behind it spends money nobody
-            // decided to spend. Deliberate spend is a button press.
+            var now = Date.now();
+            var richOk = fleetRich
+              && richRenders < RICH_MAX_RENDERS
+              && (now - richLastAt) > RICH_MIN_GAP_MS;
             var wasNeural = neuralVoice;
-            neuralVoice = false;
+            if (richOk) { richRenders += 1; richLastAt = now; }
+            else { neuralVoice = false; }        // free voice; governor holds
             news.forEach(function (n) { buddySubmit(n.priority, n.text); });
             setTimeout(function () { neuralVoice = wasNeural; }, 50);
+            if (richBtn) {
+              richBtn.innerHTML = fleetRich
+                ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
+                : "&#127908; Rich voice";
+            }
           })
           .catch(function () { if (fleetDot) fleetDot.className = "rb-live stale"; });
       }
 
       fleetTick();
       setInterval(fleetTick, 15000);   // half the timer period; never misses one
+
+      var richBtn = document.getElementById("rigRich");
+      if (richBtn) {
+        richBtn.addEventListener("click", function () {
+          fleetRich = !fleetRich;
+          richBtn.classList.toggle("on", fleetRich);
+          richBtn.innerHTML = fleetRich
+            ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
+            : "&#127908; Rich voice";
+          if (fleetRich) {
+            // Speak the whole state once on enable, so "everything" means
+            // everything rather than only what happens to change next.
+            if (!buddyOn && voiceBtn) voiceBtn.click();
+            chime("ping");
+            richRenders += 1; richLastAt = Date.now();
+            var d = fleetLast;
+            if (d) {
+              buddySubmit(4, "Rich voice engaged. " +
+                (d.sound ? "FleetNet is sound. " : "FleetNet is showing faults. ") +
+                d.units.active + " units active of " + d.units.installed +
+                ", " + d.ports + " ports held. All " + d.suites.passed +
+                " test suites green. Working tree " +
+                (d.tree.uncommitted ? d.tree.uncommitted + " files uncommitted"
+                                    : "clean") +
+                ", head " + d.tree.head + ". Live Captain is " + d.captain + ".");
+            }
+          }
+        });
+      }
 
       if (muteBtn) {
         muteBtn.addEventListener("click", function () {
