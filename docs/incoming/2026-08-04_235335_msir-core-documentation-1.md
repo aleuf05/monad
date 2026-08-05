@@ -28,83 +28,20 @@ token = stable semantic function, not decoration
 
 # 3. Canonical Core Tokens
 
-Token
-
-Canonical meaning
-
-Operational use
-
-⚓
-
-Semantic anchor
-
-Preserve the meaning, identity, or invariant that must survive transformation.
-
-🧭
-
-Intent / orientation
-
-Specify the direction, question, objective, or desired semantic destination.
-
-🔃
-
-Revision / transformation
-
-Generate a successor representation, proposal, model, or system state.
-
-🧪
-
-Test / simulation
-
-Evaluate a proposal before commitment; expose consequences and failure modes.
-
-✅ / ❌
-
-Acceptance decision
-
-Accept or reject according to declared criteria.
-
-📌
-
-Commit / canonize
-
-Record the accepted result as the current authoritative form.
-
-↩
-
-Rollback / recovery
-
-Restore or compensate when a transformation fails or violates constraints.
-
-📚
-
-Trace / provenance
-
-Preserve causal history, evidence, version lineage, and reasons for change.
-
-🛡️
-
-Governance
-
-Apply constraints, permissions, invariants, and constitutional limits.
-
-➿
-
-Re-entry
-
-Feed the successor result back into the process for further governed reasoning.
-
-👹
-
-Adversarial pressure
-
-Attack a claim, search for counterexamples, and expose hidden overreach.
-
-📈
-
-Qualified improvement
-
-Increase useful capability without degrading protected dimensions.
+| Token | Canonical meaning | Operational use |
+| --- | --- | --- |
+| ⚓ | Semantic anchor | Preserve the meaning, identity, or invariant that must survive transformation. |
+| 🧭 | Intent / orientation | Specify the direction, question, objective, or desired semantic destination. |
+| 🔃 | Revision / transformation | Generate a successor representation, proposal, model, or system state. |
+| 🧪 | Test / simulation | Evaluate a proposal before commitment; expose consequences and failure modes. |
+| ✅ / ❌ | Acceptance decision | Accept or reject according to declared criteria. |
+| 📌 | Commit / canonize | Record the accepted result as the current authoritative form. |
+| ↩ | Rollback / recovery | Restore or compensate when a transformation fails or violates constraints. |
+| 📚 | Trace / provenance | Preserve causal history, evidence, version lineage, and reasons for change. |
+| 🛡️ | Governance | Apply constraints, permissions, invariants, and constitutional limits. |
+| ➿ | Re-entry | Feed the successor result back into the process for further governed reasoning. |
+| 👹 | Adversarial pressure | Attack a claim, search for counterexamples, and expose hidden overreach. |
+| 📈 | Qualified improvement | Increase useful capability without degrading protected dimensions. |
 
 # 4. Canonical Reasoning Loop
 

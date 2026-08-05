@@ -90,6 +90,35 @@ def _paragraph_to_markdown(para: ET.Element) -> str:
     return text
 
 
+def _cell_text(cell: ET.Element) -> str:
+    pieces = [_paragraph_to_markdown(p).lstrip("# ").lstrip("- ") for p in cell.iter(W + "p")]
+    # A pipe inside a cell would otherwise split the markdown row.
+    return " ".join(piece for piece in pieces if piece).replace("|", "\\|")
+
+
+def _table_to_markdown(table: ET.Element) -> list[str]:
+    """Render a Word table as a markdown table.
+
+    Worth doing rather than flattening: the first real document through this
+    box (MSIR-CORE-001) carries its whole token vocabulary as a table, and
+    one-cell-per-line destroys exactly the structure that made it a table.
+    """
+    rows: list[list[str]] = []
+    for row in table.findall(W + "tr"):
+        cells = [_cell_text(cell) for cell in row.findall(W + "tc")]
+        if any(cells):
+            rows.append(cells)
+    if not rows:
+        return []
+
+    width = max(len(r) for r in rows)
+    rows = [r + [""] * (width - len(r)) for r in rows]
+    header, body = rows[0], rows[1:]
+    lines = ["| " + " | ".join(header) + " |", "|" + "|".join([" --- "] * width) + "|"]
+    lines.extend("| " + " | ".join(r) + " |" for r in body)
+    return lines
+
+
 def extract_markdown(docx_bytes: bytes) -> str:
     with zipfile.ZipFile(BytesIO(docx_bytes)) as archive:
         try:
@@ -101,18 +130,25 @@ def extract_markdown(docx_bytes: bytes) -> str:
         xml_bytes = archive.read(DOCUMENT_PART)
 
     root = ET.fromstring(xml_bytes)
-    lines: list[str] = []
-    for para in root.iter(W + "p"):
-        lines.append(_paragraph_to_markdown(para))
+    body = root.find(W + "body")
+    if body is None:
+        body = root
 
-    # Collapse runs of blank lines to a single blank line: Word emits a lot
-    # of empty paragraphs that mean nothing once the text is markdown.
-    out: list[str] = []
-    for line in lines:
-        if not line and out and not out[-1]:
-            continue
-        out.append(line)
-    return "\n\n".join(l for l in out if l) + "\n"
+    # Walk the body in document order rather than iter()-ing every <w:p>:
+    # paragraphs inside table cells must be consumed by the table renderer,
+    # not emitted a second time as loose lines.
+    # Blocks, not lines: blocks are joined with a blank line between them,
+    # so a whole table has to be one block or its rows get split apart.
+    blocks: list[str] = []
+    for node in body:
+        if node.tag == W + "p":
+            blocks.append(_paragraph_to_markdown(node))
+        elif node.tag == W + "tbl":
+            table = _table_to_markdown(node)
+            if table:
+                blocks.append("\n".join(table))
+
+    return "\n\n".join(block for block in blocks if block) + "\n"
 
 
 def _git(*args: str, timeout: int = 90) -> subprocess.CompletedProcess:
