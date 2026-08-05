@@ -1,0 +1,68 @@
+{
+  "asset": "assets/rigged/gasket-rigged.glb",
+  "source": "assets/models/gasket/gasket.glb",
+  "generated": "2026-08-05",
+  "joints": 8,
+  "shells": 395,
+  "triangles": 45846,
+  "bend_axis": "Z",
+  "verdict": "warn",
+  "note": "160 shell pairs newly overlapping \u2014 parts driven into each other",
+  "poses": [
+    {
+      "degrees": 0,
+      "verdict": "pass",
+      "reason": "no inversion, no clipping, max stretch 1.00x",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 0,
+      "max_stretch": 1.0000046903734223,
+      "max_displacement": 2.5472989282333746e-08
+    },
+    {
+      "degrees": 15,
+      "verdict": "warn",
+      "reason": "160 shell pairs newly overlapping \u2014 parts driven into each other",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 160,
+      "max_stretch": 1.0329494047138519,
+      "max_displacement": 0.11514937125865543
+    },
+    {
+      "degrees": 30,
+      "verdict": "warn",
+      "reason": "261 shell pairs newly overlapping \u2014 parts driven into each other",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 261,
+      "max_stretch": 1.066986248558148,
+      "max_displacement": 0.2297301966445879
+    },
+    {
+      "degrees": 45,
+      "verdict": "warn",
+      "reason": "334 shell pairs newly overlapping \u2014 parts driven into each other",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 334,
+      "max_stretch": 1.1019646560202259,
+      "max_displacement": 0.3423765349391474
+    },
+    {
+      "degrees": 60,
+      "verdict": "warn",
+      "reason": "399 shell pairs newly overlapping \u2014 parts driven into each other",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 399,
+      "max_stretch": 1.1377507612857396,
+      "max_displacement": 0.4517397536179691
+    }
+  ]
+}

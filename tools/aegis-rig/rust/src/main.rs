@@ -14,9 +14,12 @@
 //!         | f32[vertices*3] positions | u32[indices] index buffer
 //! stdout: u32 json_len | json | u16[vertices*4] joint ids | f32[vertices*4] weights
 
+mod deform;
+
 use std::io::{self, Read, Write};
 
 const MAGIC: &[u8; 4] = b"ARIG";
+const DEFORM_MAGIC: &[u8; 4] = b"ADEF";
 const VERSION: u32 = 1;
 
 /// A shell shorter than this many bone spans is bound rigidly to one joint.
@@ -30,9 +33,7 @@ struct Input {
     joint_count: usize,
 }
 
-fn read_input() -> io::Result<Input> {
-    let mut raw = Vec::new();
-    io::stdin().read_to_end(&mut raw)?;
+fn parse_input(raw: &[u8]) -> io::Result<Input> {
     if raw.len() < 20 || &raw[0..4] != MAGIC {
         return Err(io::Error::new(io::ErrorKind::InvalidData, "bad magic"));
     }
@@ -318,8 +319,102 @@ fn fail(message: &str) -> ! {
     std::process::exit(1);
 }
 
+/// ADEF layout, after the 4-byte magic:
+///   u32 version | u32 vertices | u32 indices | u32 joints | u32 poses
+///   f32[v*3] rest positions | u32[i] index buffer
+///   u16[v*4] joint ids | f32[v*4] weights
+///   f32[poses*joints*16] skinning matrices, column-major
+fn run_deform(raw: &[u8]) -> ! {
+    let u32_at = |o: usize| u32::from_le_bytes([raw[o], raw[o + 1], raw[o + 2], raw[o + 3]]);
+    if raw.len() < 24 || u32_at(4) != VERSION {
+        fail("bad deform header");
+    }
+    let (vertices, index_count) = (u32_at(8) as usize, u32_at(12) as usize);
+    let (joints, poses) = (u32_at(16) as usize, u32_at(20) as usize);
+
+    let mut offset = 24;
+    let mut positions = Vec::with_capacity(vertices);
+    for _ in 0..vertices {
+        let mut p = [0f64; 3];
+        for slot in p.iter_mut() {
+            *slot = f32::from_le_bytes([
+                raw[offset], raw[offset + 1], raw[offset + 2], raw[offset + 3],
+            ]) as f64;
+            offset += 4;
+        }
+        positions.push(p);
+    }
+    let mut indices = Vec::with_capacity(index_count);
+    for _ in 0..index_count {
+        indices.push(u32::from_le_bytes([
+            raw[offset], raw[offset + 1], raw[offset + 2], raw[offset + 3],
+        ]));
+        offset += 4;
+    }
+    let mut joint_ids = Vec::with_capacity(vertices * 4);
+    for _ in 0..vertices * 4 {
+        joint_ids.push(u16::from_le_bytes([raw[offset], raw[offset + 1]]));
+        offset += 2;
+    }
+    let mut weights = Vec::with_capacity(vertices * 4);
+    for _ in 0..vertices * 4 {
+        weights.push(f32::from_le_bytes([
+            raw[offset], raw[offset + 1], raw[offset + 2], raw[offset + 3],
+        ]));
+        offset += 4;
+    }
+    let mut pose_mats = Vec::with_capacity(poses);
+    for _ in 0..poses {
+        let mut mats = Vec::with_capacity(joints);
+        for _ in 0..joints {
+            let mut m = [0f64; 16];
+            for slot in m.iter_mut() {
+                *slot = f32::from_le_bytes([
+                    raw[offset], raw[offset + 1], raw[offset + 2], raw[offset + 3],
+                ]) as f64;
+                offset += 4;
+            }
+            mats.push(m);
+        }
+        pose_mats.push(mats);
+    }
+
+    let (labels, shell_count) = connected_components(&indices, vertices);
+    let input = deform::DeformInput {
+        positions, indices, joint_ids, weights, poses: pose_mats, labels, shell_count,
+    };
+    let reports = deform::probe(&input);
+
+    let rows: Vec<String> = reports
+        .iter()
+        .map(|r| {
+            format!(
+                "{{\"collapsed\":{},\"inverted\":{},\"torn\":{},\"max_stretch\":{},\
+\"mean_stretch\":{},\"max_displacement\":{},\"clipping_pairs\":{}}}",
+                r.collapsed, r.inverted, r.torn, r.max_stretch,
+                r.mean_stretch, r.max_displacement, r.clipping_pairs
+            )
+        })
+        .collect();
+    let json = format!(
+        "{{\"ok\":true,\"engine\":\"rust\",\"shells\":{},\"triangles\":{},\"poses\":[{}]}}",
+        shell_count,
+        input.indices.len() / 3,
+        rows.join(",")
+    );
+    let _ = emit(json, &[], &[]);
+    std::process::exit(0);
+}
+
 fn main() {
-    let input = match read_input() {
+    let mut raw = Vec::new();
+    if io::stdin().read_to_end(&mut raw).is_err() {
+        fail("cannot read stdin");
+    }
+    if raw.len() >= 4 && &raw[0..4] == DEFORM_MAGIC {
+        run_deform(&raw);
+    }
+    let input = match parse_input(&raw) {
         Ok(input) => input,
         Err(error) => fail(&error.to_string()),
     };

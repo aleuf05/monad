@@ -4,6 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Fleet Monad</title>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+    }
+  }
+</script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -131,6 +139,85 @@
   .ci-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
   .ci-dialog-body { padding: 12px 16px 16px; max-height: 76vh; overflow: auto; text-align: center; }
   .ci-dialog-body img { max-width: 100%; max-height: 70vh; border-radius: 6px; }
+
+  /* --- Gasket (live 3D component) ------------------------------------ */
+  .gasket-stage { margin: 30px 0 34px; }
+  .gasket-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: radial-gradient(120% 140% at 50% 20%, #17283A, #0B1220 70%); border: 1px solid #1E2C42; border-radius: 10px; overflow: hidden; }
+  .gasket-frame canvas { display: block; width: 100%; height: 100%; }
+  .gasket-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #6B7C93; font-size: 11px; letter-spacing: 0.06em; pointer-events: none; }
+  .gasket-caption { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; font-size: 10px; color: #6B7C93; letter-spacing: 0.04em; }
+  .gasket-caption .gasket-name { font-family: 'Oswald', sans-serif; letter-spacing: 0.12em; color: #4FD1C5; }
+  .gasket-upload { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; padding: 12px; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gasket-upload label.gu-file { background: #0B1220; border: 1px solid #1E2C42; color: #9AACBF; font-size: 10.5px; padding: 8px 11px; border-radius: 6px; cursor: pointer; }
+  .gasket-upload label.gu-file:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .gasket-upload input[type=file] { display: none; }
+  .gasket-upload input[type=password] { background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 10.5px; padding: 8px 10px; border-radius: 6px; width: 130px; }
+  .gasket-upload button { background: #4FD1C5; color: #05201D; border: none; font-weight: 700; font-size: 10.5px; padding: 8px 13px; border-radius: 6px; cursor: pointer; }
+  .gasket-upload button:disabled { opacity: 0.5; cursor: default; }
+  .gasket-upload .gu-status { font-size: 10px; color: #6B7C93; }
+  .gasket-upload .gu-filename { font-size: 10px; color: #6B7C93; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Tonight's build takes the space the gasket demo used to hold. */
+  .build-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .bh-title { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: #E8A33D; }
+  .bh-sub { font-size: 11.5px; color: #7B8CA6; }
+  .build-evidence { margin-top: 10px; }
+  .be-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 8px; }
+  .be-m { background: #0D1626; border: 1px solid #1E2C42; border-radius: 7px; padding: 10px 12px; }
+  .be-m .be-v { font-family: 'Oswald', sans-serif; font-size: 21px; color: #4FD1C5; line-height: 1.15; }
+  .be-m .be-k { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7C93; margin-top: 2px; }
+  .be-m .be-n { font-size: 10px; color: #8A9BB4; margin-top: 5px; line-height: 1.45; }
+  .be-sect { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7C93; margin: 18px 0 8px; }
+  .be-find { font-size: 11.5px; color: #9AACBF; line-height: 1.6; padding: 6px 0 6px 13px; border-left: 2px solid #2F4258; margin-bottom: 4px; }
+  .be-commits { display: flex; flex-direction: column; gap: 5px; }
+  .be-c { display: flex; gap: 10px; align-items: baseline; font-size: 11px; background: #0D1626; border: 1px solid #1E2C42; border-radius: 6px; padding: 7px 10px; }
+  .be-c .be-sha { color: #E8A33D; flex: none; }
+  .be-c .be-subj { color: #C6D5E8; }
+  .be-diff { font-size: 10.5px; color: #6B7C93; margin-top: 8px; }
+
+  /* Rig Bench — deliberately the loudest panel on the stage. It is the first
+     thing out of the rigging pipeline that a visitor can actually operate. */
+  .rig-bench { margin-top: 10px; padding: 12px 14px; background: #0D1626; border: 1px solid #2F6E63; border-radius: 8px; box-shadow: 0 0 0 1px rgba(94,214,190,0.12), 0 0 18px rgba(94,214,190,0.10); }
+  .rb-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+  .rb-title { font-size: 0.9rem; font-weight: 700; color: #5ED6BE; letter-spacing: 0.04em; }
+  .rb-new { display: inline-block; margin-left: 5px; padding: 1px 6px; border-radius: 3px; background: #5ED6BE; color: #06121B; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; vertical-align: middle; }
+  .rb-sub { font-size: 0.72rem; color: #7B8CA6; }
+  .rb-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 7px; }
+  .rb-toggle { background: #5ED6BE; color: #06121B; border: 0; border-radius: 5px; font: inherit; font-size: 0.76rem; font-weight: 700; padding: 6px 13px; cursor: pointer; }
+  .rb-toggle:hover { filter: brightness(1.1); }
+  .rb-toggle.on { background: #0D1626; color: #5ED6BE; border: 1px solid #2F6E63; }
+  .rb-stat { font-size: 0.74rem; color: #9FB3CC; }
+  .rb-bendrow label { font-size: 0.74rem; color: #7B8CA6; }
+  .rb-bendrow input[type=range] { flex: 1; min-width: 150px; max-width: 320px; }
+  .rb-deg { font-size: 0.76rem; color: #5ED6BE; min-width: 2.6rem; }
+  .rb-probe { margin-top: 9px; padding-top: 9px; border-top: 1px solid #1E2C42; font-size: 0.72rem; color: #9FB3CC; line-height: 1.6; }
+  .rb-probe .rbp-v { font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .rb-probe .pass { color: #5ED6BE; }
+  .rb-probe .warn { color: #E8A87C; }
+  .rb-probe .fail { color: #E8746C; }
+  .rb-probe code { color: #C6D5E8; }
+
+  .gasket-shader-deck { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 10px; padding: 12px 14px; background: #0D1626; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gsd-row { display: flex; align-items: center; gap: 10px; }
+  .gsd-row label, .gsd-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7C93; }
+  #gasketIntensity { width: 130px; accent-color: #4FD1C5; }
+  .gsd-palette { display: flex; gap: 6px; }
+  .gsd-swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .gsd-swatch.gsd-red { background: linear-gradient(135deg, #ff2a2a, #ff8a00); }
+  .gsd-swatch.gsd-blue { background: linear-gradient(135deg, #00eaff, #8a00ff); }
+  .gsd-swatch.gsd-green { background: linear-gradient(135deg, #33ff55, #ccff33); }
+  .gsd-swatch.active { border-color: #DCE6F2; }
+  .gsd-pulse { background: #111A2B; border: 1px solid #4FD1C5; color: #4FD1C5; font: inherit; font-weight: 700; font-size: 10.5px; padding: 8px 13px; border-radius: 6px; cursor: pointer; }
+  .gsd-pulse.off { border-color: #6B7C93; color: #6B7C93; }
+
+  .gasket-terminal { margin-top: 10px; padding: 12px 14px; background: #05080E; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gt-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #3A4C68; margin-bottom: 6px; }
+  .gt-row { display: flex; align-items: center; gap: 8px; }
+  .gt-prompt { color: #4FD1C5; font-size: 12px; }
+  .gasket-terminal input { flex: 1; background: none; border: none; color: #DCE6F2; font: inherit; font-size: 12px; padding: 4px 0; }
+  .gasket-terminal input:focus { outline: none; }
+  .gt-echo { margin-top: 6px; font-size: 10.5px; color: #6B7C93; min-height: 14px; }
+  .gt-echo.matched { color: #4FD1C5; }
 </style>
 </head>
 <body>
@@ -142,60 +229,89 @@
       <div class="tagline">FLAGSHIP MONAD · BRIDGE, INSTRUMENTS &amp; RECORD</div>
     </div>
 
+    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
+
     <div class="status-strip">
       <span>FLEET STATUS: <span id="fleetStatusVal" class="val val-unknown">CHECKING…</span> <span id="fleetStatusChecked" class="status-checked"></span></span>
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
-    <section class="captain-images" id="captainImages">
-      <div class="ci-head">
-        <span class="ci-title">Captain's Images</span>
-        <span class="ci-synced" id="ciSynced"></span>
+    <section class="gasket-stage" id="gasketStage">
+      <div class="build-head">
+        <span class="bh-title">Tonight's Build</span>
+        <span class="bh-sub" id="buildHeadline">Aegis rigging pipeline</span>
       </div>
-      <div id="ciBody"><p class="ci-empty">Loading&hellip;</p></div>
-    </section>
+      <div class="gasket-frame">
+        <canvas id="gasketCanvas"></canvas>
+        <div class="gasket-hint" id="gasketHint">Loading rigged artifact&hellip;</div>
+      </div>
+      <div class="gasket-caption">
+        <span>Live Render &middot; rigged output, drag to orbit</span>
+        <span class="gasket-name" id="gasketName">GASKET &mdash; RIGGED</span>
+      </div>
 
-    <dialog class="ci-dialog" id="ciDialog">
-      <div class="ci-dialog-head"><span id="ciDialogTime"></span><button class="ci-dialog-close" id="ciDialogClose">Close</button></div>
-      <div class="ci-dialog-body"><img id="ciDialogImg" src="" alt="Captain-generated image, full size"></div>
-    </dialog>
-
-    <section class="active-queue" id="activeQueue">
-      <div class="aq-head">
-        <span class="aq-title">Active Now &amp; Up Next</span>
-        <div class="aq-actions">
-          <button class="aq-btn" id="aqAddBtn">+ Add from archive</button>
-          <button class="aq-btn" id="aqManageBtn">Manage queue</button>
+      <!-- Rig Bench: the first testable artifact out of the Aegis pipeline.
+           The rigged GLB is real output, not a mock — INSPECT reports it as
+           rigged, and the bend slider drives its actual joints. -->
+      <div class="rig-bench" id="rigBench">
+        <div class="rb-head">
+          <span class="rb-title">Rig Bench <span class="rb-new">NEW</span></span>
+          <span class="rb-sub" id="rigBenchSub">first rigged artifact — Aegis pipeline</span>
         </div>
+        <div class="rb-row">
+          <button type="button" class="rb-toggle" id="rigToggle">Load rigged gasket</button>
+          <span class="rb-stat" id="rigStat">static model loaded</span>
+        </div>
+        <div class="rb-row rb-bendrow" id="rigBendRow" hidden>
+          <label for="rigBend">Bend</label>
+          <input type="range" id="rigBend" min="0" max="60" step="1" value="0">
+          <span class="rb-deg" id="rigBendVal">0&deg;</span>
+        </div>
+        <div class="rb-probe" id="rigProbe" hidden></div>
       </div>
-      <div id="aqBody"><p class="aq-empty">Loading queue&hellip;</p></div>
+
+      <!-- Evidence of tonight's build, generated from git rather than typed:
+           see web/data/build-evidence.json and the script that writes it. -->
+      <div class="build-evidence" id="buildEvidence"></div>
+
+      <form class="gasket-upload" id="gasketUploadForm" hidden>
+        <label class="gu-file" for="gasketFileInput">Choose .glb&hellip;</label>
+        <input type="file" id="gasketFileInput" accept=".glb,model/gltf-binary">
+        <span class="gu-filename" id="gasketFileName">No file selected</span>
+        <input type="password" id="gasketPassword" placeholder="Password" autocomplete="current-password">
+        <button type="submit" id="gasketUploadBtn" disabled>Upload GLB</button>
+        <span class="gu-status" id="gasketUploadStatus"></span>
+      </form>
+
+      <div class="gasket-shader-deck" hidden>
+        <div class="gsd-row">
+          <label for="gasketIntensity">Rim Intensity</label>
+          <input type="range" id="gasketIntensity" min="0" max="3" step="0.1" value="1.4">
+        </div>
+        <div class="gsd-row">
+          <span class="gsd-label">Palette</span>
+          <div class="gsd-palette">
+            <button type="button" class="gsd-swatch gsd-red" data-palette="red" title="Tactical Red"></button>
+            <button type="button" class="gsd-swatch gsd-blue active" data-palette="blue" title="Cyber Blue"></button>
+            <button type="button" class="gsd-swatch gsd-green" data-palette="green" title="Plasma Green"></button>
+          </div>
+        </div>
+        <button type="button" class="gsd-pulse" id="gasketPulseToggle">Pulse: ON</button>
+      </div>
+
+      <div class="gasket-terminal" hidden>
+        <div class="gt-label">Semantic Atmosphere Terminal</div>
+        <div class="gt-row">
+          <span class="gt-prompt">&gt;</span>
+          <input type="text" id="gasketTerminalInput" placeholder="dread, rum, coffee, maintenance, anomaly&hellip;" autocomplete="off">
+        </div>
+        <div class="gt-echo" id="gasketTerminalEcho"></div>
+      </div>
     </section>
-
-    <dialog class="aq-dialog" id="aqDialog">
-      <div class="aq-dialog-head"><h3 id="aqDialogTitle">Add from archive</h3><button class="aq-dialog-close" id="aqDialogClose">Close</button></div>
-      <div class="aq-dialog-body">
-        <input type="search" id="aqSearch" placeholder="Search projects, tools, pages&hellip;">
-        <div id="aqPicks"><p class="aq-empty">Loading archive&hellip;</p></div>
-      </div>
-    </dialog>
-
-    <a class="mike-berth" href="toys/mike-rocketry-notebook/">
-      <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
-      <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
-      <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
-    </a>
-
-    <a class="basin-berth" href="toys/living-basin/" style="display:none"
-      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
-      <div class="project-title">THE LIVING BASIN</div>
-      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
-    </a>
-
-    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
 
     <div class="archive-head">
-      <span class="archive-title">Project Archive</span>
+      <span class="archive-title">Start Here</span>
       <input type="search" id="archiveSearch" placeholder="Search sections&hellip;">
     </div>
     <div class="categories">
@@ -244,6 +360,54 @@
       </div>
     </div>
 
+    <section class="active-queue" id="activeQueue">
+      <div class="aq-head">
+        <span class="aq-title">Active Now &amp; Up Next</span>
+        <div class="aq-actions">
+          <button class="aq-btn" id="aqAddBtn">+ Add from archive</button>
+          <button class="aq-btn" id="aqManageBtn">Manage queue</button>
+        </div>
+      </div>
+      <div id="aqBody"><p class="aq-empty">Loading queue&hellip;</p></div>
+    </section>
+
+    <dialog class="aq-dialog" id="aqDialog">
+      <div class="aq-dialog-head"><h3 id="aqDialogTitle">Add from archive</h3><button class="aq-dialog-close" id="aqDialogClose">Close</button></div>
+      <div class="aq-dialog-body">
+        <input type="search" id="aqSearch" placeholder="Search projects, tools, pages&hellip;">
+        <div id="aqPicks"><p class="aq-empty">Loading archive&hellip;</p></div>
+      </div>
+    </dialog>
+
+    <div class="archive-head">
+      <span class="archive-title">Live Captain Feed</span>
+    </div>
+
+    <section class="captain-images" id="captainImages">
+      <div class="ci-head">
+        <span class="ci-title">Image Viewer</span>
+        <span class="ci-synced" id="ciSynced"></span>
+      </div>
+      <div id="ciBody"><p class="ci-empty">Loading&hellip;</p></div>
+    </section>
+
+    <dialog class="ci-dialog" id="ciDialog">
+      <div class="ci-dialog-head"><span id="ciDialogTime"></span><button class="ci-dialog-close" id="ciDialogClose">Close</button></div>
+      <div class="ci-dialog-body"><img id="ciDialogImg" src="" alt="Captain-generated image, full size"></div>
+    </dialog>
+
+    <a class="mike-berth" href="toys/mike-rocketry-notebook/">
+      <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
+      <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
+      <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
+    </a>
+
+    <a class="basin-berth" href="toys/living-basin/">
+      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
+      <div class="project-title">THE LIVING BASIN</div>
+      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
+    </a>
+
     <footer>
       REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
       <div class="footer-motto">Every artifact leaves a wake.</div>
@@ -291,10 +455,10 @@
   </script>
   <script>
     (function () {
-      // tools/root-console/sync_public_images.py copies the newest Codex
-      // generated images from ~/.codex/generated_images into
-      // web/captain-images/ and writes this manifest, every 10 minutes
-      // (cron). No backend involved -- same pattern as fleet-status.json.
+      // Live, not synced: every load calls public-images-api directly,
+      // which globs ~/.codex/generated_images fresh at request time and
+      // streams bytes straight from there -- no copy into web/, no
+      // manifest, no cache. See tools/root-console/public_images_server.py.
       var body = document.getElementById("ciBody");
       var syncedEl = document.getElementById("ciSynced");
       var dialog = document.getElementById("ciDialog");
@@ -320,13 +484,11 @@
         return Math.round(hr / 24) + "d ago";
       }
 
-      fetch("data/captain-images.json", { cache: "no-store" })
+      fetch("/public-images-api/api/images", { cache: "no-store" })
         .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
         .then(function (data) {
           var images = data.images || [];
-          if (data.synced_at) {
-            syncedEl.textContent = "synced " + timeAgo(data.synced_at);
-          }
+          syncedEl.textContent = "live";
           if (!images.length) {
             body.innerHTML = '<p class="ci-empty">No Captain-generated images yet.</p>';
             return;
@@ -356,5 +518,486 @@
     })();
   </script>
   <script src="assets/js/active-queue.js" data-root=""></script>
+  <script type="module">
+    // Live Gasket stage: reads assets/models/gasket/gasket.glb straight off
+    // disk (cache-busted by upload time) with no manifest/sync step. Falls
+    // back to a placeholder model only until the real Gasket asset exists.
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    (function () {
+      var frame = document.querySelector(".gasket-frame");
+      var canvas = document.getElementById("gasketCanvas");
+      var hint = document.getElementById("gasketHint");
+      if (!frame || !canvas) return;
+
+      var PLACEHOLDER_MODEL = "assets/models/uss-rubber-ducky.glb";
+      var GASKET_MODEL = "assets/models/gasket/gasket.glb";
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.set(2.2, 1.4, 2.6);
+
+      scene.add(new THREE.HemisphereLight(0x8fa8c9, 0x0b1220, 1.1));
+      var key = new THREE.DirectionalLight(0xffffff, 1.4);
+      key.position.set(3, 5, 2);
+      scene.add(key);
+      var rim = new THREE.PointLight(0x4fd1c5, 2.2, 12);
+      rim.position.set(-2, 1, -2);
+      scene.add(rim);
+
+      var controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 1.6;
+      controls.target.set(0, 0, 0);
+
+      function resize() {
+        var w = frame.clientWidth, h = frame.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(frame);
+      resize();
+
+      var current = null;
+      var PALETTES = {
+        blue: [new THREE.Color(0x00eaff), new THREE.Color(0x8a00ff)],
+        red: [new THREE.Color(0xff2a2a), new THREE.Color(0xff8a00)],
+        green: [new THREE.Color(0x33ff55), new THREE.Color(0xccff33)]
+      };
+      var uniforms = {
+        uTime: { value: 0 },
+        uIntensity: { value: 1.4 },
+        uColorA: { value: PALETTES.blue[0].clone() },
+        uColorB: { value: PALETTES.blue[1].clone() },
+        uPulseOn: { value: 1 },
+        uPulseSpeed: { value: 1.3 },
+        uGlitch: { value: 0 },
+        uWarmth: { value: 0.2 },
+        uSemanticTint: { value: new THREE.Color(0, 0, 0) }
+      };
+
+      // Semantic atmosphere state: parseSemanticPrompt() below sets these
+      // targets, and the animate() loop eases the live uniforms toward them
+      // every frame -- a plain lerp, no tween library needed.
+      var semanticTarget = { glitch: 0, warmth: 0.2, tint: new THREE.Color(0, 0, 0) };
+
+      // Drop-in shader wrapper: injects a time-driven fresnel/rim term into
+      // each material's existing shader via onBeforeCompile rather than
+      // replacing the material outright, so PBR/textures survive and the
+      // uniforms are live for the on-screen shader control deck below.
+      function wrapMaterialShader(material) {
+        if (!material || material.userData.__gasketWrapped) return;
+        material.userData.__gasketWrapped = true;
+        var prevOnBeforeCompile = material.onBeforeCompile;
+        material.onBeforeCompile = function (shader) {
+          if (prevOnBeforeCompile) prevOnBeforeCompile(shader);
+          shader.uniforms.uTime = uniforms.uTime;
+          shader.uniforms.uIntensity = uniforms.uIntensity;
+          shader.uniforms.uColorA = uniforms.uColorA;
+          shader.uniforms.uColorB = uniforms.uColorB;
+          shader.uniforms.uPulseOn = uniforms.uPulseOn;
+          shader.uniforms.uPulseSpeed = uniforms.uPulseSpeed;
+          shader.uniforms.uGlitch = uniforms.uGlitch;
+          shader.uniforms.uWarmth = uniforms.uWarmth;
+          shader.uniforms.uSemanticTint = uniforms.uSemanticTint;
+          shader.fragmentShader = shader.fragmentShader
+            .replace(
+              "#include <common>",
+              "#include <common>\n" +
+              "uniform float uTime;\n" +
+              "uniform float uIntensity;\n" +
+              "uniform vec3 uColorA;\n" +
+              "uniform vec3 uColorB;\n" +
+              "uniform float uPulseOn;\n" +
+              "uniform float uPulseSpeed;\n" +
+              "uniform float uGlitch;\n" +
+              "uniform float uWarmth;\n" +
+              "uniform vec3 uSemanticTint;\n"
+            )
+            .replace(
+              "#include <dithering_fragment>",
+              "#include <dithering_fragment>\n" +
+              // Real fresnel: view direction against the fragment's actual
+              // surface normal (not a fixed axis) -- a fixed vec3(0,0,1)
+              // here previously made this ~0 across almost the entire
+              // visible surface, which is why the rim glow was invisible.
+              "  float gasketFresnel = pow(1.0 - clamp(abs(dot(normalize(vViewPosition), normal)), 0.0, 1.0), 2.5);\n" +
+              "  vec3 gasketColor;\n" +
+              "  float gasketMag;\n" +
+              "  if (uPulseOn > 0.5) {\n" +
+              "    float mixAmt = 0.5 + 0.5 * sin(uTime * uPulseSpeed * 0.6);\n" +
+              "    gasketColor = mix(uColorA, uColorB, mixAmt);\n" +
+              "    gasketMag = uIntensity * (0.55 + 0.45 * sin(uTime * uPulseSpeed));\n" +
+              "  } else {\n" +
+              "    gasketColor = uColorA;\n" +
+              "    gasketMag = uIntensity;\n" +
+              "  }\n" +
+              "  gl_FragColor.rgb += gasketFresnel * gasketColor * gasketMag;\n" +
+              // Semantic atmosphere layer: a warm/cool color-mood wash plus
+              // a cheap scanline-tear "glitch" (RGB channel split on coarse
+              // horizontal bands, strength and phase driven by uGlitch/uTime)
+              // -- both real, visible GLSL, not just JS state with nothing
+              // consuming it.
+              "  gl_FragColor.rgb += uSemanticTint * 0.35;\n" +
+              "  gl_FragColor.rgb += vec3(0.32, 0.16, 0.03) * uWarmth;\n" +
+              "  if (uGlitch > 0.001) {\n" +
+              "    float gasketBand = floor(gl_FragCoord.y / 4.0);\n" +
+              "    float gasketNoise = fract(sin(gasketBand * 12.9898 + floor(uTime * 12.0) * 78.233) * 43758.5453);\n" +
+              "    float gasketJitter = (gasketNoise - 0.5) * uGlitch * 0.4;\n" +
+              "    gl_FragColor.r += gasketJitter;\n" +
+              "    gl_FragColor.b -= gasketJitter;\n" +
+              "    if (gasketNoise > 0.97) { gl_FragColor.rgb = vec3(gasketNoise); }\n" +
+              "  }\n"
+            );
+        };
+        material.needsUpdate = true;
+      }
+
+      function frameModel(object) {
+        var box = new THREE.Box3().setFromObject(object);
+        var size = new THREE.Vector3();
+        box.getSize(size);
+        var center = new THREE.Vector3();
+        box.getCenter(center);
+        var maxDim = Math.max(size.x, size.y, size.z) || 1;
+        var scale = 1.6 / maxDim;
+        object.scale.setScalar(scale);
+        object.position.sub(center.multiplyScalar(scale));
+      }
+
+      function loadModel(url, onReady) {
+        var loader = new GLTFLoader();
+        loader.load(
+          url,
+          function (gltf) {
+            if (current) scene.remove(current);
+            current = gltf.scene;
+            current.traverse(function (node) {
+              if (!node.isMesh) return;
+              if (Array.isArray(node.material)) {
+                node.material.forEach(wrapMaterialShader);
+              } else {
+                wrapMaterialShader(node.material);
+              }
+            });
+            frameModel(current);
+            scene.add(current);
+            if (hint) hint.style.display = "none";
+            if (onReady) onReady(current);
+          },
+          undefined,
+          function () {
+            if (url !== PLACEHOLDER_MODEL) {
+              loadModel(PLACEHOLDER_MODEL);
+            } else if (hint) {
+              hint.textContent = "Gasket render unavailable.";
+            }
+          }
+        );
+      }
+
+      // --- Rig Bench ---------------------------------------------------
+      // Standing rule: the front page carries the current build's testable
+      // artifact. Today that is the first rigged asset the Aegis pipeline
+      // produced. The bend slider drives its real joints, so what the
+      // Admiral moves here is the actual rig, not a preview of one.
+      var RIGGED_MODEL = "assets/rigged/gasket-rigged.glb";
+      var rigBones = [];
+      var rigOn = false;
+
+      function collectBones(root) {
+        var bones = [];
+        root.traverse(function (node) {
+          if (node.isBone) bones.push(node);
+        });
+        // Root first, then down the chain. The solver names them @Root,
+        // @Axis.001 … @Tip, which sorts correctly except for @Root itself.
+        bones.sort(function (a, b) {
+          if (a.name === "@Root") return -1;
+          if (b.name === "@Root") return 1;
+          if (a.name === "@Tip") return 1;
+          if (b.name === "@Tip") return -1;
+          return a.name.localeCompare(b.name);
+        });
+        return bones;
+      }
+
+      function applyBend(degrees) {
+        if (!rigBones.length) return;
+        var share = (degrees * Math.PI / 180) / Math.max(rigBones.length - 1, 1);
+        for (var i = 0; i < rigBones.length; i++) {
+          rigBones[i].rotation.z = i === 0 ? 0 : share;
+        }
+      }
+
+      var rigToggle = document.getElementById("rigToggle");
+      var rigStat = document.getElementById("rigStat");
+      var rigBendRow = document.getElementById("rigBendRow");
+      var rigBend = document.getElementById("rigBend");
+      var rigBendVal = document.getElementById("rigBendVal");
+      var rigProbe = document.getElementById("rigProbe");
+      var probeData = null;
+
+      // Evidence panel. Every number is read from a file git wrote, so the
+      // page cannot drift from what was actually committed.
+      fetch("data/build-evidence.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          var host = document.getElementById("buildEvidence");
+          if (!d || !host) return;
+          var head = document.getElementById("buildHeadline");
+          if (head) head.textContent = d.headline;
+
+          var html = '<div class="be-metrics">';
+          d.metrics.forEach(function (m) {
+            html += '<div class="be-m"><div class="be-v">' + m.v + "</div>" +
+              '<div class="be-k">' + m.k + "</div>" +
+              '<div class="be-n">' + m.note + "</div></div>";
+          });
+          html += "</div>";
+
+          html += '<div class="be-sect">What the build found</div>';
+          d.findings.forEach(function (f) {
+            html += '<div class="be-find">' + f + "</div>";
+          });
+
+          html += '<div class="be-sect">Commits</div><div class="be-commits">';
+          d.commits.forEach(function (c) {
+            html += '<div class="be-c"><span class="be-sha">' + c.sha + "</span>" +
+              '<span class="be-subj">' + c.subject + "</span></div>";
+          });
+          html += "</div>";
+          html += '<div class="be-diff">' + d.diffstat + " · " +
+            d.files_touched + " files touched</div>";
+          host.innerHTML = html;
+        })
+        .catch(function () {});
+
+      fetch("data/rig-probe.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          probeData = d;
+          if (!d) return;
+          var sub = document.getElementById("rigBenchSub");
+          if (sub) {
+            sub.textContent = d.joints + " joints · " + d.shells.toLocaleString() +
+              " disjoint shells · " + d.triangles.toLocaleString() + " triangles";
+          }
+        })
+        .catch(function () {});
+
+      function showProbe(degrees) {
+        if (!probeData || !rigProbe) return;
+        var best = probeData.poses[0];
+        for (var i = 0; i < probeData.poses.length; i++) {
+          if (probeData.poses[i].degrees <= degrees) best = probeData.poses[i];
+        }
+        rigProbe.hidden = false;
+        rigProbe.innerHTML =
+          '<span class="rbp-v ' + best.verdict + '">' + best.verdict + "</span> at " +
+          best.degrees + "&deg; — " + best.reason +
+          '<br><code>' + best.inverted + " inverted · " + best.collapsed +
+          " collapsed · " + best.torn + " torn · max stretch " +
+          best.max_stretch.toFixed(3) + "x</code>" +
+          '<br><span style="color:#6C7C93">Deformation probe (Packet Beta Module 3). ' +
+          "Per-shell rigid binding removes pinching entirely; what is left is " +
+          "parts swinging into each other.</span>";
+      }
+
+      if (rigToggle) {
+        rigToggle.addEventListener("click", function () {
+          rigOn = !rigOn;
+          rigToggle.classList.toggle("on", rigOn);
+          rigToggle.textContent = rigOn ? "Back to static gasket" : "Load rigged gasket";
+          rigBendRow.hidden = !rigOn;
+          if (!rigOn) {
+            rigBones = [];
+            if (rigProbe) rigProbe.hidden = true;
+            rigStat.textContent = "static model loaded";
+            loadModel(GASKET_MODEL);
+            return;
+          }
+          rigStat.textContent = "loading rigged asset…";
+          loadModel(RIGGED_MODEL, function (root) {
+            rigBones = collectBones(root);
+            rigStat.textContent = rigBones.length
+              ? rigBones.length + " joints bound — drag Bend to pose it"
+              : "loaded, but no joints found";
+            rigBend.value = 0;
+            rigBendVal.innerHTML = "0&deg;";
+            applyBend(0);
+            showProbe(0);
+          });
+        });
+      }
+
+      if (rigBend) {
+        rigBend.addEventListener("input", function () {
+          var degrees = parseFloat(rigBend.value);
+          rigBendVal.innerHTML = degrees + "&deg;";
+          applyBend(degrees);
+          showProbe(degrees);
+        });
+      }
+
+      // The stage opens on tonight's artifact, already rigged and posable.
+      // The static gasket is one button away rather than the default.
+      rigOn = true;
+      rigToggle.classList.add("on");
+      rigToggle.textContent = "Back to static gasket";
+      rigBendRow.hidden = false;
+      rigStat.textContent = "loading rigged asset…";
+      loadModel(RIGGED_MODEL, function (root) {
+        rigBones = collectBones(root);
+        rigStat.textContent = rigBones.length
+          ? rigBones.length + " joints bound — drag Bend to pose it"
+          : "loaded, but no joints found";
+        applyBend(0);
+        showProbe(0);
+      });
+
+      var clock = new THREE.Clock();
+      (function animate() {
+        requestAnimationFrame(animate);
+        var delta = clock.getDelta();
+        uniforms.uTime.value += delta;
+        // Ease toward the semantic engine's targets -- ~1.5s to settle,
+        // frame-rate independent, no tween library required.
+        var ease = 1 - Math.pow(0.01, delta / 1.5);
+        uniforms.uGlitch.value += (semanticTarget.glitch - uniforms.uGlitch.value) * ease;
+        uniforms.uWarmth.value += (semanticTarget.warmth - uniforms.uWarmth.value) * ease;
+        uniforms.uSemanticTint.value.lerp(semanticTarget.tint, ease);
+        controls.update();
+        renderer.render(scene, camera);
+      })();
+
+      // --- Upload widget --------------------------------------------------
+      var form = document.getElementById("gasketUploadForm");
+      var fileInput = document.getElementById("gasketFileInput");
+      var fileName = document.getElementById("gasketFileName");
+      var passwordInput = document.getElementById("gasketPassword");
+      var uploadBtn = document.getElementById("gasketUploadBtn");
+      var statusEl = document.getElementById("gasketUploadStatus");
+
+      function refreshUploadBtn() {
+        uploadBtn.disabled = !(fileInput.files.length && passwordInput.value);
+      }
+      fileInput.addEventListener("change", function () {
+        fileName.textContent = fileInput.files.length ? fileInput.files[0].name : "No file selected";
+        refreshUploadBtn();
+      });
+      passwordInput.addEventListener("input", refreshUploadBtn);
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!fileInput.files.length) return;
+        uploadBtn.disabled = true;
+        statusEl.textContent = "Uploading…";
+
+        var body = new FormData();
+        body.append("password", passwordInput.value);
+        body.append("file", fileInput.files[0]);
+
+        fetch("/gasket-upload-api/api/upload", { method: "POST", body: body })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (!result.ok || !result.data.ok) {
+              statusEl.textContent = (result.data && result.data.error) || "Upload failed.";
+              refreshUploadBtn();
+              return;
+            }
+            statusEl.textContent = "Uploaded — rendering live.";
+            passwordInput.value = "";
+            fileInput.value = "";
+            fileName.textContent = "No file selected";
+            if (hint) { hint.style.display = "flex"; hint.textContent = "Loading Gasket…"; }
+            loadModel(GASKET_MODEL + "?t=" + result.data.uploaded_at);
+          })
+          .catch(function () {
+            statusEl.textContent = "Upload failed — network error.";
+            refreshUploadBtn();
+          });
+      });
+
+      // --- Shader control deck: zero-latency uniform updates on interaction ---
+      var intensitySlider = document.getElementById("gasketIntensity");
+      var swatches = document.querySelectorAll(".gsd-swatch");
+      var pulseToggle = document.getElementById("gasketPulseToggle");
+
+      intensitySlider.addEventListener("input", function () {
+        uniforms.uIntensity.value = parseFloat(intensitySlider.value);
+      });
+
+      swatches.forEach(function (swatch) {
+        swatch.addEventListener("click", function () {
+          var palette = PALETTES[swatch.dataset.palette];
+          if (!palette) return;
+          uniforms.uColorA.value.copy(palette[0]);
+          uniforms.uColorB.value.copy(palette[1]);
+          swatches.forEach(function (s) { s.classList.remove("active"); });
+          swatch.classList.add("active");
+        });
+      });
+
+      pulseToggle.addEventListener("click", function () {
+        var on = uniforms.uPulseOn.value < 0.5;
+        uniforms.uPulseOn.value = on ? 1 : 0;
+        pulseToggle.textContent = "Pulse: " + (on ? "ON" : "OFF");
+        pulseToggle.classList.toggle("off", !on);
+      });
+
+      // --- Semantic Shader Prompt Box --------------------------------------
+      // Keyword -> atmosphere target. Values feed uGlitch/uWarmth/uSemanticTint,
+      // both of which have real GLSL consumers in wrapMaterialShader above.
+      var SEMANTIC_DICTIONARY = {
+        dread: { glitch: 0.8, warmth: 0.0, tint: [0.1, 0.2, 0.5] },
+        rum: { glitch: 0.1, warmth: 0.9, tint: [0.8, 0.5, 0.2] },
+        coffee: { glitch: 0.2, warmth: 0.5, tint: [0.5, 0.4, 0.3] },
+        maintenance: { glitch: 0.0, warmth: 0.1, tint: [0.2, 0.8, 0.6] },
+        anomaly: { glitch: 1.0, warmth: 0.3, tint: [0.9, 0.1, 0.8] }
+      };
+      var BASELINE_SEMANTIC = { glitch: 0, warmth: 0.2, tint: [0, 0, 0] };
+
+      var terminalInput = document.getElementById("gasketTerminalInput");
+      var terminalEcho = document.getElementById("gasketTerminalEcho");
+
+      function applySemanticTarget(target) {
+        semanticTarget.glitch = target.glitch;
+        semanticTarget.warmth = target.warmth;
+        semanticTarget.tint.setRGB(target.tint[0], target.tint[1], target.tint[2]);
+      }
+
+      function parseSemanticPrompt(promptText) {
+        var text = promptText.toLowerCase();
+        for (var keyword in SEMANTIC_DICTIONARY) {
+          if (text.indexOf(keyword) !== -1) {
+            applySemanticTarget(SEMANTIC_DICTIONARY[keyword]);
+            terminalEcho.textContent = '[Semantic Engine] state matched -> "' + keyword + '"';
+            terminalEcho.classList.add("matched");
+            return;
+          }
+        }
+        applySemanticTarget(BASELINE_SEMANTIC);
+        terminalEcho.textContent = "[Semantic Engine] unrecognized vector, returning to baseline.";
+        terminalEcho.classList.remove("matched");
+      }
+
+      if (terminalInput) {
+        terminalInput.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" || !terminalInput.value.trim()) return;
+          parseSemanticPrompt(terminalInput.value);
+          terminalInput.value = "";
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

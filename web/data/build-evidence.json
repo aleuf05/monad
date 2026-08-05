@@ -1,0 +1,70 @@
+{
+  "generated": "2026-08-05",
+  "headline": "Aegis rigging pipeline \u2014 built, shipped, and producing artifacts",
+  "commits": [
+    {
+      "sha": "1d338bc",
+      "subject": "Aegis RECORD: rig gasket-rigged.glb"
+    },
+    {
+      "sha": "4033181",
+      "subject": "Aegis RECORD: rig uss-rubber-ducky-rigged.glb"
+    },
+    {
+      "sha": "b27e1b9",
+      "subject": "Aegis rigging solver and pipeline stages 3-6"
+    },
+    {
+      "sha": "7bd843d",
+      "subject": "Review all 18 refusals; settle Rust/Python as doctrine 015"
+    },
+    {
+      "sha": "7197d9d",
+      "subject": "Lift the rig pipeline above the fold; fix the stuck preview placeholder"
+    },
+    {
+      "sha": "fb02dfa",
+      "subject": "LUCA resolved: research carried out and filed"
+    }
+  ],
+  "diffstat": "52 files changed, 5321 insertions(+), 68 deletions(-)",
+  "files_touched": 52,
+  "metrics": [
+    {
+      "k": "rigged assets",
+      "v": "2",
+      "note": "corpus had 0 this morning"
+    },
+    {
+      "k": "solver engine",
+      "v": "Rust",
+      "note": "7.2x on the 1.08M-vertex kraken (5,793ms -> 799ms)"
+    },
+    {
+      "k": "pipeline stages",
+      "v": "5 / 5",
+      "note": "INSPECT \u00b7 VALIDATE \u00b7 AUTHORIZE \u00b7 EXECUTE \u00b7 RECORD"
+    },
+    {
+      "k": "tests green",
+      "v": "88",
+      "note": "17 solver \u00b7 6 Rust/Python parity \u00b7 13 M3 \u00b7 52 Live Captain"
+    },
+    {
+      "k": "refusals reviewed",
+      "v": "18 / 18",
+      "note": "first full pass; 1 moot, 4 terminal, 2 resolved"
+    },
+    {
+      "k": "weight error",
+      "v": "2.98e-8",
+      "note": "max deviation from a weight sum of exactly 1.0"
+    }
+  ],
+  "findings": [
+    "Per-shell weight solving eliminates pinching completely \u2014 0 collapsed, 0 inverted, 0 torn faces at every bend angle tested.",
+    "What it does not eliminate is collision: 160 shell pairs newly overlap at 15 degrees, 399 at 60. Rigid parts swing into each other.",
+    "The corpus's fragmentation scale (~0.18 on gasket's axis) bounds useful bone density. Below it, skinning degenerates to rigid part binding.",
+    "Two figures in the LUCA packets, given without sources, turned out real and citable \u2014 the material was carrying good science under bad packaging."
+  ]
+}
