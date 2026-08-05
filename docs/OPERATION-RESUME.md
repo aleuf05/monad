@@ -66,7 +66,10 @@ below lists the services the Operation works on; the host actually runs
 > running. One known side effect: `test_live_captain.py` fails 1 of 52
 > while paused, because the test server reads the real flag. 52/52 unpaused.
 
-**Live services** — all `systemctl is-active` green:
+**Live services** — the ones *this Operation works on*. This is not the
+fleet: the host runs **23 installed units, 18 active**. Counting this table
+as the fleet was doctrine 021's error, made three times on 2026-08-05. For
+what is actually running, ask the host — `bash scripts/sound-the-ship.sh`.
 
 | Service | Port | What |
 |---|---|---|
@@ -199,7 +202,7 @@ Then: `012` (packet terms) → `013` (lifecycle + refusal review) → `014` (the
 working loop; §4a division of labour) → `015` (Rust for maths) → `016`
 (Chief Conference) → `017` (scope gaps surface when you ask to delegate) →
 `018` (instruments that agree by accident) → `020` (authority is
-permission, not correctness).
+permission, not correctness) → `021` (count the host, not the document).
 
 **Sound the ship before trusting its status:** `bash scripts/sound-the-ship.sh`
 checks python syntax, that every unit points at a real file, that installed
