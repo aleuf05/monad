@@ -16,8 +16,16 @@ below. Established 2026-08-05; first instance
    point: a bundle comes back partially answered or not at all.
 2. **Write it here** as `<ID>-<slug>.md`, following the shape below.
 3. **Commit it.** The Admiral carries it to the Chief.
-4. **Park the dependent work.** Don't build past the blocker while the
-   query is open; note the query as the reason work is parked.
+4. **Stop and wait.** (Admiral's directive, 2026-08-05: "when ready to
+   Chief-Resolve pause until you get response.") Not merely park the
+   dependent work — stop taking new work forward on Claude's own
+   initiative and leave the tree in a clean, committed state, so
+   whatever comes back lands on a known position rather than on top of
+   half-finished work.
+
+   Direct instruction from the Admiral still overrides: an open query
+   pauses self-directed work, not the Admiral. If asked to do something
+   while a query is open, do it.
 5. **File the response** when it comes back, under the normal
    documentarian flow (`../../doctrine/012-documentarian-packet-scheme.md`,
    `../../doctrine/013-packet-lifecycle-and-refusal-review.md`), and
