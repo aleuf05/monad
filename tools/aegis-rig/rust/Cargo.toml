@@ -1,0 +1,16 @@
+[package]
+name = "aegis-rig-core"
+version = "0.1.0"
+edition = "2021"
+
+# No dependencies, deliberately. The maths here is union-find and linear
+# interpolation; pulling in a crate graph to do that would cost more than it
+# saves, and this repo has no vendoring story yet.
+
+[[bin]]
+name = "aegis-rig-core"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true

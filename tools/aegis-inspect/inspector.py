@@ -166,10 +166,48 @@ def _bin_chunk_offset(data: bytes) -> int:
     raise AssetError("no binary chunk")
 
 
-def shell_analysis(path: Path) -> dict:
-    """Count connected components per primitive. Union-find with path
+def connected_components(indices, vertex_count: int) -> list[int]:
+    """Label every vertex with the shell it belongs to. Union-find with path
     compression; iterative, because a 2M-triangle mesh will not tolerate
-    recursion or anything clever."""
+    recursion or anything clever.
+
+    Returns a label per vertex, densely numbered from 0. Both VALIDATE (which
+    only counts them) and the rigging solver (which weights per shell) read
+    shells through this one function, so they cannot disagree about what a
+    shell is.
+    """
+    parent = list(range(vertex_count))
+
+    def find(x: int) -> int:
+        root = x
+        while parent[root] != root:
+            root = parent[root]
+        while parent[x] != root:      # path compression
+            parent[x], x = root, parent[x]
+        return root
+
+    for i in range(0, len(indices) - 2, 3):
+        a, b, c = indices[i], indices[i + 1], indices[i + 2]
+        ra, rb, rc = find(a), find(b), find(c)
+        if ra != rb:
+            parent[rb] = ra
+            rb = ra
+        if ra != rc:
+            parent[rc] = ra
+
+    dense: dict[int, int] = {}
+    labels = [0] * vertex_count
+    for v in range(vertex_count):
+        root = find(v)
+        label = dense.get(root)
+        if label is None:
+            label = dense[root] = len(dense)
+        labels[v] = label
+    return labels
+
+
+def shell_analysis(path: Path) -> dict:
+    """Count connected components per primitive."""
     data = path.read_bytes()
     parsed = parse_glb(path)
     gltf = parsed["gltf"]
@@ -185,29 +223,10 @@ def shell_analysis(path: Path) -> dict:
             vertex_count = gltf["accessors"][pos]["count"]
             indices = _read_indices(gltf, data, bin_offset, idx)
 
-            parent = list(range(vertex_count))
-
-            def find(x: int) -> int:
-                root = x
-                while parent[root] != root:
-                    root = parent[root]
-                while parent[x] != root:      # path compression
-                    parent[x], x = root, parent[x]
-                return root
-
-            for i in range(0, len(indices) - 2, 3):
-                a, b, c = indices[i], indices[i + 1], indices[i + 2]
-                ra, rb, rc = find(a), find(b), find(c)
-                if ra != rb:
-                    parent[rb] = ra
-                    rb = ra
-                if ra != rc:
-                    parent[rc] = ra
-
+            labels = connected_components(indices, vertex_count)
             sizes: dict[int, int] = {}
-            for v in range(vertex_count):
-                root = find(v)
-                sizes[root] = sizes.get(root, 0) + 1
+            for label in labels:
+                sizes[label] = sizes.get(label, 0) + 1
 
             ordered = sorted(sizes.values(), reverse=True)
             shells = len(ordered)

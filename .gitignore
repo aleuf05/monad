@@ -50,3 +50,4 @@ web/assets/libfive/*.stl
 # (web/data/captain-images.json) is tracked, like the other cron-refreshed
 # web/data/*.json feeds.
 web/captain-images/*
+tools/aegis-rig/rust/target/

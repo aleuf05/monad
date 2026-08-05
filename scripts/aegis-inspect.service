@@ -1,5 +1,5 @@
 [Unit]
-Description=Monad Aegis INSPECT (glTF geometry corpus inspection, via Caddy at cameronlampley.com/aegis-inspect-api)
+Description=Monad Aegis pipeline (INSPECT/VALIDATE/AUTHORIZE/EXECUTE/RECORD, via Caddy at cameronlampley.com/aegis-inspect-api)
 After=network-online.target
 Wants=network-online.target
 
@@ -15,6 +15,10 @@ NoNewPrivileges=true
 PrivateDevices=true
 PrivateTmp=true
 ProtectSystem=strict
+# EXECUTE writes rigged assets; RECORD commits them. Nothing else in the
+# repo is writable from this service.
+ReadWritePaths=/home/cgl/dev/monad/.git
+ReadWritePaths=/home/cgl/dev/monad/web/assets/rigged
 ProtectKernelTunables=true
 ProtectKernelModules=true
 RestrictSUIDSGID=true

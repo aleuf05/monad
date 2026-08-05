@@ -75,20 +75,42 @@
   .check.pass { color: var(--rigged); }
   .check.fail { color: var(--static); }
 
-  #validate-btn { width: calc(100% - 1.6rem); margin: 0.6rem 0.8rem 0; background: var(--tile); color: var(--text);
+  #validate-btn, .act-btn { width: calc(100% - 1.6rem); margin: 0.6rem 0.8rem 0; background: var(--tile); color: var(--text);
     border: 1px solid var(--border); border-radius: 5px; font: inherit; font-size: 0.72rem; padding: 0.4rem; cursor: pointer; }
-  #validate-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
-  #validate-btn:disabled { opacity: 0.5; cursor: default; }
+  #validate-btn:hover:not(:disabled), .act-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  #validate-btn:disabled, .act-btn:disabled { opacity: 0.5; cursor: default; }
+  .act-btn.armed { border-color: var(--accent); color: var(--accent); }
+  .act-btn.done { border-color: var(--rigged); color: var(--rigged); }
   .risk { margin: 0.5rem 0.8rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.72rem; line-height: 1.5; }
   .risk .rw { display: block; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
   .risk.low { border-color: var(--rigged); color: var(--rigged); }
   .risk.moderate { border-color: var(--warn); color: var(--warn); }
   .risk.high { border-color: #e8746c; color: #e8746c; }
+
+  /* Pipeline strip — the five stages, and which of them this asset has been
+     through. Lit means done in this session, not merely implemented. */
+  .strip { display: flex; gap: 3px; padding: 0.55rem 0.8rem 0.2rem; }
+  .strip .st { flex: 1; text-align: center; font-size: 0.52rem; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 0.3rem 0.1rem; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--dim); background: var(--tile); }
+  .strip .st.on { border-color: var(--rigged); color: var(--rigged); }
+  .strip .st.now { border-color: var(--accent); color: var(--accent); }
+
+  .joints-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem 0; font-size: 0.72rem; color: var(--dim); }
+  .joints-row input { flex: 1; }
+  .joints-row .jv { color: var(--text); min-width: 1.6rem; text-align: right; }
+
+  .new-badge { display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.35rem; border-radius: 3px;
+    background: var(--accent); color: #06121b; font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.08em; vertical-align: middle; }
+  .commit { margin: 0.5rem 0.8rem; padding: 0.45rem 0.6rem; border-radius: 6px; border: 1px solid var(--rigged);
+    color: var(--rigged); font-size: 0.7rem; line-height: 1.5; word-break: break-all; }
+  .commit code { font-size: 0.72rem; }
 </style>
 </head>
 <body>
   <header>
-    <h1>🦴 Aegis INSPECT <span style="color:var(--dim);font-weight:400;">— geometry corpus</span></h1>
+    <h1>🦴 Aegis Pipeline <span style="color:var(--dim);font-weight:400;">— inspect · validate · rig</span><span class="new-badge">RIG NEW</span></h1>
     <div style="display:flex;gap:0.9rem;align-items:center;">
       <a href="documents.html">📄 Documents</a>
       <a href="index.html">&larr; Back to console</a>
@@ -271,10 +293,151 @@ function renderDetail(a) {
     fact("glTF", a.gltf_version) +
     fact("path", a.path) +
     `<button id="validate-btn" data-p="${a.path}">VALIDATE — find disjoint shells</button>` +
-    `<div id="validate-out"></div>`;
+    `<div id="validate-out"></div>` +
+    rigPanel(a);
 
   const btn = document.getElementById("validate-btn");
   if (btn) btn.addEventListener("click", () => validate(a, btn));
+  wireRig(a);
+}
+
+// --- the rigging pipeline ---------------------------------------------------
+// AUTHORIZE gates and issues a token, EXECUTE spends it and writes the rigged
+// asset, RECORD commits it. Each stage stays visibly separate because the
+// decision to rig is a different act from the rigging.
+
+let rig = { token: null, stage: "VALIDATE" };
+
+function strip(stage) {
+  const order = ["INSPECT", "VALIDATE", "AUTHORIZE", "EXECUTE", "RECORD"];
+  const at = order.indexOf(stage);
+  return `<div class="strip">` + order.map((s, i) =>
+    `<div class="st ${i < at ? "on" : i === at ? "now" : ""}">${s}</div>`).join("") + `</div>`;
+}
+
+function rigPanel(a) {
+  if (!a.ok || !a.meshes) return "";
+  if (a.state === "rigged") {
+    return `<div class="sect">Rig pipeline</div>` + strip("RECORD") +
+      `<div class="verdict rigged"><span class="vw">already rigged</span>` +
+      `This asset carries a skin — the solver would refuse it at AUTHORIZE.</div>`;
+  }
+  return `<div class="sect">Rig pipeline</div>` +
+    `<div id="rig-strip">${strip("VALIDATE")}</div>` +
+    `<div class="joints-row"><span>joints</span>` +
+    `<input id="joints" type="range" min="2" max="24" value="8">` +
+    `<span class="jv" id="joints-v">8</span></div>` +
+    `<button class="act-btn" id="auth-btn">AUTHORIZE — run the gates</button>` +
+    `<button class="act-btn" id="exec-btn" disabled>EXECUTE — synthesise the rig</button>` +
+    `<button class="act-btn" id="rec-btn" disabled>RECORD — commit to git</button>` +
+    `<div id="rig-out"></div>`;
+}
+
+function wireRig(a) {
+  const slider = document.getElementById("joints");
+  if (!slider) return;
+  rig = { token: null, stage: "VALIDATE" };
+
+  const out = document.getElementById("rig-out");
+  const stripEl = document.getElementById("rig-strip");
+  const authBtn = document.getElementById("auth-btn");
+  const execBtn = document.getElementById("exec-btn");
+  const recBtn = document.getElementById("rec-btn");
+  const setStage = (s) => { rig.stage = s; stripEl.innerHTML = strip(s); };
+
+  slider.addEventListener("input", () => {
+    document.getElementById("joints-v").textContent = slider.value;
+    // Changing the bone count invalidates the authorization it was issued for.
+    if (rig.token) {
+      rig.token = null;
+      execBtn.disabled = recBtn.disabled = true;
+      authBtn.className = "act-btn";
+      authBtn.textContent = "AUTHORIZE — re-run the gates";
+      setStage("VALIDATE");
+    }
+  });
+
+  authBtn.addEventListener("click", async () => {
+    authBtn.disabled = true;
+    authBtn.textContent = "running gates…";
+    try {
+      const r = await fetch(`${API}/authorize/${encodeURI(a.path)}?joints=${slider.value}`,
+        { method: "POST" });
+      const d = await r.json();
+      const gates = (d.gates || []).map((g) =>
+        `<div class="check ${g.passed ? "pass" : "fail"}"><span class="box">${g.passed ? "✓" : "✗"}</span>${g.gate} — ${g.detail}</div>`).join("");
+      out.innerHTML = `<div class="risk ${d.ok ? "low" : "high"}">` +
+        `<span class="rw">${d.ok ? "authorized" : "refused"}</span>${d.note}</div>` +
+        `<div class="sect">Gates</div>` + gates +
+        (d.token ? fact("token", d.token) + fact("engine", d.engine) : "");
+      if (d.ok) {
+        rig.token = d.token;
+        execBtn.disabled = false;
+        execBtn.className = "act-btn armed";
+        authBtn.className = "act-btn done";
+        setStage("AUTHORIZE");
+      }
+      authBtn.textContent = "AUTHORIZE — re-run the gates";
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      authBtn.textContent = "AUTHORIZE — retry";
+    }
+    authBtn.disabled = false;
+  });
+
+  execBtn.addEventListener("click", async () => {
+    execBtn.disabled = true;
+    execBtn.textContent = "solving…";
+    try {
+      const r = await fetch(`${API}/execute/${rig.token}`, { method: "POST" });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+      out.innerHTML =
+        `<div class="risk low"><span class="rw">rigged</span>` +
+        `${d.joint_count} joints on the ${d.axis} axis; every weight sums to 1.0.</div>` +
+        `<div class="sect">Solver</div>` +
+        fact("engine", `${d.engine} · ${d.solve_ms} ms`) +
+        fact("joints", d.joint_names.join(" → ")) +
+        fact("bone span", d.bone_span) +
+        `<div class="sect">Shell handling</div>` +
+        fact("rigid shells", `${fmtNum(d.rigid_shells)} (${fmtNum(d.rigid_vertices)} verts)`) +
+        fact("blended shells", `${fmtNum(d.blended_shells)} (${fmtNum(d.blended_vertices)} verts)`) +
+        fact("max weight error", d.max_weight_error.toExponential(2)) +
+        `<div class="sect">Output</div>` +
+        fact("path", d.dest) +
+        fact("size", fmtBytes(d.rigged_bytes));
+      execBtn.className = "act-btn done";
+      execBtn.textContent = "EXECUTE — done";
+      recBtn.disabled = false;
+      recBtn.className = "act-btn armed";
+      setStage("EXECUTE");
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      execBtn.textContent = "EXECUTE — retry";
+      execBtn.disabled = false;
+    }
+  });
+
+  recBtn.addEventListener("click", async () => {
+    recBtn.disabled = true;
+    recBtn.textContent = "committing…";
+    try {
+      const r = await fetch(`${API}/record/${rig.token}`, { method: "POST" });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+      out.innerHTML = `<div class="commit"><strong>committed ${d.short}</strong><br>` +
+        `${d.path}<br><span style="color:var(--dim)">${d.note}</span></div>` +
+        `<pre style="margin:0 0.8rem;font-size:0.62rem;color:var(--dim);white-space:pre-wrap;">${d.message}</pre>`;
+      recBtn.className = "act-btn done";
+      recBtn.textContent = "RECORD — committed";
+      setStage("RECORD");
+      reload();
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      recBtn.textContent = "RECORD — retry";
+      recBtn.disabled = false;
+    }
+  });
 }
 
 // Packet Beta names weight bleeding across disjoint meshes as the failure
@@ -312,14 +475,33 @@ function select(a) {
   if (a.ok && a.meshes > 0) preview(a);
 }
 
-fetch(`${API}/assets`)
+function reload() {
+  return fetch(`${API}/assets`)
+    .then((r) => r.json())
+    .then((d) => {
+      assets = d.assets || [];
+      renderSummary(d.summary);
+      renderList();
+    })
+    .catch((e) => { summaryEl.innerHTML = `<div class="totals" style="color:var(--warn)">Failed to load: ${e}</div>`; });
+}
+
+// Which engine is doing the maths is worth stating on the page rather than
+// leaving in a log — it is the visible half of the Rust decision.
+fetch(`${API}/pipeline`)
   .then((r) => r.json())
   .then((d) => {
-    assets = d.assets || [];
-    renderSummary(d.summary);
-    renderList();
+    if (!d.ok) return;
+    const el = document.createElement("div");
+    el.className = "totals";
+    el.style.cssText = "padding:0.35rem 0.8rem;color:var(--dim);font-size:0.65rem;";
+    el.innerHTML = `solver engine <span style="color:var(--accent)">${d.engine}</span> · ` +
+      `${d.stages.filter((s) => s.built).length}/${d.stages.length} stages built`;
+    summaryEl.appendChild(el);
   })
-  .catch((e) => { summaryEl.innerHTML = `<div class="totals" style="color:var(--warn)">Failed to load: ${e}</div>`; });
+  .catch(() => {});
+
+reload();
 </script>
 </body>
 </html>

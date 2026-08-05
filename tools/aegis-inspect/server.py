@@ -10,7 +10,10 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "aegis-rig"))
 import inspector  # noqa: E402
+import pipeline  # noqa: E402
+import solver  # noqa: E402
 
 HOST, PORT = "127.0.0.1", 4799
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -63,7 +66,73 @@ class Handler(BaseHTTPRequestHandler):
             self.wfile.write(body)
             return
 
+        if path == "/api/pipeline":
+            self._json(200, {
+                "ok": True,
+                "stages": [
+                    {"stage": "INSPECT", "built": True,
+                     "note": "reads structure and rig state from the glTF JSON"},
+                    {"stage": "VALIDATE", "built": True,
+                     "note": "union-find over the index buffer; disjoint-shell risk"},
+                    {"stage": "AUTHORIZE", "built": True,
+                     "note": "runs the gates and issues a single-use token"},
+                    {"stage": "EXECUTE", "built": True,
+                     "note": "synthesises the skeleton and writes a rigged .glb"},
+                    {"stage": "RECORD", "built": True,
+                     "note": "commits to git — git is the provenance store"},
+                ],
+                "engine": "rust" if solver.core_available() else "python",
+                "engine_note": (
+                    "Rust core built — maths runs native"
+                    if solver.core_available()
+                    else "Rust core not built; falling back to the Python reference"),
+                "rigid_span_factor": solver.RIGID_SPAN_FACTOR,
+                "default_joints": solver.DEFAULT_JOINTS,
+            })
+            return
+
         self._json(404, {"ok": False, "error": "not found"})
+
+    def do_POST(self) -> None:
+        path = urlparse(self.path).path
+
+        if path.startswith("/api/authorize/"):
+            target = self._safe_asset(path[len("/api/authorize/"):])
+            if target is None:
+                self._json(404, {"ok": False, "error": "not found"})
+                return
+            joints = self._joint_count()
+            try:
+                self._json(200, pipeline.authorize(target, joints))
+            except Exception as error:  # noqa: BLE001 - report, don't crash the panel
+                self._json(500, {"ok": False, "error": str(error)})
+            return
+
+        for name, action in (("execute", pipeline.execute), ("record", pipeline.record)):
+            prefix = f"/api/{name}/"
+            if path.startswith(prefix):
+                token = unquote(path[len(prefix):]).strip("/")
+                try:
+                    self._json(200, action(token))
+                except pipeline.PipelineError as error:
+                    self._json(409, {"ok": False, "stage": name.upper(),
+                                     "error": str(error)})
+                except Exception as error:  # noqa: BLE001
+                    self._json(500, {"ok": False, "stage": name.upper(),
+                                     "error": str(error)})
+                return
+
+        self._json(404, {"ok": False, "error": "not found"})
+
+    def _joint_count(self) -> int:
+        raw = urlparse(self.path).query
+        for part in raw.split("&"):
+            if part.startswith("joints="):
+                try:
+                    return max(2, min(64, int(part[len("joints="):])))
+                except ValueError:
+                    break
+        return solver.DEFAULT_JOINTS
 
     def _safe_asset(self, rel: str) -> Path | None:
         """Resolve a request path to a .glb inside the repo, or nothing.
