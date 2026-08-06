@@ -63,3 +63,4 @@
 - **#56 · meeting_record** Live-audio acceptance is three-level: occurrence, intelligibility, and conversation usefulness; each requires separate human observation.
 - **#57 · meeting_record** Admiral heard a spoken token interpreted as “commit,” but it sounded closer to “comet”; command-word intelligibility remains unconfirmed.
 - **#58 · meeting_record** LIVE-AUDIO-ACCEPTANCE checklist is approved as the standard human acceptance artifact.
+- **#59 · meeting_record** Ambiguous spoken command tokens are observed and confirmed before execution; no consequential action proceeds from uncertain audio.
