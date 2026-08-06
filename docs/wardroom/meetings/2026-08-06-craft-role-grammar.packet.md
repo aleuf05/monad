@@ -64,3 +64,4 @@
 - **#57 · meeting_record** Admiral heard a spoken token interpreted as “commit,” but it sounded closer to “comet”; command-word intelligibility remains unconfirmed.
 - **#58 · meeting_record** LIVE-AUDIO-ACCEPTANCE checklist is approved as the standard human acceptance artifact.
 - **#59 · meeting_record** Ambiguous spoken command tokens are observed and confirmed before execution; no consequential action proceeds from uncertain audio.
+- **#60 · meeting_record** LIVE-AUDIO-COMMAND-STRESS-TEST is accepted as the standard bounded test packet for spoken command safety.
