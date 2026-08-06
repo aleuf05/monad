@@ -58,3 +58,6 @@
 - **#51 · meeting_record** Standard meeting mnemonic: OBSERVE → EXPLAIN → APPROVE → CAPTURE → READ BACK.
 - **#52 · meeting_record** The Wardroom continuity pass is the standard automatic post-meeting routine: validate the Clerk, export the ledger, and refresh the readable packet.
 - **#53 · meeting_record** wardroom-handoff.sh is the default automatic close-of-meeting action.
+- **#54 · meeting_record** Admiral witnessed live audio occur during the active meeting session.
+- **#55 · meeting_record** Refinement of audio acceptance: live audio occurrence was witnessed, but intelligibility and conversational usefulness remain unconfirmed.
+- **#56 · meeting_record** Live-audio acceptance is three-level: occurrence, intelligibility, and conversation usefulness; each requires separate human observation.

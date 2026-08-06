@@ -11,7 +11,7 @@ title="${3:-Publish Wardroom meeting packet}"
 branch="$(git branch --show-current)"
 
 scripts/wardroom-continuity-pass.sh "$ledger" "$packet"
-CAPTAIN_PUBLISH_PATHS="$packet scripts/wardroom-handoff.sh scripts/captain-publish-canon.sh scripts/wardroom-continuity-pass.sh" \
+CAPTAIN_PUBLISH_PATHS="$packet scripts/wardroom-handoff.sh scripts/wardroom-chat-handoff.sh scripts/captain-publish-canon.sh scripts/wardroom-continuity-pass.sh" \
   CAPTAIN_COMMIT_MESSAGE="Captain: ${title}" scripts/captain-publish-canon.sh
 
 if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
