@@ -76,7 +76,7 @@ echo "=== 6. Live Captain posture loads for both CLI embodiments ==="
 # repo had AGENTS.md but no CLAUDE.md, so Codex ran with full Live Captain
 # posture and Claude ran with none — silently, because both agents work fine
 # without it, just differently. Nothing else detects that.
-posture="LIVE-CAPTAIN-POSTURE.md"
+posture="EDIT-THIS-ONE-FILE.md"
 if [ ! -f "$posture" ]; then
   fault "$posture missing — neither embodiment has a posture source"
 else

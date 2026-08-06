@@ -27,13 +27,13 @@ it, because both agents work fine without posture. Just differently.
 One canonical source, two thin loaders — matching the repo's standing
 "one source of truth, don't replicate it" policy:
 
-- **`LIVE-CAPTAIN-POSTURE.md`** (new, root) — canonical and agent-neutral.
+- **`EDIT-THIS-ONE-FILE.md`** (new, root) — canonical and agent-neutral.
   Body carried over from the old `AGENTS.md` (57 of 59 sentences verbatim; the
   2 changes are the renamed title and `being Codex` → `which model you are`
   for neutrality), plus the integrated station from doctrine 023, the identity
   precondition rescued from `OUT_CLAUDE.md`, and the doctrine 024 research
   subposture.
-- **`CLAUDE.md`** (new, root) — identity line + `@LIVE-CAPTAIN-POSTURE.md`
+- **`CLAUDE.md`** (new, root) — identity line + `@EDIT-THIS-ONE-FILE.md`
   import, with a read-it-yourself fallback if the import ever stops inlining.
 - **`AGENTS.md`** (rewritten) — identity line + read instruction. Keeps the
   Codex-specific delta: Codex does *not* auto-load `/home/cgl/CLAUDE.md`, so
@@ -48,8 +48,8 @@ duty #3:
 
 | Embodiment | Carries posture | Source named | Duty #3 |
 |---|---|---|---|
-| Claude Code | yes | `LIVE-CAPTAIN-POSTURE.md` via `@import` | verbatim match |
-| Codex | yes | `LIVE-CAPTAIN-POSTURE.md` | verbatim match |
+| Claude Code | yes | `EDIT-THIS-ONE-FILE.md` via `@import` | verbatim match |
+| Codex | yes | `EDIT-THIS-ONE-FILE.md` | verbatim match |
 
 Third embodiment, the live service Captain (`live-captain-bootstrap`, :4778,
 own kernel at `tools/live-captain/prompts/captain-kernel.md`) — checked for
