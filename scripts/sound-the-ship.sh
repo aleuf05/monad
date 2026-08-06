@@ -70,6 +70,35 @@ for port in $(ss -ltn 2>/dev/null | grep -oE ':(4[0-9]{3})' | tr -d ':' | sort -
 done
 note "reachability of individual endpoints is not inferable from a prefix probe"
 
+echo "=== 6. Live Captain posture loads for both CLI embodiments ==="
+# Added 2026-08-06. Claude Code reads CLAUDE.md; Codex reads AGENTS.md. From
+# commit 5cc8de5 ("the no-CLAUDE.md experiment") until this check existed the
+# repo had AGENTS.md but no CLAUDE.md, so Codex ran with full Live Captain
+# posture and Claude ran with none — silently, because both agents work fine
+# without it, just differently. Nothing else detects that.
+posture="EDIT-THIS-ONE-FILE.md"
+if [ ! -f "$posture" ]; then
+  fault "$posture missing — neither embodiment has a posture source"
+else
+  [ -f CLAUDE.md ] || fault "CLAUDE.md missing — Claude loads no Live Captain posture"
+  [ -f AGENTS.md ] || fault "AGENTS.md missing — Codex loads no Live Captain posture"
+  grep -q "@$posture" CLAUDE.md 2>/dev/null \
+    || fault "CLAUDE.md does not import $posture"
+  grep -q "$posture" AGENTS.md 2>/dev/null \
+    || fault "AGENTS.md does not point at $posture"
+  # Entry points must stay thin. A loader that grows a posture body is a
+  # second copy, and a second copy is how the two embodiments drift apart.
+  for f in CLAUDE.md AGENTS.md; do
+    [ -f "$f" ] || continue
+    lines=$(wc -l < "$f")
+    [ "$lines" -le 45 ] || fault "$f is $lines lines — loaders stay thin, posture belongs in $posture"
+  done
+  if [ -f CLAUDE.md ] && [ -f AGENTS.md ]; then
+    note "posture: $(wc -l < "$posture") lines, loaded by CLAUDE.md and AGENTS.md"
+  fi
+fi
+
+
 echo
 if [ "$problems" -eq 0 ]; then
   echo "SHIP IS SOUND — no faults found."
