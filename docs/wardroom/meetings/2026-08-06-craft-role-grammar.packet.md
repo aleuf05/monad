@@ -57,3 +57,4 @@
 - **#50 · meeting_record** Board-focused Wardroom image captured for the official record; the whiteboard carries the process sequence OBSERVE → EXPLAIN → APPROVE → CAPTURE → READ BACK and the continuity reminder.
 - **#51 · meeting_record** Standard meeting mnemonic: OBSERVE → EXPLAIN → APPROVE → CAPTURE → READ BACK.
 - **#52 · meeting_record** The Wardroom continuity pass is the standard automatic post-meeting routine: validate the Clerk, export the ledger, and refresh the readable packet.
+- **#53 · meeting_record** wardroom-handoff.sh is the default automatic close-of-meeting action.
