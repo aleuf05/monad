@@ -15,12 +15,13 @@ CAPTAIN_PUBLISH_PATHS="$packet scripts/wardroom-handoff.sh scripts/captain-publi
   CAPTAIN_COMMIT_MESSAGE="Captain: ${title}" scripts/captain-publish-canon.sh
 
 if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-  if ! gh pr view --repo aleuf05/monad --head "$branch" >/dev/null 2>&1; then
+  existing_pr="$(gh pr list --repo aleuf05/monad --head "$branch" --state open --json url --jq '.[0].url' 2>/dev/null || true)"
+  if [[ -z "$existing_pr" ]]; then
     gh pr create --repo aleuf05/monad --draft --base main --head "$branch" \
       --title "$title" \
       --body "Automated Wardroom handoff. Continuity packet: ${packet}. Tests and export run by wardroom-continuity-pass.sh."
   else
-    gh pr view --repo aleuf05/monad --head "$branch" --json url --jq .url
+    printf '%s\n' "$existing_pr"
   fi
 else
   printf 'Published branch %s; GitHub draft creation unavailable.\n' "$branch"
