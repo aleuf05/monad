@@ -65,3 +65,5 @@
 - **#58 · meeting_record** LIVE-AUDIO-ACCEPTANCE checklist is approved as the standard human acceptance artifact.
 - **#59 · meeting_record** Ambiguous spoken command tokens are observed and confirmed before execution; no consequential action proceeds from uncertain audio.
 - **#60 · meeting_record** LIVE-AUDIO-COMMAND-STRESS-TEST is accepted as the standard bounded test packet for spoken command safety.
+- **#61 · meeting_record** Admiral typed the bridge-status directive and heard an audio confirmation reference.
+- **#62 · meeting_record** Phone loop remains unaccepted; no successful phone-based spoken-input and intelligible-response cycle has been established.
