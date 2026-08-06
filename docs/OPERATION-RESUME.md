@@ -49,11 +49,13 @@ below lists the services the Operation works on; the host actually runs
 
 ## 2. Current state
 
-> ### ⏸ THE LIVE CAPTAIN IS PAUSED
+> ### ▶ THE LIVE CAPTAIN IS RUNNING
 >
-> Paused 2026-08-05 at the Admiral's order. **This is deliberate, not a
-> fault.** Both services stay up and keep answering status; new turns are
-> refused with HTTP 409 and nothing is recorded. Continuity is intact.
+> Resumed since the 2026-08-05 pause; verified running 2026-08-06
+> (`pause.py status` → RUNNING, live turn returned 200 in 6.3s with a voice
+> artifact). The pause mechanism below still works and is how you stop it.
+> When paused, both services stay up and keep answering status; new turns
+> are refused with HTTP 409 and nothing is recorded. Continuity is intact.
 >
 > ```
 > python3 tools/live-captain/pause.py status   # check
