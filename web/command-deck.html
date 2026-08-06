@@ -20,9 +20,83 @@
 
   .lede { max-width: 560px; margin: 34px auto 6px; text-align: center; font-size: 12.5px; color: #8A9BB4; }
 
+  /* --- Active Queue ------------------------------------------------ */
+  .active-queue { margin-top: 28px; }
+  .aq-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .aq-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  .aq-actions { display: flex; gap: 8px; }
+  .aq-btn { background: #111A2B; border: 1px solid #1E2C42; color: #9AACBF; font: inherit; font-size: 10.5px; padding: 7px 11px; border-radius: 6px; cursor: pointer; letter-spacing: 0.02em; }
+  .aq-btn:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-btn.danger:hover { border-color: #E05252; color: #E05252; }
+  .aq-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+
+  .aq-current { position: relative; background: linear-gradient(120deg, #17283A, #111A2B 60%); border: 1px solid #E8A33D; border-radius: 10px; padding: 20px 22px; margin-bottom: 14px; }
+  .aq-current::before { content: "ACTIVE NOW"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #E8A33D; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .aq-current .aq-parent { color: #E8A33D; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  .aq-current .aq-item-title { font-family: 'Oswald', sans-serif; font-size: 21px; color: #F6C76D; margin: 5px 90px 6px 0; }
+  .aq-current .aq-summary { color: #9AACBF; font-size: 11.5px; line-height: 1.5; max-width: 640px; }
+  .aq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .aq-fields label { display: block; color: #6B7C93; font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; }
+  .aq-fields input, .aq-fields textarea, .aq-fields select { width: 100%; margin-top: 5px; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11.5px; padding: 7px 9px; border-radius: 5px; }
+  .aq-meta-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 10px; color: #6B7C93; }
+  .aq-row-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .aq-open { background: #E8A33D; color: #0B1220; border: none; font: inherit; font-weight: 700; font-size: 11px; padding: 9px 14px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
+
+  .aq-list { display: flex; flex-direction: column; gap: 8px; }
+  .aq-item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: #111A2B; border: 1px solid #1E2C42; border-radius: 7px; padding: 10px 12px; }
+  .aq-item .aq-item-title { font-size: 12.5px; color: #DCE6F2; }
+  .aq-item .aq-parent { color: #6B7C93; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; }
+  .aq-item .aq-next { color: #4FD1C5; font-size: 10.5px; margin-top: 3px; }
+  .aq-item.pinned { border-color: #4FD1C5; }
+  .aq-item-controls { display: flex; gap: 4px; align-items: center; }
+  .aq-mini { background: #0B1220; border: 1px solid #1E2C42; color: #9AACBF; font-size: 10px; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; }
+  .aq-mini:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-mini.on { border-color: #4FD1C5; color: #4FD1C5; background: #0F2A2C; }
+
+  .aq-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(560px, 92vw); max-height: 80vh; }
+  .aq-dialog::backdrop { background: #05080Ecc; }
+  .aq-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid #1E2C42; }
+  .aq-dialog-head h3 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: .04em; }
+  .aq-dialog-body { padding: 14px 18px; overflow-y: auto; max-height: 60vh; }
+  .aq-dialog input[type=search] { width: 100%; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; padding: 9px 11px; border-radius: 6px; margin-bottom: 12px; }
+  .aq-pick { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid #16202f; font-size: 11.5px; }
+  .aq-pick .aq-pick-name { color: #DCE6F2; }
+  .aq-pick .aq-pick-parent { color: #6B7C93; font-size: 9.5px; text-transform: uppercase; }
+  .aq-pick button { background: #10272a; border: 1px solid #4FD1C5; color: #4FD1C5; font: inherit; font-size: 10px; padding: 5px 9px; border-radius: 5px; cursor: pointer; }
+  .aq-pick button:disabled { border-color: #1E2C42; color: #6B7C93; cursor: default; }
+  .aq-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+
+  .archive-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 44px; }
+  .archive-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  #archiveSearch { background: #111A2B; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11px; padding: 7px 11px; border-radius: 6px; width: 200px; }
+  .cat-card.aq-hidden { display: none; }
+  @media (max-width: 560px) {
+    .aq-fields { grid-template-columns: 1fr; }
+    .aq-current .aq-item-title { margin-right: 0; }
+    #archiveSearch { width: 100%; }
+  }
+
+  .mike-berth { display: block; position: relative; overflow: hidden; margin: 26px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #17283A, #111A2B 55%, #103028); border: 1px solid #4FD1C5; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .mike-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #4FD1C522; }
+  .mike-berth::after { content: "NEW · VERBATIM SOURCE"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #4FD1C5; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .mike-berth .project-kicker { color: #4FD1C5; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
+  .basin-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #1E2416, #111A2B 55%, #1B2A1E); border: 1px solid #8FBF6E; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .basin-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #8FBF6E22; }
+  .basin-berth::after { content: "NEW · CAUSAL SIMULATION"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #8FBF6E; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .basin-berth .project-kicker { color: #8FBF6E; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .basin-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #C9E0A8; font-size: 23px; letter-spacing: .04em; }
+  .basin-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
+  .cat-card.mission-card { grid-column: 1 / -1; border-color: #E8A33D; background: linear-gradient(120deg, #171C2A, #111A2B 58%, #132A30); position: relative; overflow: hidden; }
+  .cat-card.mission-card::after { content: "LIVING DRAFT"; position: absolute; right: 18px; top: 16px; color: #E8A33D; border: 1px solid #E8A33D66; border-radius: 20px; padding: 3px 8px; font-size: 8px; letter-spacing: .1em; }
+  .cat-card.mission-card:hover { box-shadow: 0 0 24px #E8A33D18; }
+  .cat-card.mission-card .cat-desc { max-width: 660px; }
   .cat-eyebrow { font-size: 9.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 6px; }
   .cat-name { font-family: 'Oswald', sans-serif; font-size: 19px; letter-spacing: 0.02em; color: #DCE6F2; margin-bottom: 8px; }
   .cat-desc { font-size: 11.5px; color: #6B7C93; line-height: 1.55; }
@@ -36,6 +110,27 @@
 
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
   .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
+
+  /* --- Captain's Images ---------------------------------------------- */
+  .captain-images { margin: 30px 0 34px; }
+  .ci-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .ci-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #4FD1C5; }
+  .ci-synced { font-size: 10px; color: #6B7C93; }
+  .ci-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+  .ci-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ci-thumb { display: block; position: relative; aspect-ratio: 1 / 1; overflow: hidden; border: 1px solid #1E2C42; border-radius: 8px; background: #111A2B; cursor: pointer; padding: 0; }
+  .ci-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 200ms ease; }
+  .ci-thumb:hover { border-color: #4FD1C5; }
+  .ci-thumb:hover img { transform: scale(1.04); }
+  .ci-thumb .ci-time { position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 6px; font-size: 9px; color: #DCE6F2; background: linear-gradient(0deg, #05080Edd, transparent); opacity: 0; transition: opacity 150ms ease; }
+  .ci-thumb:hover .ci-time { opacity: 1; }
+  .ci-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(720px, 94vw); max-height: 90vh; }
+  .ci-dialog::backdrop { background: #05080Ecc; }
+  .ci-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1E2C42; }
+  .ci-dialog-head span { font-size: 10.5px; color: #6B7C93; }
+  .ci-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+  .ci-dialog-body { padding: 12px 16px 16px; max-height: 76vh; overflow: auto; text-align: center; }
+  .ci-dialog-body img { max-width: 100%; max-height: 70vh; border-radius: 6px; }
 </style>
 </head>
 <body>
@@ -47,14 +142,18 @@
       <div class="tagline">FLAGSHIP MONAD · BRIDGE, INSTRUMENTS &amp; RECORD</div>
     </div>
 
+    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
+
     <div class="status-strip">
       <span>FLEET STATUS: <span id="fleetStatusVal" class="val val-unknown">CHECKING…</span> <span id="fleetStatusChecked" class="status-checked"></span></span>
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
-    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
-
+    <div class="archive-head">
+      <span class="archive-title">Start Here</span>
+      <input type="search" id="archiveSearch" placeholder="Search sections&hellip;">
+    </div>
     <div class="categories">
       <a class="cat-card" href="command.html">
         <div class="cat-eyebrow">Act</div>
@@ -71,6 +170,11 @@
         <div class="cat-name">Build &amp; Research</div>
         <div class="cat-desc">Tools that make or study things — voices, shapes, assets, ideas. Not fleet control.</div>
       </a>
+      <a class="cat-card" href="toys/monad0-lab/" style="border-color:#71b7e6">
+        <div class="cat-eyebrow">NEW · Experiment</div>
+        <div class="cat-name">Monad-0 Nexus Laboratory</div>
+        <div class="cat-desc">Play the seeded strange-loop experiment: compare four architectures, inject probes, inspect hypotheses, and review bounded contracts.</div>
+      </a>
       <a class="cat-card" href="story.html">
         <div class="cat-eyebrow">Remember</div>
         <div class="cat-name">Story &amp; Records</div>
@@ -80,6 +184,11 @@
         <div class="cat-eyebrow">Who</div>
         <div class="cat-name">Crew</div>
         <div class="cat-desc">Who's aboard, and what each officer is responsible for.</div>
+      </a>
+      <a class="cat-card mission-card" href="core-mission.html">
+        <div class="cat-eyebrow">Why · Proposed</div>
+        <div class="cat-name">Core Mission</div>
+        <div class="cat-desc">Enter the living redefinition: Monad as a humane, evidence-bound restorative process—turning lived intent into testable intervention and preserving what reality teaches.</div>
       </a>
     </div>
 
@@ -91,8 +200,56 @@
       </div>
     </div>
 
+    <section class="active-queue" id="activeQueue">
+      <div class="aq-head">
+        <span class="aq-title">Active Now &amp; Up Next</span>
+        <div class="aq-actions">
+          <button class="aq-btn" id="aqAddBtn">+ Add from archive</button>
+          <button class="aq-btn" id="aqManageBtn">Manage queue</button>
+        </div>
+      </div>
+      <div id="aqBody"><p class="aq-empty">Loading queue&hellip;</p></div>
+    </section>
+
+    <dialog class="aq-dialog" id="aqDialog">
+      <div class="aq-dialog-head"><h3 id="aqDialogTitle">Add from archive</h3><button class="aq-dialog-close" id="aqDialogClose">Close</button></div>
+      <div class="aq-dialog-body">
+        <input type="search" id="aqSearch" placeholder="Search projects, tools, pages&hellip;">
+        <div id="aqPicks"><p class="aq-empty">Loading archive&hellip;</p></div>
+      </div>
+    </dialog>
+
+    <div class="archive-head">
+      <span class="archive-title">Live Captain Feed</span>
+    </div>
+
+    <section class="captain-images" id="captainImages">
+      <div class="ci-head">
+        <span class="ci-title">Image Viewer</span>
+        <span class="ci-synced" id="ciSynced"></span>
+      </div>
+      <div id="ciBody"><p class="ci-empty">Loading&hellip;</p></div>
+    </section>
+
+    <dialog class="ci-dialog" id="ciDialog">
+      <div class="ci-dialog-head"><span id="ciDialogTime"></span><button class="ci-dialog-close" id="ciDialogClose">Close</button></div>
+      <div class="ci-dialog-body"><img id="ciDialogImg" src="" alt="Captain-generated image, full size"></div>
+    </dialog>
+
+    <a class="mike-berth" href="toys/mike-rocketry-notebook/">
+      <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
+      <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
+      <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
+    </a>
+
+    <a class="basin-berth" href="toys/living-basin/">
+      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
+      <div class="project-title">THE LIVING BASIN</div>
+      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
+    </a>
+
     <footer>
-      IN GOD WE TRUST. ALL OTHERS BRING DATA.
+      REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
       <div class="footer-motto">Every artifact leaves a wake.</div>
     </footer>
   </div>
@@ -136,5 +293,70 @@
         });
     })();
   </script>
+  <script>
+    (function () {
+      // Live, not synced: every load calls public-images-api directly,
+      // which globs ~/.codex/generated_images fresh at request time and
+      // streams bytes straight from there -- no copy into web/, no
+      // manifest, no cache. See tools/root-console/public_images_server.py.
+      var body = document.getElementById("ciBody");
+      var syncedEl = document.getElementById("ciSynced");
+      var dialog = document.getElementById("ciDialog");
+      var dialogImg = document.getElementById("ciDialogImg");
+      var dialogTime = document.getElementById("ciDialogTime");
+      if (!body) return;
+
+      document.getElementById("ciDialogClose").addEventListener("click", function () {
+        dialog.close();
+      });
+      dialog.addEventListener("click", function (event) {
+        if (event.target === dialog) dialog.close();
+      });
+
+      function timeAgo(iso) {
+        var ms = Date.now() - new Date(iso).getTime();
+        if (!(ms >= 0)) return "";
+        var min = Math.round(ms / 60000);
+        if (min < 1) return "just now";
+        if (min < 60) return min + "m ago";
+        var hr = Math.round(min / 60);
+        if (hr < 24) return hr + "h ago";
+        return Math.round(hr / 24) + "d ago";
+      }
+
+      fetch("/public-images-api/api/images", { cache: "no-store" })
+        .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
+        .then(function (data) {
+          var images = data.images || [];
+          syncedEl.textContent = "live";
+          if (!images.length) {
+            body.innerHTML = '<p class="ci-empty">No Captain-generated images yet.</p>';
+            return;
+          }
+          var grid = document.createElement("div");
+          grid.className = "ci-grid";
+          images.forEach(function (image) {
+            var btn = document.createElement("button");
+            btn.className = "ci-thumb";
+            btn.type = "button";
+            btn.innerHTML =
+              '<img src="' + image.url + '" alt="Captain-generated image" loading="lazy">' +
+              '<span class="ci-time">' + timeAgo(image.generated_at) + "</span>";
+            btn.addEventListener("click", function () {
+              dialogImg.src = image.url;
+              dialogTime.textContent = "generated " + timeAgo(image.generated_at);
+              dialog.showModal();
+            });
+            grid.appendChild(btn);
+          });
+          body.innerHTML = "";
+          body.appendChild(grid);
+        })
+        .catch(function () {
+          body.innerHTML = '<p class="ci-empty">Image feed unreachable.</p>';
+        });
+    })();
+  </script>
+  <script src="assets/js/active-queue.js" data-root=""></script>
 </body>
 </html>

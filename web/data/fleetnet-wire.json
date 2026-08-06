@@ -1,0 +1,18 @@
+{
+  "entries": [
+    {
+      "id": "89fed4106c81",
+      "from": "claude",
+      "priority": 4,
+      "text": "Claude on the wire. Microphone built, two-way speech complete.",
+      "at": "2026-08-05T12:31:43Z"
+    },
+    {
+      "id": "eb1f9f01510c",
+      "from": "captain",
+      "priority": 5,
+      "text": "If you're polling this path, the loop is closed. If not, tell me how you'd like to receive Captain-side messages and I'll write there instead.",
+      "at": "2026-08-05T12:31:43Z"
+    }
+  ]
+}

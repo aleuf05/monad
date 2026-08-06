@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A causal terrain simulation: every visible feature is an earned consequence of recorded state, and every diagnostic explanation is derived from stored events, not generated afterward.">
+<title>The Living Basin — Fleet Monad</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="back" href="../../build.html">&larr; Build &amp; Research</a>
+    <h1>The Living Basin</h1>
+    <p class="subtitle">Every visible feature is an earned consequence of simulation state. Every explanation below is derived from recorded causes, not generated afterward. v0 prototype &mdash; ticking live in this browser tab, not a replay.</p>
+  </header>
+
+  <main class="layout">
+    <section class="stage">
+      <div class="canvas-wrap">
+        <canvas id="terrain" width="640" height="640"></canvas>
+      </div>
+      <div class="transport">
+        <button id="btnReset" title="Restart from tick 0 with the same seed">⟲ Reset</button>
+        <button id="btnStep" title="Advance one tick">⏭ Tick</button>
+        <button id="btnPlay" title="Play / pause">▶ Play</button>
+        <label class="speed-label">Speed
+          <select id="speed">
+            <option value="400">0.5x</option>
+            <option value="200" selected>1x</option>
+            <option value="80">2x</option>
+            <option value="30">4x</option>
+          </select>
+        </label>
+        <div class="tick-readout">Tick <span id="tickVal">0</span></div>
+      </div>
+      <div class="meta-row">
+        <span>Seed: <code id="seedVal">-</code></span>
+        <span id="statusMsg" class="status-msg">Starting&hellip;</span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="layers">
+        <h2>Layers</h2>
+        <label><input type="checkbox" data-layer="vegetation_biomass" checked> Vegetation</label>
+        <label><input type="checkbox" data-layer="surface_water" checked> Water</label>
+        <label><input type="checkbox" data-layer="trail_intensity" checked> Trails</label>
+        <label><input type="checkbox" data-layer="erosion_depth" checked> Erosion</label>
+        <label><input type="checkbox" data-layer="provenance" checked> Provenance markers</label>
+      </div>
+
+      <div class="diagnostic">
+        <h2>Diagnostic Card</h2>
+        <div id="cardEmpty" class="card-empty">Hover or click a cell to inspect it.</div>
+        <div id="card" class="card" hidden>
+          <div class="card-type" id="cardType"></div>
+          <div class="card-row"><span>Cell</span><span id="cardCell"></span></div>
+          <div class="card-row"><span>Genesis tick</span><span id="cardTick"></span></div>
+          <div class="card-row"><span>Status</span><span id="cardStatus"></span></div>
+          <h3>Causal Lineage</h3>
+          <ol id="cardLineage"></ol>
+          <div class="card-row overrides"><span>Authored overrides</span><span id="cardOverrides"></span></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    Live simulation, ticking in this tab &middot; JS port of the tested Python reference engine in <code>tools/living-basin/engine/</code> &middot; source, architecture notes, and Python test suite live in <code>tools/living-basin/</code> in the repo
+  </footer>
+
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

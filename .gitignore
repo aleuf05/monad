@@ -25,6 +25,11 @@ data/world-intake.sqlite3*
 data/mission-record/
 data/voice-engine/
 data/image-intake/
+data/living-captain-workbench/
+data/mike-rocketry-intake/
+data/chat-captain/
+data/monad0-lab/
+data/live-captain/
 logs/fleetcore-serve.log
 logs/npr-headlines-fetch.log
 logs/watch-officer-fetch.log
@@ -32,8 +37,27 @@ logs/review-inbox-fetch.log
 logs/lan-web-server.log
 logs/bridge-station-2.1-server.log
 logs/bridge-station-3.0-server.log
+logs/captain-images-sync.log
 
 # Generated 3D assets -- live on disk where they're served (web/), not
 # tracked in git. Regenerate or re-copy onto whatever box serves them.
 web/assets/models/*.glb
 web/assets/libfive/*.stl
+
+# Captain's generated-image gallery -- synced from ~/.codex/generated_images
+# by tools/root-console/sync_public_images.py every 10 minutes (cron). Live
+# binaries, not source, same treatment as the 3D assets above. The manifest
+# (web/data/captain-images.json) is tracked, like the other cron-refreshed
+# web/data/*.json feeds.
+web/captain-images/*
+tools/aegis-rig/rust/target/
+
+# Rigged assets are derived artifacts: EXECUTE regenerates them byte-identically
+# from source + solver (test_parity proves the sha256 matches). 345MB of GLB
+# does not delta-compress, so committing all of it would near-triple the repo
+# for data one command reproduces:
+#     python3 tools/aegis-rig/rig_corpus.py 8
+# The two the live front page depends on are already tracked and stay tracked;
+# git ignores this rule for files it already follows.
+web/assets/rigged/*.glb
+web/assets/rigged/variants/

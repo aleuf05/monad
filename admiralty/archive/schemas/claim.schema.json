@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "monad.admiralty.claim.v0.1",
+  "type": "object",
+  "required": ["id", "claim", "source_documents", "confidence", "authority_status", "support"],
+  "properties": {
+    "id": {"type": "string"}, "claim": {"type": "string"},
+    "source_documents": {"type": "array", "items": {"type": "string"}},
+    "source_locations": {"type": "array"}, "confidence": {"type": "string"},
+    "authority_status": {"type": "string"}, "support": {"type": "string"},
+    "conflicts_with": {"type": "array"}, "requires_review": {"type": "boolean"}
+  }
+}

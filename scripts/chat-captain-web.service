@@ -1,0 +1,28 @@
+[Unit]
+Description=Monad Chat Captain (LAN-only, Codex-backed; access control is the Caddy site block, not app login)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+EnvironmentFile=/home/cgl/.config/monad/gemini.env
+Environment=CHAT_CAPTAIN_ALLOWED_ORIGINS=https://cameronlampley.com,http://192.168.0.100:8080
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/chat-captain/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/cgl/dev/monad/data/chat-captain
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

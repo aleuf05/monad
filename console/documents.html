@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Semantic Document Viewer — Root Console</title>
+<style>
+  /* Three themes rather than two. Dark is the console's native register;
+     light is for daylight; paper is for the case this viewer actually
+     gets used for -- reading a long research document end to end, where
+     a warm low-contrast ground is easier on the eye than either. */
+  :root, :root[data-theme="dark"] {
+    color-scheme: dark;
+    --console-font: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --read-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --read-sans: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --bg: #14161a;
+    --panel: #1f2329;
+    --tile: #23272e;
+    --border: #4a5361;
+    --text: #f2f4f7;
+    --body-text: #d7dce3;
+    --dim: #a9b2c0;
+    --accent: #4fd1a5;
+    --warn: #f0b95a;
+    --gloss: #7fd8ff;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f6f7f9;
+    --panel: #eceef2;
+    --tile: #e1e4ea;
+    --border: #c2c8d2;
+    --text: #14181e;
+    --body-text: #2b323c;
+    --dim: #5c6675;
+    --accent: #0f8f6b;
+    --warn: #a86b00;
+    --gloss: #0b6f9c;
+  }
+  :root[data-theme="paper"] {
+    color-scheme: light;
+    --bg: #f2e9d8;
+    --panel: #e9dfc9;
+    --tile: #e0d4ba;
+    --border: #c3b393;
+    --text: #2f2a21;
+    --body-text: #433b2d;
+    --dim: #6f6350;
+    --accent: #1f7a5c;
+    --warn: #97600d;
+    --gloss: #1d6a86;
+  }
+
+  /* Reading preferences, applied only to the document body -- the UI
+     chrome stays monospace so the console never stops looking like a
+     console. */
+  #docBody {
+    font-family: var(--doc-font, var(--console-font));
+    font-size: var(--doc-size, 13.5px);
+    max-width: var(--doc-measure, 62ch);
+    line-height: var(--doc-leading, 1.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: var(--console-font); font-size: 13.5px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 0.04em; }
+  header a { color: var(--dim); text-decoration: none; font-size: 0.78rem; }
+  header a:hover { color: var(--accent); }
+
+  #layout { display: grid; grid-template-columns: 260px 1fr 260px; height: calc(100% - 46px); }
+  #left, #right { background: var(--panel); overflow-y: auto; border-right: 1px solid var(--border); }
+  #right { border-right: none; border-left: 1px solid var(--border); }
+  #center { overflow-y: auto; padding: 1.2rem 1.6rem; }
+
+  .pane-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 0.7rem 0.8rem 0.4rem; }
+  #search { width: calc(100% - 1.2rem); margin: 0 0.6rem 0.6rem; padding: 0.4rem 0.5rem; background: var(--tile); border: 1px solid var(--border); border-radius: 5px; color: var(--text); font: inherit; }
+  #search:focus { outline: none; border-color: var(--accent); }
+  .kbd-hint { margin: 0 0.8rem 0.6rem; font-size: 0.68rem; color: var(--dim); opacity: 0.8; }
+  .kbd-hint kbd { background: var(--tile); border: 1px solid var(--border); border-radius: 3px; padding: 0 0.3rem; font-family: inherit; }
+
+  .cat-group { margin-bottom: 0.4rem; }
+  .cat-label { padding: 0.3rem 0.8rem; font-size: 0.68rem; color: var(--warn); text-transform: uppercase; letter-spacing: 0.06em; }
+  .doc-row { display: flex; align-items: center; gap: 0.4rem; width: 100%; text-align: left; background: none; border: none; color: var(--dim); font: inherit; padding: 0.35rem 0.8rem; cursor: pointer; white-space: nowrap; overflow: hidden; }
+  .doc-row:hover { color: var(--text); background: var(--tile); }
+  .doc-row.active { color: var(--accent); background: var(--tile); border-left: 2px solid var(--accent); }
+  .doc-row .identicon { flex: none; }
+  .doc-row .row-title { overflow: hidden; text-overflow: ellipsis; }
+
+  /* Provenance-reactive typography: visual weight follows the epistemic
+     status already stated in each doc's own "Completion state" /
+     "Epistemic label" text, not a new judgment layered on top of it. */
+  .doc-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.2rem; }
+  .status-tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.15rem 0.45rem; border-radius: 3px; border: 1px solid currentColor; }
+  #center.status-refused .status-tag { color: var(--warn); }
+  #center.status-confirmed .status-tag { color: var(--accent); }
+  #center.status-proposal .status-tag { color: #8fb3e8; }
+  #center.status-reconstruction .status-tag { color: #c99bdb; }
+  #center.status-staged .status-tag { color: #e8a87c; }
+
+  /* Staged material reads as "arrived, not yet judged": full-strength text
+     (it is the author's real content, verbatim) inside a dashed frame that
+     visibly is not a filed document. */
+  #center.status-staged #docBody {
+    border: 1px dashed #e8a87c; border-radius: 8px;
+    padding: 0.9rem 1.1rem; background: rgba(232,168,124,0.04);
+  }
+  #center.status-staged #docBody h1 { color: #e8a87c; }
+  .cat-label.cat-incoming { color: #e8a87c; }
+  .cat-label.cat-query { color: #8fb3e8; }
+
+  #center.status-refused #docBody { opacity: 0.82; }
+  #center.status-refused #docBody h1 { color: var(--warn); }
+  #center.status-proposal #docBody { color: #cdd6e4; }
+  #center.status-proposal #docBody p { border-left: 2px dashed #8fb3e8; padding-left: 0.6rem; }
+  #center.status-reconstruction #docBody p { text-shadow: 0.5px 0 rgba(201,155,219,0.35), -0.5px 0 rgba(201,155,219,0.2); }
+
+  #center h1, #center h2, #center h3 { color: var(--text); }
+  #center h1 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+  #center h2 { font-size: 1.2em; margin-top: 1.6rem; }
+  #center h3 { font-size: 1.02em; color: var(--dim); }
+  #center p { line-height: inherit; color: var(--body-text); }
+  #center code { background: var(--tile); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.88em; font-family: var(--console-font); }
+  #center pre { background: var(--tile); border: 1px solid var(--border); border-radius: 6px; padding: 0.8rem; overflow-x: auto; font-family: var(--console-font); }
+  #center pre code { background: none; padding: 0; }
+  #center a.doclink { color: var(--accent); text-decoration: none; border-bottom: 1px dashed var(--accent); cursor: pointer; }
+  #center a.doclink:hover { background: var(--tile); }
+  #center ul { color: var(--body-text); line-height: inherit; }
+  #empty { color: var(--dim); padding: 2rem; text-align: center; }
+
+  /* Tables arrive for real now that .docx drops carry them (MSIR-CORE-001's
+     token vocabulary is one). Scrolls inside itself rather than widening
+     the reading column. */
+  #center .table-wrap { overflow-x: auto; margin: 0.9rem 0; }
+  #center table { border-collapse: collapse; width: 100%; font-size: 0.94em; }
+  #center th, #center td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; color: var(--body-text); }
+  #center th { background: var(--tile); color: var(--text); font-weight: 700; }
+
+  /* MSIR token glossing: tokens defined by MSIR-CORE-001 become
+     hoverable in every document that uses them. */
+  .msir-tok {
+    border-bottom: 1px dotted var(--gloss);
+    cursor: help; padding: 0 0.08em; border-radius: 2px;
+  }
+  .msir-tok:hover { background: color-mix(in srgb, var(--gloss) 18%, transparent); }
+  #msir-tip {
+    position: fixed; z-index: 40; max-width: 300px; pointer-events: none;
+    background: var(--panel); border: 1px solid var(--gloss); border-radius: 6px;
+    padding: 0.5rem 0.65rem; font-size: 0.74rem; line-height: 1.45;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45); display: none;
+  }
+  #msir-tip.show { display: block; }
+  #msir-tip .tip-tok { font-size: 1.1rem; }
+  #msir-tip .tip-name { color: var(--gloss); font-weight: 700; }
+  #msir-tip .tip-use { color: var(--dim); margin-top: 0.25rem; }
+
+  .msir-legend-row { display: flex; gap: 0.45rem; align-items: baseline; padding: 0.18rem 0; font-size: 0.76rem; }
+  .msir-legend-row .lg-tok { font-size: 0.95rem; flex: none; width: 1.4em; }
+  .msir-legend-row .lg-name { color: var(--body-text); }
+
+  /* Reading controls */
+  #readbar { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  #readbar .seg { display: flex; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+  #readbar .seg button {
+    background: var(--tile); color: var(--dim); border: none; font: inherit; font-size: 0.68rem;
+    padding: 0.22rem 0.42rem; cursor: pointer; border-right: 1px solid var(--border);
+  }
+  #readbar .seg button:last-child { border-right: none; }
+  #readbar .seg button.on { background: var(--accent); color: var(--bg); font-weight: 700; }
+  #readbar .seg button:hover:not(.on) { color: var(--text); }
+  #readbar .rb-label { font-size: 0.62rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  body.focus-mode #left, body.focus-mode #right { display: none; }
+  body.focus-mode #layout { grid-template-columns: 1fr; }
+  body.focus-mode #center { padding: 2rem 2.4rem; }
+  #center { display: flex; flex-direction: column; align-items: center; }
+  #center > * { width: 100%; max-width: var(--doc-measure, 62ch); }
+
+  .ctx-block { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); }
+  .ctx-block .ctx-label { font-size: 0.68rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+  .ctx-block .ctx-value { font-size: 0.82rem; color: var(--text); word-break: break-word; }
+  .ctx-related { display: block; width: 100%; text-align: left; background: none; border: none; color: var(--accent); font: inherit; font-size: 0.8rem; padding: 0.2rem 0; cursor: pointer; }
+  .ctx-related:hover { text-decoration: underline; }
+  .ctx-empty { color: var(--dim); font-size: 0.78rem; }
+
+  #login-gate { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: var(--bg); z-index: 10; }
+  #login-gate.hidden { display: none; }
+  #login-gate form { display: flex; flex-direction: column; gap: 0.85rem; padding: 1.8rem; border: 2px solid var(--accent); border-radius: 10px; background: var(--panel); box-shadow: 0 16px 48px rgba(0,0,0,0.7); min-width: 280px; }
+  #login-gate h2 { margin: 0; font-size: 0.9rem; color: var(--text); font-weight: 700; }
+  #login-gate input { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 5px; padding: 0.7rem; font-family: inherit; font-size: 1rem; }
+  #login-gate input:focus { outline: none; border-color: var(--accent); }
+  #login-gate button { background: var(--accent); color: #06251c; border: none; border-radius: 5px; padding: 0.7rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+  #login-gate .error { color: var(--warn); font-size: 0.8rem; min-height: 1em; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div id="login-gate" class="hidden">
+    <form id="login-form">
+      <h2>ROOT CONSOLE — authentication required</h2>
+      <input id="login-password" type="password" placeholder="password" autocomplete="current-password">
+      <button type="submit">Enter</button>
+      <div class="error" id="login-error"></div>
+    </form>
+  </div>
+  <header>
+    <h1>📄 Semantic Document Viewer</h1>
+    <div id="readbar">
+      <span class="rb-label">theme</span>
+      <div class="seg" id="seg-theme">
+        <button data-v="dark">dark</button><button data-v="light">light</button><button data-v="paper">paper</button>
+      </div>
+      <span class="rb-label">font</span>
+      <div class="seg" id="seg-font">
+        <button data-v="mono">mono</button><button data-v="sans">sans</button><button data-v="serif">serif</button>
+      </div>
+      <span class="rb-label">size</span>
+      <div class="seg" id="seg-size">
+        <button data-v="13.5">S</button><button data-v="15.5">M</button><button data-v="17.5">L</button><button data-v="20">XL</button>
+      </div>
+      <span class="rb-label">width</span>
+      <div class="seg" id="seg-measure">
+        <button data-v="52ch">narrow</button><button data-v="68ch">comfy</button><button data-v="100%">full</button>
+      </div>
+      <div class="seg" id="seg-toggles">
+        <button id="tgl-gloss" title="Gloss MSIR tokens with their canonical meaning">⚓ gloss</button><button id="tgl-focus" title="Hide side panes (F)">focus</button>
+      </div>
+      <a href="index.html">&larr; console</a>
+    </div>
+  </header>
+  <div id="msir-tip"></div>
+  <div id="layout">
+    <div id="left">
+      <div class="pane-title">Documents</div>
+      <input id="search" type="search" placeholder="Search incoming, packets, chronicle...">
+      <div class="kbd-hint"><kbd>&uarr;</kbd><kbd>&darr;</kbd> navigate &middot; <kbd>/</kbd> search &middot; <kbd>&crarr;</kbd> opens top match</div>
+      <div id="docList"><p class="ctx-empty" style="padding:0 0.8rem;">Loading…</p></div>
+    </div>
+    <div id="center">
+      <div id="empty">Select a document on the left. This viewer reads <code>docs/engineering-orders/packets/</code>, <code>docs/reports/</code>, <code>docs/logs/</code>, and <code>docs/doctrine/</code> fresh off disk on every load — no cache, no manifest.</div>
+    </div>
+    <div id="right">
+      <div class="pane-title">Semantic Context</div>
+      <div id="ctxBody"><p class="ctx-empty" style="padding:0 0.8rem;">No document selected.</p></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var CATEGORY_LABEL = { incoming: "Incoming (staged)", query: "Queries (open)", packet: "Packets", chronicle: "Chronicle", notes: "Engineering Notes", doctrine: "Doctrine" };
+      var CATEGORY_ORDER = ["incoming", "query", "packet", "chronicle", "notes", "doctrine"];
+
+      var entries = [];
+      var byId = {};
+      var activeId = null;
+      var visibleOrder = [];
+
+      var docList = document.getElementById("docList");
+      var center = document.getElementById("center");
+      var ctxBody = document.getElementById("ctxBody");
+      var search = document.getElementById("search");
+
+      function escapeHtml(s) {
+        return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      // Minimal, dependency-free markdown -> HTML: headers, fenced code
+      // blocks, inline code, bold/italic, links, lists, and this repo's
+      // own [[Packet]] cross-link convention (already used throughout
+      // docs/ and the memory files -- this viewer reuses the existing
+      // pattern rather than inventing a new link syntax).
+      function renderMarkdown(text) {
+        var lines = text.split("\n");
+        var html = [];
+        var inCode = false, codeBuf = [];
+        var inList = false;
+        var tableBuf = [];
+        lines.forEach(function (line) {
+          if (line.trim().startsWith("```")) {
+            if (inCode) {
+              html.push("<pre><code>" + escapeHtml(codeBuf.join("\n")) + "</code></pre>");
+              codeBuf = [];
+              inCode = false;
+            } else {
+              inCode = true;
+            }
+            return;
+          }
+          if (inCode) { codeBuf.push(line); return; }
+
+          // Markdown tables: real content now that .docx drops carry them.
+          if (/^\s*\|.*\|\s*$/.test(line)) {
+            if (inList) { html.push("</ul>"); inList = false; }
+            tableBuf.push(line);
+            return;
+          }
+          if (tableBuf.length) { html.push(renderTable(tableBuf)); tableBuf = []; }
+
+          var isListItem = /^\s*[-*]\s+/.test(line);
+          if (isListItem && !inList) { html.push("<ul>"); inList = true; }
+          if (!isListItem && inList) { html.push("</ul>"); inList = false; }
+
+          if (/^#{1,6}\s/.test(line)) {
+            var level = line.match(/^#+/)[0].length;
+            html.push("<h" + level + ">" + inline(line.replace(/^#+\s*/, "")) + "</h" + level + ">");
+          } else if (isListItem) {
+            html.push("<li>" + inline(line.replace(/^\s*[-*]\s+/, "")) + "</li>");
+          } else if (line.trim() === "") {
+            // paragraph break, nothing to emit
+          } else {
+            html.push("<p>" + inline(line) + "</p>");
+          }
+        });
+        if (tableBuf.length) html.push(renderTable(tableBuf));
+        if (inList) html.push("</ul>");
+        if (inCode && codeBuf.length) html.push("<pre><code>" + escapeHtml(codeBuf.join("\n")) + "</code></pre>");
+        return html.join("\n");
+      }
+
+      function splitRow(line) {
+        return line.trim().replace(/^\|/, "").replace(/\|$/, "")
+          .split(/(?<!\\)\|/).map(function (c) { return c.trim().replace(/\\\|/g, "|"); });
+      }
+
+      function renderTable(rows) {
+        if (!rows.length) return "";
+        var head = splitRow(rows[0]);
+        var body = rows.slice(1).filter(function (r) {
+          return !/^\s*\|[\s:|-]+\|\s*$/.test(r); // the --- separator row
+        });
+        var out = ["<div class='table-wrap'><table><thead><tr>"];
+        head.forEach(function (c) { out.push("<th>" + inline(c) + "</th>"); });
+        out.push("</tr></thead><tbody>");
+        body.forEach(function (r) {
+          out.push("<tr>");
+          splitRow(r).forEach(function (c) { out.push("<td>" + inline(c) + "</td>"); });
+          out.push("</tr>");
+        });
+        out.push("</tbody></table></div>");
+        return out.join("");
+      }
+
+      function inline(text) {
+        text = escapeHtml(text);
+        text = text.replace(/\[\[([^\]]+)\]\]/g, function (m, name) {
+          return '<a class="doclink" data-link="' + escapeHtml(name) + '">[[' + escapeHtml(name) + ']]</a>';
+        });
+        text = text.replace(/`([^`]+)`/g, "<code>$1</code>");
+        text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+        text = text.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
+        text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a class="doclink" href="$2" target="_blank" rel="noopener">$1</a>');
+        return text;
+      }
+
+      // --- MSIR token glossing ------------------------------------------
+      // The corpus defines its own notation: MSIR-CORE-001 carries a table
+      // of tokens with canonical meanings, and documents across the corpus
+      // then use those tokens bare (🧭 🔃 🧪 👹 ⚓ 🛡️ 📌 ➿). Rather than
+      // hard-code a glossary that would drift, this reads the definition
+      // table straight out of whichever document currently defines it, so
+      // the notation stays legible to a reader who hasn't memorised it and
+      // stays correct if the Admiral revises the vocabulary.
+      var msirTokens = {};   // token -> { name, use }
+      var glossOn = true;
+
+      function buildMsirGlossary() {
+        msirTokens = {};
+        var source = entries.find(function (e) {
+          return /\|\s*Token\s*\|/i.test(e.content) && /canonical meaning/i.test(e.content);
+        });
+        if (!source) return;
+        source.content.split("\n").forEach(function (line) {
+          if (!/^\s*\|/.test(line)) return;
+          var cells = splitRow(line);
+          if (cells.length < 2) return;
+          var tok = cells[0].trim();
+          if (!tok || /^-+$/.test(tok) || /^token$/i.test(tok)) return;
+          // A cell may define more than one token ("✅ / ❌").
+          tok.split(/\s*\/\s*/).forEach(function (t) {
+            t = t.trim();
+            if (t && !/[A-Za-z0-9]/.test(t)) {
+              msirTokens[t] = { name: cells[1] || "", use: cells[2] || "" };
+            }
+          });
+        });
+      }
+
+      function msirRegex() {
+        var toks = Object.keys(msirTokens).sort(function (a, b) { return b.length - a.length; });
+        if (!toks.length) return null;
+        return new RegExp("(" + toks.map(function (t) {
+          return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        }).join("|") + ")", "g");
+      }
+
+      // Walk text nodes only: rewriting innerHTML would corrupt attributes
+      // and re-run on already-glossed markup.
+      function glossMsir(root) {
+        var re = msirRegex();
+        if (!re || !glossOn) return;
+        var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+          acceptNode: function (node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            var p = node.parentElement;
+            while (p && p !== root) {
+              var tag = p.tagName;
+              if (tag === "PRE" || tag === "CODE" || p.classList.contains("msir-tok")) return NodeFilter.FILTER_REJECT;
+              p = p.parentElement;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        var targets = [];
+        while (walker.nextNode()) {
+          re.lastIndex = 0;
+          if (re.test(walker.currentNode.nodeValue)) targets.push(walker.currentNode);
+        }
+        targets.forEach(function (node) {
+          var frag = document.createDocumentFragment();
+          var text = node.nodeValue;
+          var last = 0;
+          re.lastIndex = 0;
+          var m;
+          while ((m = re.exec(text)) !== null) {
+            if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+            var span = document.createElement("span");
+            span.className = "msir-tok";
+            span.textContent = m[1];
+            span.dataset.tok = m[1];
+            frag.appendChild(span);
+            last = m.index + m[1].length;
+          }
+          if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+          node.parentNode.replaceChild(frag, node);
+        });
+      }
+
+      var tip = document.getElementById("msir-tip");
+      document.addEventListener("mouseover", function (ev) {
+        var el = ev.target.closest && ev.target.closest(".msir-tok");
+        if (!el) return;
+        var def = msirTokens[el.dataset.tok];
+        if (!def) return;
+        tip.innerHTML = '<div><span class="tip-tok">' + escapeHtml(el.dataset.tok) + '</span> <span class="tip-name">' +
+          escapeHtml(def.name) + "</span></div>" + (def.use ? '<div class="tip-use">' + escapeHtml(def.use) + "</div>" : "");
+        tip.classList.add("show");
+        var r = el.getBoundingClientRect();
+        var top = r.bottom + 8;
+        tip.style.left = Math.min(r.left, window.innerWidth - 320) + "px";
+        tip.style.top = (top + 120 > window.innerHeight ? r.top - tip.offsetHeight - 8 : top) + "px";
+      });
+      document.addEventListener("mouseout", function (ev) {
+        if (ev.target.closest && ev.target.closest(".msir-tok")) tip.classList.remove("show");
+      });
+
+      function msirLegendHtml(text) {
+        var present = Object.keys(msirTokens).filter(function (t) { return text.indexOf(t) !== -1; });
+        if (!present.length) return "";
+        return '<div class="ctx-block"><div class="ctx-label">MSIR tokens in this document</div>' +
+          present.map(function (t) {
+            return '<div class="msir-legend-row"><span class="lg-tok">' + escapeHtml(t) +
+              '</span><span class="lg-name">' + escapeHtml(msirTokens[t].name) + "</span></div>";
+          }).join("") + "</div>";
+      }
+
+      // --- Reading preferences ------------------------------------------
+      var FONTS = { mono: "var(--console-font)", sans: "var(--read-sans)", serif: "var(--read-serif)" };
+      var prefs = { theme: "dark", font: "mono", size: "13.5", measure: "68ch", gloss: "1", focus: "0" };
+      try { Object.assign(prefs, JSON.parse(localStorage.getItem("docviewer-prefs") || "{}")); } catch (e) {}
+
+      function applyPrefs() {
+        document.documentElement.dataset.theme = prefs.theme;
+        var root = document.documentElement.style;
+        root.setProperty("--doc-font", FONTS[prefs.font] || FONTS.mono);
+        root.setProperty("--doc-size", prefs.size + "px");
+        root.setProperty("--doc-measure", prefs.measure);
+        // Serif and larger sizes want more leading; mono at 13.5 does not.
+        root.setProperty("--doc-leading", prefs.font === "mono" ? "1.6" : "1.72");
+        glossOn = prefs.gloss === "1";
+        document.body.classList.toggle("focus-mode", prefs.focus === "1");
+        document.getElementById("tgl-gloss").classList.toggle("on", glossOn);
+        document.getElementById("tgl-focus").classList.toggle("on", prefs.focus === "1");
+        [["seg-theme", "theme"], ["seg-font", "font"], ["seg-size", "size"], ["seg-measure", "measure"]].forEach(function (pair) {
+          document.querySelectorAll("#" + pair[0] + " button").forEach(function (b) {
+            b.classList.toggle("on", b.dataset.v === prefs[pair[1]]);
+          });
+        });
+        try { localStorage.setItem("docviewer-prefs", JSON.stringify(prefs)); } catch (e) {}
+      }
+
+      [["seg-theme", "theme"], ["seg-font", "font"], ["seg-size", "size"], ["seg-measure", "measure"]].forEach(function (pair) {
+        document.getElementById(pair[0]).addEventListener("click", function (ev) {
+          if (!ev.target.dataset.v) return;
+          prefs[pair[1]] = ev.target.dataset.v;
+          applyPrefs();
+        });
+      });
+      document.getElementById("tgl-gloss").addEventListener("click", function () {
+        prefs.gloss = prefs.gloss === "1" ? "0" : "1";
+        applyPrefs();
+        if (activeId) openDoc(activeId);
+      });
+      document.getElementById("tgl-focus").addEventListener("click", function () {
+        prefs.focus = prefs.focus === "1" ? "0" : "1";
+        applyPrefs();
+      });
+
+      var STATUS_LABEL = { refused: "Refused", confirmed: "Confirmed", proposal: "Proposal", reconstruction: "Reconstruction", staged: "Staged", neutral: "Unclassified" };
+
+      // Deterministic per-entity "living glyph": a symmetric 5x5 block
+      // identicon (classic GitHub-avatar shape) hashed from the doc's own
+      // id, so identity stays stable across reloads without any stored
+      // image or manifest -- matching this viewer's live-off-disk rule.
+      function hashString(s) {
+        var h = 5381;
+        for (var i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+        return Math.abs(h);
+      }
+
+      function identiconSvg(id, size) {
+        var h = hashString(id);
+        var hue = h % 360;
+        var color = "hsl(" + hue + ", 62%, 58%)";
+        var cols = 3, rows = 5, cell = size / rows;
+        var cells = [];
+        var bit = 0;
+        for (var y = 0; y < rows; y++) {
+          for (var x = 0; x < cols; x++) {
+            bit++;
+            var on = ((h >> bit) & 1) === 1;
+            if (!on) continue;
+            cells.push([x, y]);
+            if (x < cols - 1) cells.push([rows > 0 ? (2 * cols - 2 - x) : x, y]); // mirror to make a 5-wide symmetric grid (cols=3 -> width 5)
+          }
+        }
+        var rects = cells.map(function (c) {
+          return '<rect x="' + (c[0] * cell) + '" y="' + (c[1] * cell) + '" width="' + cell + '" height="' + cell + '" fill="' + color + '"/>';
+        }).join("");
+        return '<svg class="identicon" width="' + size + '" height="' + size + '" viewBox="0 0 ' + (cell * 5) + " " + (cell * rows) + '" style="border-radius:2px;background:rgba(255,255,255,0.05);flex:none;">' + rects + "</svg>";
+      }
+
+      function timeAgo(mtimeSeconds) {
+        var ms = Date.now() - mtimeSeconds * 1000;
+        var min = Math.round(ms / 60000);
+        if (min < 60) return min + "m ago";
+        var hr = Math.round(min / 60);
+        if (hr < 24) return hr + "h ago";
+        return Math.round(hr / 24) + "d ago";
+      }
+
+      function renderList(filterText) {
+        var q = (filterText || "").toLowerCase();
+        docList.innerHTML = "";
+        visibleOrder = [];
+        CATEGORY_ORDER.forEach(function (cat) {
+          var group = entries.filter(function (e) {
+            return e.category === cat && (!q || e.title.toLowerCase().indexOf(q) !== -1 || e.excerpt.toLowerCase().indexOf(q) !== -1);
+          });
+          if (!group.length) return;
+          var wrap = document.createElement("div");
+          wrap.className = "cat-group";
+          var label = document.createElement("div");
+          label.className = "cat-label cat-" + cat;
+          label.textContent = CATEGORY_LABEL[cat] + " (" + group.length + ")";
+          wrap.appendChild(label);
+          group.forEach(function (e) {
+            visibleOrder.push(e.id);
+            var btn = document.createElement("button");
+            btn.className = "doc-row" + (e.id === activeId ? " active" : "");
+            btn.innerHTML = identiconSvg(e.id, 13) + '<span class="row-title"></span>';
+            btn.querySelector(".row-title").textContent = e.title;
+            btn.title = e.path + " — " + STATUS_LABEL[e.status || "neutral"];
+            btn.addEventListener("click", function () { openDoc(e.id); });
+            wrap.appendChild(btn);
+          });
+          docList.appendChild(wrap);
+        });
+        if (!docList.children.length) {
+          docList.innerHTML = '<p class="ctx-empty" style="padding:0 0.8rem;">No matches.</p>';
+        }
+        var activeRow = docList.querySelector(".doc-row.active");
+        if (activeRow) activeRow.scrollIntoView({ block: "nearest" });
+      }
+
+      function findByLoose(name) {
+        var norm = name.toLowerCase();
+        return entries.find(function (e) {
+          return e.title.toLowerCase() === norm || e.file.toLowerCase().indexOf(norm.replace(/\s+/g, "-")) !== -1 || e.id.toLowerCase().indexOf(norm) !== -1;
+        });
+      }
+
+      function openDoc(id) {
+        var entry = byId[id];
+        if (!entry) return;
+        activeId = id;
+        var status = entry.status || "neutral";
+        center.className = "status-" + status;
+        // entry.content already starts with its own "# Title" line (that's
+        // where entry.title was extracted from), so render it as-is rather
+        // than prepending a second, duplicate heading.
+        var head = status === "neutral" ? "" :
+          '<div class="doc-head">' + identiconSvg(entry.id, 22) + '<span class="status-tag">' + STATUS_LABEL[status] + "</span></div>";
+        center.innerHTML = head + '<div id="docBody">' + renderMarkdown(entry.content) + "</div>";
+        glossMsir(center.querySelector("#docBody"));
+        center.querySelectorAll("a.doclink[data-link]").forEach(function (a) {
+          a.addEventListener("click", function () {
+            var target = findByLoose(a.dataset.link);
+            if (target) openDoc(target.id);
+          });
+        });
+        renderList(search.value);
+        renderContext(entry);
+        center.scrollTop = 0;
+        // Deep-linkable + back/forward-able: reflect selection in the URL.
+        // Setting an already-matching hash is a no-op (no extra history
+        // entry, no hashchange re-fire), so this is safe to call on every
+        // open, whether triggered by click, keyboard, or a doclink.
+        var target = "#" + encodeURIComponent(id);
+        if (location.hash !== target) location.hash = target;
+      }
+
+      function moveSelection(delta) {
+        if (!visibleOrder.length) return;
+        var idx = visibleOrder.indexOf(activeId);
+        var next = idx === -1 ? 0 : Math.min(Math.max(idx + delta, 0), visibleOrder.length - 1);
+        openDoc(visibleOrder[next]);
+      }
+
+      function renderContext(entry) {
+        var relatedIds = new Set();
+        entry.links.forEach(function (link) {
+          var m = findByLoose(link);
+          if (m) relatedIds.add(m.id);
+        });
+        entries.forEach(function (e) {
+          if (e.id !== entry.id && e.links.some(function (l) { return findByLoose(l) && findByLoose(l).id === entry.id; })) {
+            relatedIds.add(e.id);
+          }
+        });
+
+        var html = "";
+        html += '<div class="ctx-block"><div class="ctx-label">Status</div><div class="ctx-value" style="display:flex;align-items:center;gap:0.4rem;">' + identiconSvg(entry.id, 16) + STATUS_LABEL[entry.status || "neutral"] + "</div></div>";
+        html += '<div class="ctx-block"><div class="ctx-label">Path</div><div class="ctx-value">' + escapeHtml(entry.path) + "</div></div>";
+        html += '<div class="ctx-block"><div class="ctx-label">Category</div><div class="ctx-value">' + escapeHtml(CATEGORY_LABEL[entry.category]) + "</div></div>";
+        html += '<div class="ctx-block"><div class="ctx-label">Last modified</div><div class="ctx-value">' + timeAgo(entry.mtime) + "</div></div>";
+        html += '<div class="ctx-block"><div class="ctx-label">Related packets (' + relatedIds.size + ')</div>';
+        if (relatedIds.size) {
+          relatedIds.forEach(function (id) {
+            var e = byId[id];
+            html += '<button class="ctx-related" data-id="' + id + '">' + escapeHtml(e.title) + "</button><br>";
+          });
+        } else {
+          html += '<span class="ctx-empty">No [[cross-links]] found.</span>';
+        }
+        html += "</div>";
+        html += msirLegendHtml(entry.content);
+        ctxBody.innerHTML = html;
+        ctxBody.querySelectorAll(".ctx-related").forEach(function (btn) {
+          btn.addEventListener("click", function () { openDoc(btn.dataset.id); });
+        });
+      }
+
+      search.addEventListener("input", function () { renderList(search.value); });
+      search.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && visibleOrder.length) { e.preventDefault(); openDoc(visibleOrder[0]); }
+        else if (e.key === "ArrowDown") { e.preventDefault(); moveSelection(1); }
+        else if (e.key === "ArrowUp") { e.preventDefault(); moveSelection(-1); }
+        else if (e.key === "Escape" && search.value) { search.value = ""; renderList(""); }
+      });
+
+      document.addEventListener("keydown", function (e) {
+        var tag = document.activeElement && document.activeElement.tagName;
+        var typing = tag === "INPUT" || tag === "TEXTAREA";
+        if (e.key === "/" && !typing) {
+          e.preventDefault();
+          search.focus();
+          search.select();
+        } else if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !typing) {
+          e.preventDefault();
+          moveSelection(e.key === "ArrowDown" ? 1 : -1);
+        } else if ((e.key === "f" || e.key === "F") && !typing) {
+          e.preventDefault();
+          document.getElementById("tgl-focus").click();
+        }
+      });
+
+      applyPrefs();
+
+      window.addEventListener("hashchange", function () {
+        var id = decodeURIComponent(location.hash.replace(/^#/, ""));
+        if (id && byId[id] && id !== activeId) openDoc(id);
+      });
+
+      // This page can be reached directly (e.g. the console header button)
+      // without the app-level login (separate from the outer /root gate)
+      // ever having happened. Rather than a silent, cryptic "401" -- the
+      // actual bug a real test run just caught -- show the same login gate
+      // the console itself uses, and retry loading once authenticated.
+      var loginGate = document.getElementById("login-gate");
+      var loginForm = document.getElementById("login-form");
+      var loginPassword = document.getElementById("login-password");
+      var loginError = document.getElementById("login-error");
+
+      function loadCorpus() {
+        fetch("/root-console-api/api/docs-corpus", { credentials: "include", cache: "no-store" })
+          .then(function (res) {
+            if (res.status === 401) { loginGate.classList.remove("hidden"); loginPassword.focus(); throw new Error("auth"); }
+            if (!res.ok) throw new Error(String(res.status));
+            return res.json();
+          })
+          .then(function (data) {
+            loginGate.classList.add("hidden");
+            entries = data.entries || [];
+            byId = {};
+            entries.forEach(function (e) { byId[e.id] = e; });
+            buildMsirGlossary();
+            renderList("");
+            var hashId = decodeURIComponent(location.hash.replace(/^#/, ""));
+            if (hashId && byId[hashId]) openDoc(hashId);
+            else if (entries.length) openDoc(entries[0].id);
+          })
+          .catch(function (err) {
+            if (err.message === "auth") return;
+            docList.innerHTML = '<p class="ctx-empty" style="padding:0 0.8rem;">Failed to load (' + err.message + ').</p>';
+          });
+      }
+
+      loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        fetch("/root-console-api/api/login", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          credentials: "include", body: JSON.stringify({ password: loginPassword.value })
+        })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (!result.ok) {
+              loginError.textContent = (result.data && result.data.error) || "Login failed.";
+              return;
+            }
+            loginPassword.value = "";
+            loginError.textContent = "";
+            loadCorpus();
+          })
+          .catch(function () { loginError.textContent = "Network error."; });
+      });
+
+      loadCorpus();
+    })();
+  </script>
+</body>
+</html>

@@ -22,6 +22,7 @@
   var signal = document.getElementById("signal");
   var empty = document.getElementById("empty");
   var proposal = document.getElementById("proposal");
+  var resolve = document.getElementById("resolve");
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, function (character) {
@@ -89,6 +90,7 @@
     }).join("");
     empty.style.display = "none";
     proposal.classList.add("visible");
+    resolve.classList.add("visible");
     signal.textContent = "Reviewed language accepted. Nine physical and review requirements remain unresolved.";
     signal.className = "signal";
   }
@@ -123,6 +125,38 @@
       try { render(JSON.parse(reader.result)); } catch (_) { refuse("file is not valid JSON"); }
     };
     reader.readAsText(file);
+  });
+
+  document.getElementById("compileDemo").addEventListener("click", function () {
+    var values = {};
+    document.querySelectorAll("[data-measure]").forEach(function (input) { values[input.dataset.measure] = Number(input.value); });
+    var valid = Object.keys(values).every(function (key) { return Number.isFinite(values[key]) && values[key] > 0; });
+    var signal = document.getElementById("compileSignal");
+    if (!valid) { signal.textContent = "Every illustrative measurement must be a positive number."; signal.className = "signal error"; return; }
+    signal.textContent = "Typed computational contract accepted; source gesture remains provenance.";
+    signal.className = "signal";
+    document.getElementById("compiled").hidden = false;
+    var svg = document.getElementById("bracketPreview");
+    svg.innerHTML = '<rect x="35" y="35" width="350" height="230" rx="5" fill="#102b3b" stroke="#4fd1c5" stroke-width="3"/><circle cx="210" cy="145" r="72" fill="#08111e" stroke="#e8a33d" stroke-width="3"/><circle cx="125" cy="82" r="10" fill="#08111e" stroke="#4fd1c5" stroke-width="3"/><circle cx="295" cy="82" r="10" fill="#08111e" stroke="#4fd1c5" stroke-width="3"/><path d="M185 265h50l' + (values.notch * 2) + ' 0v-22h-' + (values.notch * 2) + 'z" fill="#08111e" stroke="#e06b67" stroke-width="3"/><text x="210" y="286" text-anchor="middle" fill="#8192aa" font-size="10">illustrative ' + values.width + ' × ' + values.height + ' × ' + values.thickness + ' mm contract</text>';
+    document.getElementById("next").innerHTML = "<strong>Reality boundary:</strong> this is a computational proposal from illustrative measurements. Replace the fixture values with measured interfaces, then print and test before calling it a successful part.";
+  });
+
+  document.getElementById("downloadContract").addEventListener("click", function () {
+    var packet = {
+      schema_version: "intentforge.publicContractPacket.v0.1",
+      status: "computational-only-proposal",
+      source_episode_id: "episode-reviewed-demonstration",
+      units: "mm",
+      measurements: {},
+      sacred_interfaces: ["Panel.Hole:1", "Panel.Hole:2", "Fan.Face:A"],
+      keep_out: { source: "gesture:keep-out", representation: "edge-notch", dimensions_are_illustrative: true },
+      validation: { geometry_proposed: true, constraints_checked: true, printability_estimated: true, manufactured: false, physically_tested: false, validated_for_use: false },
+      warning: "Replace all illustrative values with physical measurements and review the resulting part before manufacture."
+    };
+    document.querySelectorAll("[data-measure]").forEach(function (input) { packet.measurements[input.dataset.measure] = Number(input.value); });
+    var blob = new Blob([JSON.stringify(packet, null, 2)], { type: "application/json" });
+    var link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "intentforge-fan-bracket-contract-v0.1.json"; link.click();
+    setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
   });
 
   var handoff = localStorage.getItem(HANDOFF_KEY);

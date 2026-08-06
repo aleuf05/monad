@@ -17,6 +17,43 @@ building out elaborate local test harnesses first.
 - This does not relax the URL/port policy right below -- "test live" means
   the real domain, not a throwaway port standing in for it.
 
+## POLICY: Liveness means concurrent, not just deployed
+
+"No staging" has a sharper edge than "edit the real files instead of a
+copy." As of 2026-08-01, Root Console proved it in practice: while Claude
+was mid-edit on `console/assets/js/root-console.js`, the Captain -- the
+Codex daemon in `tools/root-console`, which holds its own real
+`sandbox: workspace-write` session against this same repo -- independently
+added a whole feature (an image-preview lightbox) to that same file, in the
+same window, with no coordination between the two agents beyond the
+filesystem itself. Full account, evidence, and the near-miss risk this
+creates: `docs/reports/2026-08-01-live-concurrent-ux-development.md`.
+
+That is what "live" actually means here, and it is stated as policy because
+it changes how any agent -- human, Claude, or Captain -- must behave when
+editing shared files, not just where:
+
+- **Re-read a file immediately before editing it, even one you read
+  minutes ago in the same session.** On this project, staleness between a
+  read and a write is not a hypothetical to guard against out of general
+  discipline -- it has already happened. Another live agent may hold
+  write access to the exact file you're about to change.
+- **There is no lock and no merge step.** Two agents editing the same file
+  concurrently can clobber each other; it hasn't happened yet by luck of
+  non-overlapping regions, not by any protection. Prefer small, frequent
+  edits over long-held in-progress rewrites of a shared file, to shrink the
+  window where a collision is possible.
+- **A file diverging from what you last wrote is not necessarily an error
+  or an accident to investigate and revert.** It may be the Captain (or the
+  Admiral, or a future second agent) doing its own live, authorized work on
+  the same live surface. Read what changed, understand it, build on it --
+  don't reflexively stomp it back to your last version.
+- This is the operational payoff of "no dev/staging, ever": it is precisely
+  what makes this kind of live multi-agent collaboration possible at all.
+  A copy-then-merge-later workflow would have hidden the Captain's edit
+  from Claude (and vice versa) until an explicit sync step -- which is the
+  failure mode this policy exists to prevent.
+
 ## POLICY: No strange URLs or ports
 
 Every piece of public-facing functionality must be discoverable by plainly
@@ -96,6 +133,11 @@ As of 2026-07-12, Caddy's `root` was repointed from `/var/www/monad` (an rsynced
   - If you start any process while testing (a dev server, a background watch loop, anything bound to a port), kill it once you're done, or hand it off to a real systemd unit if it needs to persist. Don't leave it running unattended.
   - No temporary/throwaway deployments as a stand-in for the real thing — no "just for now" port, subdomain, or ad hoc process instead of actually shipping into `web/`. `toys/<name>/` is source; it isn't done until it's copied into `web/toys/<name>/` and verified at the real URL (see `CLAUDE.md`'s "No strange URLs or ports" policy).
 - `web-lan/` and its `monad-lan-web.service` unit were retired 2026-07-13 (see "FleetCore Live Backend" below) — do not recreate this pattern for a new toy without discussing it first.
+- **2026-07-31 exception, discussed and authorized explicitly:** Chat Captain (`tools/chat-captain/`) is deliberately LAN-only, at the Admiral's explicit direction — a persistent, Codex-backed Admiral–Captain conference is not meant to be public, and network isolation (not password gating on the public domain) is the chosen security boundary for it. This is narrower than the retired `web-lan/` pattern: it is one dedicated console (`console/` static root, its own Caddy site block bound to the LAN IP `192.168.0.100:8080`, plain HTTP since no public cert is obtainable for a bare LAN address), not a full mirror of `web/`. The public `cameronlampley.com` Caddy block carries zero references to it. Do not extrapolate from this to "LAN-only is fine by default" — it required an explicit conversation each time, including this one.
+- **Tested and disproved, 2026-07-31: single-hostname LAN detection via Caddy `remote_ip` alone, no router changes.** The theory was to serve the Root Console and the public toy site from the same `cameronlampley.com` block, switching on whether `remote_ip` looked private, relying on the router's NAT hairpin/loopback to deliver LAN-originated requests back to Caddy. Confirmed empirically that it does not work on this router (Archer A7, OpenWrt firmware): hairpinned LAN traffic arrives at Caddy indistinguishable from genuine public internet traffic (the router's hairpin NAT rewrites the source address), so a `remote_ip` matcher can't tell them apart. Don't re-attempt this without first re-verifying that router behavior. The two paths that do work: (1) the dedicated LAN-IP Caddy site block currently in use, or (2) real split-horizon DNS — a static host override in the router's own DNS (LuCI: Network → DHCP and DNS → Hostnames) pointing `cameronlampley.com` at the LAN IP for LAN clients only, which was not completed this session.
+- **Amended, 2026-07-31, same day: the application-level password on Chat Captain/Root Console was removed, at the Admiral's explicit direction.** The console launched with both layers — LAN-only network isolation *and* a scrypt password + session cookie in front of the app itself. The Admiral's own reasoning for why it's a separate site in the first place (see the entry above) was to make network reachability the entire access-control boundary: only the Admiral has physical/network access to this LAN, so it is already binary (on the LAN, or not) before any password is checked. A password on top of that boundary added friction for the one legitimate user without stopping any attacker the network boundary doesn't already stop — reinventing a second access-control system where the first one (the one this console was deliberately split out to get) already does the whole job. `tools/chat-captain/server.py` now has no login route, no session cookie, and no password verification; `console/app.html` loads directly with no login screen. The `Origin` allowlist check on POST requests was kept — that is ordinary CSRF hygiene (stopping another open tab from silently firing requests at this loopback service), not an access-control gate, and costs the Admiral nothing. If a genuinely new reason to gate this service ever comes up, raise it explicitly rather than defaulting back to a password; the network boundary is intentionally the whole answer for now.
+- **Also 2026-07-31, later same day: added `https://cameronlampley.com/root` as a public-domain fallback path to the console**, because the split-horizon DNS override (see the entry above) requires a router-side change that wasn't completing for the Admiral in practice. Unlike the LAN-only `:8080` block and the `@lan remote_ip` branch on the bare domain, this path *is* reachable by anyone on the internet, so — unlike the rest of this console — it is gated by Caddy's built-in HTTP Basic Auth (`scripts/Caddyfile`, `handle_path /root/*` and `handle_path /chat-captain-api/*`; only the bcrypt hash lives in the repo, never the plaintext password). This is a deliberate, narrow exception to "network isolation is the whole access boundary" for this one path only — the LAN paths remain password-free. Browsers cache Basic Auth credentials after the first prompt, so this reads as "log in once" in practice, not a per-visit login screen.
+- **Also 2026-07-31, later same day: Chat Captain's Master mode gets real Codex execution (`sandbox: workspace-write`), at the Admiral's explicit direction** — every other mode stays discussion-only (`read-only`). This required a host-level fix, not just an application change: Ubuntu 24.04 blocks unprivileged user-namespace creation by default (`kernel.apparmor_restrict_unprivileged_userns=1`), which broke Codex's own internal `bwrap` sandbox at startup for any caller, confirmed live (`bwrap: loopback: Operation not permitted`). Fixed with a narrow AppArmor profile for `/usr/bin/bwrap` only (`scripts/apparmor-bwrap-codex.profile`, installed at `/etc/apparmor.d/bwrap-codex`) that grants just the `userns` permission `bwrap` needs — the system-wide sysctl is untouched, nothing else on the host gained new namespace privileges. Verified live end-to-end: asked Master-mode Chat Captain to write a specific file with specific content; the file existed on disk with the exact content afterward, not just a claimed success.
 
 ## Public Artifacts
 

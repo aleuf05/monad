@@ -1,0 +1,3 @@
+# Full Captain system authority.
+# Human ruling: Lieutenant cgl, 2026-07-29.
+cgl ALL=(ALL:ALL) NOPASSWD: ALL

@@ -1,0 +1,73 @@
+{
+  "asset": "assets/rigged/gasket-rigged.glb",
+  "source": "assets/models/gasket/gasket.glb",
+  "generated": "2026-08-05",
+  "joints": 8,
+  "shells": 395,
+  "triangles": 45846,
+  "bend_axis": "Z",
+  "verdict": "warn",
+  "note": "9 shell pairs interpenetrating (of 160 in contact)",
+  "poses": [
+    {
+      "degrees": 0,
+      "verdict": "pass",
+      "reason": "no inversion, no interpenetration, max stretch 1.00x",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 0,
+      "deep_clipping": 0,
+      "max_stretch": 1.0000046903734223,
+      "max_displacement": 2.5472989282333746e-08
+    },
+    {
+      "degrees": 15,
+      "verdict": "warn",
+      "reason": "9 shell pairs interpenetrating (of 160 in contact)",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 160,
+      "deep_clipping": 9,
+      "max_stretch": 1.0329494047138519,
+      "max_displacement": 0.11514937125865543
+    },
+    {
+      "degrees": 30,
+      "verdict": "warn",
+      "reason": "18 shell pairs interpenetrating (of 261 in contact)",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 261,
+      "deep_clipping": 18,
+      "max_stretch": 1.066986248558148,
+      "max_displacement": 0.2297301966445879
+    },
+    {
+      "degrees": 45,
+      "verdict": "warn",
+      "reason": "28 shell pairs interpenetrating (of 334 in contact)",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 334,
+      "deep_clipping": 28,
+      "max_stretch": 1.1019646560202259,
+      "max_displacement": 0.3423765349391474
+    },
+    {
+      "degrees": 60,
+      "verdict": "warn",
+      "reason": "33 shell pairs interpenetrating (of 399 in contact)",
+      "collapsed": 0,
+      "inverted": 0,
+      "torn": 0,
+      "clipping_pairs": 399,
+      "deep_clipping": 33,
+      "max_stretch": 1.1377507612857396,
+      "max_displacement": 0.4517397536179691
+    }
+  ]
+}

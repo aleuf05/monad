@@ -1,0 +1,15 @@
+{
+  "schema_version": "monad.admiralty.projects.v0.1",
+  "generated_at": "2026-07-31",
+  "projects": [
+    {"id": "project-fleetcore", "name": "FleetCore", "status": "implemented-prototype", "executive_summary": "Deterministic maritime world-model prototype.", "evidence_quality": "high", "last_reviewed": "2026-07-31"},
+    {"id": "project-bridge", "name": "Bridge", "status": "implemented-public-artifact", "executive_summary": "Unified maritime instrument projection.", "evidence_quality": "high", "last_reviewed": "2026-07-31"},
+    {"id": "project-periscope", "name": "Periscope", "status": "implemented-instrument", "executive_summary": "Optical projection of maritime contact state.", "evidence_quality": "high", "last_reviewed": "2026-07-31"},
+    {"id": "project-world-intake", "name": "World Intake", "status": "implemented-mixed", "executive_summary": "Evidence-preserving intake and review workflow.", "evidence_quality": "mixed", "last_reviewed": "2026-07-31"},
+    {"id": "project-living-fleet", "name": "Living Fleet", "status": "active-mixed", "executive_summary": "Persistent runtime and memory coordination layer.", "evidence_quality": "mixed", "last_reviewed": "2026-07-31"},
+    {"id": "project-living-basin", "name": "Living Basin", "status": "candidate-reconstruction", "executive_summary": "Causal landscape candidate; legibility before complexity.", "evidence_quality": "low", "last_reviewed": "2026-07-31"},
+    {"id": "project-beastscape", "name": "Beastscape", "status": "research-prototype", "executive_summary": "Structural visual/navigation research direction.", "evidence_quality": "mixed", "last_reviewed": "2026-07-31"},
+    {"id": "project-coalition-engine", "name": "Coalition Engine", "status": "candidate-reconstruction", "executive_summary": "Variable specialist coalition candidate.", "evidence_quality": "low", "last_reviewed": "2026-07-31"},
+    {"id": "project-research-methods", "name": "Research Methods", "status": "active-research", "executive_summary": "Semantic and operational methods for intent-preserving engineering.", "evidence_quality": "mixed", "last_reviewed": "2026-07-31"}
+  ]
+}

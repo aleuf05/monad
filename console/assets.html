@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aegis INSPECT — Geometry Corpus</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+  :root {
+    color-scheme: dark;
+    --font: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --bg: #14161a; --panel: #1f2329; --tile: #23272e; --border: #4a5361;
+    --text: #f2f4f7; --dim: #a9b2c0; --accent: #4fd1a5; --warn: #f0b95a;
+    --rigged: #4fd1a5; --static: #e8a87c;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13.5px; }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+  header h1 { font-size: 0.9rem; margin: 0; letter-spacing: 0.04em; }
+  header a { color: var(--dim); text-decoration: none; font-size: 0.78rem; }
+  header a:hover { color: var(--accent); }
+
+  #layout { display: grid; grid-template-columns: 290px 1fr 250px; height: calc(100% - 46px); }
+  #left, #right { background: var(--panel); overflow-y: auto; }
+  #left { border-right: 1px solid var(--border); }
+  #right { border-left: 1px solid var(--border); }
+  #stage { position: relative; background: #0d0f12; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  #stage-empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 0.82rem; text-align: center; padding: 2rem; }
+  /* The id selector beats the UA's [hidden] rule, so the placeholder stayed
+     painted over every loaded model until this was added. */
+  #stage-empty[hidden] { display: none; }
+  #stage-loading { position: absolute; top: 0.7rem; left: 0.9rem; color: var(--accent); font-size: 0.76rem; }
+
+  .pane-title { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); padding: 0.7rem 0.8rem 0.4rem; }
+
+  /* The corpus headline: the single fact that decides what work is even
+     possible next. Rigged-vs-static is the whole question right now. */
+  #summary { padding: 0.55rem 0.8rem 0.7rem; border-bottom: 1px solid var(--border); }
+  #summary .big { display: flex; gap: 0.4rem; margin-bottom: 0.4rem; }
+  #summary .stat { flex: 1; background: var(--tile); border: 1px solid var(--border); border-radius: 6px; padding: 0.35rem 0.4rem; text-align: center; }
+  #summary .stat .n { font-size: 1.15rem; font-weight: 700; }
+  #summary .stat .l { font-size: 0.58rem; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  #summary .stat.rig .n { color: var(--rigged); }
+  #summary .stat.sta .n { color: var(--static); }
+  #summary .totals { font-size: 0.68rem; color: var(--dim); line-height: 1.5; }
+
+  .asset-row { display: flex; align-items: center; gap: 0.45rem; width: 100%; text-align: left; background: none; border: none; color: var(--dim); font: inherit; padding: 0.4rem 0.8rem; cursor: pointer; }
+  .asset-row:hover { color: var(--text); background: var(--tile); }
+  .asset-row.active { color: var(--text); background: var(--tile); border-left: 2px solid var(--accent); }
+  .asset-row .pip { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+  .asset-row .pip.rigged { background: var(--rigged); }
+  .asset-row .pip.static { background: var(--static); }
+  .asset-row .pip.empty  { background: var(--dim); }
+  .asset-row .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .asset-row .sz { font-size: 0.65rem; color: var(--dim); flex: none; }
+
+  .fact { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.22rem 0.8rem; font-size: 0.75rem; }
+  .fact .k { color: var(--dim); }
+  .fact .v { color: var(--text); text-align: right; word-break: break-word; }
+  .fact.zero .v { color: var(--dim); }
+  .sect { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--dim); padding: 0.7rem 0.8rem 0.25rem; border-top: 1px solid var(--border); margin-top: 0.4rem; }
+
+  .verdict { margin: 0.6rem 0.8rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.72rem; line-height: 1.5; }
+  .verdict.rigged { border-color: var(--rigged); color: var(--rigged); }
+  .verdict.static { border-color: var(--static); color: var(--static); }
+  .verdict .vw { display: block; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+
+  .check { display: flex; align-items: center; gap: 0.4rem; padding: 0.15rem 0.8rem; font-size: 0.72rem; }
+  .check .box { width: 12px; text-align: center; }
+  .check.pass { color: var(--rigged); }
+  .check.fail { color: var(--static); }
+
+  #validate-btn, .act-btn { width: calc(100% - 1.6rem); margin: 0.6rem 0.8rem 0; background: var(--tile); color: var(--text);
+    border: 1px solid var(--border); border-radius: 5px; font: inherit; font-size: 0.72rem; padding: 0.4rem; cursor: pointer; }
+  #validate-btn:hover:not(:disabled), .act-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  #validate-btn:disabled, .act-btn:disabled { opacity: 0.5; cursor: default; }
+  .act-btn.armed { border-color: var(--accent); color: var(--accent); }
+  .act-btn.done { border-color: var(--rigged); color: var(--rigged); }
+  .risk { margin: 0.5rem 0.8rem; padding: 0.5rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); font-size: 0.72rem; line-height: 1.5; }
+  .risk .rw { display: block; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+  .risk.low { border-color: var(--rigged); color: var(--rigged); }
+  .risk.moderate { border-color: var(--warn); color: var(--warn); }
+  .risk.high { border-color: #e8746c; color: #e8746c; }
+
+  /* Pipeline strip — the five stages, and which of them this asset has been
+     through. Lit means done in this session, not merely implemented. */
+  .strip { display: flex; gap: 3px; padding: 0.55rem 0.8rem 0.2rem; }
+  .strip .st { flex: 1; text-align: center; font-size: 0.52rem; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 0.3rem 0.1rem; border-radius: 4px;
+    border: 1px solid var(--border); color: var(--dim); background: var(--tile); }
+  .strip .st.on { border-color: var(--rigged); color: var(--rigged); }
+  .strip .st.now { border-color: var(--accent); color: var(--accent); }
+
+  .joints-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.8rem 0; font-size: 0.72rem; color: var(--dim); }
+  .joints-row input { flex: 1; }
+  .joints-row .jv { color: var(--text); min-width: 1.6rem; text-align: right; }
+
+  .new-badge { display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.35rem; border-radius: 3px;
+    background: var(--accent); color: #06121b; font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.08em; vertical-align: middle; }
+  .commit { margin: 0.5rem 0.8rem; padding: 0.45rem 0.6rem; border-radius: 6px; border: 1px solid var(--rigged);
+    color: var(--rigged); font-size: 0.7rem; line-height: 1.5; word-break: break-all; }
+  .commit code { font-size: 0.72rem; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>🦴 Aegis Pipeline <span style="color:var(--dim);font-weight:400;">— inspect · validate · rig</span><span class="new-badge">RIG NEW</span></h1>
+    <div style="display:flex;gap:0.9rem;align-items:center;">
+      <a href="documents.html">📄 Documents</a>
+      <a href="index.html">&larr; Back to console</a>
+    </div>
+  </header>
+  <div id="layout">
+    <div id="left">
+      <div id="summary"><div class="totals">Loading corpus…</div></div>
+      <div class="pane-title">Assets</div>
+      <div id="list"></div>
+    </div>
+    <div id="stage">
+      <div id="stage-empty">Select an asset to preview.<br>Drag to orbit · scroll to zoom</div>
+      <div id="stage-loading" hidden></div>
+    </div>
+    <div id="right">
+      <div class="pane-title">Rig Status</div>
+      <div id="detail"><div class="fact"><span class="k">No asset selected.</span></div></div>
+    </div>
+  </div>
+
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const API = "/aegis-inspect-api/api";
+const listEl = document.getElementById("list");
+const detailEl = document.getElementById("detail");
+const summaryEl = document.getElementById("summary");
+const stageEl = document.getElementById("stage");
+const emptyEl = document.getElementById("stage-empty");
+const loadingEl = document.getElementById("stage-loading");
+
+let assets = [], activePath = null;
+
+// --- three.js stage ---------------------------------------------------------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+stageEl.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0f12);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x223044, 2.2));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(3, 6, 4);
+scene.add(key);
+const grid = new THREE.GridHelper(10, 10, 0x4a5361, 0x2a3038);
+scene.add(grid);
+
+let current = null;
+const loader = new GLTFLoader();
+
+function resize() {
+  const { clientWidth: w, clientHeight: h } = stageEl;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(h, 1);
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(stageEl);
+resize();
+
+(function tick() {
+  requestAnimationFrame(tick);
+  controls.update();
+  renderer.render(scene, camera);
+})();
+
+function frameObject(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const extent = Math.max(size.x, size.y, size.z) || 1;
+  object.position.sub(center);
+  grid.scale.setScalar(extent / 5);
+  const dist = extent * 1.9;
+  camera.position.set(dist * 0.7, dist * 0.55, dist * 0.9);
+  camera.near = extent / 500;
+  camera.far = extent * 60;
+  camera.updateProjectionMatrix();
+  controls.target.set(0, 0, 0);
+  controls.update();
+}
+
+function disposeCurrent() {
+  if (!current) return;
+  scene.remove(current);
+  current.traverse((n) => {
+    if (n.geometry) n.geometry.dispose();
+    if (n.material) (Array.isArray(n.material) ? n.material : [n.material]).forEach((m) => m.dispose());
+  });
+  current = null;
+}
+
+async function preview(asset) {
+  emptyEl.hidden = true;
+  loadingEl.hidden = false;
+  loadingEl.textContent = `loading ${asset.name} (${fmtBytes(asset.bytes)})…`;
+  disposeCurrent();
+  try {
+    const gltf = await loader.loadAsync(`${API}/asset/${encodeURI(asset.path)}`);
+    current = gltf.scene;
+    scene.add(current);
+    frameObject(current);
+    // A skeleton is the thing we are looking for; if one exists, show it
+    // rather than making the operator infer it from a number.
+    let bones = 0;
+    current.traverse((n) => { if (n.isSkinnedMesh && n.skeleton) { scene.add(new THREE.SkeletonHelper(n)); bones += n.skeleton.bones.length; } });
+    loadingEl.hidden = true;
+  } catch (err) {
+    loadingEl.textContent = `✗ ${err.message || err}`;
+  }
+}
+
+// --- data -------------------------------------------------------------------
+const fmtBytes = (b) => b > 1e6 ? (b / 1048576).toFixed(1) + "MB" : (b / 1024).toFixed(0) + "KB";
+const fmtNum = (n) => n.toLocaleString();
+
+function renderSummary(s) {
+  summaryEl.innerHTML = `
+    <div class="big">
+      <div class="stat rig"><div class="n">${s.rigged}</div><div class="l">rigged</div></div>
+      <div class="stat sta"><div class="n">${s.static}</div><div class="l">static</div></div>
+      <div class="stat"><div class="n">${s.total}</div><div class="l">assets</div></div>
+    </div>
+    <div class="totals">
+      ${fmtNum(s.vertices)} vertices · ${fmtNum(s.triangles)} triangles<br>
+      ${fmtBytes(s.bytes)} on disk
+      ${s.rigged === 0 ? '<br><span style="color:var(--static)">No rigged asset exists — a solver would synthesise skeletons from scratch.</span>' : ""}
+    </div>`;
+}
+
+function renderList() {
+  listEl.innerHTML = "";
+  assets.forEach((a) => {
+    const btn = document.createElement("button");
+    btn.className = "asset-row" + (a.path === activePath ? " active" : "");
+    btn.innerHTML = `<span class="pip ${a.state || "empty"}"></span><span class="nm"></span><span class="sz">${fmtBytes(a.bytes)}</span>`;
+    btn.querySelector(".nm").textContent = a.name;
+    btn.title = a.path;
+    btn.addEventListener("click", () => select(a));
+    listEl.appendChild(btn);
+  });
+}
+
+function fact(k, v, zero) {
+  return `<div class="fact${zero ? " zero" : ""}"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+}
+
+function renderDetail(a) {
+  if (!a.ok) { detailEl.innerHTML = fact("error", a.error); return; }
+  const c = a.checks;
+  const check = (ok, label) =>
+    `<div class="check ${ok ? "pass" : "fail"}"><span class="box">${ok ? "✓" : "✗"}</span>${label}</div>`;
+
+  // The rig pipeline sits directly under the verdict rather than at the
+  // bottom of the panel: it is the thing to act on, and burying it below
+  // four sections of facts meant scrolling to find the only buttons here.
+  detailEl.innerHTML =
+    `<div class="verdict ${a.state}"><span class="vw">${a.state}</span>${a.note}</div>` +
+    rigPanel(a) +
+    `<div class="sect">Rig requirements</div>` +
+    check(c.has_mesh, "mesh geometry") +
+    check(c.has_skin, "skin binding") +
+    check(c.has_joints, "joint hierarchy") +
+    check(a.has_weights, "vertex weights (WEIGHTS_0)") +
+    `<div class="sect">Structure</div>` +
+    fact("meshes", a.meshes, !a.meshes) +
+    fact("primitives", a.primitives, !a.primitives) +
+    fact("nodes", a.nodes, !a.nodes) +
+    fact("skins", a.skins, !a.skins) +
+    fact("joints", a.joints, !a.joints) +
+    fact("animations", a.animations, !a.animations) +
+    (a.animation_names.length ? fact("names", a.animation_names.join(", ")) : "") +
+    `<div class="sect">Geometry</div>` +
+    fact("vertices", fmtNum(a.vertices)) +
+    fact("triangles", fmtNum(a.triangles)) +
+    fact("materials", a.materials, !a.materials) +
+    fact("textures", a.textures, !a.textures) +
+    `<div class="sect">Provenance</div>` +
+    fact("generator", a.generator) +
+    fact("glTF", a.gltf_version) +
+    fact("path", a.path) +
+    `<button id="validate-btn" data-p="${a.path}">VALIDATE — find disjoint shells</button>` +
+    `<div id="validate-out"></div>`;
+
+  const btn = document.getElementById("validate-btn");
+  if (btn) btn.addEventListener("click", () => validate(a, btn));
+  wireRig(a);
+}
+
+// --- the rigging pipeline ---------------------------------------------------
+// AUTHORIZE gates and issues a token, EXECUTE spends it and writes the rigged
+// asset, RECORD commits it. Each stage stays visibly separate because the
+// decision to rig is a different act from the rigging.
+
+let rig = { token: null, stage: "VALIDATE" };
+
+function strip(stage) {
+  const order = ["INSPECT", "VALIDATE", "AUTHORIZE", "EXECUTE", "RECORD"];
+  const at = order.indexOf(stage);
+  return `<div class="strip">` + order.map((s, i) =>
+    `<div class="st ${i < at ? "on" : i === at ? "now" : ""}">${s}</div>`).join("") + `</div>`;
+}
+
+function rigPanel(a) {
+  if (!a.ok || !a.meshes) return "";
+  if (a.state === "rigged") {
+    return `<div class="sect">Rig pipeline</div>` + strip("RECORD") +
+      `<div class="verdict rigged"><span class="vw">already rigged</span>` +
+      `This asset carries a skin — the solver would refuse it at AUTHORIZE.</div>`;
+  }
+  return `<div class="sect">Rig pipeline</div>` +
+    `<div id="rig-strip">${strip("VALIDATE")}</div>` +
+    `<div class="joints-row"><span>joints</span>` +
+    `<input id="joints" type="range" min="2" max="24" value="8">` +
+    `<span class="jv" id="joints-v">8</span></div>` +
+    `<button class="act-btn" id="auth-btn">AUTHORIZE — run the gates</button>` +
+    `<button class="act-btn" id="exec-btn" disabled>EXECUTE — synthesise the rig</button>` +
+    `<button class="act-btn" id="rec-btn" disabled>RECORD — commit to git</button>` +
+    `<div id="rig-out"></div>`;
+}
+
+function wireRig(a) {
+  const slider = document.getElementById("joints");
+  if (!slider) return;
+  rig = { token: null, stage: "VALIDATE" };
+
+  const out = document.getElementById("rig-out");
+  const stripEl = document.getElementById("rig-strip");
+  const authBtn = document.getElementById("auth-btn");
+  const execBtn = document.getElementById("exec-btn");
+  const recBtn = document.getElementById("rec-btn");
+  const setStage = (s) => { rig.stage = s; stripEl.innerHTML = strip(s); };
+
+  slider.addEventListener("input", () => {
+    document.getElementById("joints-v").textContent = slider.value;
+    // Changing the bone count invalidates the authorization it was issued for.
+    if (rig.token) {
+      rig.token = null;
+      execBtn.disabled = recBtn.disabled = true;
+      authBtn.className = "act-btn";
+      authBtn.textContent = "AUTHORIZE — re-run the gates";
+      setStage("VALIDATE");
+    }
+  });
+
+  authBtn.addEventListener("click", async () => {
+    authBtn.disabled = true;
+    authBtn.textContent = "running gates…";
+    try {
+      const r = await fetch(`${API}/authorize/${encodeURI(a.path)}?joints=${slider.value}`,
+        { method: "POST" });
+      const d = await r.json();
+      const gates = (d.gates || []).map((g) =>
+        `<div class="check ${g.passed ? "pass" : "fail"}"><span class="box">${g.passed ? "✓" : "✗"}</span>${g.gate} — ${g.detail}</div>`).join("");
+      out.innerHTML = `<div class="risk ${d.ok ? "low" : "high"}">` +
+        `<span class="rw">${d.ok ? "authorized" : "refused"}</span>${d.note}</div>` +
+        `<div class="sect">Gates</div>` + gates +
+        (d.token ? fact("token", d.token) + fact("engine", d.engine) : "");
+      if (d.ok) {
+        rig.token = d.token;
+        execBtn.disabled = false;
+        execBtn.className = "act-btn armed";
+        authBtn.className = "act-btn done";
+        setStage("AUTHORIZE");
+      }
+      authBtn.textContent = "AUTHORIZE — re-run the gates";
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      authBtn.textContent = "AUTHORIZE — retry";
+    }
+    authBtn.disabled = false;
+  });
+
+  execBtn.addEventListener("click", async () => {
+    execBtn.disabled = true;
+    execBtn.textContent = "solving…";
+    try {
+      const r = await fetch(`${API}/execute/${rig.token}`, { method: "POST" });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+      out.innerHTML =
+        `<div class="risk low"><span class="rw">rigged</span>` +
+        `${d.joint_count} joints on the ${d.axis} axis; every weight sums to 1.0.</div>` +
+        `<div class="sect">Solver</div>` +
+        fact("engine", `${d.engine} · ${d.solve_ms} ms`) +
+        fact("joints", d.joint_names.join(" → ")) +
+        fact("bone span", d.bone_span) +
+        `<div class="sect">Shell handling</div>` +
+        fact("rigid shells", `${fmtNum(d.rigid_shells)} (${fmtNum(d.rigid_vertices)} verts)`) +
+        fact("blended shells", `${fmtNum(d.blended_shells)} (${fmtNum(d.blended_vertices)} verts)`) +
+        fact("max weight error", d.max_weight_error.toExponential(2)) +
+        `<div class="sect">Output</div>` +
+        fact("path", d.dest) +
+        fact("size", fmtBytes(d.rigged_bytes));
+      execBtn.className = "act-btn done";
+      execBtn.textContent = "EXECUTE — done";
+      recBtn.disabled = false;
+      recBtn.className = "act-btn armed";
+      setStage("EXECUTE");
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      execBtn.textContent = "EXECUTE — retry";
+      execBtn.disabled = false;
+    }
+  });
+
+  recBtn.addEventListener("click", async () => {
+    recBtn.disabled = true;
+    recBtn.textContent = "committing…";
+    try {
+      const r = await fetch(`${API}/record/${rig.token}`, { method: "POST" });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+      out.innerHTML = `<div class="commit"><strong>committed ${d.short}</strong><br>` +
+        `${d.path}<br><span style="color:var(--dim)">${d.note}</span></div>` +
+        `<pre style="margin:0 0.8rem;font-size:0.62rem;color:var(--dim);white-space:pre-wrap;">${d.message}</pre>`;
+      recBtn.className = "act-btn done";
+      recBtn.textContent = "RECORD — committed";
+      setStage("RECORD");
+      reload();
+    } catch (e) {
+      out.innerHTML = `<div class="risk high">${e.message}</div>`;
+      recBtn.textContent = "RECORD — retry";
+      recBtn.disabled = false;
+    }
+  });
+}
+
+// Packet Beta names weight bleeding across disjoint meshes as the failure
+// mode of proximity auto-weighting. Shell count is the measurable form of
+// that risk, so it gets stated as a risk verdict rather than a raw number.
+async function validate(asset, btn) {
+  const out = document.getElementById("validate-out");
+  btn.disabled = true;
+  btn.textContent = "analysing connectivity…";
+  try {
+    const r = await fetch(`${API}/validate/${encodeURI(asset.path)}`);
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    const p = d.primitives[0] || {};
+    out.innerHTML =
+      `<div class="risk ${d.weight_bleed_risk}"><span class="rw">${d.weight_bleed_risk} bleed risk</span>${d.note}</div>` +
+      `<div class="sect">Connectivity</div>` +
+      fact("disjoint shells", fmtNum(d.total_shells)) +
+      fact("largest shell", (d.largest_shell_ratio * 100).toFixed(1) + "% of mesh") +
+      (p.shell_sizes ? fact("top shells", p.shell_sizes.slice(0, 5).map(fmtNum).join(" · ")) : "") +
+      fact("orphan vertices", fmtNum(p.orphan_vertices || 0), !p.orphan_vertices) +
+      (d.cached ? fact("source", "cached") : "");
+    btn.textContent = "VALIDATE — re-run";
+  } catch (e) {
+    out.innerHTML = `<div class="risk high">${e.message}</div>`;
+    btn.textContent = "VALIDATE — retry";
+  }
+  btn.disabled = false;
+}
+
+function select(a) {
+  activePath = a.path;
+  renderList();
+  renderDetail(a);
+  if (a.ok && a.meshes > 0) preview(a);
+}
+
+function reload() {
+  return fetch(`${API}/assets`)
+    .then((r) => r.json())
+    .then((d) => {
+      assets = d.assets || [];
+      renderSummary(d.summary);
+      renderList();
+    })
+    .catch((e) => { summaryEl.innerHTML = `<div class="totals" style="color:var(--warn)">Failed to load: ${e}</div>`; });
+}
+
+// Which engine is doing the maths is worth stating on the page rather than
+// leaving in a log — it is the visible half of the Rust decision.
+fetch(`${API}/pipeline`)
+  .then((r) => r.json())
+  .then((d) => {
+    if (!d.ok) return;
+    const el = document.createElement("div");
+    el.className = "totals";
+    el.style.cssText = "padding:0.35rem 0.8rem;color:var(--dim);font-size:0.65rem;";
+    el.innerHTML = `solver engine <span style="color:var(--accent)">${d.engine}</span> · ` +
+      `${d.stages.filter((s) => s.built).length}/${d.stages.length} stages built`;
+    summaryEl.appendChild(el);
+  })
+  .catch(() => {});
+
+reload();
+</script>
+</body>
+</html>

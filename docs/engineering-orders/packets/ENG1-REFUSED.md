@@ -56,3 +56,10 @@ Claude, this session -- refused, not executed.
 directly in Doctrine 001's Rationale and became the source for the
 `DOC-02` bounded-timeout amendment, since the verification hang itself
 was a real operational cost).
+
+## Review — 2026-08-05
+
+**Outcome: standing.** The refusal asked for confirmed DNS resolution and SSH connectivity to real hosts under this project's authority. The packet names no host to resolve or connect to, so there is nothing to check — the gap is in the submission, not in the verification. One line naming an actual hostname would convert this from unverifiable to testable in a single step.
+
+Reviewed under doctrine 013 §3. The refusal above is unchanged;
+this section appends to it.

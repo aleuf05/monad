@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A playable comparison of constant and optimally scheduled rocket exhaust under the same ideal energy budget.">
+  <title>Mike's Variable-Exhaust Rocket Lab</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <a class="back" href="../../index.html">← Fleet Monad</a>
+    <div class="eyebrow">Captain's Reverie · Unofficial Preview · Version 1</div>
+    <h1>Mike's Variable-Exhaust Rocket Lab</h1>
+    <p>Spend the same ideal energy two ways. Watch the optimal exhaust schedule pull ahead.</p>
+    <p class="attribution">Based on <a href="https://github.com/aleuf05/rocketry/tree/captain/complete-rocketry-lab" rel="noopener">Mike's challenge and original derivation</a>. Mike has not yet reviewed or endorsed this interpretation.</p>
+    <p class="attribution">Prefer the source itself? <a href="../mike-rocketry-notebook/">Read the actual notebook, verbatim (read-only)</a>.</p>
+    <div class="mobile-tripo">
+      <span>On your phone to make the 3D rocket?</span>
+      <a href="#assetHelper">Open the 2-step Tripo bridge ↓</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="lab-grid" aria-label="Interactive rocket laboratory">
+      <aside class="panel controls">
+        <div class="panel-label">01 · Set the vehicle</div>
+        <label>Initial mass, <i>m</i><sub>i</sub> <output id="miOut"></output>
+          <input id="mi" type="range" min="2" max="200" step="1">
+        </label>
+        <label>Final mass, <i>m</i><sub>f</sub> <output id="mfOut"></output>
+          <input id="mf" type="range" min="1" max="100" step="1">
+        </label>
+        <label>Specific energy, <i>R</i><sub>e</sub> <output id="reOut"></output>
+          <input id="re" type="range" min="1" max="1000" step="1">
+        </label>
+        <div class="presets" aria-label="Presets">
+          <button data-preset="modest">Modest</button>
+          <button data-preset="launch">Launch vehicle</button>
+          <button data-preset="extreme">Extreme</button>
+          <button data-preset="mike">Mike's example</button>
+        </div>
+        <button id="share" class="share">Copy shareable link</button>
+        <span id="shareStatus" class="share-status" role="status"></span>
+      </aside>
+
+      <section class="panel flight">
+        <div class="panel-label">02 · Run the burn</div>
+        <div class="space" aria-hidden="true">
+          <div class="stars"></div>
+          <div id="exhaust" class="exhaust"></div>
+          <div id="rocket" class="rocket">▶</div>
+          <div class="model-tag constant-tag">constant</div>
+          <div class="model-tag optimal-tag">optimal</div>
+          <div id="constantGhost" class="ghost constant-ghost">◆</div>
+          <div id="optimalGhost" class="ghost optimal-ghost">◆</div>
+        </div>
+        <label class="burn-label">Mass remaining, <i>m</i> <output id="massOut"></output>
+          <input id="burn" type="range" min="0" max="1000" step="1">
+        </label>
+        <button id="play" class="play">▶ Run burn</button>
+        <div class="energy-ledger">
+          <span>Energy released <strong id="energyReleased">0%</strong></span>
+          <span>Same total budget <strong>✓</strong></span>
+        </div>
+      </section>
+
+      <aside class="panel readout">
+        <div class="panel-label">03 · Compare</div>
+        <div class="metric">
+          <span>Constant Δv</span>
+          <strong id="constantDv">—</strong>
+        </div>
+        <div class="metric optimal">
+          <span>Optimal Δv</span>
+          <strong id="optimalDv">—</strong>
+        </div>
+        <div class="metric">
+          <span>Constant exhaust</span>
+          <strong id="constantVe">—</strong>
+        </div>
+        <div class="metric optimal">
+          <span>Optimal exhaust now</span>
+          <strong id="optimalVe">—</strong>
+        </div>
+        <div class="gain-card">
+          <span>Final gain factor</span>
+          <strong id="gain">—</strong>
+          <code>G(r) = (r−1) / (√r ln r)</code>
+        </div>
+      </aside>
+    </section>
+
+    <section class="charts">
+      <article class="chart-card">
+        <div><span class="line-key constant-key"></span> constant <span class="line-key optimal-key"></span> optimal</div>
+        <h2>Accumulated Δv</h2>
+        <svg id="dvChart" viewBox="0 0 640 260" role="img" aria-label="Accumulated delta-v by mass spent"></svg>
+      </article>
+      <article class="chart-card">
+        <div><span class="line-key constant-key"></span> constant <span class="line-key optimal-key"></span> optimal</div>
+        <h2>Exhaust velocity schedule</h2>
+        <svg id="veChart" viewBox="0 0 640 260" role="img" aria-label="Exhaust velocity by mass spent"></svg>
+      </article>
+    </section>
+
+    <details class="derivation">
+      <summary>Inspect Mike's derivation</summary>
+      <div class="derivation-grid">
+        <div>
+          <h2>Fixed energy budget</h2>
+          <p class="equation">R<sub>e</sub>(m<sub>i</sub>−m<sub>f</sub>) = ∫ ½v<sub>e</sub>²(m) dm</p>
+          <p>Both schedules receive exactly the same idealized energy.</p>
+        </div>
+        <div>
+          <h2>Optimal schedule</h2>
+          <p class="equation">v<sub>e</sub>(m) = k/m, &nbsp; k = √(2R<sub>e</sub>m<sub>i</sub>m<sub>f</sub>)</p>
+          <p>The optimal exhaust velocity rises as the spacecraft gets lighter.</p>
+        </div>
+        <div>
+          <h2>Final comparison</h2>
+          <p class="equation">Δv<sub>opt</sub> = (m<sub>i</sub>−m<sub>f</sub>)√(2R<sub>e</sub>/(m<sub>i</sub>m<sub>f</sub>))</p>
+          <p>Only the mass ratio controls the gain over constant exhaust.</p>
+        </div>
+      </div>
+    </details>
+
+    <section class="assumptions">
+      <h2>What this instrument assumes</h2>
+      <ul>
+        <li>One-dimensional, non-relativistic motion.</li>
+        <li>No gravity, drag, structural mass changes, or conversion losses.</li>
+        <li>Energy can be stored and reassigned between parcels of reaction mass without penalty.</li>
+        <li>The result is an ideal upper-bound comparison—not an engine design.</li>
+      </ul>
+    </section>
+
+    <section class="reality-check" aria-labelledby="realityTitle">
+      <div>
+        <div class="panel-label">Live construction wake</div>
+        <h2 id="realityTitle">Reality Check</h2>
+        <p>This preview exposes its unfinished edges. A green result is tested; amber remains open; blue awaits human contact.</p>
+      </div>
+      <div class="problem-grid">
+        <article class="problem passed">
+          <span>Verified</span>
+          <h3>Core equations</h3>
+          <p>Analytical endpoints, monotonicity, and the gain-factor identity pass automated checks.</p>
+        </article>
+        <article class="problem open">
+          <span>Open problem</span>
+          <h3>Energy storage is magic</h3>
+          <p>The optimal curve assumes lossless, massless storage with unlimited power. A real constraint model is not yet present.</p>
+        </article>
+        <article class="problem passed">
+          <span>Verified</span>
+          <h3>Browser behavior</h3>
+          <p>Desktop and phone renders, presets, slider updates, URL restoration, and the page-error channel passed in Chromium.</p>
+        </article>
+        <article class="problem waiting">
+          <span>Awaiting Mike</span>
+          <h3>Authorship and direction</h3>
+          <p>This is an unofficial interpretation. Mike has not reviewed its voice, mathematics, interaction, or publication course.</p>
+        </article>
+      </div>
+      <p class="wake-time">Wake last recorded: 2026-07-29 UTC · Reverie Version 1</p>
+    </section>
+
+    <section id="assetHelper" class="asset-helper" aria-labelledby="assetHelperTitle">
+      <div class="asset-source">
+        <img src="assets/mike-lab-rocket-tripo-phone-v2.jpg" alt="Retro-futurist silver research rocket on a green square background, prepared as a phone-compatible Tripo image-to-3D source">
+      </div>
+      <div>
+        <div class="panel-label">Optional 3D sidecar · Manual Tripo bridge</div>
+        <h2 id="assetHelperTitle">Carry this rocket through Tripo</h2>
+        <p>The Captain prepared a clean source plate, but Tripo currently needs an authenticated human operator. The 2D laboratory does not depend on this step.</p>
+        <ol>
+          <li><strong>Save/share the source</strong> to your phone.</li>
+          <li><strong>Open Tripo</strong>, choose Image to 3D, and upload it.</li>
+          <li>Generate a textured static model, then export <strong>GLB</strong>.</li>
+          <li>When back on Granite, save the GLB under <code>/home/cgl</code> and give the Captain its path.</li>
+        </ol>
+        <div class="asset-actions">
+          <button id="shareRocketSource" class="asset-button primary" type="button">1 · Share / save image</button>
+          <a class="asset-button primary" href="https://www.tripo3d.ai/" target="_blank" rel="noopener">2 · Open Tripo ↗</a>
+          <a class="asset-button" href="assets/mike-lab-rocket-tripo-phone-v2.jpg" download="mike-lab-rocket-tripo-phone-v2.jpg">Plain JPEG download</a>
+          <a class="asset-button" href="assets/mike-lab-rocket-tripo-source-v1.png" download="mike-lab-rocket-tripo-source-v1.png">Original PNG</a>
+          <a class="asset-button granite-only" href="../asset-viewer/">Return GLB on Granite</a>
+        </div>
+        <p id="assetShareStatus" class="asset-share-status" role="status"></p>
+        <form id="glbUploadForm" class="glb-upload">
+          <label for="glbUpload">Already generated it? Upload the GLB here</label>
+          <input id="glbUpload" name="file" type="file" accept=".glb,model/gltf-binary">
+          <button id="glbUploadButton" class="asset-button primary" type="submit">Upload GLB for Captain review</button>
+          <progress id="glbUploadProgress" max="100" value="0" hidden></progress>
+          <p id="glbUploadStatus" role="status">The file will be validated and quarantined—not published automatically.</p>
+        </form>
+        <p class="asset-note">Phone source: square 1024px baseline RGB JPEG, 75 KB · SHA-256 <code>dbf4a781…2d74857a</code> · No Tripo model has been claimed yet.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>Preserve Mike's idea first. Add delight second. Reality decides what survives.</footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

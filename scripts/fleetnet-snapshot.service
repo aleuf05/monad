@@ -1,0 +1,18 @@
+[Unit]
+Description=Monad FleetNet snapshot (writes web/data/fleetnet.json from live host state)
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/scripts/fleetnet-snapshot.py
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/cgl/dev/monad/web/data
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictSUIDSGID=true
+LockPersonality=true

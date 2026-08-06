@@ -1,0 +1,28 @@
+[Unit]
+Description=Monad Aegis pipeline (INSPECT/VALIDATE/AUTHORIZE/EXECUTE/RECORD, via Caddy at cameronlampley.com/aegis-inspect-api)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/aegis-inspect/server.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+# EXECUTE writes rigged assets; RECORD commits them. Nothing else in the
+# repo is writable from this service.
+ReadWritePaths=/home/cgl/dev/monad/.git
+ReadWritePaths=/home/cgl/dev/monad/web/assets/rigged
+ProtectKernelTunables=true
+ProtectKernelModules=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

@@ -18,6 +18,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from conversation import ConversationStore
+import sys as _sys
+from pathlib import Path as _Path
+_sys.path.insert(0, str(_Path(__file__).resolve().parents[1] / 'live-captain'))
+import pause_state  # shared flag: one answer to 'is the Captain paused'
 from gemini_provider import GeminiProvider
 from live_captain_engine import CaptainEngine, OwnershipError, SecretRejected
 from model_provider import ProviderError
@@ -133,7 +137,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "authentication required"}, 401)
             return
         if path == "/status":
-            self._json({"ok": True, **self.server.engine.status()})
+            self._json({"ok": True, **self.server.engine.status(),
+                        **pause_state.read()})
             return
         if path == "/messages":
             self._json(
@@ -203,6 +208,9 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": "Captain is already replying"}, 409)
             return
         try:
+            if pause_state.is_paused():
+                self._json(pause_state.refusal(), status=409)
+                return
             response = self.server.engine.reply(text)
             self._json(
                 {

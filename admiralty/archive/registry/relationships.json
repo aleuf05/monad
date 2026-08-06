@@ -1,0 +1,9 @@
+{
+  "schema_version": "monad.admiralty.relationships.v0.1",
+  "generated_at": "2026-07-31",
+  "relationships": [
+    {"source": "project-fleetcore", "relationship": "projects-world-state", "target": "project-bridge", "evidence": ["docs/architecture/fleetcore.md"]},
+    {"source": "project-research-methods", "relationship": "informs", "target": "project-living-basin", "evidence": ["docs/architecture/ADMIRALTY_SECTION_FOUNDATIONAL_UI_BRIEF_2026-07-31.md"]},
+    {"source": "doc-docs-mission-md", "relationship": "defines", "target": "project-research-methods", "evidence": ["docs/mission.md"]}
+  ]
+}

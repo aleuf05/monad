@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Site Plan — Fleet Monad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 100px; }
+  .page-header { padding: 56px 0 24px; border-bottom: 1px solid #1E2C42; }
+  .page-eyebrow { font-size: 10.5px; letter-spacing: 0.1em; color: #E8A33D; text-transform: uppercase; margin-bottom: 8px; }
+  .page-header h1 { font-family: 'Oswald', sans-serif; font-size: 28px; letter-spacing: 0.08em; font-weight: 700; }
+  .page-header p { font-size: 12px; color: #6B7C93; margin-top: 10px; max-width: 640px; }
+
+  .plan-frame { margin-top: 28px; background: radial-gradient(120% 120% at 50% 40%, #101B2C, #0B1220 75%); border: 1px solid #1E2C42; border-radius: 10px; padding: 8px; }
+  .plan-frame svg { width: 100%; height: auto; display: block; }
+
+  .sp-link { text-decoration: none; }
+  .sp-node circle { fill: #111A2B; stroke: #1E2C42; stroke-width: 1.5; transition: stroke 120ms ease, fill 120ms ease; }
+  .sp-node:hover circle { stroke: #4FD1C5; fill: #14243a; }
+  .sp-node text { fill: #9AACBF; font-family: 'JetBrains Mono', monospace; transition: fill 120ms ease; }
+  .sp-node:hover text { fill: #DCE6F2; }
+  .sp-root circle { fill: #17283A; stroke: #E8A33D; stroke-width: 2; }
+  .sp-root text { fill: #F6C76D; font-family: 'Oswald', sans-serif; font-weight: 700; }
+  .sp-cat circle { stroke-width: 2; }
+  .sp-cat text { fill: #DCE6F2; font-weight: 600; }
+  .sp-link-line { stroke: #1E2C42; stroke-width: 1; fill: none; }
+
+  .plan-legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 14px; font-size: 10.5px; color: #6B7C93; }
+  .plan-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .plan-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .plan-note { margin-top: 18px; font-size: 10.5px; color: #6B7C93; max-width: 700px; }
+  .plan-note code { color: #9AACBF; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="page-header">
+      <div class="page-eyebrow">Make · Study the site itself</div>
+      <h1>Site Plan</h1>
+      <p>A live map of Fleet Monad's actual information architecture — every node below is a real page or toy that exists on this site right now, pulled directly from <code>command.html</code>, <code>observe.html</code>, <code>build.html</code>, <code>story.html</code>, and <code>staff.html</code>'s real links. Click any node to go there.</p>
+    </div>
+
+    <div class="plan-frame">
+      <svg id="planSvg" viewBox="-170 -70 1340 1140" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+
+    <div class="plan-legend" id="planLegend"></div>
+
+    <p class="plan-note">This diagram is hand-maintained to match the site's real navigation (same source as <code>web/assets/js/monad-nav.js</code>'s five sections) — if a page moves or a toy is added/removed from a category page, update the <code>SITE_TREE</code> data below to match. It does not crawl the site live; it is a verified-accurate snapshot as of 2026-08-03.</p>
+  </div>
+  <script>
+    (function () {
+      // Verified 2026-08-03 against the real hrefs in each category page --
+      // see docs/reports/2026-07-28-web-ia-reorganization.md for the
+      // original hierarchy decision.
+      var CATEGORY_COLOR = {
+        command: "#E8A33D",
+        observe: "#4FD1C5",
+        build: "#8A7CFF",
+        story: "#C9E0A8",
+        crew: "#FF8FB1"
+      };
+
+      var SITE_TREE = [
+        {
+          key: "command", label: "Command", href: "../../command.html",
+          children: [
+            { label: "Ops Reader", href: "../../ops.html" },
+            { label: "Agent Operations", href: "../agent-ops/" },
+            { label: "Bridge Station 3.0", href: "../bridge-station-3.0/" }
+          ]
+        },
+        {
+          key: "observe", label: "Observe", href: "../../observe.html",
+          children: [
+            { label: "Fleet Map", href: "../../fleet.html" },
+            { label: "Fleet Motion", href: "../fleet-motion/" },
+            { label: "Living Captain", href: "../living-captain/" },
+            { label: "Periscope", href: "../periscope/" },
+            { label: "Radio Console", href: "../radio-console/" },
+            { label: "Review Inbox", href: "../review-inbox/" },
+            { label: "Watch Officer", href: "../watch-officer/" },
+            { label: "World Intake", href: "../world-intake/" }
+          ]
+        },
+        {
+          key: "build", label: "Build & Research", href: "../../build.html",
+          children: [
+            { label: "Captain's Desk", href: "../captains-desk/" },
+            { label: "Living Basin", href: "../living-basin/" },
+            { label: "Metastable Comedown", href: "../metastable-comedown/" },
+            { label: "Beastscape", href: "../beastscape/" },
+            { label: "IntentForge Bench", href: "../intentforge-translation-bench/" },
+            { label: "Geometric Language Lab", href: "../geometric-language-lab/" },
+            { label: "Claim Lab", href: "../claim-lab/" },
+            { label: "Legend Shaper", href: "../legend-shaper/" },
+            { label: "Character Voice Studio", href: "../character-voice-studio/" },
+            { label: "Asset Viewer", href: "../asset-viewer/" },
+            { label: "Shape Foundry", href: "../libfive/" },
+            { label: "Reaction-Diffusion Painter", href: "../reaction-diffusion-painter/" },
+            { label: "Cognition Graph", href: "../cognition-graph/" },
+            { label: "Truth Engine", href: "../truth-engine/" },
+            { label: "Site Plan (you are here)", href: "../site-plan/", self: true }
+          ]
+        },
+        {
+          key: "story", label: "Story & Records", href: "../../story.html",
+          children: [
+            { label: "Adventure Stations", href: "../../final.html" },
+            { label: "Ship's Log", href: "../../logs.html" },
+            { label: "Sea Monster Hunt 001", href: "../../missions/sea-monster-hunt-001/" },
+            { label: "Quacken Transit 001", href: "../../archive/missions/quacken-transit-001/" },
+            { label: "Quacken Transit 002", href: "../../archive/missions/quacken-transit-002/" }
+          ]
+        },
+        {
+          key: "crew", label: "Crew", href: "../../staff.html",
+          children: []
+        }
+      ];
+
+      var CX = 500, CY = 500, R_ROOT = 34, R_CAT = 190, R_LEAF = 400;
+      var svg = document.getElementById("planSvg");
+      var NS = "http://www.w3.org/2000/svg";
+
+      function el(tag, attrs) {
+        var e = document.createElementNS(NS, tag);
+        for (var k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+      }
+
+      function polar(cx, cy, r, deg) {
+        var rad = (deg - 90) * Math.PI / 180;
+        return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+      }
+
+      // Root node
+      var rootPos = [CX, CY];
+      var linkLayer = el("g", {});
+      var nodeLayer = el("g", {});
+      svg.appendChild(linkLayer);
+      svg.appendChild(nodeLayer);
+
+      var wedge = 360 / SITE_TREE.length;
+      SITE_TREE.forEach(function (cat, i) {
+        var catAngle = i * wedge + wedge / 2;
+        var catPos = polar(CX, CY, R_CAT, catAngle);
+        var color = CATEGORY_COLOR[cat.key] || "#4FD1C5";
+
+        linkLayer.appendChild(el("line", {
+          class: "sp-link-line", x1: rootPos[0], y1: rootPos[1], x2: catPos[0], y2: catPos[1]
+        }));
+
+        var catAnchor = (catAngle > 90 && catAngle < 270) ? "end" : "start";
+        var catDx = catAnchor === "end" ? -16 : 16;
+        var catNode = el("a", { class: "sp-link" });
+        catNode.setAttributeNS("http://www.w3.org/1999/xlink", "href", cat.href);
+        catNode.setAttribute("href", cat.href);
+        var catG = el("g", { class: "sp-node sp-cat" });
+        catG.appendChild(el("circle", { cx: catPos[0], cy: catPos[1], r: 10, style: "stroke:" + color }));
+        var catText = el("text", { x: catPos[0] + catDx, y: catPos[1] + 4, "text-anchor": catAnchor, "font-size": "15" });
+        catText.textContent = cat.label;
+        catG.appendChild(catText);
+        catNode.appendChild(catG);
+        nodeLayer.appendChild(catNode);
+
+        // Dense branches (build/research has 15 children) need almost the
+        // full wedge plus radius staggering, or labels collide -- verified
+        // visually via headless screenshot, not just by eyeballing the code.
+        var count = cat.children.length;
+        var padding = count > 10 ? 2 : Math.min(wedge * 0.28, 10);
+        var startAngle = i * wedge + padding;
+        var endAngle = (i + 1) * wedge - padding;
+        var fontSize = count > 10 ? 9 : 10.5;
+        cat.children.forEach(function (child, j) {
+          var t = count > 1 ? j / (count - 1) : 0.5;
+          var angle = count > 0 ? startAngle + t * (endAngle - startAngle) : catAngle;
+          var tier = count > 10 ? (j % 3) : 0;
+          var radius = R_LEAF + tier * 75;
+          var pos = polar(CX, CY, radius, angle);
+
+          linkLayer.appendChild(el("line", {
+            class: "sp-link-line", x1: catPos[0], y1: catPos[1], x2: pos[0], y2: pos[1]
+          }));
+
+          var anchor = (angle > 90 && angle < 270) ? "end" : "start";
+          var dx = anchor === "end" ? -10 : 10;
+          var leafNode = el("a", { class: "sp-link" });
+          leafNode.setAttributeNS("http://www.w3.org/1999/xlink", "href", child.href);
+          leafNode.setAttribute("href", child.href);
+          var leafG = el("g", { class: "sp-node" });
+          leafG.appendChild(el("circle", { cx: pos[0], cy: pos[1], r: 5.5 }));
+          var leafText = el("text", { x: pos[0] + dx, y: pos[1] + 3.5, "text-anchor": anchor, "font-size": fontSize });
+          leafText.textContent = child.label;
+          leafG.appendChild(leafText);
+          leafNode.appendChild(leafG);
+          nodeLayer.appendChild(leafNode);
+        });
+      });
+
+      var rootG = el("g", { class: "sp-node sp-root" });
+      rootG.appendChild(el("circle", { cx: rootPos[0], cy: rootPos[1], r: R_ROOT }));
+      var rootText = el("text", { x: rootPos[0], y: rootPos[1] + 5, "text-anchor": "middle", "font-size": "14" });
+      rootText.textContent = "MONAD";
+      rootG.appendChild(rootText);
+      var rootLink = el("a", { class: "sp-link" });
+      rootLink.setAttributeNS("http://www.w3.org/1999/xlink", "href", "../../index.html");
+      rootLink.setAttribute("href", "../../index.html");
+      rootLink.appendChild(rootG);
+      nodeLayer.appendChild(rootLink);
+
+      var legend = document.getElementById("planLegend");
+      SITE_TREE.forEach(function (cat) {
+        var span = document.createElement("span");
+        var dot = document.createElement("i");
+        dot.style.background = CATEGORY_COLOR[cat.key] || "#4FD1C5";
+        span.appendChild(dot);
+        span.appendChild(document.createTextNode(cat.label + " (" + cat.children.length + ")"));
+        legend.appendChild(span);
+      });
+    })();
+  </script>
+  <script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Site Plan"></script>
+</body>
+</html>

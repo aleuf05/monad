@@ -236,6 +236,12 @@ pub struct World {
     pub escort_intents: Vec<EscortIntent>,
     #[serde(default)]
     pub agent_decisions: Vec<AgentDecisionRecord>,
+    // Recent operational decisions exposed in snapshots. The durable command
+    // log remains the source of full history; keeping this live projection
+    // bounded prevents every tick and WebSocket broadcast from cloning and
+    // serializing an ever-growing vector.
+    #[serde(default = "default_agent_decision_retention")]
+    pub agent_decision_retention: usize,
     #[serde(default)]
     pub canon_entities: Vec<CanonEntity>,
     #[serde(default)]
@@ -260,6 +266,10 @@ pub fn default_vessel_event_retention() -> usize {
     2000
 }
 
+pub fn default_agent_decision_retention() -> usize {
+    2000
+}
+
 impl World {
     // Assigns the next monotonic event_seq, pushes, and trims to
     // vessel_event_retention -- the one place vessel_events is ever
@@ -275,6 +285,13 @@ impl World {
         }
     }
 
+    fn record_agent_decision(&mut self, decision: AgentDecisionRecord) {
+        self.agent_decisions.push(decision);
+        if self.agent_decisions.len() > self.agent_decision_retention {
+            let excess = self.agent_decisions.len() - self.agent_decision_retention;
+            self.agent_decisions.drain(0..excess);
+        }
+    }
 
     fn apply_canon_change(
         &mut self,
@@ -574,6 +591,10 @@ impl World {
         if self.vessel_events.len() > self.vessel_event_retention {
             let excess = self.vessel_events.len() - self.vessel_event_retention;
             self.vessel_events.drain(0..excess);
+        }
+        if self.agent_decisions.len() > self.agent_decision_retention {
+            let excess = self.agent_decisions.len() - self.agent_decision_retention;
+            self.agent_decisions.drain(0..excess);
         }
     }
 
@@ -924,7 +945,7 @@ impl World {
                         "escort-intent-accepted",
                     )
                 };
-                self.agent_decisions.push(AgentDecisionRecord {
+                self.record_agent_decision(AgentDecisionRecord {
                     decision_id,
                     captain_id: captain_id.clone(),
                     vessel_id: vessel_id.clone(),

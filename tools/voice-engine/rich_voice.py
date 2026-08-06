@@ -101,26 +101,58 @@ class GeminiTTSProvider:
         self.api_key = api_key
 
     def render_pcm(self, *, prompt: str, voice_name: str, model: str) -> bytes:
+        """Call Gemini TTS.
+
+        Repointed 2026-08-05. The original posted to `v1beta/interactions`
+        with `response_format: {type: audio}` and read `output_audio.data` —
+        a surface that no longer exists, so every render returned "response
+        contained no output audio". It had never worked in production, and
+        nothing noticed because the route to this service was also missing:
+        the studio's 404 hid the fact that the pump was broken too.
+
+        Current shape, verified against ai.google.dev rather than recalled:
+        `models/{model}:generateContent`, `responseModalities: ["AUDIO"]`,
+        and the audio arrives base64 at
+        `candidates[0].content.parts[0].inlineData.data` as raw PCM,
+        16-bit, 24 kHz, mono — which is exactly what `format` already
+        promised.
+        """
         body = json.dumps(
             {
-                "model": model,
-                "input": prompt,
-                "response_format": {"type": "audio"},
-                "generation_config": {"speech_config": [{"voice": voice_name}]},
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "responseModalities": ["AUDIO"],
+                    "speechConfig": {
+                        "voiceConfig": {
+                            "prebuiltVoiceConfig": {"voiceName": voice_name}
+                        }
+                    },
+                },
             }
         ).encode()
         request = urllib.request.Request(
-            "https://generativelanguage.googleapis.com/v1beta/interactions",
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model}:generateContent",
             data=body,
-            headers={"x-goog-api-key": self.api_key, "Content-Type": "application/json"},
+            headers={"x-goog-api-key": self.api_key,
+                     "Content-Type": "application/json"},
             method="POST",
         )
         with urllib.request.urlopen(request, timeout=90) as response:
             result = json.load(response)
-        audio = result.get("output_audio") or result.get("outputAudio") or {}
-        data = audio.get("data")
+
+        try:
+            part = result["candidates"][0]["content"]["parts"][0]
+        except (KeyError, IndexError, TypeError):
+            raise RuntimeError(
+                "Gemini TTS returned no candidate part: "
+                f"{json.dumps(result)[:300]}")
+        inline = part.get("inlineData") or part.get("inline_data") or {}
+        data = inline.get("data")
         if not data:
-            raise RuntimeError("Gemini TTS response contained no output audio")
+            raise RuntimeError(
+                "Gemini TTS candidate carried no inline audio: "
+                f"{json.dumps(part)[:300]}")
         return base64.b64decode(data)
 
 
@@ -168,6 +200,13 @@ class RichVoiceEngine:
             ).fetchone()
             if used["seconds"] + quote["seconds"] > self.daily_seconds or used["usd"] + quote["max_usd"] > self.daily_usd:
                 raise BudgetExceeded("daily rich-voice budget exhausted")
+            # A failed render leaves its row behind. Without this, the same
+            # text can never be retried: the reservation collides on
+            # cache_key and the request dies with an IntegrityError instead
+            # of a budget message. Found 2026-08-05 when a provider fix made
+            # the retry possible and the retry was refused by the ledger.
+            self.db.execute(
+                "DELETE FROM spend WHERE cache_key=? AND state='failed'", (key,))
             self.db.execute(
                 "INSERT INTO spend(day,cache_key,seconds,usd,state,created_at) VALUES(?,?,?,?,?,?)",
                 (day, key, quote["seconds"], quote["max_usd"], "reserved", now.isoformat()),

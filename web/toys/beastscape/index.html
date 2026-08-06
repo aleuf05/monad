@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beastscape</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="views.css?v=3">
+</head>
+<body><main>
+<header><a href="../../build.html">← Build &amp; Research</a><p class="eyebrow">Living structural laboratory · master</p><h1>Beastscape</h1><p>Navigate a structural universe, inspect the selected specimen, and ask Captain to interpret it.</p><button id="labToggle" class="labToggle">Lab Mode <span class="newBadge">NEW · PHASE 1</span></button></header>
+<section class="instrument">
+<aside>
+<h2>Beastscape Foundry <span class="newBadge">NEW · COMPARE</span></h2><p class="dim">Select a candidate generative territory, then navigate its independently learned Passage.</p>
+<label class="strategy">Candidate Beastscape<select id="space"></select></label>
+<div class="foundryEvidence" id="foundryEvidence"><strong id="spaceHypothesis">Loading candidate grammars…</strong><span id="spaceOperations"></span><dl><div><dt>Soundings</dt><dd id="spaceSpecimens">—</dd></div><div><dt>Topologies</dt><dd id="spaceTopologies">—</dd></div><div><dt>Transition density</dt><dd id="spaceTransitions">—</dd></div><div><dt>Validity</dt><dd id="spaceValidity">—</dd></div></dl></div>
+<label class="strategy">Passage<select id="strategy"><option value="umap">Continuous UMAP Passage</option><option value="authored">Authored Passage</option></select></label>
+<p class="mapStatus" id="mapStatus">Loading the pre-existing specimen atlas…</p>
+<label>Bearing α <output id="aOut"></output><input id="a" type="range" min="0" max="1000" value="173"></label>
+<label>Bearing β <output id="bOut"></output><input id="b" type="range" min="0" max="1000" value="419"></label>
+<label>Bearing γ <output id="cOut"></output><input id="c" type="range" min="0" max="1000" value="731"></label>
+<div class="actions"><button id="drift">Drift</button><button id="landmark">Save landmark</button><button id="exportSpecimen">Export specimen</button><button id="exportImage">Export image</button></div>
+<dl><dt>Current region</dt><dd id="region"></dd><dt>Structural transition</dt><dd id="transition"></dd><dt>Coordinate</dt><dd id="coordinate"></dd></dl>
+</aside>
+<section class="stage"><div class="stageHead"><div><h2>Selected specimen</h2><p id="reading"></p></div><span id="specimen"></span></div><div class="views"><figure><figcaption>Structural truth</figcaption><canvas id="skeleton" width="700" height="700"></canvas></figure><figure><figcaption>Anatomical interpretation</figcaption><canvas id="organism" width="700" height="700"></canvas></figure></div></section>
+</section>
+<section class="atlas"><h2>Course landmarks</h2><div id="landmarks"><p class="dim">Save specimens while charting the space.</p></div></section>
+<section class="lab" id="lab" hidden>
+<div class="labHead"><div><p class="eyebrow">Experimental · never rewrites the canonical atlas</p><h2>Beastscape Lab</h2><p class="dim">A control room over the same live specimen shown above — Phase 1: inspect, annotate, compare neighbors, rate. The two canvases above are the real preview; nothing here renders a separate copy.</p></div><label class="strategy">Experiment<select id="labExperimentSelect"><option value="">— none —</option></select></label></div>
+<div class="labExperimentActions"><input id="labNewExperimentName" placeholder="New experiment name" maxlength="60"><button id="labNewExperiment">Create experiment</button><button id="labInspect">Inspect current specimen in Lab</button></div>
+<p class="dim" id="labEmpty">No experiment yet — create one, then inspect the specimen currently shown above.</p>
+<div id="labBeast" class="labBeast" hidden>
+<div class="labBeastGrid">
+<div><h3>Generated <span class="dim">(real, read-only)</span></h3><dl id="labGenerated"></dl></div>
+<div><h3>Identity <span class="dim">(editable, Lab-only)</span></h3><label>Name<input id="labName" maxlength="80"></label><label>Notes<textarea id="labNotes" rows="4" maxlength="600"></textarea></label></div>
+<div><h3>Neighbors <span class="dim" id="labNeighborNote"></span></h3><ol id="labNeighbors"></ol></div>
+<div><h3>Operator ratings</h3><label>Coherence <output id="labRateCoherenceOut">3</output><input id="labRateCoherence" type="range" min="1" max="5" value="3"></label><label>Distinctiveness <output id="labRateDistinctOut">3</output><input id="labRateDistinct" type="range" min="1" max="5" value="3"></label><label>Desire to continue <output id="labRateContinueOut">3</output><input id="labRateContinue" type="range" min="1" max="5" value="3"></label></div>
+</div>
+<div class="labExperimentStatus"><span id="labStatus"></span><div class="actions"><button id="labDiscard" class="danger">Discard experiment</button><button id="labPromote">Mark accepted</button></div></div>
+</div>
+</section>
+<section class="captain"><div><p class="eyebrow">Live Captain pipeline</p><h2>LLM-enhanced interpretation</h2><p class="dim">A live window into the browser → local Workbench → remote generation → artifact system.</p><label class="engine">Enhancement engine<select id="engine"><option value="gemini">Gemini direct</option><option value="codex">GPT · Live Captain</option></select></label></div><div class="captainAction"><button id="enhance">Begin Captain enhancement</button><button id="cancelRun" class="danger" hidden>Cancel local run</button><span id="enhanceStatus">Ready</span><div class="captainActivity" id="captainActivity" hidden><div class="activitySignal"><i></i><strong id="activityState">Observed activity</strong><time id="activityTime"></time></div><dl class="liveTelemetry"><div><dt>Engine</dt><dd id="activityEngine">—</dd></div><div><dt>Visibility</dt><dd id="activityVisibility">—</dd></div><div><dt>Job</dt><dd id="activityJob">—</dd></div><div><dt>State age</dt><dd id="activityAge">—</dd></div><div><dt>Polling link</dt><dd id="pollAge">—</dd></div></dl><details><summary>Latest observed signals</summary><ol id="activityLog"></ol></details><p>Remote generation exposes no completion percentage. Cancellation terminates local acceptance and discards late output; it may not halt computation already running remotely.</p></div></div><figure id="enhanceResult" hidden><img id="enhancedImage" alt="Captain-enhanced Beastscape specimen"><figcaption><a id="downloadEnhanced" download>Download enhanced source</a></figcaption></figure></section>
+</main><script src="app.js?v=10"></script><script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Beastscape"></script></body>
+</html>

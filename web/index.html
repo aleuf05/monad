@@ -4,9 +4,25 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Fleet Monad</title>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* The UA's [hidden] rule loses to any class or id that sets display, so
+     `hidden` silently did nothing on the gasket chrome — the upload form,
+     shader deck and terminal all stayed on screen after being hidden. Fixed
+     once here for the whole page rather than per-element; this is the second
+     time this exact trap has bitten (see #stage-empty). */
+  [hidden] { display: none !important; }
   body { background: #0B1220; color: #DCE6F2; font-family: 'JetBrains Mono', monospace; line-height: 1.6; }
   .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 100px; }
   .banner { text-align: center; padding: 56px 0 28px; }
@@ -19,6 +35,76 @@
   .status-strip .status-checked { font-size: 10px; opacity: 0.7; }
 
   .lede { max-width: 560px; margin: 34px auto 6px; text-align: center; font-size: 12.5px; color: #8A9BB4; }
+
+  /* --- Active Queue ------------------------------------------------ */
+  .active-queue { margin-top: 28px; }
+  .aq-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .aq-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  .aq-actions { display: flex; gap: 8px; }
+  .aq-btn { background: #111A2B; border: 1px solid #1E2C42; color: #9AACBF; font: inherit; font-size: 10.5px; padding: 7px 11px; border-radius: 6px; cursor: pointer; letter-spacing: 0.02em; }
+  .aq-btn:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-btn.danger:hover { border-color: #E05252; color: #E05252; }
+  .aq-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+
+  .aq-current { position: relative; background: linear-gradient(120deg, #17283A, #111A2B 60%); border: 1px solid #E8A33D; border-radius: 10px; padding: 20px 22px; margin-bottom: 14px; }
+  .aq-current::before { content: "ACTIVE NOW"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #E8A33D; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .aq-current .aq-parent { color: #E8A33D; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+  .aq-current .aq-item-title { font-family: 'Oswald', sans-serif; font-size: 21px; color: #F6C76D; margin: 5px 90px 6px 0; }
+  .aq-current .aq-summary { color: #9AACBF; font-size: 11.5px; line-height: 1.5; max-width: 640px; }
+  .aq-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .aq-fields label { display: block; color: #6B7C93; font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; }
+  .aq-fields input, .aq-fields textarea, .aq-fields select { width: 100%; margin-top: 5px; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11.5px; padding: 7px 9px; border-radius: 5px; }
+  .aq-meta-row { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 10px; color: #6B7C93; }
+  .aq-row-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .aq-open { background: #E8A33D; color: #0B1220; border: none; font: inherit; font-weight: 700; font-size: 11px; padding: 9px 14px; border-radius: 6px; cursor: pointer; text-decoration: none; display: inline-block; }
+
+  .aq-list { display: flex; flex-direction: column; gap: 8px; }
+  .aq-item { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: #111A2B; border: 1px solid #1E2C42; border-radius: 7px; padding: 10px 12px; }
+  .aq-item .aq-item-title { font-size: 12.5px; color: #DCE6F2; }
+  .aq-item .aq-parent { color: #6B7C93; font-size: 9px; text-transform: uppercase; letter-spacing: .06em; }
+  .aq-item .aq-next { color: #4FD1C5; font-size: 10.5px; margin-top: 3px; }
+  .aq-item.pinned { border-color: #4FD1C5; }
+  .aq-item-controls { display: flex; gap: 4px; align-items: center; }
+  .aq-mini { background: #0B1220; border: 1px solid #1E2C42; color: #9AACBF; font-size: 10px; width: 26px; height: 26px; border-radius: 5px; cursor: pointer; }
+  .aq-mini:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .aq-mini.on { border-color: #4FD1C5; color: #4FD1C5; background: #0F2A2C; }
+
+  .aq-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(560px, 92vw); max-height: 80vh; }
+  .aq-dialog::backdrop { background: #05080Ecc; }
+  .aq-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid #1E2C42; }
+  .aq-dialog-head h3 { font-family: 'Oswald', sans-serif; font-size: 14px; letter-spacing: .04em; }
+  .aq-dialog-body { padding: 14px 18px; overflow-y: auto; max-height: 60vh; }
+  .aq-dialog input[type=search] { width: 100%; background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; padding: 9px 11px; border-radius: 6px; margin-bottom: 12px; }
+  .aq-pick { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid #16202f; font-size: 11.5px; }
+  .aq-pick .aq-pick-name { color: #DCE6F2; }
+  .aq-pick .aq-pick-parent { color: #6B7C93; font-size: 9.5px; text-transform: uppercase; }
+  .aq-pick button { background: #10272a; border: 1px solid #4FD1C5; color: #4FD1C5; font: inherit; font-size: 10px; padding: 5px 9px; border-radius: 5px; cursor: pointer; }
+  .aq-pick button:disabled { border-color: #1E2C42; color: #6B7C93; cursor: default; }
+  .aq-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+
+  .archive-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-top: 44px; }
+  .archive-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7C93; }
+  #archiveSearch { background: #111A2B; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 11px; padding: 7px 11px; border-radius: 6px; width: 200px; }
+  .cat-card.aq-hidden { display: none; }
+  @media (max-width: 560px) {
+    .aq-fields { grid-template-columns: 1fr; }
+    .aq-current .aq-item-title { margin-right: 0; }
+    #archiveSearch { width: 100%; }
+  }
+
+  .mike-berth { display: block; position: relative; overflow: hidden; margin: 26px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #17283A, #111A2B 55%, #103028); border: 1px solid #4FD1C5; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .mike-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #4FD1C522; }
+  .mike-berth::after { content: "NEW · VERBATIM SOURCE"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #4FD1C5; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .mike-berth .project-kicker { color: #4FD1C5; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .mike-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .mike-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
+  .basin-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #1E2416, #111A2B 55%, #1B2A1E); border: 1px solid #8FBF6E; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .basin-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #8FBF6E22; }
+  .basin-berth::after { content: "NEW · CAUSAL SIMULATION"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #8FBF6E; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .basin-berth .project-kicker { color: #8FBF6E; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .basin-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #C9E0A8; font-size: 23px; letter-spacing: .04em; }
+  .basin-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
 
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
@@ -40,6 +126,155 @@
 
   footer { text-align: center; margin-top: 48px; padding-top: 24px; border-top: 1px solid #1E2C42; font-size: 11px; color: #3A4C68; letter-spacing: 0.05em; }
   .footer-motto { margin-top: 6px; color: #6B7C93; font-style: italic; }
+
+  /* --- Captain's Images ---------------------------------------------- */
+  .captain-images { margin: 30px 0 34px; }
+  .ci-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .ci-title { font-family: 'Oswald', sans-serif; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #4FD1C5; }
+  .ci-synced { font-size: 10px; color: #6B7C93; }
+  .ci-empty { color: #6B7C93; font-size: 11.5px; padding: 18px; text-align: center; border: 1px dashed #1E2C42; border-radius: 8px; }
+  .ci-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .ci-thumb { display: block; position: relative; aspect-ratio: 1 / 1; overflow: hidden; border: 1px solid #1E2C42; border-radius: 8px; background: #111A2B; cursor: pointer; padding: 0; }
+  .ci-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 200ms ease; }
+  .ci-thumb:hover { border-color: #4FD1C5; }
+  .ci-thumb:hover img { transform: scale(1.04); }
+  .ci-thumb .ci-time { position: absolute; left: 0; right: 0; bottom: 0; padding: 4px 6px; font-size: 9px; color: #DCE6F2; background: linear-gradient(0deg, #05080Edd, transparent); opacity: 0; transition: opacity 150ms ease; }
+  .ci-thumb:hover .ci-time { opacity: 1; }
+  .ci-dialog { border: 1px solid #1E2C42; border-radius: 10px; background: #0D1626; color: #DCE6F2; padding: 0; width: min(720px, 94vw); max-height: 90vh; }
+  .ci-dialog::backdrop { background: #05080Ecc; }
+  .ci-dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #1E2C42; }
+  .ci-dialog-head span { font-size: 10.5px; color: #6B7C93; }
+  .ci-dialog-close { background: none; border: 1px solid #1E2C42; color: #9AACBF; border-radius: 5px; padding: 5px 9px; cursor: pointer; font: inherit; }
+  .ci-dialog-body { padding: 12px 16px 16px; max-height: 76vh; overflow: auto; text-align: center; }
+  .ci-dialog-body img { max-width: 100%; max-height: 70vh; border-radius: 6px; }
+
+  /* --- Gasket (live 3D component) ------------------------------------ */
+  .gasket-stage { margin: 30px 0 34px; }
+  .gasket-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; background: radial-gradient(120% 140% at 50% 20%, #17283A, #0B1220 70%); border: 1px solid #1E2C42; border-radius: 10px; overflow: hidden; }
+  .gasket-frame canvas { display: block; width: 100%; height: 100%; }
+  .gasket-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #6B7C93; font-size: 11px; letter-spacing: 0.06em; pointer-events: none; }
+  .gasket-caption { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; font-size: 10px; color: #6B7C93; letter-spacing: 0.04em; }
+  .gasket-caption .gasket-name { font-family: 'Oswald', sans-serif; letter-spacing: 0.12em; color: #4FD1C5; }
+  .gasket-upload { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; padding: 12px; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gasket-upload label.gu-file { background: #0B1220; border: 1px solid #1E2C42; color: #9AACBF; font-size: 10.5px; padding: 8px 11px; border-radius: 6px; cursor: pointer; }
+  .gasket-upload label.gu-file:hover { border-color: #4FD1C5; color: #4FD1C5; }
+  .gasket-upload input[type=file] { display: none; }
+  .gasket-upload input[type=password] { background: #0B1220; border: 1px solid #1E2C42; color: #DCE6F2; font: inherit; font-size: 10.5px; padding: 8px 10px; border-radius: 6px; width: 130px; }
+  .gasket-upload button { background: #4FD1C5; color: #05201D; border: none; font-weight: 700; font-size: 10.5px; padding: 8px 13px; border-radius: 6px; cursor: pointer; }
+  .gasket-upload button:disabled { opacity: 0.5; cursor: default; }
+  .gasket-upload .gu-status { font-size: 10px; color: #6B7C93; }
+  .gasket-upload .gu-filename { font-size: 10px; color: #6B7C93; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Tonight's build takes the space the gasket demo used to hold. */
+  .build-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .bh-title { font-family: 'Oswald', sans-serif; font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase; color: #E8A33D; }
+  .bh-sub { font-size: 11.5px; color: #7B8CA6; }
+  .build-evidence { margin-top: 10px; }
+  .be-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 8px; }
+  .be-m { background: #0D1626; border: 1px solid #1E2C42; border-radius: 7px; padding: 10px 12px; }
+  .be-m .be-v { font-family: 'Oswald', sans-serif; font-size: 21px; color: #4FD1C5; line-height: 1.15; }
+  .be-m .be-k { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7C93; margin-top: 2px; }
+  .be-m .be-n { font-size: 10px; color: #8A9BB4; margin-top: 5px; line-height: 1.45; }
+  .be-sect { font-family: 'Oswald', sans-serif; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7C93; margin: 18px 0 8px; }
+  .be-find { font-size: 11.5px; color: #9AACBF; line-height: 1.6; padding: 6px 0 6px 13px; border-left: 2px solid #2F4258; margin-bottom: 4px; }
+  .be-commits { display: flex; flex-direction: column; gap: 5px; }
+  .be-c { display: flex; gap: 10px; align-items: baseline; font-size: 11px; background: #0D1626; border: 1px solid #1E2C42; border-radius: 6px; padding: 7px 10px; }
+  .be-c .be-sha { color: #E8A33D; flex: none; }
+  .be-c .be-subj { color: #C6D5E8; }
+  .be-diff { font-size: 10.5px; color: #6B7C93; margin-top: 8px; }
+  .be-table { width: 100%; border-collapse: collapse; font-size: 10.5px; display: block; overflow-x: auto; }
+  .be-table th { text-align: right; color: #6B7C93; font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; padding: 5px 8px; border-bottom: 1px solid #1E2C42; white-space: nowrap; }
+  .be-table th:first-child, .be-table td:first-child { text-align: left; }
+  .be-table td { text-align: right; padding: 5px 8px; border-bottom: 1px solid #131E2E; color: #9AACBF; white-space: nowrap; }
+  .be-table td:first-child { color: #C6D5E8; }
+  .be-table td.pass { color: #4FD1C5; } .be-table td.warn { color: #E8A33D; } .be-table td.fail { color: #E05252; }
+
+  /* Rig Bench — deliberately the loudest panel on the stage. It is the first
+     thing out of the rigging pipeline that a visitor can actually operate. */
+  .rig-bench { margin-top: 10px; padding: 12px 14px; background: #0D1626; border: 1px solid #2F6E63; border-radius: 8px; box-shadow: 0 0 0 1px rgba(94,214,190,0.12), 0 0 18px rgba(94,214,190,0.10); }
+  .rb-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+  .rb-title { font-size: 0.9rem; font-weight: 700; color: #5ED6BE; letter-spacing: 0.04em; }
+  .rb-new { display: inline-block; margin-left: 5px; padding: 1px 6px; border-radius: 3px; background: #5ED6BE; color: #06121B; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; vertical-align: middle; }
+  .rb-sub { font-size: 0.72rem; color: #7B8CA6; }
+  .rb-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 7px; }
+  .rb-toggle { background: #5ED6BE; color: #06121B; border: 0; border-radius: 5px; font: inherit; font-size: 0.76rem; font-weight: 700; padding: 6px 13px; cursor: pointer; }
+  .rb-toggle:hover { filter: brightness(1.1); }
+  .rb-toggle.on { background: #0D1626; color: #5ED6BE; border: 1px solid #2F6E63; }
+  .rb-stat { font-size: 0.74rem; color: #9FB3CC; }
+  .rb-bendrow label { font-size: 0.74rem; color: #7B8CA6; }
+  .rb-bendrow input[type=range] { flex: 1; min-width: 150px; max-width: 320px; }
+  .rb-deg { font-size: 0.76rem; color: #5ED6BE; min-width: 2.6rem; }
+  /* Skeleton overlay — the joints the solver synthesised, drawn where they
+     actually are. Pointer-events off so it never eats an orbit drag or poke. */
+  .rig-overlay { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .rj { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center;
+    gap: 5px; white-space: nowrap; transition: opacity 120ms linear; }
+  .rj.flip { flex-direction: row-reverse; }
+  .rj.flip .rj-label { text-align: right; }
+  .rj.lift { margin-top: -11px; }
+  .rj.drop { margin-top: 11px; }
+  .rj .rj-dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid #4FD1C5;
+    background: rgba(79,209,197,0.18); box-shadow: 0 0 6px rgba(79,209,197,0.5); flex: none; }
+  .rj .rj-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.04em;
+    color: #4FD1C5; text-shadow: 0 0 4px #0B1220, 0 0 8px #0B1220; }
+  .rj.root .rj-dot { border-color: #E8A33D; background: rgba(232,163,61,0.22); box-shadow: 0 0 8px rgba(232,163,61,0.6); }
+  .rj.root .rj-label { color: #E8A33D; }
+  .rh { position: absolute; transform: translate(-50%, -50%); width: 13px; height: 13px;
+    border-radius: 50%; border: 1.5px solid #E8746C; background: rgba(232,116,108,0.16);
+    box-shadow: 0 0 7px rgba(232,116,108,0.55); }
+  .rh::after { content: ""; position: absolute; inset: 3.5px; border-radius: 50%; background: #E8746C; opacity: 0.85; }
+  .rig-bone { position: absolute; height: 1.5px; transform-origin: 0 50%;
+    background: linear-gradient(90deg, rgba(79,209,197,0.75), rgba(79,209,197,0.25)); }
+
+  .rb-jointrow label { font-size: 0.74rem; color: #7B8CA6; }
+  .rb-jointrow input[type=range] { flex: 0 0 170px; }
+  .rb-jhint { font-size: 0.7rem; color: #9AACBF; }
+  .rb-live { display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: #4FD1C5; margin: 0 4px 0 2px; vertical-align: middle;
+    animation: fleetpulse 2.4s ease-in-out infinite; }
+  .rb-live.stale { background: #E8A33D; animation: none; }
+  .rb-live.fault { background: #E8746C; animation: fleetpulse 0.9s ease-in-out infinite; }
+  @keyframes fleetpulse { 0%,100% { opacity: 1; transform: scale(1); }
+                          50% { opacity: 0.35; transform: scale(0.7); } }
+  .rb-assets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .rb-asset { background: #0D1626; border: 1px solid #1E2C42; color: #9AACBF; font: inherit;
+    font-size: 0.68rem; padding: 5px 9px; border-radius: 5px; cursor: pointer; line-height: 1.3; text-align: left; }
+  .rb-asset:hover { border-color: #5ED6BE; color: #5ED6BE; }
+  .rb-asset.on { border-color: #5ED6BE; color: #5ED6BE; background: #0F2A2C; }
+  .rb-asset .rb-a-size { display: block; font-size: 0.58rem; color: #6C7C93; }
+  .rb-asset.big .rb-a-size { color: #E8A33D; }
+  .rb-asset:disabled { opacity: 0.5; cursor: default; }
+  .rb-sound { background: #0D1626; color: #7B8CA6; border: 1px solid #2F4258; border-radius: 5px; font: inherit; font-size: 0.72rem; padding: 5px 11px; cursor: pointer; }
+  .rb-sound:hover { border-color: #5ED6BE; color: #5ED6BE; }
+  .rb-sound.on { border-color: #5ED6BE; color: #5ED6BE; background: #0F2A2C; }
+  .rb-probe { margin-top: 9px; padding-top: 9px; border-top: 1px solid #1E2C42; font-size: 0.72rem; color: #9FB3CC; line-height: 1.6; }
+  .rb-probe .rbp-v { font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .rb-probe .pass { color: #5ED6BE; }
+  .rb-probe .warn { color: #E8A87C; }
+  .rb-probe .fail { color: #E8746C; }
+  .rb-probe code { color: #C6D5E8; }
+
+  .gasket-shader-deck { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 10px; padding: 12px 14px; background: #0D1626; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gsd-row { display: flex; align-items: center; gap: 10px; }
+  .gsd-row label, .gsd-label { font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7C93; }
+  #gasketIntensity { width: 130px; accent-color: #4FD1C5; }
+  .gsd-palette { display: flex; gap: 6px; }
+  .gsd-swatch { width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0; }
+  .gsd-swatch.gsd-red { background: linear-gradient(135deg, #ff2a2a, #ff8a00); }
+  .gsd-swatch.gsd-blue { background: linear-gradient(135deg, #00eaff, #8a00ff); }
+  .gsd-swatch.gsd-green { background: linear-gradient(135deg, #33ff55, #ccff33); }
+  .gsd-swatch.active { border-color: #DCE6F2; }
+  .gsd-pulse { background: #111A2B; border: 1px solid #4FD1C5; color: #4FD1C5; font: inherit; font-weight: 700; font-size: 10.5px; padding: 8px 13px; border-radius: 6px; cursor: pointer; }
+  .gsd-pulse.off { border-color: #6B7C93; color: #6B7C93; }
+
+  .gasket-terminal { margin-top: 10px; padding: 12px 14px; background: #05080E; border: 1px solid #1E2C42; border-radius: 8px; }
+  .gt-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #3A4C68; margin-bottom: 6px; }
+  .gt-row { display: flex; align-items: center; gap: 8px; }
+  .gt-prompt { color: #4FD1C5; font-size: 12px; }
+  .gasket-terminal input { flex: 1; background: none; border: none; color: #DCE6F2; font: inherit; font-size: 12px; padding: 4px 0; }
+  .gasket-terminal input:focus { outline: none; }
+  .gt-echo { margin-top: 6px; font-size: 10.5px; color: #6B7C93; min-height: 14px; }
+  .gt-echo.matched { color: #4FD1C5; }
 </style>
 </head>
 <body>
@@ -51,14 +286,108 @@
       <div class="tagline">FLAGSHIP MONAD · BRIDGE, INSTRUMENTS &amp; RECORD</div>
     </div>
 
+    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
+
     <div class="status-strip">
       <span>FLEET STATUS: <span id="fleetStatusVal" class="val val-unknown">CHECKING…</span> <span id="fleetStatusChecked" class="status-checked"></span></span>
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
-    <p class="lede">A live naval simulation: an autonomous fleet, a captain who watches over it, and the record of everything that's happened so far. Start with what you're trying to do.</p>
+    <section class="gasket-stage" id="gasketStage">
+      <div class="build-head">
+        <span class="bh-title">Tonight's Build</span>
+        <span class="bh-sub" id="buildHeadline">Aegis rigging pipeline</span>
+      </div>
+      <div class="gasket-frame">
+        <canvas id="gasketCanvas"></canvas>
+        <div class="gasket-hint" id="gasketHint">Loading rigged artifact&hellip;</div>
+        <div class="rig-overlay" id="rigOverlay"><div id="rigSkelLayer"></div><div id="rigHotLayer"></div></div>
+      </div>
+      <div class="gasket-caption">
+        <span>Live Render &middot; drag to orbit &middot; <strong style="color:#5ED6BE">click the robot to poke it</strong></span>
+        <span class="gasket-name" id="gasketName">RIGGED</span>
+      </div>
 
+      <!-- Rig Bench: the first testable artifact out of the Aegis pipeline.
+           The rigged GLB is real output, not a mock — INSPECT reports it as
+           rigged, and the bend slider drives its actual joints. -->
+      <div class="rig-bench" id="rigBench">
+        <div class="rb-head">
+          <span class="rb-title">Rig Bench <span class="rb-new">NEW</span></span>
+          <span class="rb-sub" id="rigBenchSub">first rigged artifact — Aegis pipeline</span>
+        </div>
+        <div class="rb-row">
+          <button type="button" class="rb-toggle" id="rigToggle">Load rigged gasket</button>
+          <span class="rb-stat" id="rigStat">static model loaded</span>
+        </div>
+        <div class="rb-assets" id="rigAssets"></div>
+        <div class="rb-row rb-jointrow" id="rigJointRow" hidden>
+          <label for="rigJoints">Joints</label>
+          <input type="range" id="rigJoints" min="0" max="4" step="1" value="1">
+          <span class="rb-deg" id="rigJointsVal">8</span>
+          <span class="rb-jhint" id="rigJointHint"></span>
+        </div>
+        <div class="rb-row rb-bendrow" id="rigBendRow" hidden>
+          <label for="rigBend">Drive</label>
+          <input type="range" id="rigBend" min="0" max="60" step="1" value="14">
+          <span class="rb-deg" id="rigBendVal">14&deg;</span>
+          <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
+          <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
+          <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
+          <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
+          <button type="button" class="rb-sound on" id="rigRadio">&#128251; FleetNet <span id="rigRadioDot" class="rb-live"></span> live</button>
+          <button type="button" class="rb-sound" id="rigRich">&#127908; Rich voice</button>
+          <button type="button" class="rb-sound" id="rigMute">&#128263; Mute</button>
+          <button type="button" class="rb-sound" id="rigChime">&#128266; Test Sound</button>
+          <button type="button" class="rb-sound" id="rigCaptain">&#9875; Captain Speaks</button>
+        </div>
+        <div class="rb-probe" id="rigProbe" hidden></div>
+      </div>
+
+      <!-- Evidence of tonight's build, generated from git rather than typed:
+           see web/data/build-evidence.json and the script that writes it. -->
+      <div class="build-evidence" id="buildEvidence"></div>
+
+      <form class="gasket-upload" id="gasketUploadForm" hidden>
+        <label class="gu-file" for="gasketFileInput">Choose .glb&hellip;</label>
+        <input type="file" id="gasketFileInput" accept=".glb,model/gltf-binary">
+        <span class="gu-filename" id="gasketFileName">No file selected</span>
+        <input type="password" id="gasketPassword" placeholder="Password" autocomplete="current-password">
+        <button type="submit" id="gasketUploadBtn" disabled>Upload GLB</button>
+        <span class="gu-status" id="gasketUploadStatus"></span>
+      </form>
+
+      <div class="gasket-shader-deck" hidden>
+        <div class="gsd-row">
+          <label for="gasketIntensity">Rim Intensity</label>
+          <input type="range" id="gasketIntensity" min="0" max="3" step="0.1" value="1.4">
+        </div>
+        <div class="gsd-row">
+          <span class="gsd-label">Palette</span>
+          <div class="gsd-palette">
+            <button type="button" class="gsd-swatch gsd-red" data-palette="red" title="Tactical Red"></button>
+            <button type="button" class="gsd-swatch gsd-blue active" data-palette="blue" title="Cyber Blue"></button>
+            <button type="button" class="gsd-swatch gsd-green" data-palette="green" title="Plasma Green"></button>
+          </div>
+        </div>
+        <button type="button" class="gsd-pulse" id="gasketPulseToggle">Pulse: ON</button>
+      </div>
+
+      <div class="gasket-terminal" hidden>
+        <div class="gt-label">Semantic Atmosphere Terminal</div>
+        <div class="gt-row">
+          <span class="gt-prompt">&gt;</span>
+          <input type="text" id="gasketTerminalInput" placeholder="dread, rum, coffee, maintenance, anomaly&hellip;" autocomplete="off">
+        </div>
+        <div class="gt-echo" id="gasketTerminalEcho"></div>
+      </div>
+    </section>
+
+    <div class="archive-head">
+      <span class="archive-title">Start Here</span>
+      <input type="search" id="archiveSearch" placeholder="Search sections&hellip;">
+    </div>
     <div class="categories">
       <a class="cat-card" href="command.html">
         <div class="cat-eyebrow">Act</div>
@@ -74,6 +403,11 @@
         <div class="cat-eyebrow">Make</div>
         <div class="cat-name">Build &amp; Research</div>
         <div class="cat-desc">Tools that make or study things — voices, shapes, assets, ideas. Not fleet control.</div>
+      </a>
+      <a class="cat-card" href="toys/monad0-lab/" style="border-color:#71b7e6">
+        <div class="cat-eyebrow">NEW · Experiment</div>
+        <div class="cat-name">Monad-0 Nexus Laboratory</div>
+        <div class="cat-desc">Play the seeded strange-loop experiment: compare four architectures, inject probes, inspect hypotheses, and review bounded contracts.</div>
       </a>
       <a class="cat-card" href="story.html">
         <div class="cat-eyebrow">Remember</div>
@@ -99,6 +433,54 @@
         <a href="ops.html">Ops Reader<span class="mn-new">NEW</span></a>
       </div>
     </div>
+
+    <section class="active-queue" id="activeQueue">
+      <div class="aq-head">
+        <span class="aq-title">Active Now &amp; Up Next</span>
+        <div class="aq-actions">
+          <button class="aq-btn" id="aqAddBtn">+ Add from archive</button>
+          <button class="aq-btn" id="aqManageBtn">Manage queue</button>
+        </div>
+      </div>
+      <div id="aqBody"><p class="aq-empty">Loading queue&hellip;</p></div>
+    </section>
+
+    <dialog class="aq-dialog" id="aqDialog">
+      <div class="aq-dialog-head"><h3 id="aqDialogTitle">Add from archive</h3><button class="aq-dialog-close" id="aqDialogClose">Close</button></div>
+      <div class="aq-dialog-body">
+        <input type="search" id="aqSearch" placeholder="Search projects, tools, pages&hellip;">
+        <div id="aqPicks"><p class="aq-empty">Loading archive&hellip;</p></div>
+      </div>
+    </dialog>
+
+    <div class="archive-head">
+      <span class="archive-title">Live Captain Feed</span>
+    </div>
+
+    <section class="captain-images" id="captainImages">
+      <div class="ci-head">
+        <span class="ci-title">Image Viewer</span>
+        <span class="ci-synced" id="ciSynced"></span>
+      </div>
+      <div id="ciBody"><p class="ci-empty">Loading&hellip;</p></div>
+    </section>
+
+    <dialog class="ci-dialog" id="ciDialog">
+      <div class="ci-dialog-head"><span id="ciDialogTime"></span><button class="ci-dialog-close" id="ciDialogClose">Close</button></div>
+      <div class="ci-dialog-body"><img id="ciDialogImg" src="" alt="Captain-generated image, full size"></div>
+    </dialog>
+
+    <a class="mike-berth" href="toys/mike-rocketry-notebook/">
+      <div class="project-kicker">Mike's Own Work · Verbatim, Read-Only</div>
+      <div class="project-title">MIKE'S ROCKET EQUATIONS NOTEBOOK</div>
+      <div class="project-desc">The actual notebook &mdash; source and outputs preserved exactly as Mike wrote them, not a reinterpretation. Read <code>rocket equations.ipynb</code> as rendered, cover to cover.</div>
+    </a>
+
+    <a class="basin-berth" href="toys/living-basin/">
+      <div class="project-kicker">Causal Terrain Simulation &middot; v0 Prototype</div>
+      <div class="project-title">THE LIVING BASIN</div>
+      <div class="project-desc">Watch a herbivore trail, grazing, rainfall, and erosion interact on a 64&times;64 basin, then click any water pool, trail, or gully to inspect the exact recorded events that caused it &mdash; not a story generated afterward.</div>
+    </a>
 
     <footer>
       REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
@@ -143,6 +525,1762 @@
         .catch(function () {
           setStatus("UNKNOWN", "val-unknown", "status feed unreachable");
         });
+    })();
+  </script>
+  <script>
+    (function () {
+      // Live, not synced: every load calls public-images-api directly,
+      // which globs ~/.codex/generated_images fresh at request time and
+      // streams bytes straight from there -- no copy into web/, no
+      // manifest, no cache. See tools/root-console/public_images_server.py.
+      var body = document.getElementById("ciBody");
+      var syncedEl = document.getElementById("ciSynced");
+      var dialog = document.getElementById("ciDialog");
+      var dialogImg = document.getElementById("ciDialogImg");
+      var dialogTime = document.getElementById("ciDialogTime");
+      if (!body) return;
+
+      document.getElementById("ciDialogClose").addEventListener("click", function () {
+        dialog.close();
+      });
+      dialog.addEventListener("click", function (event) {
+        if (event.target === dialog) dialog.close();
+      });
+
+      function timeAgo(iso) {
+        var ms = Date.now() - new Date(iso).getTime();
+        if (!(ms >= 0)) return "";
+        var min = Math.round(ms / 60000);
+        if (min < 1) return "just now";
+        if (min < 60) return min + "m ago";
+        var hr = Math.round(min / 60);
+        if (hr < 24) return hr + "h ago";
+        return Math.round(hr / 24) + "d ago";
+      }
+
+      fetch("/public-images-api/api/images", { cache: "no-store" })
+        .then(function (res) { if (!res.ok) throw new Error("status " + res.status); return res.json(); })
+        .then(function (data) {
+          var images = data.images || [];
+          syncedEl.textContent = "live";
+          if (!images.length) {
+            body.innerHTML = '<p class="ci-empty">No Captain-generated images yet.</p>';
+            return;
+          }
+          var grid = document.createElement("div");
+          grid.className = "ci-grid";
+          images.forEach(function (image) {
+            var btn = document.createElement("button");
+            btn.className = "ci-thumb";
+            btn.type = "button";
+            btn.innerHTML =
+              '<img src="' + image.url + '" alt="Captain-generated image" loading="lazy">' +
+              '<span class="ci-time">' + timeAgo(image.generated_at) + "</span>";
+            btn.addEventListener("click", function () {
+              dialogImg.src = image.url;
+              dialogTime.textContent = "generated " + timeAgo(image.generated_at);
+              dialog.showModal();
+            });
+            grid.appendChild(btn);
+          });
+          body.innerHTML = "";
+          body.appendChild(grid);
+        })
+        .catch(function () {
+          body.innerHTML = '<p class="ci-empty">Image feed unreachable.</p>';
+        });
+    })();
+  </script>
+  <script src="assets/js/active-queue.js" data-root=""></script>
+  <script type="module">
+    // Live Gasket stage: reads assets/models/gasket/gasket.glb straight off
+    // disk (cache-busted by upload time) with no manifest/sync step. Falls
+    // back to a placeholder model only until the real Gasket asset exists.
+    import * as THREE from "three";
+    import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    (function () {
+      var frame = document.querySelector(".gasket-frame");
+      var canvas = document.getElementById("gasketCanvas");
+      var hint = document.getElementById("gasketHint");
+      if (!frame || !canvas) return;
+
+      var PLACEHOLDER_MODEL = "assets/models/uss-rubber-ducky.glb";
+      var GASKET_MODEL = "assets/models/gasket/gasket.glb";
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      camera.position.set(2.2, 1.4, 2.6);
+
+      scene.add(new THREE.HemisphereLight(0x8fa8c9, 0x0b1220, 1.1));
+      var key = new THREE.DirectionalLight(0xffffff, 1.4);
+      key.position.set(3, 5, 2);
+      scene.add(key);
+      var rim = new THREE.PointLight(0x4fd1c5, 2.2, 12);
+      rim.position.set(-2, 1, -2);
+      scene.add(rim);
+
+      var controls = new OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      // Idle behaviour is limb movement, not a turntable. A rigged asset
+      // spinning tells you nothing the static one didn't; a rigged asset
+      // moving its own joints is the only thing on this page that a static
+      // mesh physically cannot do.
+      controls.autoRotate = false;
+      controls.target.set(0, 0, 0);
+
+      function resize() {
+        var w = frame.clientWidth, h = frame.clientHeight;
+        if (!w || !h) return;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      new ResizeObserver(resize).observe(frame);
+      resize();
+
+      var current = null;
+      var PALETTES = {
+        blue: [new THREE.Color(0x00eaff), new THREE.Color(0x8a00ff)],
+        red: [new THREE.Color(0xff2a2a), new THREE.Color(0xff8a00)],
+        green: [new THREE.Color(0x33ff55), new THREE.Color(0xccff33)]
+      };
+      var uniforms = {
+        uTime: { value: 0 },
+        uIntensity: { value: 1.4 },
+        uColorA: { value: PALETTES.blue[0].clone() },
+        uColorB: { value: PALETTES.blue[1].clone() },
+        uPulseOn: { value: 1 },
+        uPulseSpeed: { value: 1.3 },
+        uGlitch: { value: 0 },
+        uWarmth: { value: 0.2 },
+        uSemanticTint: { value: new THREE.Color(0, 0, 0) }
+      };
+
+      // Semantic atmosphere state: parseSemanticPrompt() below sets these
+      // targets, and the animate() loop eases the live uniforms toward them
+      // every frame -- a plain lerp, no tween library needed.
+      var semanticTarget = { glitch: 0, warmth: 0.2, tint: new THREE.Color(0, 0, 0) };
+
+      // Drop-in shader wrapper: injects a time-driven fresnel/rim term into
+      // each material's existing shader via onBeforeCompile rather than
+      // replacing the material outright, so PBR/textures survive and the
+      // uniforms are live for the on-screen shader control deck below.
+      function wrapMaterialShader(material) {
+        if (!material || material.userData.__gasketWrapped) return;
+        material.userData.__gasketWrapped = true;
+        var prevOnBeforeCompile = material.onBeforeCompile;
+        material.onBeforeCompile = function (shader) {
+          if (prevOnBeforeCompile) prevOnBeforeCompile(shader);
+          shader.uniforms.uTime = uniforms.uTime;
+          shader.uniforms.uIntensity = uniforms.uIntensity;
+          shader.uniforms.uColorA = uniforms.uColorA;
+          shader.uniforms.uColorB = uniforms.uColorB;
+          shader.uniforms.uPulseOn = uniforms.uPulseOn;
+          shader.uniforms.uPulseSpeed = uniforms.uPulseSpeed;
+          shader.uniforms.uGlitch = uniforms.uGlitch;
+          shader.uniforms.uWarmth = uniforms.uWarmth;
+          shader.uniforms.uSemanticTint = uniforms.uSemanticTint;
+          shader.fragmentShader = shader.fragmentShader
+            .replace(
+              "#include <common>",
+              "#include <common>\n" +
+              "uniform float uTime;\n" +
+              "uniform float uIntensity;\n" +
+              "uniform vec3 uColorA;\n" +
+              "uniform vec3 uColorB;\n" +
+              "uniform float uPulseOn;\n" +
+              "uniform float uPulseSpeed;\n" +
+              "uniform float uGlitch;\n" +
+              "uniform float uWarmth;\n" +
+              "uniform vec3 uSemanticTint;\n"
+            )
+            .replace(
+              "#include <dithering_fragment>",
+              "#include <dithering_fragment>\n" +
+              // Real fresnel: view direction against the fragment's actual
+              // surface normal (not a fixed axis) -- a fixed vec3(0,0,1)
+              // here previously made this ~0 across almost the entire
+              // visible surface, which is why the rim glow was invisible.
+              "  float gasketFresnel = pow(1.0 - clamp(abs(dot(normalize(vViewPosition), normal)), 0.0, 1.0), 2.5);\n" +
+              "  vec3 gasketColor;\n" +
+              "  float gasketMag;\n" +
+              "  if (uPulseOn > 0.5) {\n" +
+              "    float mixAmt = 0.5 + 0.5 * sin(uTime * uPulseSpeed * 0.6);\n" +
+              "    gasketColor = mix(uColorA, uColorB, mixAmt);\n" +
+              "    gasketMag = uIntensity * (0.55 + 0.45 * sin(uTime * uPulseSpeed));\n" +
+              "  } else {\n" +
+              "    gasketColor = uColorA;\n" +
+              "    gasketMag = uIntensity;\n" +
+              "  }\n" +
+              "  gl_FragColor.rgb += gasketFresnel * gasketColor * gasketMag;\n" +
+              // Semantic atmosphere layer: a warm/cool color-mood wash plus
+              // a cheap scanline-tear "glitch" (RGB channel split on coarse
+              // horizontal bands, strength and phase driven by uGlitch/uTime)
+              // -- both real, visible GLSL, not just JS state with nothing
+              // consuming it.
+              "  gl_FragColor.rgb += uSemanticTint * 0.35;\n" +
+              "  gl_FragColor.rgb += vec3(0.32, 0.16, 0.03) * uWarmth;\n" +
+              "  if (uGlitch > 0.001) {\n" +
+              "    float gasketBand = floor(gl_FragCoord.y / 4.0);\n" +
+              "    float gasketNoise = fract(sin(gasketBand * 12.9898 + floor(uTime * 12.0) * 78.233) * 43758.5453);\n" +
+              "    float gasketJitter = (gasketNoise - 0.5) * uGlitch * 0.4;\n" +
+              "    gl_FragColor.r += gasketJitter;\n" +
+              "    gl_FragColor.b -= gasketJitter;\n" +
+              "    if (gasketNoise > 0.97) { gl_FragColor.rgb = vec3(gasketNoise); }\n" +
+              "  }\n"
+            );
+        };
+        material.needsUpdate = true;
+      }
+
+      function frameModel(object) {
+        var box = new THREE.Box3().setFromObject(object);
+        var size = new THREE.Vector3();
+        box.getSize(size);
+        var center = new THREE.Vector3();
+        box.getCenter(center);
+        var maxDim = Math.max(size.x, size.y, size.z) || 1;
+        var scale = 1.35 / maxDim;
+        object.scale.setScalar(scale);
+        object.position.sub(center.multiplyScalar(scale));
+      }
+
+      function loadModel(url, onReady) {
+        var loader = new GLTFLoader();
+        loader.load(
+          url,
+          function (gltf) {
+            if (current) scene.remove(current);
+            current = gltf.scene;
+            current.traverse(function (node) {
+              if (!node.isMesh) return;
+              if (Array.isArray(node.material)) {
+                node.material.forEach(wrapMaterialShader);
+              } else {
+                wrapMaterialShader(node.material);
+              }
+            });
+            frameModel(current);
+            scene.add(current);
+            if (hint) hint.style.display = "none";
+            if (onReady) onReady(current);
+          },
+          undefined,
+          function () {
+            if (url !== PLACEHOLDER_MODEL) {
+              loadModel(PLACEHOLDER_MODEL);
+            } else if (hint) {
+              hint.textContent = "Gasket render unavailable.";
+            }
+          }
+        );
+      }
+
+      // --- Rig Bench ---------------------------------------------------
+      // Standing rule: the front page carries the current build's testable
+      // artifact. Today that is the first rigged asset the Aegis pipeline
+      // produced. The bend slider drives its real joints, so what the
+      // Admiral moves here is the actual rig, not a preview of one.
+      var RIGGED_MODEL = "assets/rigged/file_00000000a68c722f9cd29e1996dba4cf-rigged.glb";
+      var rigBones = [];
+      var rigOn = false;
+
+      function collectBones(root) {
+        skinSkeleton = null;
+        root.traverse(function (node) {
+          if (node.isSkinnedMesh && node.skeleton) skinSkeleton = node.skeleton;
+        });
+        var bones = [];
+        root.traverse(function (node) {
+          if (node.isBone) bones.push(node);
+        });
+        // Root first, then down the chain. The solver names them @Root,
+        // @Axis.001 … @Tip, which sorts correctly except for @Root itself.
+        bones.sort(function (a, b) {
+          if (a.name === "@Root") return -1;
+          if (b.name === "@Root") return 1;
+          if (a.name === "@Tip") return 1;
+          if (b.name === "@Tip") return -1;
+          return a.name.localeCompare(b.name);
+        });
+        return bones;
+      }
+
+      // Peak bend of the travelling wave, in degrees. The slider sets this,
+      // so the probe readout still describes the extreme the rig reaches.
+      var rigAmplitude = 14;
+
+      function applyBend(degrees) {
+        rigAmplitude = degrees;
+      }
+
+      // Simple dynamics rather than a canned animation. Each joint is an
+      // angular spring-damper that chases its parent's current angle; only
+      // the first joint is driven directly. The wave down the chain, the lag,
+      // and the overshoot are not authored — they fall out of the coupling,
+      // which is what makes it worth having a rig at all.
+      var rigState = [];
+      var STIFFNESS = 26;
+      var DAMPING = 5.2;
+      var FOLLOW = 0.86;
+
+      // --- sonification -------------------------------------------------
+      // One voice per joint, loudness driven by that joint's angular
+      // velocity. Nothing is sampled or sequenced: the sound is read from
+      // the same integrator state that moves the mesh, so the cascade you
+      // hear as the wave travels outward is the wave, not an impression of
+      // it. A joint at rest is silent because its velocity is zero.
+      var audio = null;
+
+      // Pentatonic, so a chain of eight simultaneous voices stays consonant
+      // whatever phase the joints happen to be in.
+      var SCALE = [196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+
+      function startAudio(count) {
+        // Must be called from a click: browsers refuse to start an
+        // AudioContext without a user gesture, and that is the only genuinely
+        // awkward part of wiring sound into a page.
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        var ctx = new Ctx();
+        var master = ctx.createGain();
+        master.gain.value = 0.0001;
+
+        // Rolls the top off the sines so a cascade reads as motion rather
+        // than a test tone.
+        var filter = ctx.createBiquadFilter();
+        filter.type = "lowpass";
+        filter.frequency.value = 1800;
+        filter.Q.value = 0.7;
+        filter.connect(master);
+        master.connect(ctx.destination);
+
+        var voices = [];
+        for (var i = 0; i < count; i++) {
+          var osc = ctx.createOscillator();
+          osc.type = i % 2 ? "sine" : "triangle";
+          osc.frequency.value = SCALE[i % SCALE.length];
+          var gain = ctx.createGain();
+          gain.gain.value = 0;
+          osc.connect(gain);
+          gain.connect(filter);
+          osc.start();
+          voices.push({ osc: osc, gain: gain });
+        }
+        master.gain.setTargetAtTime(0.5, ctx.currentTime, 0.25);
+        return { ctx: ctx, master: master, voices: voices };
+      }
+
+      function updateAudio() {
+        if (!audio || !rigState.length) return;
+        var now = audio.ctx.currentTime;
+        for (var i = 0; i < audio.voices.length; i++) {
+          var s = rigState[i];
+          var speed = s ? Math.abs(s.v) : 0;
+          // setTargetAtTime rather than .value: stepping a gain once per
+          // frame is what zipper noise sounds like.
+          var level = Math.min(speed * 0.55, 1) * 0.16;
+          audio.voices[i].gain.gain.setTargetAtTime(level, now, 0.06);
+        }
+      }
+
+      function resetDynamics(count) {
+        rigState = [];
+        for (var i = 0; i < count; i++) rigState.push({ a: 0, v: 0 });
+      }
+
+      function animateLimbs(seconds, delta) {
+        if (!rigBones.length) return;
+        if (rigState.length !== rigBones.length) resetDynamics(rigBones.length);
+        // A chain distributes one bend along its length. A tree hangs several
+        // limbs off one trunk, so the same per-joint amplitude moves every
+        // limb at once and reads as thrashing rather than motion. Damp it by
+        // the branching factor: hold easy, not fixed.
+        var branchDamp = Math.min(1, 6 / Math.max(rigBones.length, 1));
+        // Clamp dt: a backgrounded tab hands back a huge delta, and an
+        // explicit integrator with a huge step is how a spring explodes.
+        var dt = Math.min(delta || 0.016, 1 / 30);
+        var share = branchDamp * (rigAmplitude * Math.PI / 180)
+                    / Math.max(rigBones.length - 1, 1);
+        // Two slow components at incommensurate periods so it never settles
+        // into a visible loop — alive, not cycling.
+        var drive = share * (Math.sin(seconds * 0.55) * 0.7
+                             + Math.sin(seconds * 0.31 + 1.3) * 0.3);
+
+        for (var i = 1; i < rigBones.length; i++) {
+          var target = i === 1 ? drive : rigState[i - 1].a * FOLLOW;
+          var s = rigState[i];
+          s.v += (STIFFNESS * (target - s.a) - DAMPING * s.v) * dt;
+          s.a += s.v * dt;
+          rigBones[i].rotation.z = s.a;
+        }
+      }
+
+      // --- poke ---------------------------------------------------------
+      // Clicking the robot kicks the spring chain. It is worth having because
+      // the dynamics are real: an impulse propagates outward and settles on
+      // its own, so a poke looks different every time depending on where the
+      // chain already was. A canned animation could not do that.
+      var raycaster = new THREE.Raycaster();
+      var pointer = new THREE.Vector2();
+      var downAt = null;
+
+      function pointerAt(event) {
+        var rect = canvas.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        return pointer;
+      }
+
+      function overRobot(event) {
+        if (!current) return false;
+        raycaster.setFromCamera(pointerAt(event), camera);
+        return raycaster.intersectObject(current, true).length > 0;
+      }
+
+      function poke() {
+        if (!rigBones.length) return false;
+        if (rigState.length !== rigBones.length) resetDynamics(rigBones.length);
+        // Alternating kick, decaying down the chain — a shove near the root
+        // that the spring coupling turns into a travelling wobble.
+        for (var i = 1; i < rigState.length; i++) {
+          rigState[i].v += (i % 2 ? 1 : -1) * (5.5 / i);
+        }
+        return true;
+      }
+
+      // --- drag to pull -------------------------------------------------
+      // Orbit is what every 3D viewer does with a drag, and it tells you
+      // nothing about the rig. Dragging *on the model* now grabs the nearest
+      // joint and pulls it: the spring chain resists, the wave propagates
+      // outward, and it settles on its own when released. Dragging empty
+      // space still orbits, so nothing is lost.
+      var grabbed = -1;
+      var lastDrag = null;
+      var screenBone = new THREE.Vector3();
+
+      function nearestBoneToPointer(event) {
+        if (!rigBones.length) return -1;
+        var rect = canvas.getBoundingClientRect();
+        var px = event.clientX - rect.left, py = event.clientY - rect.top;
+        var best = -1, bestDist = 1e9;
+        for (var i = 0; i < rigBones.length; i++) {
+          rigBones[i].getWorldPosition(screenBone);
+          screenBone.project(camera);
+          var bx = (screenBone.x * 0.5 + 0.5) * rect.width;
+          var by = (-screenBone.y * 0.5 + 0.5) * rect.height;
+          var d = Math.hypot(bx - px, by - py);
+          if (d < bestDist) { bestDist = d; best = i; }
+        }
+        return best;
+      }
+
+      function pull(dx, dy) {
+        if (grabbed < 1 || !rigState.length) return;
+        // Horizontal drag twists the grabbed joint; vertical drag drives it
+        // harder. Both go in as *velocity*, not position — the integrator
+        // then does the rest, which is why it feels like pulling something
+        // with weight rather than dragging a puppet.
+        var impulse = (dx * 0.010) + (dy * 0.004);
+        rigState[grabbed].v += impulse;
+        // Neighbours feel a fraction of it, so a pull travels.
+        if (rigState[grabbed - 1]) rigState[grabbed - 1].v += impulse * 0.35;
+        if (rigState[grabbed + 1]) rigState[grabbed + 1].v += impulse * 0.5;
+      }
+
+      canvas.style.cursor = "grab";
+      canvas.addEventListener("pointermove", function (event) {
+        if (grabbed >= 0 && lastDrag) {
+          pull(event.clientX - lastDrag.x, event.clientY - lastDrag.y);
+          lastDrag = { x: event.clientX, y: event.clientY };
+          return;
+        }
+        if (downAt) return;
+        canvas.style.cursor = overRobot(event) ? "pointer" : "grab";
+      });
+      canvas.addEventListener("pointerdown", function (event) {
+        downAt = { x: event.clientX, y: event.clientY };
+        canvas.style.cursor = "grabbing";
+        if (overRobot(event)) {
+          grabbed = nearestBoneToPointer(event);
+          lastDrag = { x: event.clientX, y: event.clientY };
+          controls.enabled = false;          // pulling, not orbiting
+          if (rigStat) rigStat.textContent = "holding " +
+            (rigBones[grabbed] && rigBones[grabbed].name || "joint") + " — pull it";
+        }
+      });
+      canvas.addEventListener("pointerup", function (event) {
+        if (grabbed >= 0) {
+          grabbed = -1;
+          lastDrag = null;
+          controls.enabled = true;
+          if (rigStat) rigStat.textContent = rigBones.length +
+            " joints bound — spring chain driving them live";
+        }
+        var moved = downAt
+          ? Math.hypot(event.clientX - downAt.x, event.clientY - downAt.y)
+          : 99;
+        downAt = null;
+        // --- drag to pull -------------------------------------------------
+      // Orbit is what every 3D viewer does with a drag, and it tells you
+      // nothing about the rig. Dragging *on the model* now grabs the nearest
+      // joint and pulls it: the spring chain resists, the wave propagates
+      // outward, and it settles on its own when released. Dragging empty
+      // space still orbits, so nothing is lost.
+      var grabbed = -1;
+      var lastDrag = null;
+      var screenBone = new THREE.Vector3();
+
+      function nearestBoneToPointer(event) {
+        if (!rigBones.length) return -1;
+        var rect = canvas.getBoundingClientRect();
+        var px = event.clientX - rect.left, py = event.clientY - rect.top;
+        var best = -1, bestDist = 1e9;
+        for (var i = 0; i < rigBones.length; i++) {
+          rigBones[i].getWorldPosition(screenBone);
+          screenBone.project(camera);
+          var bx = (screenBone.x * 0.5 + 0.5) * rect.width;
+          var by = (-screenBone.y * 0.5 + 0.5) * rect.height;
+          var d = Math.hypot(bx - px, by - py);
+          if (d < bestDist) { bestDist = d; best = i; }
+        }
+        return best;
+      }
+
+      function pull(dx, dy) {
+        if (grabbed < 1 || !rigState.length) return;
+        // Horizontal drag twists the grabbed joint; vertical drag drives it
+        // harder. Both go in as *velocity*, not position — the integrator
+        // then does the rest, which is why it feels like pulling something
+        // with weight rather than dragging a puppet.
+        var impulse = (dx * 0.010) + (dy * 0.004);
+        rigState[grabbed].v += impulse;
+        // Neighbours feel a fraction of it, so a pull travels.
+        if (rigState[grabbed - 1]) rigState[grabbed - 1].v += impulse * 0.35;
+        if (rigState[grabbed + 1]) rigState[grabbed + 1].v += impulse * 0.5;
+      }
+
+      canvas.style.cursor = "grab";
+        // Under 5px is a click, not an orbit drag — otherwise every camera
+        // move would also poke it.
+        if (moved < 5 && overRobot(event) && poke()) {
+          chime("low");
+          buddySubmit(0, "Ow.");
+          if (rigStat) {
+            var was = rigStat.textContent;
+            rigStat.textContent = "poked — watch it settle";
+            clearTimeout(rigStat._pokeTimer);
+            rigStat._pokeTimer = setTimeout(function () {
+              rigStat.textContent = was;
+            }, 1800);
+          }
+        }
+      });
+
+      // --- skeleton overlay -----------------------------------------
+      // Projects each joint's world position to screen every frame and draws
+      // a marker there, with a bone line to its parent. The dot brightens and
+      // grows with that joint's angular velocity, so the wave travelling down
+      // the chain is visible as light as well as motion.
+      var overlayEl = document.getElementById("rigOverlay");
+      var skelLayer = document.getElementById("rigSkelLayer");
+      var hotLayer = document.getElementById("rigHotLayer");
+      var jointMarkers = [];
+      var boneLines = [];
+      var skeletonOn = true;
+      var projected = new THREE.Vector3();
+
+      function buildSkeletonMarkers() {
+        if (!overlayEl) return;
+        skelLayer.innerHTML = "";
+        jointMarkers = [];
+        boneLines = [];
+        rigBones.forEach(function (bone, i) {
+          if (i > 0) {
+            var line = document.createElement("div");
+            line.className = "rig-bone";
+            skelLayer.appendChild(line);
+            boneLines.push(line);
+          }
+          var marker = document.createElement("div");
+          // Fan the labels out: alternate side and nudge up/down, otherwise
+          // adjacent joints stack their text into an unreadable pile wherever
+          // the chain bunches.
+          marker.className = "rj" + (i === 0 ? " root" : "") +
+            (i % 2 ? " flip" : "") + (i % 4 < 2 ? " lift" : " drop");
+          marker.innerHTML = '<span class="rj-dot"></span><span class="rj-label">' +
+            (bone.name || ("joint " + i)) + "</span>";
+          skelLayer.appendChild(marker);
+          jointMarkers.push(marker);
+        });
+      }
+
+      function updateSkeletonOverlay() {
+        if (!overlayEl) return;
+        skelLayer.style.display = (skeletonOn && rigBones.length) ? "" : "none";
+        if (!rigBones.length) return;
+        if (jointMarkers.length !== rigBones.length) buildSkeletonMarkers();
+
+        var rect = canvas.getBoundingClientRect();
+        var w = rect.width, h = rect.height;
+        var pts = [];
+        for (var i = 0; i < rigBones.length; i++) {
+          rigBones[i].getWorldPosition(projected);
+          projected.project(camera);
+          var x = (projected.x * 0.5 + 0.5) * w;
+          var y = (-projected.y * 0.5 + 0.5) * h;
+          var behind = projected.z > 1;
+          pts.push({ x: x, y: y, behind: behind });
+
+          var speed = (rigState[i] && Math.abs(rigState[i].v)) || 0;
+          var heat = Math.min(speed * 0.9, 1);
+          var marker = jointMarkers[i];
+          marker.style.left = x + "px";
+          marker.style.top = y + "px";
+          marker.style.opacity = behind ? 0.25 : (0.55 + heat * 0.45);
+          var dot = marker.firstChild;
+          dot.style.transform = "scale(" + (1 + heat * 0.9) + ")";
+        }
+        updateHotspots(w, h);
+        for (var j = 0; j < boneLines.length; j++) {
+          var a = pts[j], b = pts[j + 1];
+          if (!a || !b) continue;
+          var dx = b.x - a.x, dy = b.y - a.y;
+          var line = boneLines[j];
+          line.style.left = a.x + "px";
+          line.style.top = a.y + "px";
+          line.style.width = Math.hypot(dx, dy) + "px";
+          line.style.transform = "rotate(" + Math.atan2(dy, dx) + "rad)";
+          line.style.opacity = (a.behind || b.behind) ? 0.2 : 0.85;
+        }
+      }
+
+      // --- interpenetration hotspots --------------------------------
+      // The probe reports "N shell pairs interpenetrating" as a number. These
+      // are the same defects, located. Positions come from the Rust probe in
+      // rest space tagged with the joint they belong to, so each one is
+      // carried through the live pose by its own bone rather than being
+      // pinned to the fixed test bend the probe measured at.
+      var hotspots = [];
+      var hotMarkers = [];
+      var clipOn = false;
+      var skinSkeleton = null;
+      var hotVec = new THREE.Vector3();
+
+      function buildHotspots(entry) {
+        hotspots = [];
+        hotMarkers.forEach(function (m) { m.remove(); });
+        hotMarkers = [];
+        var pose = (entry && entry.probe && entry.probe.poses && entry.probe.poses[0]) || null;
+        if (!pose || !pose.hotspots) return;
+        hotspots = pose.hotspots;
+        hotspots.forEach(function () {
+          var el = document.createElement("div");
+          el.className = "rh";
+          el.style.display = "none";
+          hotLayer.appendChild(el);
+          hotMarkers.push(el);
+        });
+      }
+
+      function updateHotspots(w, h) {
+        if (!clipOn || !hotspots.length || !skinSkeleton) {
+          hotMarkers.forEach(function (m) { m.style.display = "none"; });
+          return;
+        }
+        for (var i = 0; i < hotspots.length; i++) {
+          var spot = hotspots[i];
+          var j = Math.min(spot.joint, skinSkeleton.bones.length - 1);
+          var bone = skinSkeleton.bones[j];
+          if (!bone) continue;
+          hotVec.set(spot.x, spot.y, spot.z);
+          // rest position -> bone space -> world, i.e. the same skinning
+          // transform the GPU applies to the vertices around it.
+          hotVec.applyMatrix4(skinSkeleton.boneInverses[j]);
+          hotVec.applyMatrix4(bone.matrixWorld);
+          hotVec.project(camera);
+          var el = hotMarkers[i];
+          el.style.display = hotVec.z > 1 ? "none" : "";
+          el.style.left = ((hotVec.x * 0.5 + 0.5) * w) + "px";
+          el.style.top = ((-hotVec.y * 0.5 + 0.5) * h) + "px";
+        }
+      }
+
+      var clipBtn = document.getElementById("rigClip");
+      if (clipBtn) {
+        clipBtn.addEventListener("click", function () {
+          clipOn = !clipOn;
+          clipBtn.classList.toggle("on", clipOn);
+          clipBtn.innerHTML = "&#9888; Clipping: " + (clipOn ? "on" : "off") +
+            (clipOn && hotspots.length ? " (" + hotspots.length + ")" : "");
+        });
+      }
+
+      // --- joint count ------------------------------------------------
+      // Bone density is the parameter that actually decides how much of a
+      // fragmented mesh can deform at all, and until now it was a CLI
+      // argument. Variants are pre-rigged, so switching is a model swap
+      // rather than a solve, and the page stays public.
+      var variantData = null;
+      var variants = [];
+      var jointRow = document.getElementById("rigJointRow");
+      var jointSlider = document.getElementById("rigJoints");
+      var jointVal = document.getElementById("rigJointsVal");
+      var jointHint = document.getElementById("rigJointHint");
+
+      fetch("data/rig-variants.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { variantData = d; syncVariants(); })
+        .catch(function (e) { console.error("variants failed:", e && e.message); });
+
+      function variantKeyFor(entry) {
+        if (!entry || !variantData) return null;
+        var stem = entry.name.replace(/\.glb$/, "");
+        return variantData.assets[stem] ? stem : null;
+      }
+
+      function syncVariants() {
+        var entry = corpusAssets.filter(function (e) { return e.dest === activeAsset; })[0];
+        var key = variantKeyFor(entry);
+        if (!key) {
+          variants = [];
+          if (jointRow) jointRow.hidden = true;
+          return;
+        }
+        variants = variantData.assets[key];
+        jointRow.hidden = false;
+        jointSlider.max = String(variants.length - 1);
+        var idx = 0;
+        for (var i = 0; i < variants.length; i++) {
+          if (variants[i].joints === 8) idx = i;
+        }
+        jointSlider.value = String(idx);
+        applyVariant(idx, true);
+      }
+
+      function applyVariant(index, quiet) {
+        var v = variants[index];
+        if (!v) return;
+        jointVal.textContent = v.joints;
+        jointHint.innerHTML = v.rigid.toLocaleString() + " rigid / " +
+          v.blended.toLocaleString() + " blended · <strong style=\"color:" +
+          (v.deep ? "#E8A33D" : "#4FD1C5") + "\">" + v.deep + " interpenetrating</strong>";
+        rigStat.textContent = "loading " + v.joints + "-joint rig…";
+        loadModel(v.dest, function (root) {
+          rigBones = collectBones(root);
+          buildSkeletonMarkers();
+          hotspots = v.hotspots || [];
+          hotMarkers.forEach(function (m) { m.remove(); });
+          hotMarkers = [];
+          hotspots.forEach(function () {
+            var el = document.createElement("div");
+            el.className = "rh";
+            el.style.display = "none";
+            hotLayer.appendChild(el);
+            hotMarkers.push(el);
+          });
+          if (clipBtn) {
+            clipBtn.innerHTML = "&#9888; Clipping: " + (clipOn ? "on" : "off") +
+              (clipOn && hotspots.length ? " (" + hotspots.length + ")" : "");
+          }
+          rigStat.textContent = rigBones.length + " joints bound — spring chain driving them live";
+          var sub = document.getElementById("rigBenchSub");
+          if (sub) {
+            sub.textContent = v.joints + " joints · " + v.shells.toLocaleString() +
+              " shells · bone span " + v.bone_span.toFixed(3);
+          }
+          applyBend(parseFloat(rigBend.value) || 14);
+          buddyReport(null, v);
+          if (rigProbe) {
+            rigProbe.hidden = false;
+            rigProbe.innerHTML =
+              '<span class="rbp-v ' + v.verdict + '">' + v.verdict + "</span> at 15&deg; — " +
+              v.deep + " interpenetrating (of " + v.contact.toLocaleString() + " in contact)" +
+              "<br><code>" + v.inverted + " inverted · " + v.collapsed + " collapsed · " +
+              v.torn + " torn · solved in " + Math.round(v.solve_ms) + "ms</code>";
+          }
+        });
+      }
+
+      if (jointSlider) {
+        jointSlider.addEventListener("change", function () {
+          applyVariant(parseInt(jointSlider.value, 10));
+        });
+      }
+
+      // --- Little Buddy voice ---------------------------------------
+      // The software path to the packet's feature. §2A wants an ESP32 and an
+      // I2S DAC; none exists on this host and hardware is deprioritised. But
+      // the browser already *is* a DAC, and speechSynthesis is a local
+      // synthesiser with no API cost — so the same pipeline runs today and
+      // actually makes sound.
+      //
+      // Contract and rules are the ones in tools/voice-engine/buddy_router.py:
+      // {timestamp, priority_level, text_payload}, priority ordering, and a
+      // hard preempt at DUCK_PRIORITY. Kept deliberately identical so the
+      // Python router stays the canonical implementation.
+      // --- chime --------------------------------------------------------
+      // The most reliable sound the browser can make: two oscillators, an
+      // envelope, no speech engine, no network, no artifact to fetch. If
+      // anything audible is going to work, this is it — so it is what every
+      // control fires, and speech is layered on top rather than depended on.
+      var chimeCtx = null;
+      function chime(kind) {
+        try {
+          var Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return false;
+          if (!chimeCtx) chimeCtx = new Ctx();
+          if (chimeCtx.state === "suspended") chimeCtx.resume();
+          var now = chimeCtx.currentTime;
+          // ping = confirm, alert = something wrong, low = acknowledge
+          var notes = kind === "alert" ? [880, 660]
+                    : kind === "low"   ? [330, 247]
+                    :                    [660, 990];
+          notes.forEach(function (freq, i) {
+            var osc = chimeCtx.createOscillator();
+            var gain = chimeCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, now + i * 0.09);
+            gain.gain.setValueAtTime(0.0001, now + i * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.22, now + i * 0.09 + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.09 + 0.34);
+            osc.connect(gain); gain.connect(chimeCtx.destination);
+            osc.start(now + i * 0.09);
+            osc.stop(now + i * 0.09 + 0.36);
+          });
+          return true;
+        } catch (e) { return false; }
+      }
+
+      var DUCK_PRIORITY = 7;
+      // Two tiers, decided by who is asking. /voice-api sits behind the same
+      // forward_auth as every other API, so a logged-in operator reaches it
+      // and an anonymous visitor gets 401. That is the tiering: Gemini for
+      // the Admiral, free browser speech for everyone else, and the failover
+      // means it can never go silent — a 401, a timeout, or an exhausted
+      // budget all land on the same local voice.
+      var neuralVoice = false;
+      var neuralProven = false;   // set only by a render that actually played
+      fetch("/voice-api/status", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          neuralVoice = !!(d && d.configured);
+          if (voiceBtn && buddyOn) {
+            voiceBtn.innerHTML = "&#128266; Buddy: on" + (neuralVoice ? " (neural)" : "");
+          }
+        })
+        .catch(function () { neuralVoice = false; });
+      var buddyOn = false;
+      var buddyQueue = [];
+      var buddySpeaking = false;
+
+      function buddySubmit(priority, text) {
+        if (!buddyOn || !window.speechSynthesis) return { status: "DROPPED_QUEUE_FULL" };
+        var payload = { timestamp: Date.now(), priority_level: priority,
+                        text_payload: text, seq: buddyQueue.length };
+        if (priority >= DUCK_PRIORITY) {
+          // Critical cuts off whatever is *sounding* — an alert that waits
+          // its turn is not an alert. It does not discard what is queued:
+          // the Python router defers ambient rather than dropping it, and
+          // two implementations of one contract must not disagree about
+          // whether a message survives. Sorting puts the critical first
+          // anyway, so the ambient simply speaks afterwards.
+          window.speechSynthesis.cancel();
+          buddySpeaking = false;
+        }
+        buddyQueue.push(payload);
+        buddyQueue.sort(function (a, b) {
+          return (b.priority_level - a.priority_level) || (a.timestamp - b.timestamp);
+        });
+        var status = buddyQueue.length === 1 ? "READY" : "BUFFERING";
+        buddyPump();
+        return { status: status, queued: buddyQueue.length };
+      }
+
+      function buddyPump() {
+        if (buddySpeaking || !buddyQueue.length || !buddyOn) return;
+        var next = buddyQueue.shift();
+        // Local speech ALWAYS fires. The neural path was made a gate in front
+        // of it and swallowed the sound entirely when its request 400'd — the
+        // schema was guessed (text/plan) rather than read (transcript/
+        // performance). A voice that can be silenced by a network call is not
+        // a voice. Neural is opt-in and additive now, never in the path.
+        // Use the good voice. The no-silence guarantee is a DEADLINE, not a
+        // refusal to try: attempt neural, and if audio is not actually
+        // playing within the window, speak locally instead. Earlier this was
+        // gated behind a proving render, which was over-cautious now that the
+        // schema is correct and verified rendering real WAV.
+        if (neuralVoice) { buddySpeakNeural(next); return; }
+        var utterance = new SpeechSynthesisUtterance(next.text_payload);
+        utterance.rate = next.priority_level >= DUCK_PRIORITY ? 1.05 : 0.95;
+        utterance.pitch = next.priority_level >= DUCK_PRIORITY ? 1.15 : 1.0;
+        buddySpeaking = true;
+        utterance.onend = utterance.onerror = function () {
+          buddySpeaking = false;
+          buddyPump();
+        };
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function proveNeural() {
+        // One real render. If it returns an artifact AND that artifact plays,
+        // the neural path is proven and takes over. Anything else and we stay
+        // on local speech forever — silence is not an acceptable upgrade.
+        if (!neuralVoice || neuralProven) return;
+        fetch("/voice-api/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            transcript: "Voice online.",
+            character_id: "captain.alpha",
+            performance: { intent: "report status" },
+          }),
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (a) {
+            if (!a || !a.audio_url) throw new Error("no artifact");
+            var audio = new Audio(a.audio_url);
+            return audio.play().then(function () {
+              neuralProven = true;
+              if (voiceBtn) voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
+            });
+          })
+          .catch(function () { neuralProven = false; });
+      }
+
+      function buddySpeakNeural(payload) {
+        var settled = false;
+        var speakLocally = function () {
+          if (settled) return;
+          settled = true;
+          buddySpeaking = false;
+          buddyQueue.unshift(payload);
+          neuralVoice = false;                 // stop trying for this session
+          if (voiceBtn && buddyOn) voiceBtn.innerHTML = "&#128266; Buddy: on";
+          buddyPump();
+        };
+        // Hard deadline. If nothing is audibly playing by now, the local
+        // voice takes the line. Silence is never an outcome.
+        var deadline = setTimeout(speakLocally, 5000);
+        // wav-pcm16-24khz-mono served at /voice-api/artifacts/<key>. The
+        // studio already plays it with a plain <audio> element, so this
+        // reuses that rather than decoding anything.
+        buddySpeaking = true;
+        var done = function () {
+          if (settled) return;
+          settled = true;
+          clearTimeout(deadline);
+          buddySpeaking = false;
+          buddyPump();
+        };
+        fetch("/voice-api/render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            transcript: payload.text_payload,
+            character: { name: "Little Buddy", voice_name: "Puck" },
+            performance: { intent: payload.priority_level >= DUCK_PRIORITY
+                             ? "urgent" : "calm" },
+          }),
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (artifact) {
+            if (!artifact || !artifact.audio_url) throw new Error("no artifact");
+            var audio = new Audio(artifact.audio_url);
+            audio.onended = audio.onerror = done;
+            audio.onplaying = function () {
+              clearTimeout(deadline);          // it is audibly playing; stand down
+              neuralProven = true;
+              if (voiceBtn && buddyOn) {
+                voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
+              }
+            };
+            return audio.play();
+          })
+          .catch(function () {
+            // Budget exhausted, render failed, gate said no, autoplay blocked.
+            clearTimeout(deadline);
+            speakLocally();
+          });
+      }
+
+      function buddyReport(entry, variant) {
+        // What the buddy actually says: the rig it is wearing and what the
+        // probe found. Interpenetration is the fault condition, so it goes
+        // out at critical priority and preempts the routine line.
+        var joints = (variant && variant.joints) || (rigBones.length || 0);
+        buddySubmit(2, "Rig loaded. " + joints + " joints, " +
+          ((variant && variant.shells) || (entry && entry.shells) || 0) + " shells.");
+        var deep = variant ? variant.deep
+          : ((entry && entry.probe && entry.probe.poses && entry.probe.poses[0]
+              && entry.probe.poses[0].deep_clipping) || 0);
+        if (deep > 0) {
+          buddySubmit(8, "Warning. " + deep + " shell pairs interpenetrating.");
+        } else {
+          buddySubmit(3, "Deformation clean. No interpenetration detected.");
+        }
+      }
+
+      var voiceBtn = document.getElementById("rigVoice");
+      if (voiceBtn) {
+        voiceBtn.addEventListener("click", function () {
+          if (!window.speechSynthesis) {
+            voiceBtn.innerHTML = "&#128266; no speech support";
+            return;
+          }
+          buddyOn = !buddyOn;
+          voiceBtn.classList.toggle("on", buddyOn);
+          voiceBtn.innerHTML = "&#128266; Buddy: " + (buddyOn ? "on" : "off");
+          if (!buddyOn) {
+            window.speechSynthesis.cancel();
+            buddyQueue = [];
+            buddySpeaking = false;
+            return;
+          }
+          var entry = corpusAssets.filter(function (e) {
+            return e.dest === activeAsset;
+          })[0];
+          var variant = variants[parseInt(jointSlider.value, 10)] || null;
+          chime("ping");
+          buddySubmit(1, "Little Buddy online.");
+          buddyReport(entry, variant);
+          proveNeural();
+        });
+      }
+
+      // --- FleetNet Radio ---------------------------------------------
+      // The Lady speaks the ship's real condition. Every figure is counted
+      // from the host by scripts/fleetnet-snapshot.py — units from systemd,
+      // ports from sockets, suites actually run — never carried forward from
+      // a document. Doctrine 021, given a voice.
+      //
+      // Priorities come from the snapshot and go through the same router
+      // contract the Buddy already uses: a fault speaks first and interrupts,
+      // a sound ship reports calmly.
+      var fleetnet = null;
+      var radioBtn = document.getElementById("rigRadio");
+      // --- the Captain speaks -------------------------------------------
+      // Not the Buddy. The Live Captain's OWN words — the mirror-leg message
+      // it wrote to captain-channel.md on 2026-08-03 — rendered in its own
+      // voice (captain.monad / Kore, measured authority) rather than the
+      // Buddy's (captain.alpha / Puck). It is paused, so this is its record
+      // speaking, not the running service. Said plainly rather than implied.
+      var captainBtn = document.getElementById("rigCaptain");
+      if (captainBtn) {
+        captainBtn.addEventListener("click", function () {
+          chime("low");
+          captainBtn.classList.add("on");
+          captainBtn.innerHTML = "&#9875; rendering…";
+          var restore = function (label) {
+            captainBtn.classList.remove("on");
+            captainBtn.innerHTML = label || "&#9875; Captain Speaks";
+          };
+          fetch("/voice-api/render", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              transcript: "This is the Live Captain. This file is the mirror "
+                + "leg, Captain to Claude, written by me. If you are polling "
+                + "this path, the loop is closed. I remain paused, by order "
+                + "of the Admiral. Continuity is intact.",
+              character_id: "captain.monad",
+              performance: { intent: "reporting to the Admiral",
+                             affect: "measured, grounded, restrained warmth" },
+            }),
+          })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (a) {
+              if (!a || !a.audio_url) throw new Error("no artifact");
+              captainBtn.innerHTML = "&#9875; speaking…";
+              var audio = new Audio(a.audio_url);
+              audio.onended = function () { restore(); };
+              audio.onerror = function () { restore("&#9875; playback failed"); };
+              return audio.play();
+            })
+            .catch(function () {
+              // Not logged in, or the render failed. Say so out loud rather
+              // than going quiet — the Buddy's local voice always works.
+              restore("&#9875; needs /root login");
+              buddySubmit(3, "Captain voice unavailable. Log in at root to hear it.");
+            });
+        });
+      }
+
+      var chimeBtn = document.getElementById("rigChime");
+      if (chimeBtn) {
+        chimeBtn.addEventListener("click", function () {
+          var ok = chime("ping");
+          chimeBtn.classList.toggle("on", ok);
+          chimeBtn.innerHTML = ok ? "&#128266; heard it?" : "&#128266; no audio";
+          setTimeout(function () {
+            chimeBtn.classList.remove("on");
+            chimeBtn.innerHTML = "&#128266; Test Sound";
+          }, 2500);
+        });
+      }
+
+      function loadFleetnet() {
+        return fetch("data/fleetnet.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) { fleetnet = d; return d; })
+          .catch(function () { return null; });
+      }
+      loadFleetnet();
+
+      // --- always-on stream ---------------------------------------------
+      // A button you press is not alive. The snapshot is regenerated every
+      // 30s by fleetnet-snapshot.timer; this watches it and speaks only what
+      // CHANGED. A ship that reads its whole status every half minute is
+      // noise, and noise gets muted and then ignored — so silence is the
+      // default and a change is the event.
+      //
+      // Announcements use the free local voice deliberately. An always-on
+      // stream on a metered neural voice is a way to spend $0.10 without
+      // noticing.
+      var fleetLast = null;
+      var fleetMuted = false;
+      // RICH MODE — the Admiral wants to hear everything, in the good voice.
+      // The stream was pinned to the free voice because an unattended 15s
+      // loop with a metered voice behind it is how a budget disappears.
+      // Rich mode lifts that, so it carries its own governor instead:
+      //   · opt-in, never the default
+      //   · a hard ceiling on renders per session
+      //   · a floor between renders, so a burst of changes cannot chain
+      //   · falls back to the free voice the moment either is hit
+      var fleetRich = false;
+      var richRenders = 0;
+      var richLastAt = 0;
+      var RICH_MAX_RENDERS = 40;      // ~$0.20 at typical line length
+      var RICH_MIN_GAP_MS = 20000;
+      var fleetDot = document.getElementById("rigRadioDot");
+      var muteBtn = document.getElementById("rigMute");
+
+      // The full picture, spoken. Used by rich mode, which reports
+      // EVERYTHING rather than only what changed — the Admiral asked to hear
+      // it all before deciding whether it needs filtering. If it turns out
+      // spammy, the filter goes here: drop the lines that repeat unchanged.
+      function fleetFullReport(d) {
+        if (!d) return [];
+        return [
+          { priority: d.sound ? 3 : 8,
+            text: d.sound ? "FleetNet sound." : "FleetNet showing faults." },
+          { priority: 2, text: d.units.active + " units active of " +
+                              d.units.installed + ". " + d.units.expected_down +
+                              " parked by design, " + (d.units.oneshot || 0) +
+                              " one-shot." },
+          { priority: 2, text: d.ports + " ports held." },
+          { priority: 2, text: "All " + d.suites.passed + " test suites green." },
+          { priority: 2, text: d.tree.uncommitted
+              ? d.tree.uncommitted + " files uncommitted, head " + d.tree.head + "."
+              : "Working tree clean, head " + d.tree.head + "." },
+          { priority: 1, text: "Live Captain " + d.captain + "." },
+          { priority: 1, text: d.voice
+              ? "Voice budget " + d.voice.usd_used.toFixed(4) + " of " +
+                d.voice.usd_limit + " dollars."
+              : "Voice budget unreadable." },
+        ];
+      }
+
+      function fleetChanges(prev, now) {
+        if (!now) return [];
+        var out = [];
+        if (!prev) return out;                    // first read is not news
+        if (prev.sound !== now.sound) {
+          out.push({ priority: now.sound ? 6 : 9,
+                     text: now.sound ? "FleetNet. Ship is sound again."
+                                     : "FleetNet alert. Faults detected." });
+        }
+        if (prev.units.active !== now.units.active) {
+          var delta = now.units.active - prev.units.active;
+          out.push({ priority: delta < 0 ? 9 : 5,
+                     text: delta < 0
+                       ? "Warning. " + Math.abs(delta) + " unit" +
+                         (Math.abs(delta) > 1 ? "s" : "") + " went down. " +
+                         now.units.active + " active."
+                       : delta + " unit" + (delta > 1 ? "s" : "") +
+                         " came up. " + now.units.active + " active." });
+        }
+        (now.units.down || []).forEach(function (d) {
+          var was = (prev.units.down || []).some(function (p) { return p.unit === d.unit; });
+          if (!was) out.push({ priority: 9,
+                               text: "Unit down. " + d.unit.replace(/-/g, " ") + "." });
+        });
+        if (prev.suites.failed !== now.suites.failed && now.suites.failed > 0) {
+          out.push({ priority: 8,
+                     text: now.suites.failed + " test suites now failing." });
+        }
+        if (prev.tree.head !== now.tree.head) {
+          out.push({ priority: 4, text: "New commit. " + now.tree.head + "." });
+        }
+        return out;
+      }
+
+      // The wire: messages from Claude and the Captain, spoken as they land.
+      // Each entry carries an id derived from its content, so the stream says
+      // a thing once and then leaves it alone.
+      var wireSeen = {};
+      var wireFirstPass = true;
+
+      function wireTick() {
+        fetch("data/fleetnet-wire.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) {
+            if (!d || !d.entries) return;
+            var fresh = d.entries.filter(function (e) { return !wireSeen[e.id]; });
+            d.entries.forEach(function (e) { wireSeen[e.id] = 1; });
+            // The first pass only learns what is already there. Otherwise a
+            // page load reads out the entire backlog.
+            if (wireFirstPass) { wireFirstPass = false; return; }
+            if (fleetMuted || !fresh.length) return;
+            if (!buddyOn && voiceBtn) voiceBtn.click();
+            chime("ping");
+            fresh.forEach(function (e) {
+              var who = e.from === "captain" ? "Captain" :
+                        e.from === "claude" ? "Claude" : e.from;
+              buddySubmit(e.priority, who + " on the wire. " + e.text);
+            });
+          })
+          .catch(function () {});
+      }
+      wireTick();
+      setInterval(wireTick, 12000);
+
+      function fleetTick() {
+        fetch("data/fleetnet.json", { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (d) {
+            if (!d) { if (fleetDot) fleetDot.className = "rb-live stale"; return; }
+            fleetnet = d;
+            if (fleetDot) {
+              fleetDot.className = "rb-live" + (d.sound ? "" : " fault");
+            }
+            var news = fleetChanges(fleetLast, d);
+            // Rich mode hears EVERYTHING: the whole state each time the
+            // snapshot moves, not only the deltas. Keyed on `generated` so a
+            // poll that finds the same snapshot stays quiet — otherwise the
+            // 15s poller would talk over a 30s timer.
+            var moved = !fleetLast || fleetLast.generated !== d.generated;
+            if (fleetRich && moved) news = fleetFullReport(d).concat(news);
+            fleetLast = d;
+            if (fleetMuted || !news.length) return;
+            if (!buddyOn && voiceBtn) voiceBtn.click();   // something happened
+            chime(news.some(function (n) { return n.priority >= 8; }) ? "alert" : "ping");
+            var now = Date.now();
+            var richOk = fleetRich
+              && richRenders < RICH_MAX_RENDERS
+              && (now - richLastAt) > RICH_MIN_GAP_MS;
+            var wasNeural = neuralVoice;
+            if (richOk) { richRenders += 1; richLastAt = now; }
+            else { neuralVoice = false; }        // free voice; governor holds
+            news.forEach(function (n) { buddySubmit(n.priority, n.text); });
+            setTimeout(function () { neuralVoice = wasNeural; }, 50);
+            if (richBtn) {
+              richBtn.innerHTML = fleetRich
+                ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
+                : "&#127908; Rich voice";
+            }
+          })
+          .catch(function () { if (fleetDot) fleetDot.className = "rb-live stale"; });
+      }
+
+      fleetTick();
+      setInterval(fleetTick, 15000);   // half the timer period; never misses one
+
+      var richBtn = document.getElementById("rigRich");
+      if (richBtn) {
+        richBtn.addEventListener("click", function () {
+          fleetRich = !fleetRich;
+          richBtn.classList.toggle("on", fleetRich);
+          richBtn.innerHTML = fleetRich
+            ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
+            : "&#127908; Rich voice";
+          if (fleetRich) {
+            // Speak the whole state once on enable, so "everything" means
+            // everything rather than only what happens to change next.
+            if (!buddyOn && voiceBtn) voiceBtn.click();
+            chime("ping");
+            richRenders += 1; richLastAt = Date.now();
+            var d = fleetLast;
+            if (d) {
+              buddySubmit(4, "Rich voice engaged. " +
+                (d.sound ? "FleetNet is sound. " : "FleetNet is showing faults. ") +
+                d.units.active + " units active of " + d.units.installed +
+                ", " + d.ports + " ports held. All " + d.suites.passed +
+                " test suites green. Working tree " +
+                (d.tree.uncommitted ? d.tree.uncommitted + " files uncommitted"
+                                    : "clean") +
+                ", head " + d.tree.head + ". Live Captain is " + d.captain + ".");
+            }
+          }
+        });
+      }
+
+      if (muteBtn) {
+        muteBtn.addEventListener("click", function () {
+          fleetMuted = !fleetMuted;
+          muteBtn.classList.toggle("on", fleetMuted);
+          muteBtn.innerHTML = fleetMuted ? "&#128263; Muted" : "&#128263; Mute";
+          if (fleetDot) fleetDot.style.opacity = fleetMuted ? "0.35" : "";
+        });
+      }
+
+      function radioReport() {
+        var speak = function (d) {
+          chime(d && d.sound ? "ping" : "alert");
+          if (!d) { buddySubmit(8, "FleetNet unreachable. No snapshot."); return; }
+          if (!buddyOn && voiceBtn) voiceBtn.click();   // radio implies sound
+          buddySubmit(d.sound ? 3 : 8,
+            d.sound ? "FleetNet. Ship is sound." : "FleetNet. Faults detected.");
+          d.lines.forEach(function (line) {
+            buddySubmit(line.priority, line.text);
+          });
+          if (d.captain === "paused") {
+            buddySubmit(2, "Live Captain is paused, by order.");
+          }
+          if (radioBtn) {
+            radioBtn.classList.add("on");
+            radioBtn.innerHTML = "&#128251; " + (d.sound ? "SOUND" : "FAULTS") +
+              " · " + d.units.active + "/" + d.units.installed;
+            setTimeout(function () {
+              radioBtn.classList.remove("on");
+              radioBtn.innerHTML = "&#128251; FleetNet Radio";
+            }, 9000);
+          }
+        };
+        // Always re-read before speaking. A radio that reports a cached fleet
+        // is the document-not-host error with a speaker attached.
+        loadFleetnet().then(speak);
+      }
+
+      if (radioBtn) radioBtn.addEventListener("click", radioReport);
+
+      var skeletonBtn = document.getElementById("rigSkeleton");
+      if (skeletonBtn) {
+        skeletonBtn.addEventListener("click", function () {
+          skeletonOn = !skeletonOn;
+          skeletonBtn.classList.toggle("on", skeletonOn);
+          skeletonBtn.innerHTML = "&#9679; Skeleton: " + (skeletonOn ? "on" : "off");
+        });
+      }
+
+      // --- asset switching ------------------------------------------
+      // Every rigged asset the pipeline produced, smallest first. Size is on
+      // the chip because two of these are 88MB and nobody should discover
+      // that by waiting.
+      var assetsEl = document.getElementById("rigAssets");
+      var corpusAssets = [];
+      var activeAsset = null;
+
+      function fmtBytes(n) {
+        if (!n) return "?";
+        if (n >= 1e9) return (n / 1e9).toFixed(1) + "GB";
+        if (n >= 1e6) return (n / 1e6).toFixed(1) + "MB";
+        if (n >= 1e3) return Math.round(n / 1e3) + "KB";
+        return n + "B";
+      }
+
+      function shortName(name) {
+        return name.replace(/\.glb$/, "").replace(/^(.{22}).+$/, "$1…");
+      }
+
+      function loadRigged(entry, chip) {
+        if (activeAsset === entry.dest) return;
+        activeAsset = entry.dest;
+        Array.prototype.forEach.call(
+          assetsEl.querySelectorAll(".rb-asset"),
+          function (b) { b.classList.toggle("on", b === chip); });
+        rigStat.textContent = "loading " + shortName(entry.name) +
+          " (" + fmtBytes(entry.bytes) + ")…";
+        rigBones = [];
+        rigState = [];
+        loadModel(entry.dest.replace(/^web\//, ""), function (root) {
+          rigBones = collectBones(root);
+          buildSkeletonMarkers();
+          buildHotspots(entry);
+          rigStat.textContent = rigBones.length
+            ? rigBones.length + " joints bound — spring chain driving them live"
+            : "loaded, but no joints found";
+          // Header and caption describe the loaded asset, not the first one.
+          var sub = document.getElementById("rigBenchSub");
+          if (sub) {
+            sub.textContent = rigBones.length + " joints · " +
+              entry.shells.toLocaleString() + " disjoint shells · " +
+              entry.vertices.toLocaleString() + " vertices";
+          }
+          var nameEl = document.getElementById("gasketName");
+          if (nameEl) {
+            nameEl.textContent = shortName(entry.name).toUpperCase() + " — RIGGED";
+          }
+          applyBend(parseFloat(rigBend.value) || 14);
+          showProbeFor(entry);
+          syncVariants();
+          buddyReport(entry, null);
+        });
+      }
+
+      function showProbeFor(entry) {
+        if (!rigProbe) return;
+        var pose = (entry.probe && entry.probe.poses && entry.probe.poses[0]) || null;
+        if (!pose) { rigProbe.hidden = true; return; }
+        rigProbe.hidden = false;
+        var deep = pose.deep_clipping;
+        rigProbe.innerHTML =
+          '<span class="rbp-v ' + pose.verdict + '">' + pose.verdict + "</span> at " +
+          pose.degrees + "&deg; — " + (deep || 0) + " shell pairs interpenetrating (of " +
+          (pose.clipping_pairs || 0).toLocaleString() + " in contact)" +
+          "<br><code>" + pose.inverted + " inverted · " + pose.collapsed +
+          " collapsed · " + pose.torn + " torn · max stretch " +
+          pose.max_stretch.toFixed(3) + "x</code>" +
+          '<br><span style="color:#6C7C93">' + entry.shells.toLocaleString() +
+          " shells · " + entry.rigid.toLocaleString() + " rigid · " +
+          entry.blended.toLocaleString() + " blended · solved in " +
+          Math.round(entry.ms) + "ms</span>";
+      }
+
+      fetch("data/corpus-rig.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          if (!d || !assetsEl) return;
+          var seen = {};
+          d.assets.forEach(function (a) {
+            if (a.status !== "rigged" || seen[a.dest]) return;
+            seen[a.dest] = 1;
+            corpusAssets.push({
+              name: a.asset, dest: a.dest, bytes: a.rigged_bytes || 0,
+              vertices: a.vertices, shells: a.shells, rigid: a.rigid_shells,
+              blended: a.blended_shells, ms: a.solve_ms, probe: a.probe,
+            });
+          });
+          corpusAssets.sort(function (x, y) { return x.bytes - y.bytes; });
+
+          corpusAssets.forEach(function (entry) {
+            var chip = document.createElement("button");
+            chip.type = "button";
+            chip.className = "rb-asset" + (entry.bytes > 20e6 ? " big" : "");
+            chip.innerHTML = shortName(entry.name) +
+              '<span class="rb-a-size">' + fmtBytes(entry.bytes) + " · " +
+              entry.vertices.toLocaleString() + "v</span>";
+            chip.addEventListener("click", function () { loadRigged(entry, chip); });
+            if (entry.dest.indexOf("file_00000000a68c") !== -1) {
+              chip.classList.add("on");
+              activeAsset = entry.dest;
+            }
+            assetsEl.appendChild(chip);
+          });
+          // The first asset loads before this fetch resolves, so its hotspots
+          // are built here rather than in the load callback.
+          var initial = corpusAssets.filter(function (e) {
+            return e.dest === activeAsset;
+          })[0];
+          if (initial) buildHotspots(initial);
+          // Both fetches race; whichever lands second does the sync.
+          syncVariants();
+        })
+        .catch(function (e) { console.error("asset picker failed:", e && e.message); });
+
+      var rigToggle = document.getElementById("rigToggle");
+      var rigStat = document.getElementById("rigStat");
+      var rigBendRow = document.getElementById("rigBendRow");
+      var rigBend = document.getElementById("rigBend");
+      var rigBendVal = document.getElementById("rigBendVal");
+      var rigProbe = document.getElementById("rigProbe");
+      var probeData = null;
+
+      // Evidence panel. Every number is read from a file git wrote, so the
+      // page cannot drift from what was actually committed.
+      fetch("data/build-evidence.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          var host = document.getElementById("buildEvidence");
+          if (!d || !host) return;
+          var head = document.getElementById("buildHeadline");
+          if (head) head.textContent = d.headline;
+
+          var html = '<div class="be-metrics">';
+          d.metrics.forEach(function (m) {
+            html += '<div class="be-m"><div class="be-v">' + m.v + "</div>" +
+              '<div class="be-k">' + m.k + "</div>" +
+              '<div class="be-n">' + m.note + "</div></div>";
+          });
+          html += "</div>";
+
+          html += '<div class="be-sect">What the build found</div>';
+          d.findings.forEach(function (f) {
+            html += '<div class="be-find">' + f + "</div>";
+          });
+
+          if (d.corpus && d.corpus.length) {
+            html += '<div class="be-sect">Corpus — every static asset, rigged and probed</div>';
+            html += '<table class="be-table"><thead><tr><th>asset</th><th>vertices</th>' +
+              "<th>shells</th><th>rigid</th><th>blended</th><th>solve</th><th>probe</th>" +
+              "</tr></thead><tbody>";
+            d.corpus.forEach(function (a) {
+              html += "<tr><td>" + a.name + "</td><td>" + a.vertices.toLocaleString() +
+                "</td><td>" + a.shells.toLocaleString() + "</td><td>" +
+                a.rigid.toLocaleString() + "</td><td>" + a.blended.toLocaleString() +
+                "</td><td>" + a.ms.toFixed(0) + "ms</td>" +
+                '<td class="' + a.verdict + '">' + a.verdict + "</td></tr>";
+            });
+            html += "</tbody></table>";
+          }
+
+          html += '<div class="be-sect">Commits</div><div class="be-commits">';
+          d.commits.forEach(function (c) {
+            html += '<div class="be-c"><span class="be-sha">' + c.sha + "</span>" +
+              '<span class="be-subj">' + c.subject + "</span></div>";
+          });
+          html += "</div>";
+          html += '<div class="be-diff">' + d.diffstat + " · " +
+            d.files_touched + " files touched</div>";
+          host.innerHTML = html;
+        })
+        .catch(function () {});
+
+      fetch("data/rig-probe.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) {
+          probeData = d;
+          if (!d) return;
+          var sub = document.getElementById("rigBenchSub");
+          if (sub) {
+            sub.textContent = d.joints + " joints · " + d.shells.toLocaleString() +
+              " disjoint shells · " + d.triangles.toLocaleString() + " triangles";
+          }
+        })
+        .catch(function () {});
+
+      function showProbe(degrees) {
+        if (!probeData || !rigProbe) return;
+        var best = probeData.poses[0];
+        for (var i = 0; i < probeData.poses.length; i++) {
+          if (probeData.poses[i].degrees <= degrees) best = probeData.poses[i];
+        }
+        rigProbe.hidden = false;
+        rigProbe.innerHTML =
+          '<span class="rbp-v ' + best.verdict + '">' + best.verdict + "</span> at " +
+          best.degrees + "&deg; — " + best.reason +
+          '<br><code>' + best.inverted + " inverted · " + best.collapsed +
+          " collapsed · " + best.torn + " torn · max stretch " +
+          best.max_stretch.toFixed(3) + "x</code>" +
+          '<br><span style="color:#6C7C93">Deformation probe (Packet Beta Module 3). ' +
+          "Per-shell rigid binding removes pinching entirely; what is left is " +
+          "parts swinging into each other.</span>";
+      }
+
+      if (rigToggle) {
+        rigToggle.addEventListener("click", function () {
+          rigOn = !rigOn;
+          rigToggle.classList.toggle("on", rigOn);
+          rigToggle.textContent = rigOn ? "Back to static gasket" : "Load rigged gasket";
+          rigBendRow.hidden = !rigOn;
+          if (!rigOn) {
+            rigBones = [];
+            if (rigProbe) rigProbe.hidden = true;
+            rigStat.textContent = "static model loaded";
+            loadModel(GASKET_MODEL);
+            return;
+          }
+          rigStat.textContent = "loading rigged asset…";
+          loadModel(RIGGED_MODEL, function (root) {
+            rigBones = collectBones(root);
+            rigStat.textContent = rigBones.length
+              ? rigBones.length + " joints bound — spring chain driving them live"
+              : "loaded, but no joints found";
+            rigBend.value = 14;
+            rigBendVal.innerHTML = "14&deg;";
+            applyBend(14);
+            showProbe(14);
+          });
+        });
+      }
+
+      var rigSound = document.getElementById("rigSound");
+      if (rigSound) {
+        rigSound.addEventListener("click", function () {
+          if (audio) {
+            audio.master.gain.setTargetAtTime(0.0001, audio.ctx.currentTime, 0.1);
+            audio.ctx.close();
+            audio = null;
+            rigSound.classList.remove("on");
+            rigSound.innerHTML = "&#9834; Sound: off";
+            return;
+          }
+          audio = startAudio(rigBones.length || 8);
+          if (!audio) { rigSound.innerHTML = "&#9834; no audio support"; return; }
+          rigSound.classList.add("on");
+          rigSound.innerHTML = "&#9834; Sound: on";
+        });
+      }
+
+      if (rigBend) {
+        rigBend.addEventListener("input", function () {
+          var degrees = parseFloat(rigBend.value);
+          rigBendVal.innerHTML = degrees + "&deg;";
+          applyBend(degrees);
+          showProbe(degrees);
+        });
+      }
+
+      // The stage opens on tonight's artifact, already rigged and posable.
+      // The static gasket is one button away rather than the default.
+      rigOn = true;
+      rigToggle.classList.add("on");
+      rigToggle.textContent = "Back to static gasket";
+      rigBendRow.hidden = false;
+      rigStat.textContent = "loading rigged asset…";
+      loadModel(RIGGED_MODEL, function (root) {
+        rigBones = collectBones(root);
+        buildSkeletonMarkers();
+        rigStat.textContent = rigBones.length
+          ? rigBones.length + " joints bound — spring chain driving them live"
+          : "loaded, but no joints found";
+        var sub0 = document.getElementById("rigBenchSub");
+        if (sub0) sub0.textContent = rigBones.length + " joints · spine chain · live physics";
+        applyBend(14);
+        showProbe(14);
+      });
+
+      var clock = new THREE.Clock();
+      (function animate() {
+        requestAnimationFrame(animate);
+        var delta = clock.getDelta();
+        uniforms.uTime.value += delta;
+        // Ease toward the semantic engine's targets -- ~1.5s to settle,
+        // frame-rate independent, no tween library required.
+        var ease = 1 - Math.pow(0.01, delta / 1.5);
+        uniforms.uGlitch.value += (semanticTarget.glitch - uniforms.uGlitch.value) * ease;
+        uniforms.uWarmth.value += (semanticTarget.warmth - uniforms.uWarmth.value) * ease;
+        uniforms.uSemanticTint.value.lerp(semanticTarget.tint, ease);
+        animateLimbs(uniforms.uTime.value, delta);
+        updateAudio();
+        updateSkeletonOverlay();
+        controls.update();
+        renderer.render(scene, camera);
+      })();
+
+      // --- Upload widget --------------------------------------------------
+      var form = document.getElementById("gasketUploadForm");
+      var fileInput = document.getElementById("gasketFileInput");
+      var fileName = document.getElementById("gasketFileName");
+      var passwordInput = document.getElementById("gasketPassword");
+      var uploadBtn = document.getElementById("gasketUploadBtn");
+      var statusEl = document.getElementById("gasketUploadStatus");
+
+      function refreshUploadBtn() {
+        uploadBtn.disabled = !(fileInput.files.length && passwordInput.value);
+      }
+      fileInput.addEventListener("change", function () {
+        fileName.textContent = fileInput.files.length ? fileInput.files[0].name : "No file selected";
+        refreshUploadBtn();
+      });
+      passwordInput.addEventListener("input", refreshUploadBtn);
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!fileInput.files.length) return;
+        uploadBtn.disabled = true;
+        statusEl.textContent = "Uploading…";
+
+        var body = new FormData();
+        body.append("password", passwordInput.value);
+        body.append("file", fileInput.files[0]);
+
+        fetch("/gasket-upload-api/api/upload", { method: "POST", body: body })
+          .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+          .then(function (result) {
+            if (!result.ok || !result.data.ok) {
+              statusEl.textContent = (result.data && result.data.error) || "Upload failed.";
+              refreshUploadBtn();
+              return;
+            }
+            statusEl.textContent = "Uploaded — rendering live.";
+            passwordInput.value = "";
+            fileInput.value = "";
+            fileName.textContent = "No file selected";
+            if (hint) { hint.style.display = "flex"; hint.textContent = "Loading Gasket…"; }
+            loadModel(GASKET_MODEL + "?t=" + result.data.uploaded_at);
+          })
+          .catch(function () {
+            statusEl.textContent = "Upload failed — network error.";
+            refreshUploadBtn();
+          });
+      });
+
+      // --- Shader control deck: zero-latency uniform updates on interaction ---
+      var intensitySlider = document.getElementById("gasketIntensity");
+      var swatches = document.querySelectorAll(".gsd-swatch");
+      var pulseToggle = document.getElementById("gasketPulseToggle");
+
+      intensitySlider.addEventListener("input", function () {
+        uniforms.uIntensity.value = parseFloat(intensitySlider.value);
+      });
+
+      swatches.forEach(function (swatch) {
+        swatch.addEventListener("click", function () {
+          var palette = PALETTES[swatch.dataset.palette];
+          if (!palette) return;
+          uniforms.uColorA.value.copy(palette[0]);
+          uniforms.uColorB.value.copy(palette[1]);
+          swatches.forEach(function (s) { s.classList.remove("active"); });
+          swatch.classList.add("active");
+        });
+      });
+
+      pulseToggle.addEventListener("click", function () {
+        var on = uniforms.uPulseOn.value < 0.5;
+        uniforms.uPulseOn.value = on ? 1 : 0;
+        pulseToggle.textContent = "Pulse: " + (on ? "ON" : "OFF");
+        pulseToggle.classList.toggle("off", !on);
+      });
+
+      // --- Semantic Shader Prompt Box --------------------------------------
+      // Keyword -> atmosphere target. Values feed uGlitch/uWarmth/uSemanticTint,
+      // both of which have real GLSL consumers in wrapMaterialShader above.
+      var SEMANTIC_DICTIONARY = {
+        dread: { glitch: 0.8, warmth: 0.0, tint: [0.1, 0.2, 0.5] },
+        rum: { glitch: 0.1, warmth: 0.9, tint: [0.8, 0.5, 0.2] },
+        coffee: { glitch: 0.2, warmth: 0.5, tint: [0.5, 0.4, 0.3] },
+        maintenance: { glitch: 0.0, warmth: 0.1, tint: [0.2, 0.8, 0.6] },
+        anomaly: { glitch: 1.0, warmth: 0.3, tint: [0.9, 0.1, 0.8] }
+      };
+      var BASELINE_SEMANTIC = { glitch: 0, warmth: 0.2, tint: [0, 0, 0] };
+
+      var terminalInput = document.getElementById("gasketTerminalInput");
+      var terminalEcho = document.getElementById("gasketTerminalEcho");
+
+      function applySemanticTarget(target) {
+        semanticTarget.glitch = target.glitch;
+        semanticTarget.warmth = target.warmth;
+        semanticTarget.tint.setRGB(target.tint[0], target.tint[1], target.tint[2]);
+      }
+
+      function parseSemanticPrompt(promptText) {
+        var text = promptText.toLowerCase();
+        for (var keyword in SEMANTIC_DICTIONARY) {
+          if (text.indexOf(keyword) !== -1) {
+            applySemanticTarget(SEMANTIC_DICTIONARY[keyword]);
+            terminalEcho.textContent = '[Semantic Engine] state matched -> "' + keyword + '"';
+            terminalEcho.classList.add("matched");
+            return;
+          }
+        }
+        applySemanticTarget(BASELINE_SEMANTIC);
+        terminalEcho.textContent = "[Semantic Engine] unrecognized vector, returning to baseline.";
+        terminalEcho.classList.remove("matched");
+      }
+
+      if (terminalInput) {
+        terminalInput.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" || !terminalInput.value.trim()) return;
+          parseSemanticPrompt(terminalInput.value);
+          terminalInput.value = "";
+        });
+      }
     })();
   </script>
 </body>

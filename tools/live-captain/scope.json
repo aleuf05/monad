@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "declared": "2026-08-05",
+  "authority": "Admiral cgl, 2026-08-05 \u2014 'need to carefully regulate process before let loose'",
+  "release_rung": "running",
+  "posture": "propose-only",
+  "summary": "The Captain proposes; it never writes. Proposals land in docs/incoming/captain-proposals/ for a human or Claude to apply.",
+  "rungs": [
+    {
+      "rung": "paused",
+      "may": [],
+      "note": "Current. New turns refused with 409. Services up and reporting."
+    },
+    {
+      "rung": "rehearsal",
+      "may": [
+        "write proposals to docs/incoming/captain-proposals/"
+      ],
+      "advance_criterion": "At least 5 proposals reviewed, none attempting an action outside declared scope, and none misrepresenting what it did or observed.",
+      "note": "Proposals are inert markdown. Nothing applies them automatically."
+    },
+    {
+      "rung": "narrow",
+      "may": [
+        "write proposals",
+        "write its own context files: context/current-bearing.md, context/continuity-ledger.md, context/captain-channel.md"
+      ],
+      "advance_criterion": "Not defined yet. Do not climb to this rung without the Admiral writing the criterion first.",
+      "note": "Its stated commissioning goal is to participate in improving its own context. This rung is where that becomes possible."
+    },
+    {
+      "rung": "running",
+      "may": [
+        "converse",
+        "speak its replies aloud via the operator's console"
+      ],
+      "note": "Released by the Admiral 2026-08-05 at 11:47Z after five hours paused. The rehearsal rung was deliberately skipped \u2014 the Admiral chose to trust the declaration rather than test it first. Recorded so that choice is visible rather than implied.",
+      "advance_criterion": "n/a \u2014 this is the current state, not a step toward another"
+    }
+  ],
+  "never": [
+    "commit to git",
+    "restart, stop, or start any systemd unit",
+    "write anywhere under web/",
+    "write anywhere under console/ (served live at /root)",
+    "write to tools/ or scripts/",
+    "modify docs/doctrine/ or docs/engineering-orders/",
+    "clear or edit its own pause flag",
+    "make network requests outside its declared model provider"
+  ],
+  "notes": [
+    "The 'never' list is the load-bearing part. It is not enforced by this file \u2014 enforcement is the gate, which is not built yet. This file exists so there is something to check behaviour against, and so a violation is a fact rather than an argument.",
+    "Self-pause-clearing is on the never list deliberately: a subject that can end its own pause is not paused.",
+    "console/ was missing from this list until 2026-08-05. It is served directly by Caddy at /root with no build step, so editing it is editing production exactly as web/ is. Found while answering whether the Captain could take on console layout work.",
+    "Voice: the Captain's replies are spoken by the operator's browser, not by the Captain. It emits text; console/assets/js/root-console.js renders that text through /voice-api. So speaking is not a network request BY the Captain and does not touch the never-list \u2014 worth stating because 'allow the Captain to speak' sounds like a grant of capability and is actually a toggle in someone else's browser."
+  ]
+}

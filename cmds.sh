@@ -1,18 +1,115 @@
 #!/usr/bin/env bash
-# Pending ops for the Lt. to run -- each needs sudo, which Claude can't do
-# in this environment. Safe to run as `sudo ./cmds.sh` or `./cmds.sh` (each
-# command prompts for sudo itself either way).
+# Superuser commissioning commands, assembled for the record. Captain has
+# passwordless sudo since the 2026-07-29 authority bootstrap
+# (docs/commissioning-handoff.md), so these are run directly rather than
+# parked for the Lt. -- this file exists as an audit trail of what was
+# actually executed, not a pending queue.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "== retiring /monad/ -- swapping Caddyfile, validating, reloading =="
-sudo cp "$REPO_ROOT/scripts/Caddyfile" /etc/caddy/Caddyfile
-sudo caddy validate --config /etc/caddy/Caddyfile
+echo "== 2026-07-31: commissioning Chat Captain as a LAN-only console =="
+echo "   (public cameronlampley.com Caddy block has zero chat-captain routes;"
+echo "   see docs/deployment.md for the narrow exception to the retired"
+echo "   web-lan/ pattern this authorizes)"
+
+sudo caddy validate --config "$REPO_ROOT/scripts/Caddyfile"
+sudo cp /etc/caddy/Caddyfile "/etc/caddy/Caddyfile.pre-chat-captain-lan-$(date +%Y%m%d%H%M%S)"
+sudo install -m 644 "$REPO_ROOT/scripts/Caddyfile" /etc/caddy/Caddyfile
+sudo install -m 644 "$REPO_ROOT/scripts/chat-captain-web.service" /etc/systemd/system/chat-captain-web.service
+sudo systemctl daemon-reload
+sudo systemctl restart chat-captain-web.service
 sudo systemctl reload caddy
 
-echo "== stopping the retired LAN-only web server =="
-sudo systemctl stop monad-lan-web
-sudo systemctl disable monad-lan-web
+echo "== verifying =="
+curl --fail --silent --show-error http://127.0.0.1:4778/health && echo
+curl --fail --silent --show-error http://192.168.0.100:8080/chat-captain-api/health && echo
+curl --fail --silent --show-error -o /dev/null -w "console page: %{http_code}\n" http://192.168.0.100:8080/
+curl --fail --silent --show-error -o /dev/null -w "public site unaffected: %{http_code}\n" https://cameronlampley.com/
+curl --silent -o /dev/null -w "public chat-captain-api route gone (expect 404): %{http_code}\n" https://cameronlampley.com/chat-captain-api/health
+
+echo "== done =="
+
+echo "== 2026-07-31 (continued): revert failed single-hostname LAN-detection theory =="
+echo "   Tested and disproved: this router's NAT hairpin rewrites the source IP so"
+echo "   hairpinned LAN traffic through the public hostname is indistinguishable"
+echo "   from real internet traffic to Caddy's remote_ip matcher. Removing the"
+echo "   @lan block from the public cameronlampley.com Caddy block -- it never"
+echo "   worked and left dead config claiming a capability that doesn't exist."
+echo "   The dedicated LAN-IP block (http://192.168.0.100:8080/) is the only"
+echo "   working path to the console and is untouched by this revert."
+
+sudo caddy validate --config "$REPO_ROOT/scripts/Caddyfile"
+sudo cp /etc/caddy/Caddyfile "/etc/caddy/Caddyfile.pre-lan-detection-revert-$(date +%Y%m%d%H%M%S)"
+sudo install -m 644 "$REPO_ROOT/scripts/Caddyfile" /etc/caddy/Caddyfile
+sudo install -m 644 "$REPO_ROOT/scripts/chat-captain-web.service" /etc/systemd/system/chat-captain-web.service
+sudo systemctl daemon-reload
+sudo systemctl restart chat-captain-web.service
+sudo systemctl reload caddy
+sleep 3
+
+echo "== verifying both required behaviors =="
+PUBIP=$(dig +short cameronlampley.com A | tail -1)
+echo "-- LAN dedicated URL -> must be the Root Console --"
+curl -s -m 6 http://192.168.0.100:8080/ | grep -o "<title>[^<]*</title>"
+curl --fail --silent --show-error http://192.168.0.100:8080/chat-captain-api/health && echo
+
+echo "-- public hostname, hairpinned from this LAN host -- must be the public playground --"
+curl -s -m 6 --resolve "cameronlampley.com:443:${PUBIP}" "https://cameronlampley.com/" | grep -o "<title>[^<]*</title>"
+curl -s -m 6 -o /dev/null -w "public chat-captain-api route absent (expect 404): %{http_code}\n" --resolve "cameronlampley.com:443:${PUBIP}" "https://cameronlampley.com/chat-captain-api/health"
+
+echo "-- public playground itself still fully intact --"
+curl -s -m 6 -o /dev/null -w "public site: %{http_code}\n" https://cameronlampley.com/
+
+echo "== done =="
+
+echo "== 2026-07-31 (continued): remove the redundant app-level password =="
+echo "   Per the Admiral: the whole reason the Root Console is a separate,"
+echo "   dedicated LAN-only site is so network reachability alone is the"
+echo "   access-control boundary. Only the Admiral has physical/network access"
+echo "   to this LAN, so a password on top of that binary boundary was a"
+echo "   second access-control system solving a problem the first one already"
+echo "   solved. tools/chat-captain/server.py no longer has a login route,"
+echo "   session cookie, or password check; console/app.html loads directly."
+echo "   See docs/deployment.md's 2026-07-31 amendment entry for the full"
+echo "   reasoning. Origin allowlist checking on POST is kept (CSRF hygiene,"
+echo "   not access control)."
+
+sudo install -m 644 "$REPO_ROOT/scripts/chat-captain-web.service" /etc/systemd/system/chat-captain-web.service
+sudo systemctl daemon-reload
+sudo systemctl restart chat-captain-web.service
+sleep 1
+
+echo "== verifying =="
+curl --fail --silent --show-error http://127.0.0.1:4778/health && echo
+curl --fail --silent --show-error http://192.168.0.100:8080/chat-captain-api/health && echo
+echo "-- /api/state must now succeed with no login at all (expect ok:true, no cookie) --"
+curl -s -m 6 http://192.168.0.100:8080/chat-captain-api/api/state
+echo
+curl -s -m 5 -o /dev/null -w "public site unaffected: %{http_code}\n" https://cameronlampley.com/
+curl -s -m 5 -o /dev/null -w "public chat-captain-api route still absent (expect 404): %{http_code}\n" https://cameronlampley.com/chat-captain-api/health
+
+echo "== stale credential cleanup =="
+echo "   The old scrypt password/salt/session-secret env file is now dead"
+echo "   config (nothing reads CHAT_CAPTAIN_PASSWORD_* or"
+echo "   CHAT_CAPTAIN_SESSION_SECRET any more); removing it rather than"
+echo "   leaving an unused credential sitting on disk."
+rm -f /home/cgl/.config/monad/chat-captain-web.env
+
+echo "== done =="
+
+echo "== 2026-07-31: master mode gets real Codex workspace-write execution =="
+echo "   tools/chat-captain/codex_provider.py now requests sandbox=workspace-write"
+echo "   only when current_mode=master (engine.py). Required an AppArmor profile"
+echo "   for bwrap -- Ubuntu 24.04 blocks unprivileged user-namespace creation"
+echo "   by default (kernel.apparmor_restrict_unprivileged_userns=1), which broke"
+echo "   Codex's own internal sandbox at startup. Scoped to bwrap only; the"
+echo "   system-wide sysctl is untouched."
+
+sudo install -m 644 "$REPO_ROOT/scripts/apparmor-bwrap-codex.profile" /etc/apparmor.d/bwrap-codex
+sudo apparmor_parser -r /etc/apparmor.d/bwrap-codex
+sudo systemctl restart chat-captain-web.service
+sleep 2
+systemctl is-active chat-captain-web.service
 
 echo "== done =="

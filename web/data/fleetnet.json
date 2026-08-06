@@ -1,0 +1,51 @@
+{
+  "generated": "2026-08-05T12:31:42Z",
+  "units": {
+    "installed": 24,
+    "active": 19,
+    "down": [],
+    "expected_down": 4,
+    "oneshot": 2
+  },
+  "ports": 17,
+  "suites": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5
+  },
+  "tree": {
+    "uncommitted": 7,
+    "head": "5a628ed"
+  },
+  "captain": "running",
+  "voice": {
+    "day": "2026-08-05",
+    "seconds_used": 204.2,
+    "seconds_limit": 20000.0,
+    "usd_used": 0.10210000000000001,
+    "usd_limit": 10.0
+  },
+  "sound": true,
+  "lines": [
+    {
+      "priority": 3,
+      "text": "FleetNet. All 19 units active. 4 parked by design."
+    },
+    {
+      "priority": 2,
+      "text": "19 of 24 units running on 17 ports."
+    },
+    {
+      "priority": 2,
+      "text": "All 5 test suites green."
+    },
+    {
+      "priority": 3,
+      "text": "7 files uncommitted."
+    },
+    {
+      "priority": 1,
+      "text": "Voice budget, 0.1021 of 10.0 dollars used."
+    }
+  ]
+}

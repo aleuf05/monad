@@ -1,0 +1,195 @@
+{
+  "generated": "2026-08-05",
+  "headline": "Aegis rigging pipeline \u2014 built, shipped, and producing artifacts",
+  "commits": [
+    {
+      "sha": "1d338bc",
+      "subject": "Aegis RECORD: rig gasket-rigged.glb"
+    },
+    {
+      "sha": "4033181",
+      "subject": "Aegis RECORD: rig uss-rubber-ducky-rigged.glb"
+    },
+    {
+      "sha": "b27e1b9",
+      "subject": "Aegis rigging solver and pipeline stages 3-6"
+    },
+    {
+      "sha": "7bd843d",
+      "subject": "Review all 18 refusals; settle Rust/Python as doctrine 015"
+    },
+    {
+      "sha": "7197d9d",
+      "subject": "Lift the rig pipeline above the fold; fix the stuck preview placeholder"
+    },
+    {
+      "sha": "fb02dfa",
+      "subject": "LUCA resolved: research carried out and filed"
+    },
+    {
+      "sha": "81fea0f",
+      "subject": "Front page carries tonight's build: deformation probe + Rig Bench"
+    },
+    {
+      "sha": "b09a4ab",
+      "subject": "Rig the whole corpus: 9 of 9, no refusals, no errors"
+    },
+    {
+      "sha": "f8e7419",
+      "subject": "Commit outstanding Live Captain and root-console work"
+    },
+    {
+      "sha": "9f4ccbb",
+      "subject": "Commit gasket upload service, semantic metamorphosis, and site work"
+    },
+    {
+      "sha": "5cc8de5",
+      "subject": "Commit captain logs, the no-CLAUDE.md experiment state, and live data"
+    },
+    {
+      "sha": "a80b0e0",
+      "subject": "Replace the turntable spin with a coupled spring chain on the rig"
+    },
+    {
+      "sha": "3b94941",
+      "subject": "Sonify the rig: one voice per joint, driven by angular velocity"
+    },
+    {
+      "sha": "6748293",
+      "subject": "File the chief plan, name Chief Conference, add the live-page verifier"
+    },
+    {
+      "sha": "4ac17bd",
+      "subject": "Live data snapshot: fleet status, review inbox, watch officer"
+    }
+  ],
+  "diffstat": "102 files changed, 12187 insertions(+), 470 deletions(-)",
+  "files_touched": 102,
+  "metrics": [
+    {
+      "k": "rigged assets",
+      "v": "9 / 9",
+      "note": "whole corpus, 4,454,579 vertices, 0 refused, 0 errors"
+    },
+    {
+      "k": "solver engine",
+      "v": "Rust",
+      "note": "7.2x on the 1.08M-vertex kraken (5,793ms -> 799ms)"
+    },
+    {
+      "k": "pipeline stages",
+      "v": "5 / 5",
+      "note": "INSPECT \u00b7 VALIDATE \u00b7 AUTHORIZE \u00b7 EXECUTE \u00b7 RECORD"
+    },
+    {
+      "k": "tests green",
+      "v": "88",
+      "note": "17 solver \u00b7 6 Rust/Python parity \u00b7 13 M3 \u00b7 52 Live Captain"
+    },
+    {
+      "k": "refusals reviewed",
+      "v": "18 / 18",
+      "note": "first full pass; 1 moot, 4 terminal, 2 resolved"
+    },
+    {
+      "k": "corpus solve",
+      "v": "35s",
+      "note": "every static asset rigged and deformation-probed end to end"
+    },
+    {
+      "k": "deep interpenetration",
+      "v": "28",
+      "note": "gasket at 45 degrees, was reported as 334 before the metric was corrected"
+    }
+  ],
+  "findings": [
+    "Per-shell weight solving eliminates pinching completely \u2014 0 collapsed, 0 inverted, 0 torn faces at every bend angle tested.",
+    "Every static asset in the corpus rigs: 9 of 9, no refusals, no errors. The multi-primitive limit never bit \u2014 the whole corpus is single-primitive.",
+    "The collision metric was wrong and got fixed. Counting any new bounding-box contact reported 334 'collisions' on gasket at 45 degrees; measuring overlap depth shows a median of 8% of a part's volume. That is articulation, not clipping. The real interpenetration count is 28.",
+    "Grouping touching shells was the obvious fix and it fails: union-find is transitive, so any epsilon above zero collapsed all 395 shells into one group \u2014 and clipping did not improve even then. Kept as a documented negative result, disabled by default.",
+    "The corpus's fragmentation scale (~0.18 on gasket's axis) bounds useful bone density. Below it, skinning degenerates to rigid part binding."
+  ],
+  "corpus": [
+    {
+      "name": "kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 817.5,
+      "verdict": "warn"
+    },
+    {
+      "name": "21ddb560-0090-40e0-a0df-948e99dcd171_5fc12f696f79cffe6e53a5ddbc992b3f.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 814.19,
+      "verdict": "warn"
+    },
+    {
+      "name": "20260729T123905Z-21751df24fbb.glb",
+      "vertices": 28586,
+      "shells": 133,
+      "rigid": 103,
+      "blended": 30,
+      "ms": 22.97,
+      "verdict": "warn"
+    },
+    {
+      "name": "kraken_tripo_v1.glb",
+      "vertices": 1076978,
+      "shells": 1831,
+      "rigid": 1811,
+      "blended": 20,
+      "ms": 806.3,
+      "verdict": "warn"
+    },
+    {
+      "name": "end-to-end-manual.glb",
+      "vertices": 282840,
+      "shells": 1764,
+      "rigid": 1677,
+      "blended": 87,
+      "ms": 187.44,
+      "verdict": "warn"
+    },
+    {
+      "name": "file_00000000a68c722f9cd29e1996dba4cf.glb",
+      "vertices": 284844,
+      "shells": 3634,
+      "rigid": 3590,
+      "blended": 44,
+      "ms": 198.14,
+      "verdict": "warn"
+    },
+    {
+      "name": "gasket.glb",
+      "vertices": 29378,
+      "shells": 395,
+      "rigid": 374,
+      "blended": 21,
+      "ms": 19.93,
+      "verdict": "warn"
+    },
+    {
+      "name": "the-monad.glb",
+      "vertices": 315157,
+      "shells": 4676,
+      "rigid": 4609,
+      "blended": 67,
+      "ms": 198.46,
+      "verdict": "warn"
+    },
+    {
+      "name": "uss-rubber-ducky.glb",
+      "vertices": 282840,
+      "shells": 1764,
+      "rigid": 1677,
+      "blended": 87,
+      "ms": 191.28,
+      "verdict": "warn"
+    }
+  ]
+}

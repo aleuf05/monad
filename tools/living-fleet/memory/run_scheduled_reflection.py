@@ -21,7 +21,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run scheduled reflection for every captain once.")
     parser.add_argument("--db", default=str(DEFAULT_DB))
     parser.add_argument("--captains", default=str(DEFAULT_CAPTAINS))
+    parser.add_argument(
+        "--enable-living-fleet",
+        action="store_true",
+        help="explicitly re-enable the retired Living Fleet reflection path",
+    )
     args = parser.parse_args()
+
+    if not args.enable_living_fleet:
+        print("Living Fleet reflection disabled; Root Console Captain is authoritative.")
+        return 0
 
     captains = _read_captains(Path(args.captains))
     service = MemoryService(args.db, captains)

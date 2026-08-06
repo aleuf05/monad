@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Captain's Desk</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <style>.monad-home-link{position:fixed;top:10px;left:10px;z-index:9999;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:#9BB0C8;background:rgba(11,18,32,.85);border:1px solid rgba(79,209,197,.35);border-radius:4px;padding:5px 10px;text-decoration:none;transition:color .15s ease,border-color .15s ease}.monad-home-link:hover{color:#4FD1C5;border-color:#4FD1C5}</style>
+    <a class="monad-home-link" href="../../index.html">⚓ Fleet Monad</a>
+
+    <header class="desk-header">
+      <div>
+        <h1>The Captain's Desk</h1>
+        <p>Version 1 — a tabletop with draggable tokens and sticky-note cards. Reasoning made visible.</p>
+      </div>
+      <div class="desk-header-actions">
+        <button type="button" id="newCardBtn">+ New Card</button>
+        <button type="button" id="clearDeskBtn">Clear Desk</button>
+      </div>
+    </header>
+
+    <main class="desk-surface" id="deskSurface" aria-label="The desk">
+      <!-- cards and loose tokens are injected here by app.js -->
+    </main>
+
+    <aside class="token-tray" aria-label="Cognitive object tray">
+      <div class="tray-label">Tokens — drag onto a card, or onto the desk</div>
+      <div class="tray-tokens" id="trayTokens"><!-- populated by app.js --></div>
+    </aside>
+
+    <div class="drag-ghost" id="dragGhost" aria-hidden="true"></div>
+  </body>
+</html>

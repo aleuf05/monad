@@ -1,0 +1,14 @@
+[Unit]
+Description=Monad-0 Nexus Laboratory web operator surface
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 -m monad_zero.web_lab --host 127.0.0.1 --port 4793
+Restart=on-failure
+RestartSec=2
+User=cgl
+
+[Install]
+WantedBy=multi-user.target
