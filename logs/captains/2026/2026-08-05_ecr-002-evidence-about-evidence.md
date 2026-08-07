@@ -1,10 +1,30 @@
-# CAPTURE — Packet: ECR-002 — Evidence About Evidence
+# FILED — Packet: ECR-002 — Evidence About Evidence
 
-**Captured:** 2026-08-05
+**Captured:** 2026-08-05 · **Filed:** 2026-08-07
 **Source:** Admiral, direct paste. Originates with the read-only Captain.
-**Status:** **Staged, not filed.** Captured verbatim on arrival per the
-standing rule ("anything I paste capture, organize later"). No evaluation,
-no restructuring, no assessment applied here.
+**Disposition:** **Filed** (doctrine 013 §2). Not refused, not
+research-split. The packet is a research record about the Captain's own
+evaluation process; it asks for no build and asserts no infrastructure.
+
+**Epistemic label:** the packet's §6 verdict, §7 capability status, and the
+"accepted as a provisional second specimen" line are the *document's own
+claims about itself* (doctrine 012). Filing confirms none of them. What is
+independently confirmed is narrower and stated in §9: three of the four
+`UNDEFINED` items in the frozen spec are now supplied.
+
+**Filing note, 2026-08-07.** This sat staged in `docs/incoming/` for two
+days. It was read in full at capture — §9 below is that read — so filing
+required no new evaluation, only the move that doctrine 013 §2 already
+called for. The delay was a process gap, not a judgement: nothing routed
+staged material to disposition once the capture itself was written. Cleared
+ahead of the Old Captain's inbound packet so the tray is unambiguous.
+
+**Carried forward, unresolved:** the capability-level inference rule
+`{ECR₁ … ECRₙ} ⇒ Support(CAP-EVID-001)` remains `UNDEFINED` and is one of
+the two items `docs/OPERATION-RESUME.md` lists as waiting on the Admiral.
+§8's blind gate is a live design constraint, not a task: if it is ever run,
+the deliberately flawed record and its success criteria must be committed
+**before** the Captain can read them, or the gate is spent on first sight.
 
 **Note for the later organizing pass:** this packet supplies three of the
 four items marked `UNDEFINED` in

@@ -1,9 +1,33 @@
-# CAPTURE — Master Strategic Directive: The Little Buddy Ecosystem Packet
+# FILED — Master Strategic Directive: The Little Buddy Ecosystem Packet
 
-**Captured:** 2026-08-05
+**Captured:** 2026-08-05 · **Filed:** 2026-08-07
 **Source:** Admiral, direct paste.
-**Status:** **Staged, not filed.** Captured verbatim on arrival per the
-standing rule. No evaluation applied to the content below.
+**Disposition:** **Filed** (doctrine 013 §2) as a legitimate specification.
+Explicitly **not refused** — and the distinction matters. `PMA-MASTER-SEQUENCE`,
+`PMA-DIAMOND-PROTOCOL` and `QUANTUM-DEMAGNETIZER` were refused for asserting
+hardware that already existed and was running. This packet asserts no such
+thing: it states a design and a roadmap toward hardware that would have to be
+acquired. That is a specification, and it is filed as one.
+
+**Epistemic label:** the `AUTHORIZATION: CHIEF COMMAND (ACTIVE)` header and
+the `PACKET STATUS: FULLY SPECIFIED & LOCKED FOR EXECUTION` closer are the
+document's own claims about itself (doctrine 012). Filing confirms neither.
+The hardware absence recorded below *was* independently verified on this host.
+
+**Filing note, 2026-08-07.** Staged two days in `docs/incoming/`; read in
+full at capture (the capture notes below are that read), so filing needed no
+new evaluation, only the move doctrine 013 §2 already called for. Cleared
+ahead of the Old Captain's inbound packet.
+
+**Live amendment, unchanged:** *"hardware stuff low prio."* §2A and
+Milestone 1 remain deprioritised by direct instruction.
+
+**The one sequencing point worth carrying forward:** Milestone 1 is the only
+milestone requiring parts, and it gates nothing the others need. §2B and §2C
+are pure software and buildable now against a file or browser sink. Any such
+build should inherit `tools/voice-engine/`'s existing budget discipline
+rather than open a second uncapped path to a paid API — the packet does not
+know that engine exists.
 
 **Admiral's live amendment, same session:** *"hardware stuff low prio."*
 Section 2A and Milestone 1 are therefore deprioritised by direct
