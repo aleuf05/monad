@@ -4,6 +4,27 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## CANON-TRACK-01: Ten "Status: Canon" doctrine files are untracked
+
+Status: **queued — highest value open item**, inherited from Research Object
+001 (`docs/reports/2026-08-07-research-object-001-flight-record.md`, "Five
+provenance defects"). Re-verified 2026-08-07 at the Codex → Claude watch
+handoff; still exactly ten.
+
+```
+for f in docs/doctrine/*.md; do git ls-files --error-unmatch "$f" >/dev/null 2>&1 || echo "$f"; done
+```
+
+`023, 024, 025, 026, 027, 028, 029, 030, 031, 041` — every one stamped
+`Status: Canon`, none in git. Consequences, all real: `git clean -fd`
+deletes them; M³ has never governed one of them, because an untracked file
+never reaches `HEAD` and `H_t` is git; and `023-true-live-captain-integrated-command.md`
+is the doctrine of record cited by `EDIT-THIS-ONE-FILE.md` itself.
+
+The fix is `git add` plus one M³ pass, not a redesign. It was correctly
+declined mid-survey (a discovery mission must not change its own subject);
+that reason expired when Research Object 001 landed.
+
 ## AEGIS-COLLISION-01: Reduce deep interpenetration under pose
 
 Status: **attempted, reduced, re-argue before resuming** — see
