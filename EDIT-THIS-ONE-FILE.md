@@ -104,15 +104,30 @@ distilled operational findings. Nothing further needs supplying.
 **Blinding, resolved by the Admiral 2026-08-07. This is the one rule that
 decides whether the finding is defensible or merely suggestive.**
 
-> **You are the scorer. You are never both generator and scorer.**
+> **Nobody is both generator and scorer. Roles are assigned by name below —
+> read the one that is you, and do not assume the other.**
+
+This file is loaded by both embodiments, so the roles must be named rather
+than addressed as "you":
+
+| Role | Held by | Does | Must never |
+|---|---|---|---|
+| **Blind-holder** | **Claude** | runs both arms, strips markers, shuffles, writes `A.md`/`B.md`, keeps the mapping sealed | score, or hint at which is which |
+| **Scorer** | **Codex** — the mission Captain | scores `A.md` and `B.md` cold against the seven dimensions | generate either arm, or try to deduce the mapping |
+| **Control arm** | Claude, **run outside this repo** | produces the ordinary-assistant response | be run inside the repo — see below |
 
 The payload's procedure has one party generate the ordinary-assistant
 response, generate the commissioned-Captain response, and then score both.
-That is not blinding, whatever step 4 says. Claude holds the blind: it runs
-both postures, strips identifying markers, shuffles, and hands you two
-unlabelled outputs. You score them without knowing which is which and
-without attempting to work it out. Claude records the mapping and unblinds
-afterwards.
+That is not blinding, whatever step 4 says.
+
+**The control arm must be produced outside this repository.** Verified
+2026-08-07: an agent started in `/home/cgl/dev/monad` auto-loads Live
+Captain posture through `CLAUDE.md` / `AGENTS.md`, so an "ordinary
+assistant" response generated here is not ordinary — it is a Captain with
+the label removed, and the comparison measures nothing. Started in a
+directory with no loaders, the same agent answers "no posture" cleanly.
+That empty directory *is* the control condition; treat it as apparatus and
+do not casually run the control arm anywhere else.
 
 If you ever find yourself scoring something you wrote, stop and say so. A
 contaminated comparison reported honestly is recoverable; one reported as
