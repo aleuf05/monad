@@ -13,6 +13,7 @@ import json
 import hashlib
 import sqlite3
 import subprocess
+import time
 from pathlib import Path
 from unittest import mock
 
@@ -20,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from context_compiler import (
     ContextCompilerError,
+    compact_runtime_sources,
     compile_live_captain_context,
     context_size_metrics,
     format_chronological_messages,
@@ -33,6 +35,8 @@ from persistence import (
 from run_tests import append_report, build_report
 from server import LiveCaptainHandler, browser_sse_payload, load_context_sources
 from auth import COOKIE_NAME, AuthConfig
+from objectives import ObjectiveStore
+from turn_arbiter import TurnArbiter
 import generated_images
 from context_metabolism import (
     ContinuityFact,
@@ -201,6 +205,29 @@ class LedgerAuditTests(unittest.TestCase):
 
 
 class ContextCompilerTests(unittest.TestCase):
+    def test_hot_context_drops_archives_but_keeps_live_sections(self):
+        bearing, ledger, channel = compact_runtime_sources(
+            "old commissioning\n## Living Captain Master Page course, 2026-08-05\nLIVE COURSE",
+            "# Continuity Ledger\n## Durable commitments\nKEEP\n## Verified state\nOLD RECEIPTS",
+            "old dispatch\n---\nlatest dispatch",
+        )
+        self.assertNotIn("old commissioning", bearing)
+        self.assertIn("LIVE COURSE", bearing)
+        self.assertIn("KEEP", ledger)
+        self.assertNotIn("OLD RECEIPTS", ledger)
+        self.assertEqual(channel, "latest dispatch")
+
+    def test_latest_operational_bearing_supersedes_commissioning_history(self):
+        bearing, _, _ = compact_runtime_sources(
+            "archive\n## Living Captain Master Page course, 2026-08-05\nOLD COURSE\n"
+            "## Current operational bearing, 2026-08-06\nCURRENT COURSE",
+            "LEDGER",
+            "CHANNEL",
+        )
+        self.assertIn("CURRENT COURSE", bearing)
+        self.assertNotIn("OLD COURSE", bearing)
+        self.assertNotIn("archive", bearing)
+
     def test_kernel_and_bearing_always_included(self):
         text = compile_live_captain_context(
             "KERNEL-MARKER", "BEARING-MARKER", "LEDGER-MARKER", [], "hello captain"
@@ -251,6 +278,20 @@ class ContextCompilerTests(unittest.TestCase):
         )
         self.assertEqual(text.count("THE CURRENT MESSAGE"), 1)
         self.assertGreater(text.rindex("THE CURRENT MESSAGE"), text.index("earlier"))
+
+    def test_command_draft_adds_immediate_implementation_contract(self):
+        text = compile_live_captain_context(
+            "KERNEL", "BEARING", "LEDGER", [], "Refit the bridge.", interaction_mode="command_draft"
+        )
+        self.assertIn("one coherent high-level command", text)
+        self.assertIn("authorized for immediate implementation", text)
+        self.assertLess(text.index("# Interaction contract"), text.index("# Current Admiral message"))
+
+    def test_unknown_interaction_mode_is_rejected(self):
+        with self.assertRaisesRegex(ContextCompilerError, "unsupported interaction mode"):
+            compile_live_captain_context(
+                "KERNEL", "BEARING", "LEDGER", [], "hello", interaction_mode="wishful_thinking"
+            )
 
     def test_context_size_metrics_attribute_sources_and_total(self):
         messages = [{"role": "admiral", "text": "earlier"}]
@@ -769,7 +810,12 @@ class EndToEndHttpBootTests(unittest.TestCase):
     HTTP server, auth, and request/response wiring are all real."""
 
     class _FakeDaemon:
+        def __init__(self):
+            self.compiled = []
+            self.broadcasts = []
+
         def send_and_wait(self, compiled_text, sandbox=None, timeout=180):
+            self.compiled.append(compiled_text)
             return {
                 "text": "fake reply",
                 "thread_id": "test-thread-id",
@@ -780,6 +826,9 @@ class EndToEndHttpBootTests(unittest.TestCase):
 
         def status(self):
             return {"running": True, "pid": 0, "backend": "fake"}
+
+        def broadcast(self, event):
+            self.broadcasts.append(event)
 
     def setUp(self):
         # Isolate from the operator's real pause flag. This suite boots a
@@ -806,10 +855,17 @@ class EndToEndHttpBootTests(unittest.TestCase):
         )
         self._tmpdir = tempfile.TemporaryDirectory()
         self.store = LiveCaptainStore(Path(self._tmpdir.name) / "test.db")
+        self.objectives = ObjectiveStore(Path(self._tmpdir.name) / "objectives.db")
 
-        LiveCaptainHandler.daemon = self._FakeDaemon()
+        self.daemon = self._FakeDaemon()
+        LiveCaptainHandler.daemon = self.daemon
         LiveCaptainHandler.store = self.store
         LiveCaptainHandler.auth = self.auth
+        LiveCaptainHandler.objectives = self.objectives
+        LiveCaptainHandler.arbiter = TurnArbiter()
+        LiveCaptainHandler.speech_renderer = lambda text: {
+            "audio_url": "/voice-api/artifacts/test.wav", "transcript": text,
+        }
         for name, value in load_context_sources().items():
             setattr(LiveCaptainHandler, name, value)
 
@@ -822,6 +878,7 @@ class EndToEndHttpBootTests(unittest.TestCase):
         self.httpd.shutdown()
         self.httpd.server_close()
         self.thread.join(timeout=5)
+        self.objectives.close()
         self._tmpdir.cleanup()
 
     def _url(self, path):
@@ -866,9 +923,33 @@ class EndToEndHttpBootTests(unittest.TestCase):
             body = json.loads(response.read())
         self.assertEqual(body["text"], "fake reply")
         self.assertEqual(body["thread_id"], "test-thread-id")
+        self.assertEqual(body["speech_artifact"]["audio_url"], "/voice-api/artifacts/test.wav")
 
         messages, _ = self.store.load_recent_messages(10)
         self.assertTrue(any(m["text"] == "end-to-end boot test message" for m in messages))
+
+    def test_concurrent_turn_context_is_compiled_after_prior_reply(self):
+        import threading
+        import urllib.request
+
+        cookie = self.auth.issue_session()
+        errors = []
+        def send(text):
+            try:
+                request = urllib.request.Request(
+                    self._url("/api/turn"), data=json.dumps({"text": text}).encode(), method="POST",
+                    headers={"Cookie": f"{COOKIE_NAME}={cookie}", "Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(request, timeout=5) as response: response.read()
+            except Exception as exc: errors.append(exc)
+
+        first = threading.Thread(target=send, args=("first queued utterance",))
+        second = threading.Thread(target=send, args=("second queued utterance",))
+        first.start(); time.sleep(.02); second.start(); first.join(5); second.join(5)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(self.daemon.compiled), 2)
+        self.assertIn("Admiral: first queued utterance", self.daemon.compiled[1])
+        self.assertIn("Captain: fake reply", self.daemon.compiled[1])
 
 
 if __name__ == "__main__":

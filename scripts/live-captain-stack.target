@@ -1,0 +1,8 @@
+[Unit]
+Description=Monad Live Co-Captain operational stack
+After=network-online.target public-root-auth.service
+Wants=network-online.target public-root-auth.service
+Wants=root-console.service live-captain-bootstrap.service
+
+[Install]
+WantedBy=multi-user.target

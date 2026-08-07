@@ -16,5 +16,14 @@ states its authority status.
   boundaries; source doctrine remains controlling.
 - [Archive stewardship doctrine](../../../docs/doctrine/005-captain-archive-stewardship.md) —
   active standing order in its source record.
+- [True Live Captain Integrated Command](../../../docs/doctrine/023-true-live-captain-integrated-command.md) —
+  canon by explicit Admiral order; defines the combined Captain, Chief
+  Engineer, Technical Lead, Operator, continuity, and integration station.
+- [Captain Architect, Chief Engineer, Tech Lead Progression](../../../docs/doctrine/026-captain-chief-tech-lead-progression.md) —
+  canon by explicit Admiral order; defines the inspectable progression from
+  product intent through engineering, implementation, and live verification.
+- [Captain-Centered Documentary Interface](../../../docs/doctrine/027-captain-centered-documentary-interface.md) —
+  canon by explicit Admiral order; makes Living Captain concept/history
+  explanation the primary documentary interface while sources remain evidence.
 
 Entries should be added only with a direct source path and an explicit status.

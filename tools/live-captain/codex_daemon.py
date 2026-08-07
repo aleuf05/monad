@@ -69,6 +69,7 @@ class CodexDaemon:
         self._subscribers_lock = threading.Lock()
         self._turn_lock = threading.Lock()
         self._active_thread_id: str | None = None
+        self._active_source = "system"
         self._started_at = time.time()
         self._closing = False
         self.last_thread_start_result: dict = {}
@@ -154,6 +155,7 @@ class CodexDaemon:
                         "type": "codex_event",
                         "method": message["method"],
                         "params": message.get("params", {}),
+                        "source": self._active_source,
                         "ts": time.time(),
                     }
                 )
@@ -172,7 +174,8 @@ class CodexDaemon:
                 self._subscribers.remove(listener)
 
     def send_and_wait(
-        self, compiled_text: str, sandbox: str = EXECUTION_SANDBOX, timeout: int = TURN_TIMEOUT_SECONDS
+        self, compiled_text: str, sandbox: str = EXECUTION_SANDBOX, timeout: int = TURN_TIMEOUT_SECONDS,
+        source: str = "admiral",
     ) -> dict:
         """Start one ephemeral turn with compiled_text as its entire input,
         wait for the completed agentMessage, and return the reply plus
@@ -185,6 +188,10 @@ class CodexDaemon:
         listener = self.subscribe()
         try:
             with self._turn_lock:
+                # _read runs on its own thread. Publish the semantic source
+                # before starting the Codex thread so every subsequent delta
+                # can be routed to the right Captain surface.
+                self._active_source = source
                 started = self._request(
                     "thread/start",
                     {
@@ -202,6 +209,7 @@ class CodexDaemon:
                         "type": "turn_started",
                         "thread_id": thread_id,
                         "text": compiled_text,
+                        "source": source,
                         "ts": time.time(),
                     }
                 )
@@ -250,6 +258,7 @@ class CodexDaemon:
             "thread_id": thread_id,
             "sandbox": sandbox,
             "approval_policy": APPROVAL_POLICY,
+            "source": source,
             "tool_events": tool_events,
             "thread_start_result": started,
         }

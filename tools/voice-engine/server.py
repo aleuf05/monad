@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Same-origin HTTP boundary for budgeted rich voice rendering."""
+"""Same-origin HTTP boundary for rich voice rendering."""
 
 from __future__ import annotations
 
 import json
 import os
 import sys
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -19,7 +19,7 @@ from rich_voice import (  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = ROOT / "data" / "voice-engine"
 CHARACTERS = {
-    "captain.monad": CharacterSpec("captain.monad", "1", "Captain Monad", "command presence", "Kore", "Measured authority, grounded vocal weight, restrained warmth, and deliberate cadence."),
+    "captain.monad": CharacterSpec("captain.monad", "2", "Captain Monad", "live command conversation", "Kore", "Present, intelligent, grounded, and human-scaled; conversational authority with restrained warmth, responsive timing, and no announcer affect."),
     "captain.alpha": CharacterSpec("captain.alpha", "1", "Captain Alpha", "forward reconnaissance", "Puck", "Alert, concise, tactical, understated, and quick without sounding breathless."),
     "captain.bravo": CharacterSpec("captain.bravo", "1", "Captain Bravo", "flank security", "Charon", "Low-drama, deliberate, spare, and steady under pressure."),
     "captain.charlie": CharacterSpec("captain.charlie", "1", "Captain Charlie", "rear guard", "Aoede", "Dry, procedural, observant, with a restrained wry edge."),
@@ -53,11 +53,7 @@ def build_request(payload: dict) -> RenderRequest:
 def create_engine() -> RichVoiceEngine:
     api_key = os.environ.get("GEMINI_API_KEY", "")
     provider = GeminiTTSProvider(api_key) if api_key else UnconfiguredProvider()
-    return RichVoiceEngine(
-        DATA_ROOT, provider,
-        daily_usd=float(os.environ.get("MONAD_VOICE_DAILY_USD", "0.10")),
-        daily_seconds=float(os.environ.get("MONAD_VOICE_DAILY_SECONDS", "300")),
-    )
+    return RichVoiceEngine(DATA_ROOT, provider)
 
 
 def handler_factory(engine: RichVoiceEngine):
@@ -65,7 +61,9 @@ def handler_factory(engine: RichVoiceEngine):
         def json_response(self, payload, status=200):
             body = json.dumps(payload, indent=2).encode()
             self.send_response(status); self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+            self.send_header("Content-Length", str(len(body))); self.end_headers()
+            try: self.wfile.write(body)
+            except (BrokenPipeError, ConnectionResetError): pass
 
         def read_json(self):
             length = int(self.headers.get("Content-Length", "0"))
@@ -82,7 +80,10 @@ def handler_factory(engine: RichVoiceEngine):
                 artifact = engine._artifact(key)
                 if not artifact: self.json_response({"error": "artifact not found"}, 404); return
                 audio = Path(artifact["path"]).read_bytes()
-                self.send_response(200); self.send_header("Content-Type", "audio/wav"); self.send_header("Content-Length", str(len(audio))); self.end_headers(); self.wfile.write(audio); return
+                self.send_response(200); self.send_header("Content-Type", "audio/wav"); self.send_header("Content-Length", str(len(audio))); self.end_headers()
+                try: self.wfile.write(audio)
+                except (BrokenPipeError, ConnectionResetError): pass
+                return
             self.json_response({"error": "not found"}, 404)
 
         def do_POST(self):
@@ -103,9 +104,9 @@ def handler_factory(engine: RichVoiceEngine):
 
 
 def serve(host="127.0.0.1", port=4775):
-    # Rendering and budget reservation are serialized deliberately: this is a
-    # low-volume demo boundary and one request must own the spend decision.
-    engine = create_engine(); server = HTTPServer((host, port), handler_factory(engine))
+    # Rendering and accounting are serialized deliberately so cache and usage
+    # records remain coherent under concurrent requests.
+    engine = create_engine(); server = ThreadingHTTPServer((host, port), handler_factory(engine))
     print(f"Rich Voice API listening on http://{host}:{port}", flush=True)
     server.serve_forever()
 

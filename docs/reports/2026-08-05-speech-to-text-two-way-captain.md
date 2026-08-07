@@ -134,6 +134,27 @@ Small, and honest about it:
 3. On final result, the existing `submitDirective()` path — no new endpoint.
 4. Graceful absence: no `SpeechRecognition`, no button. Typing is unaffected.
 
+### Commissioned push-to-talk boot sequence
+
+The input channel is now deliberately single-mode. There is no continuous
+microphone toggle and no recognition restart loop.
+
+1. Root Console loads with the microphone closed.
+2. An authenticated, ready Bridge accepts `pointerdown` on the visible 🎙
+   control, captures that pointer, stops Captain playback, and starts exactly
+   one browser `SpeechRecognition` session.
+3. While the same pointer remains held, interim hypotheses replace the command
+   field. Cumulative provider prefixes are collapsed instead of appended.
+4. `pointerup` stops recognition. Its `onend` flush boundary submits once
+   through the existing `submitDirective()` path; a 700 ms fallback covers a
+   browser that omits `onend`.
+5. `pointercancel` or loss of window focus stops recognition and submits
+   nothing. Recognition never restarts itself.
+
+Operational invariant: **no held mic button, no live voice input**. Captain
+speech output remains independently selectable; it does not open the Admiral's
+microphone.
+
 **Estimated: one component, ~60 lines, in `console/`. No new service, no new
 route, no new unit, no spend.**
 

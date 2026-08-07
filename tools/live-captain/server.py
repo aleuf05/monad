@@ -26,13 +26,24 @@ from auth import COOKIE_NAME, AuthConfig
 from codex_daemon import CodexDaemon, CodexError
 from context_compiler import (
     ContextCompilerError,
+    compile_watch_context,
     compile_live_captain_context,
     context_size_metrics,
     load_optional_text,
     load_required_text,
 )
 from persistence import LiveCaptainStore, PersistenceError
+from objectives import ObjectiveError, ObjectiveStore, WatchController
+from turn_arbiter import TurnArbiter
+from speech import CaptainSpeechError, render_captain_speech
 import pause_state
+from concept_retrieval import (
+    ConceptEngine,
+    ConceptRetrievalError,
+    compile_concept_prompt,
+    normalized_concept_title,
+    spoken_brief,
+)
 
 # Generated-image serving remains owned by root-console.service.  Reuse its
 # trust-boundary mapper here so the Live Captain stream emits the same
@@ -42,6 +53,7 @@ if str(ROOT_CONSOLE_DIR) not in sys.path:
     sys.path.append(str(ROOT_CONSOLE_DIR))
 from generated_images import map_generated_images  # noqa: E402
 from claude_daemon import ClaudeDaemon  # noqa: E402
+import docs_corpus  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = 4778
@@ -58,7 +70,7 @@ CAPTAIN_CHANNEL_PATH = ROOT_DIR / "context" / "captain-channel.md"
 CHANNEL_PLACEHOLDER = "(no message from Claude right now)"
 DB_PATH = REPO_ROOT / "data" / "live-captain" / "live-captain.db"
 DIAGNOSTIC_LOG_PATH = REPO_ROOT / "data" / "live-captain" / "instruction-sources.log"
-RECENT_MESSAGE_LIMIT = 30
+RECENT_MESSAGE_LIMIT = 12
 STATUS_LABEL = "Live Captain — commissioning baseline"
 
 
@@ -132,6 +144,10 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
     daemon: CodexDaemon
     store: LiveCaptainStore
     auth: AuthConfig
+    objectives: ObjectiveStore
+    watch: WatchController
+    concepts: ConceptEngine
+    arbiter: TurnArbiter = TurnArbiter()
     kernel_text: str
     kernel_digest: str
     bearing_text: str
@@ -153,7 +169,31 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        try:
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            # Mobile browsers may background or navigate after the SSE stream
+            # has already received the completed turn. The work is persisted;
+            # a vanished synchronous response reader is not a server fault.
+            pass
+        finally:
+            self._release_turn_admission()
+
+    def _release_turn_admission(self) -> None:
+        ticket = getattr(self, "_turn_ticket", None)
+        if ticket is None:
+            return
+        self._turn_ticket = None
+        self.arbiter.release(ticket)
+        if hasattr(self.daemon, "broadcast"):
+            self.daemon.broadcast({"type": "captain_turn_admission", "phase": "released",
+                                   "ticket": ticket, **self.arbiter.status(), "ts": time.time()})
+
+    def finish(self) -> None:
+        try:
+            super().finish()
+        finally:
+            self._release_turn_admission()
 
     def _handle_stream(self) -> None:
         listener = self.daemon.subscribe()
@@ -178,12 +218,13 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
             self.daemon.unsubscribe(listener)
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/api/stream":
+        route = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if route == "/api/stream":
             if not self._authenticated():
                 self.send_error(401)
                 return
             self._handle_stream()
-        elif self.path == "/api/status":
+        elif route == "/api/status":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
                 return
@@ -208,13 +249,138 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     "recent_message_count": len(messages),
                     "recent_message_window": RECENT_MESSAGE_LIMIT,
                     "omitted_older_messages": omitted,
+                    "objective": self.objectives.latest() if hasattr(self, "objectives") else None,
+                    "turn_arbiter": self.arbiter.status() if hasattr(self, "arbiter") else None,
                 }
             )
+        elif route == "/api/objective":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json({"objective": self.objectives.latest()})
+        elif route == "/api/concept/rooms":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json({"rooms": self.store.list_concept_rooms()})
+        elif route == "/api/concept/index":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                self._send_json(self.concepts.sync())
+            except ConceptRetrievalError as exc:
+                self._send_json({"error": str(exc)}, status=500)
+        elif route.startswith("/api/concepts/"):
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                self._send_json({"concept": self.store.get_concept(route.rsplit("/", 1)[-1])})
+            except PersistenceError as exc:
+                self._send_json({"error": str(exc)}, status=404)
+        elif route.startswith("/api/concept/rooms/"):
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            tail = route[len("/api/concept/rooms/"):].split("/")
+            room_id = tail[0]
+            try:
+                room = self.store.get_concept_room(room_id)
+                if len(tail) == 2 and tail[1] == "turns":
+                    self._send_json({"room": room, "turns": self.store.load_concept_turns(room_id),
+                                     "concepts": self.store.list_concepts(room_id)})
+                elif len(tail) == 2 and tail[1] == "concepts":
+                    self._send_json({"room": room, "concepts": self.store.list_concepts(room_id)})
+                else:
+                    self._send_json({"room": room})
+            except PersistenceError as exc:
+                self._send_json({"error": str(exc)}, status=404)
         else:
             self.send_error(404)
 
     def do_POST(self) -> None:  # noqa: N802
-        if self.path != "/api/turn":
+        route = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if route == "/api/objective":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                payload = json.loads(self.rfile.read(length) if length else b"{}")
+                action = payload.get("action")
+                if action == "propose":
+                    objective = self.objectives.propose(
+                        payload.get("objective", ""), payload.get("scope", ""),
+                        payload.get("success_criteria", []), int(payload.get("move_budget", 3)),
+                    )
+                else:
+                    objective = self.objectives.transition(payload.get("id", ""), action)
+                    if action in {"approve", "resume"}:
+                        self.watch.wake()
+                self.daemon.broadcast({"type": "captain_objective", "objective": objective, "ts": time.time()})
+                self._send_json({"objective": objective})
+            except (ObjectiveError, ValueError, TypeError, json.JSONDecodeError) as exc:
+                self._send_json({"error": str(exc)}, status=409)
+            return
+        if route == "/api/concept/rooms":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                payload = json.loads(self.rfile.read(length) if length else b"{}")
+                room = self.store.create_concept_room(payload.get("title", "New Concept Room"))
+                self._send_json({"room": room}, status=201)
+            except (json.JSONDecodeError, PersistenceError) as exc:
+                self._send_json({"error": str(exc)}, status=400)
+            return
+        if route.startswith("/api/concept/rooms/") and route.endswith("/turns"):
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            room_id = route[len("/api/concept/rooms/"):-len("/turns")].strip("/")
+            length = int(self.headers.get("Content-Length", "0"))
+            try:
+                payload = json.loads(self.rfile.read(length) if length else b"{}")
+                text = payload.get("text", "")
+                if not isinstance(text, str) or not text.strip():
+                    raise ValueError("message is empty")
+                room = self.store.get_concept_room(room_id)
+                sources = load_context_sources()
+                previous = self.store.load_concept_turns(room_id, 24)
+                self.daemon.broadcast({"type": "concept_room", "phase": "retrieving", "room_id": room_id, "ts": time.time()})
+                retrieval = self.concepts.retrieve(text)
+                admiral_turn = self.store.record_concept_turn(room_id, "admiral", text, retrieval=retrieval)
+                compiled = compile_concept_prompt(
+                    sources["kernel_text"], sources["bearing_text"], room, previous, text, retrieval
+                )
+                self.daemon.broadcast({"type": "concept_room", "phase": "synthesizing", "room_id": room_id,
+                                       "evidence_count": len(retrieval["evidence"]), "ts": time.time()})
+                result = self.daemon.send_and_wait(compiled, source=f"concept-room:{room_id}")
+                brief = spoken_brief(result["text"])
+                captain_turn = self.store.record_concept_turn(
+                    room_id, "captain", result["text"], retrieval=retrieval, brief=brief
+                )
+                concept = self.store.append_concept_revision(
+                    room_id, normalized_concept_title(text), result["text"], captain_turn["id"], retrieval["evidence"],
+                    "inferred" if retrieval["evidence"] else "unsupported-inference",
+                )
+                response = {"room": room, "admiral_turn": admiral_turn, "captain_turn": captain_turn,
+                            "concept": concept, "thread_id": result["thread_id"]}
+                self.daemon.broadcast({"type": "concept_room", "phase": "completed", "room_id": room_id,
+                                       "turn": captain_turn, "concept": concept, "ts": time.time()})
+                self._send_json(response)
+            except (json.JSONDecodeError, ValueError, PersistenceError) as exc:
+                self._send_json({"error": str(exc)}, status=400)
+            except (ConceptRetrievalError, ContextCompilerError) as exc:
+                self._send_json({"error": str(exc)}, status=500)
+            except CodexError as exc:
+                self.daemon.broadcast({"type": "concept_room", "phase": "failed", "room_id": room_id,
+                                       "error": str(exc), "ts": time.time()})
+                self._send_json({"error": str(exc)}, status=502)
+            return
+        if route != "/api/turn":
             self.send_error(404)
             return
         if not self._authenticated():
@@ -231,12 +397,24 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         if not isinstance(text, str) or not text.strip():
             self._send_json({"error": "message is empty"}, status=400)
             return
+        interaction_mode = payload.get("interaction_mode", "bridge")
+        if interaction_mode not in {"bridge", "command_draft"}:
+            self._send_json({"error": "unsupported interaction mode"}, status=400)
+            return
 
         # Refuse *new* turns while paused. Nothing is recorded, no context is
         # compiled, no model is called — continuity is left exactly as it was.
         if pause_state.is_paused():
             self._send_json(pause_state.refusal(), status=409)
             return
+
+        admission_started = time.monotonic()
+        ticket = self.arbiter.acquire()
+        admission_wait_ms = round((time.monotonic() - admission_started) * 1000, 3)
+        self._turn_ticket = ticket
+        if hasattr(self.daemon, "broadcast"):
+            self.daemon.broadcast({"type": "captain_turn_admission", "phase": "admitted",
+                                   "ticket": ticket, **self.arbiter.status(), "ts": time.time()})
 
         try:
             sources = load_context_sources()
@@ -261,6 +439,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                 text,
                 omitted,
                 sources["channel_text"],
+                interaction_mode,
             )
         except ContextCompilerError as exc:
             self._send_json({"error": str(exc)}, status=500)
@@ -346,6 +525,28 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
             )
             return
 
+        speech_artifact = None
+        speech_error = None
+        speech_started = time.monotonic()
+        renderer = getattr(type(self), "speech_renderer", None)
+        if renderer:
+            if hasattr(self.daemon, "broadcast"):
+                self.daemon.broadcast({"type": "captain_speech", "phase": "rendering",
+                                       "thread_id": result["thread_id"], "ts": time.time()})
+            try:
+                speech_artifact = renderer(result["text"])
+                if hasattr(self.daemon, "broadcast"):
+                    self.daemon.broadcast({"type": "captain_speech", "phase": "ready",
+                                           "thread_id": result["thread_id"], "artifact": speech_artifact,
+                                           "text": result["text"], "ts": time.time()})
+            except CaptainSpeechError as exc:
+                speech_error = str(exc)
+                if hasattr(self.daemon, "broadcast"):
+                    self.daemon.broadcast({"type": "captain_speech", "phase": "failed",
+                                           "thread_id": result["thread_id"], "text": result["text"],
+                                           "error": str(exc), "ts": time.time()})
+        speech_ms = round((time.monotonic() - speech_started) * 1000, 3) if renderer else 0
+
         log_diagnostic(
             {
                 "ts": time.time(),
@@ -362,24 +563,54 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                 "context_metrics": context_metrics,
                 "context_assembly_ms": context_assembly_ms,
                 "inference_ms": inference_ms,
+                "admission_ticket": ticket,
+                "admission_wait_ms": admission_wait_ms,
+                "speech_ms": speech_ms,
+                "speech_error": speech_error,
             }
         )
-        self._send_json({"text": result["text"], "thread_id": result["thread_id"]})
+        self._send_json({"text": result["text"], "thread_id": result["thread_id"],
+                         "speech_artifact": speech_artifact})
 
 
 def main() -> None:
     sources = load_context_sources()
     store = LiveCaptainStore(DB_PATH)
-    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
+    backend = os.environ.get("CAPTAIN_BACKEND", "codex")
     daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
+    objectives = ObjectiveStore(DB_PATH)
+    concepts = ConceptEngine(DB_PATH, REPO_ROOT, docs_corpus)
+    arbiter = TurnArbiter()
+
+    def execute_watch_move(objective: dict, move: int) -> str:
+        if pause_state.is_paused():
+            raise ObjectiveError("Live Captain is paused")
+        sources_now = load_context_sources()
+        messages, omitted = store.load_recent_messages(RECENT_MESSAGE_LIMIT)
+        compiled = compile_watch_context(
+            sources_now["kernel_text"], sources_now["bearing_text"], sources_now["ledger_text"],
+            messages, objective, move, omitted, sources_now["channel_text"],
+        )
+        daemon.broadcast({"type": "captain_watch_move", "phase": "started", "objective_id": objective["id"], "move": move, "ts": time.time()})
+        result = daemon.send_and_wait(compiled, source="captain-watch")
+        daemon.broadcast({"type": "captain_watch_move", "phase": "completed", "objective_id": objective["id"], "move": move, "text": result["text"], "ts": time.time()})
+        return result["text"]
+
+    watch = WatchController(objectives, execute_watch_move)
 
     LiveCaptainHandler.daemon = daemon
     LiveCaptainHandler.store = store
     LiveCaptainHandler.auth = AuthConfig.from_environment()
+    LiveCaptainHandler.objectives = objectives
+    LiveCaptainHandler.watch = watch
+    LiveCaptainHandler.concepts = concepts
+    LiveCaptainHandler.arbiter = arbiter
+    LiveCaptainHandler.speech_renderer = render_captain_speech
     for name, value in sources.items():
         setattr(LiveCaptainHandler, name, value)
 
     server = ThreadingHTTPServer((HOST, PORT), LiveCaptainHandler)
+    watch.start()
     print(
         f"Live Captain listening on http://{HOST}:{PORT} "
         f"(kernel={sources['kernel_digest'][:12]} "
@@ -391,6 +622,9 @@ def main() -> None:
     except KeyboardInterrupt:
         pass
     finally:
+        watch.close()
+        objectives.close()
+        concepts.close()
         daemon.close()
         store.close()
 

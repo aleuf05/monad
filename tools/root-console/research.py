@@ -38,9 +38,9 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 ARCHIVE_DIR = REPO_ROOT / "admiralty" / "archive" / "research" / "autonomous-inquiry"
 
-REAL_PACKET_IDS = ["CAP-ARI-001", "CAP-ARI-002", "CAP-ARI-003"]
+REAL_PACKET_IDS = ["CAP-ARI-001", "CAP-ARI-002", "CAP-ARI-003", "CAP-ARI-004"]
 DEMO_ARC_ID = "CAP-ARI-003-DEMO"
-CANONICAL_IDS = ["CAP-ARI-001", "CAP-ARI-002", "CAP-ARI-003"]
+CANONICAL_IDS = ["CAP-ARI-001", "CAP-ARI-002", "CAP-ARI-003", "CAP-ARI-004"]
 
 
 class ResearchError(ValueError):

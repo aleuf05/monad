@@ -1,13 +1,13 @@
 # Monad Rich Voice Engine
 
-This is the backend-only, cache-first Gemini TTS tier behind Character Voice Studio. Browser Speech remains the free rehearsal tier.
+This is the backend-only, cache-first Gemini TTS tier behind Character Voice Studio. Browser Speech remains the local fallback tier.
 
-## Cost boundary
+## Usage accounting
 
 - `GET /status`, `GET /budget`, and `POST /estimate` never call Gemini.
-- `POST /render` checks the immutable artifact cache before reserving budget.
-- Default daily limits are `$0.10` and `300` generated seconds.
-- A failed provider request is recorded as failed and releases its reservation.
+- `POST /render` checks the immutable artifact cache before generating.
+- Generated seconds and estimated USD remain observable; they do not gate voice.
+- A failed provider request is recorded as failed and releases its usage reservation.
 - The Studio never renders on slider or text changes. The operator must estimate, then explicitly generate.
 
 ## Configuration
@@ -19,15 +19,6 @@ GEMINI_API_KEY=your-key
 ```
 
 The file is operator-owned, must not enter Git, and needs no `sudo` to create. Without it, status and estimates work while new rich renders return a clear unconfigured response. Cached artifacts remain readable.
-
-Optional service overrides:
-
-```text
-MONAD_VOICE_DAILY_USD=0.10
-MONAD_VOICE_DAILY_SECONDS=300
-```
-
-The committed unit fixes those conservative defaults. Raise them only through an intentional service change.
 
 ## Tests
 
@@ -52,7 +43,7 @@ Stop the server immediately after the check. The commissioned service is loopbac
 
 ## First commissioned proof
 
-1. Confirm `/voice-api/status` says `configured: true` and shows zero or expected spend.
+1. Confirm `/voice-api/status` says `configured: true` and shows expected usage.
 2. In Character Voice Studio, rehearse free.
 3. Estimate one short Captain line.
 4. Generate exactly one rich take.

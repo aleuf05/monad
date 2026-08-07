@@ -13,7 +13,9 @@ server, matching the convention already used by tools/chat-captain.
 from __future__ import annotations
 
 import json
+import cgi
 import os
+import re
 import queue
 import sys
 import threading
@@ -28,9 +30,12 @@ from auth import COOKIE_NAME, AuthConfig, LoginLimiter
 from codex_daemon import CodexDaemon, CodexError
 from claude_daemon import ClaudeDaemon
 import docs_corpus
+import course_projection
 import handoff
+import intake_projection
 import research
 import ship_log
+import speech_acceptance
 from generated_images import (
     GENERATED_IMAGE_API_PREFIX,
     GENERATED_IMAGE_DIR,
@@ -50,6 +55,45 @@ REPO_ROOT = ROOT_DIR.parent.parent
 SESSION_SECONDS = 12 * 60 * 60
 COMMISSIONING_TASK_ID = "CODEX-LIVE-CAPTAIN-1"
 AUTHORITY_MODE = "MAXIMUM-CAPABILITY COMMISSIONING"
+BRIDGE_SIGNAL_PHASES = {
+    "armed", "press", "recognition-start", "release", "commit", "cancel",
+    "recognition-error", "disarmed",
+}
+CONTEXT_IMAGE_MAX_BYTES = 12 * 1024 * 1024
+CONTEXT_IMAGE_TYPES = {
+    "image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif",
+}
+
+
+def save_context_image(handler: BaseHTTPRequestHandler) -> dict:
+    """Save one authenticated operator image into the private incoming pool."""
+    length = int(handler.headers.get("Content-Length", "0"))
+    if length <= 0 or length > CONTEXT_IMAGE_MAX_BYTES + 1024 * 1024:
+        raise ValueError("image upload is empty or exceeds the 12 MB limit")
+    content_type = handler.headers.get("Content-Type", "")
+    form = cgi.FieldStorage(fp=handler.rfile, headers=handler.headers,
+                             environ={"REQUEST_METHOD": "POST", "CONTENT_TYPE": content_type,
+                                      "CONTENT_LENGTH": str(length)})
+    item = form["file"] if "file" in form else None
+    # cgi.FieldStorage deliberately rejects truth-value testing; use an
+    # explicit None check or multipart uploads terminate the handler and
+    # surface to Caddy as a misleading 502.
+    if item is None or not getattr(item, "filename", None):
+        raise ValueError("choose an image file")
+    mime = str(item.type or "").lower()
+    suffix = CONTEXT_IMAGE_TYPES.get(mime)
+    if not suffix:
+        raise ValueError("supported images: PNG, JPEG, WebP, or GIF")
+    data = item.file.read(CONTEXT_IMAGE_MAX_BYTES + 1)
+    if len(data) > CONTEXT_IMAGE_MAX_BYTES:
+        raise ValueError("image upload exceeds the 12 MB limit")
+    original = Path(item.filename).name
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", Path(original).stem).strip(".-")[:80] or "context-image"
+    target_dir = REPO_ROOT / "docs" / "incoming" / "context-images"
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target = target_dir / f"{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{stem}{suffix}"
+    target.write_bytes(data)
+    return {"ok": True, "path": str(target.relative_to(REPO_ROOT)), "bytes": len(data), "content_type": mime}
 
 def commissioning_status(daemon: CodexDaemon) -> dict:
     """Truthful, inspectable state for the Live Captain commission."""
@@ -242,6 +286,26 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
                 self._send_json({"error": "authentication required"}, status=401)
                 return
             self._send_json({"entries": ship_log.collect(REPO_ROOT)})
+        elif path == "/api/speech-acceptance":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json(speech_acceptance.read())
+        elif path == "/api/course":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json(course_projection.build(
+                REPO_ROOT,
+                handoff.list_handoffs(),
+                ship_log.collect(REPO_ROOT),
+                speech_acceptance.read(),
+            ))
+        elif path == "/api/intake":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            self._send_json(intake_projection.build())
         elif path == "/api/docs-corpus":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
@@ -290,6 +354,15 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
             self.send_error(404)
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/api/context-image":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                self._send_json(save_context_image(self))
+            except (ValueError, OSError) as exc:
+                self._send_json({"error": str(exc)}, status=400)
+            return
         length = int(self.headers.get("Content-Length", "0"))
         raw = self.rfile.read(length) if length else b"{}"
         try:
@@ -352,6 +425,36 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
             self._send_json(result)
             return
 
+        if self.path == "/api/speech-acceptance":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                result = speech_acceptance.record(payload.get("outcome", ""), payload.get("note", ""))
+            except ValueError as exc:
+                self._send_json({"error": str(exc)}, status=400)
+                return
+            self._send_json(result)
+            return
+
+        if self.path == "/api/bridge-signal":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            phase = str(payload.get("phase", ""))
+            if phase not in BRIDGE_SIGNAL_PHASES:
+                self._send_json({"error": "invalid bridge signal phase"}, status=400)
+                return
+            signal = {
+                "phase": phase,
+                "elapsed_ms": max(0, min(int(payload.get("elapsed_ms", 0)), 600000)),
+                "pointer": str(payload.get("pointer", ""))[:16],
+                "live_mode": bool(payload.get("live_mode", False)),
+            }
+            print(f"BRIDGE_SIGNAL {json.dumps(signal, separators=(',', ':'))}", flush=True)
+            self._send_json({"ok": True})
+            return
+
         if self.path != "/api/turn":
             self.send_error(404)
             return
@@ -371,7 +474,7 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
+    backend = os.environ.get("CAPTAIN_BACKEND", "codex")
     daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
     RootConsoleHandler.daemon = daemon
     RootConsoleHandler.auth = AuthConfig.from_environment()

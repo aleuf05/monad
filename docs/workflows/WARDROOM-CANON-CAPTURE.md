@@ -72,3 +72,16 @@ Otherwise preserve it as `HOLD` or meeting material.
 
 > Minutes preserve what happened. Canon preserves what governs. The register
 > preserves how one became the other.
+
+## Live-audio acceptance rule
+
+Record these as separate observations:
+
+1. **Audio occurrence:** the Admiral directly heard a sound produced by the
+   system.
+2. **Intelligibility:** the Admiral could understand the spoken content.
+3. **Conversation usefulness:** the exchange supported reliable back-and-forth
+   interaction.
+
+Passing level 1 never implies levels 2 or 3. Each level requires its own human
+   observation.

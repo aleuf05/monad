@@ -13,6 +13,8 @@ import sqlite3
 import threading
 import time
 import uuid
+import json
+import re
 from pathlib import Path
 
 SCHEMA = """
@@ -32,6 +34,59 @@ CREATE TABLE IF NOT EXISTS restarts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id TEXT NOT NULL,
     ts REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS concept_rooms (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    source_scope_json TEXT NOT NULL DEFAULT '{"mode":"whole-corpus"}',
+    archived INTEGER NOT NULL DEFAULT 0,
+    created_at REAL NOT NULL,
+    updated_at REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS concept_turns (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES concept_rooms(id),
+    role TEXT NOT NULL CHECK (role IN ('admiral', 'captain')),
+    text TEXT NOT NULL,
+    state TEXT NOT NULL,
+    retrieval_json TEXT NOT NULL DEFAULT '{}',
+    spoken_brief TEXT NOT NULL DEFAULT '',
+    created_at REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_concept_turns_room ON concept_turns(room_id, created_at);
+
+CREATE TABLE IF NOT EXISTS concepts (
+    id TEXT PRIMARY KEY,
+    room_id TEXT NOT NULL REFERENCES concept_rooms(id),
+    slug TEXT NOT NULL,
+    title TEXT NOT NULL,
+    current_revision INTEGER NOT NULL DEFAULT 0,
+    created_at REAL NOT NULL,
+    updated_at REAL NOT NULL,
+    UNIQUE(room_id, slug)
+);
+
+CREATE TABLE IF NOT EXISTS concept_revisions (
+    id TEXT PRIMARY KEY,
+    concept_id TEXT NOT NULL REFERENCES concepts(id),
+    revision INTEGER NOT NULL,
+    synopsis TEXT NOT NULL,
+    epistemic_state TEXT NOT NULL,
+    source_turn_id TEXT NOT NULL REFERENCES concept_turns(id),
+    created_at REAL NOT NULL,
+    UNIQUE(concept_id, revision)
+);
+
+CREATE TABLE IF NOT EXISTS concept_evidence (
+    revision_id TEXT NOT NULL REFERENCES concept_revisions(id),
+    source_id TEXT NOT NULL,
+    path TEXT NOT NULL,
+    heading TEXT NOT NULL,
+    content_hash TEXT NOT NULL,
+    excerpt TEXT NOT NULL,
+    PRIMARY KEY(revision_id, source_id)
 );
 """
 
@@ -207,6 +262,146 @@ class LiveCaptainStore:
     def restart_count(self) -> int:
         with self._lock:
             return self._conn.execute("SELECT COUNT(*) FROM restarts").fetchone()[0]
+
+    @staticmethod
+    def _row_dict(row, columns: tuple[str, ...]) -> dict:
+        return dict(zip(columns, row))
+
+    def create_concept_room(self, title: str = "New Concept Room") -> dict:
+        clean = (title or "New Concept Room").strip()[:140]
+        room_id = "room-" + uuid.uuid4().hex[:16]
+        timestamp = time.time()
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO concept_rooms(id,title,created_at,updated_at) VALUES(?,?,?,?)",
+                (room_id, clean, timestamp, timestamp),
+            )
+            self._conn.commit()
+        return self.get_concept_room(room_id)
+
+    def list_concept_rooms(self, include_archived: bool = False) -> list[dict]:
+        where = "" if include_archived else "WHERE archived=0"
+        with self._lock:
+            rows = self._conn.execute(
+                f"SELECT id,title,source_scope_json,archived,created_at,updated_at FROM concept_rooms {where} ORDER BY updated_at DESC"
+            ).fetchall()
+        return [
+            {"id": row[0], "title": row[1], "source_scope": json.loads(row[2]),
+             "archived": bool(row[3]), "created_at": row[4], "updated_at": row[5]}
+            for row in rows
+        ]
+
+    def get_concept_room(self, room_id: str) -> dict:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT id,title,source_scope_json,archived,created_at,updated_at FROM concept_rooms WHERE id=?",
+                (room_id,),
+            ).fetchone()
+        if row is None:
+            raise PersistenceError("concept room does not exist")
+        return {"id": row[0], "title": row[1], "source_scope": json.loads(row[2]),
+                "archived": bool(row[3]), "created_at": row[4], "updated_at": row[5]}
+
+    def record_concept_turn(self, room_id: str, role: str, text: str, *, state: str = "complete", retrieval: dict | None = None, brief: str = "") -> dict:
+        if role not in {"admiral", "captain"} or not text.strip():
+            raise PersistenceError("invalid concept turn")
+        self.get_concept_room(room_id)
+        turn_id = "turn-" + uuid.uuid4().hex[:16]
+        timestamp = time.time()
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO concept_turns(id,room_id,role,text,state,retrieval_json,spoken_brief,created_at) VALUES(?,?,?,?,?,?,?,?)",
+                (turn_id, room_id, role, text.strip(), state, json.dumps(retrieval or {}), brief, timestamp),
+            )
+            self._conn.execute("UPDATE concept_rooms SET updated_at=? WHERE id=?", (timestamp, room_id))
+            self._conn.commit()
+        return {"id": turn_id, "room_id": room_id, "role": role, "text": text.strip(),
+                "state": state, "retrieval": retrieval or {}, "spoken_brief": brief, "created_at": timestamp}
+
+    def load_concept_turns(self, room_id: str, limit: int = 100) -> list[dict]:
+        self.get_concept_room(room_id)
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id,room_id,role,text,state,retrieval_json,spoken_brief,created_at FROM concept_turns WHERE room_id=? ORDER BY created_at DESC LIMIT ?",
+                (room_id, limit),
+            ).fetchall()
+        rows.reverse()
+        return [
+            {"id": row[0], "room_id": row[1], "role": row[2], "text": row[3], "state": row[4],
+             "retrieval": json.loads(row[5]), "spoken_brief": row[6], "created_at": row[7]}
+            for row in rows
+        ]
+
+    @staticmethod
+    def _concept_slug(title: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:120] or "concept"
+
+    def append_concept_revision(self, room_id: str, title: str, synopsis: str, source_turn_id: str, evidence: list[dict], epistemic_state: str = "inferred") -> dict:
+        slug = self._concept_slug(title)
+        timestamp = time.time()
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT id,current_revision FROM concepts WHERE room_id=? AND slug=?", (room_id, slug)
+            ).fetchone()
+            if row:
+                concept_id, current = row
+            else:
+                concept_id, current = "concept-" + uuid.uuid4().hex[:16], 0
+                self._conn.execute(
+                    "INSERT INTO concepts(id,room_id,slug,title,current_revision,created_at,updated_at) VALUES(?,?,?,?,0,?,?)",
+                    (concept_id, room_id, slug, title[:140], timestamp, timestamp),
+                )
+            revision = current + 1
+            revision_id = "revision-" + uuid.uuid4().hex[:16]
+            self._conn.execute(
+                "INSERT INTO concept_revisions(id,concept_id,revision,synopsis,epistemic_state,source_turn_id,created_at) VALUES(?,?,?,?,?,?,?)",
+                (revision_id, concept_id, revision, synopsis[:12000], epistemic_state, source_turn_id, timestamp),
+            )
+            for item in evidence:
+                self._conn.execute(
+                    "INSERT INTO concept_evidence(revision_id,source_id,path,heading,content_hash,excerpt) VALUES(?,?,?,?,?,?)",
+                    (revision_id, item.get("id", "source"), item.get("path", ""), item.get("heading", ""),
+                     item.get("content_hash", ""), item.get("excerpt", "")[:1800]),
+                )
+            self._conn.execute(
+                "UPDATE concepts SET current_revision=?,title=?,updated_at=? WHERE id=?",
+                (revision, title[:140], timestamp, concept_id),
+            )
+            self._conn.commit()
+        return self.get_concept(concept_id)
+
+    def list_concepts(self, room_id: str) -> list[dict]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id,title,current_revision,created_at,updated_at FROM concepts WHERE room_id=? ORDER BY updated_at DESC",
+                (room_id,),
+            ).fetchall()
+        return [{"id": row[0], "title": row[1], "current_revision": row[2],
+                 "created_at": row[3], "updated_at": row[4]} for row in rows]
+
+    def get_concept(self, concept_id: str) -> dict:
+        with self._lock:
+            concept = self._conn.execute(
+                "SELECT id,room_id,title,current_revision,created_at,updated_at FROM concepts WHERE id=?", (concept_id,)
+            ).fetchone()
+            if concept is None:
+                raise PersistenceError("concept does not exist")
+            revisions = self._conn.execute(
+                "SELECT id,revision,synopsis,epistemic_state,source_turn_id,created_at FROM concept_revisions WHERE concept_id=? ORDER BY revision",
+                (concept_id,),
+            ).fetchall()
+            revision_items = []
+            for revision in revisions:
+                evidence = self._conn.execute(
+                    "SELECT source_id,path,heading,content_hash,excerpt FROM concept_evidence WHERE revision_id=? ORDER BY source_id",
+                    (revision[0],),
+                ).fetchall()
+                revision_items.append({"id": revision[0], "revision": revision[1], "synopsis": revision[2],
+                    "epistemic_state": revision[3], "source_turn_id": revision[4], "created_at": revision[5],
+                    "evidence": [{"id": e[0], "path": e[1], "heading": e[2], "content_hash": e[3], "excerpt": e[4]} for e in evidence]})
+        return {"id": concept[0], "room_id": concept[1], "title": concept[2],
+                "current_revision": concept[3], "created_at": concept[4], "updated_at": concept[5],
+                "revisions": revision_items}
 
     def close(self) -> None:
         with self._lock:

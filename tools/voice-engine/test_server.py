@@ -15,6 +15,11 @@ class ServerRequestTests(unittest.TestCase):
         self.assertEqual(request.character.voice_name, "Puck")
         self.assertEqual(request.transcript, "Contact ahead.")
 
+    def test_live_captain_uses_conversational_voice_revision(self):
+        request = server.build_request({"character_id": "captain.monad", "transcript": "I am here."})
+        self.assertEqual(request.character.revision, "2")
+        self.assertIn("no announcer affect", request.character.vocal_identity)
+
     def test_unknown_character_and_long_transcript_rejected(self):
         with self.assertRaisesRegex(ValueError, "unknown"): server.build_request({"character_id": "somebody.real", "transcript": "hello"})
         with self.assertRaisesRegex(ValueError, "1200"): server.build_request({"character_id": "captain.monad", "transcript": "x" * 1201})
