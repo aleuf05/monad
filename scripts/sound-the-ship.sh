@@ -77,32 +77,41 @@ for port in $(ss -ltn 2>/dev/null | grep -oE ':(4[0-9]{3})' | tr -d ':' | sort -
 done
 note "reachability of individual endpoints is not inferable from a prefix probe"
 
-echo "=== 6. Live Captain posture loads for both CLI embodiments ==="
-# Added 2026-08-06. Claude Code reads CLAUDE.md; Codex reads AGENTS.md. From
-# commit 5cc8de5 ("the no-CLAUDE.md experiment") until this check existed the
-# repo had AGENTS.md but no CLAUDE.md, so Codex ran with full Live Captain
-# posture and Claude ran with none — silently, because both agents work fine
-# without it, just differently. Nothing else detects that.
+echo "=== 6. Live Captain posture loads for every CLI embodiment ==="
+# Added 2026-08-06. Claude Code reads CLAUDE.md; Codex reads AGENTS.md; Gemini
+# CLI reads GEMINI.md (third embodiment added 2026-08-07). From commit 5cc8de5
+# ("the no-CLAUDE.md experiment") until this check existed the repo had
+# AGENTS.md but no CLAUDE.md, so Codex ran with full Live Captain posture and
+# Claude ran with none — silently, because both agents work fine without it,
+# just differently. Nothing else detects that. Each new embodiment adds one
+# row here; a loader nobody checks is the same silent failure again.
 posture="EDIT-THIS-ONE-FILE.md"
+embodiments="CLAUDE.md:Claude AGENTS.md:Codex GEMINI.md:Gemini"
 if [ ! -f "$posture" ]; then
-  fault "$posture missing — neither embodiment has a posture source"
+  fault "$posture missing — no embodiment has a posture source"
 else
-  [ -f CLAUDE.md ] || fault "CLAUDE.md missing — Claude loads no Live Captain posture"
-  [ -f AGENTS.md ] || fault "AGENTS.md missing — Codex loads no Live Captain posture"
-  grep -q "@$posture" CLAUDE.md 2>/dev/null \
-    || fault "CLAUDE.md does not import $posture"
-  grep -q "$posture" AGENTS.md 2>/dev/null \
-    || fault "AGENTS.md does not point at $posture"
-  # Entry points must stay thin. A loader that grows a posture body is a
-  # second copy, and a second copy is how the two embodiments drift apart.
-  for f in CLAUDE.md AGENTS.md; do
-    [ -f "$f" ] || continue
-    lines=$(wc -l < "$f")
-    [ "$lines" -le 45 ] || fault "$f is $lines lines — loaders stay thin, posture belongs in $posture"
+  loaded=""
+  for pair in $embodiments; do
+    loader="${pair%%:*}"; who="${pair##*:}"
+    if [ ! -f "$loader" ]; then
+      fault "$loader missing — $who loads no Live Captain posture"
+      continue
+    fi
+    grep -q "$posture" "$loader" 2>/dev/null \
+      || fault "$loader does not point at $posture — $who would run postureless"
+    # Entry points must stay thin. A loader that grows a posture body is a
+    # second copy, and a second copy is how the embodiments drift apart.
+    lines=$(wc -l < "$loader")
+    [ "$lines" -le 45 ] || fault "$loader is $lines lines — loaders stay thin, posture belongs in $posture"
+    loaded="$loaded $loader"
   done
-  if [ -f CLAUDE.md ] && [ -f AGENTS.md ]; then
-    note "posture: $(wc -l < "$posture") lines, loaded by CLAUDE.md and AGENTS.md"
+  # Claude Code's import is mechanical, not just a mention: without the @ the
+  # file is never inlined and Claude runs on the loader's three lines alone.
+  if [ -f CLAUDE.md ]; then
+    grep -q "@$posture" CLAUDE.md 2>/dev/null \
+      || fault "CLAUDE.md mentions $posture but does not @import it"
   fi
+  [ -n "$loaded" ] && note "posture: $(wc -l < "$posture") lines, loaded by $(echo "$loaded" | tr ' ' '\n' | grep . | paste -sd, - | sed 's/,/, /g')"
 fi
 
 echo

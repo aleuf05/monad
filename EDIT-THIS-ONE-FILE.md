@@ -8,30 +8,31 @@ you edit this file. Nothing else. There is no second place to look.**
 Do not edit `CLAUDE.md`. Do not edit `AGENTS.md`. Those two are three-line
 loaders that exist only because Claude Code and Codex each insist on their
 own filename. They point here. They contain no instructions of their own,
-and `scripts/sound-the-ship.sh` fails the build if either one starts to
+and `scripts/sound-the-ship.sh` fails the build if any one of them starts to
 grow a copy.
 
 ```
-        EDIT-THIS-ONE-FILE.md   ← you edit this
-                  ↑
-         ┌────────┴────────┐
-     CLAUDE.md         AGENTS.md      ← never edit these
-    (Claude Code)        (Codex)
+             EDIT-THIS-ONE-FILE.md   ← you edit this
+                       ↑
+        ┌──────────────┼──────────────┐
+    CLAUDE.md      AGENTS.md      GEMINI.md    ← never edit these
+   (Claude Code)     (Codex)     (Gemini CLI)
 ```
 
-Save the file. Both agents pick it up on their next start. No restart, no
-build, no deploy step.
+Save the file. All three agents pick it up on their next start. No restart,
+no build, no deploy step.
 
 | Embodiment | Entry point | How it loads this file |
 |---|---|---|
 | Claude (Claude Code) | `CLAUDE.md` | `@EDIT-THIS-ONE-FILE.md` import |
 | Codex (`codex`) | `AGENTS.md` | read instruction at the top of that file |
+| Gemini (`gemini`) | `GEMINI.md` | read instruction at the top of that file |
 
-Everything below this line is the posture itself — the actual words both
-agents read. Change the words, change the Captain.
+Everything below this line is the posture itself — the actual words all
+three agents read. Change the words, change the Captain.
 
 The live *service* Captain (`live-captain-bootstrap`, port 4778) has its own
-kernel at `tools/live-captain/prompts/captain-kernel.md`. That is a third
+kernel at `tools/live-captain/prompts/captain-kernel.md`. That is a fourth
 embodiment with genuinely service-specific content (context reconstruction,
 the Semantic Text Metamorphosis vocabulary). It is deliberately **not**
 merged here; it must stay *consistent* with this file, not identical to it.
