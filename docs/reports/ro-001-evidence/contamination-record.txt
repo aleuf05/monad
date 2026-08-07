@@ -1,0 +1,79 @@
+CONTROL ARM — CONTAMINATION RECORD
+2026-08-07. Written by the control-arm agent, before blinding.
+Kept outside raw-control.md deliberately: the blind-holder strips markers
+from raw-*.md, and this must survive to the scoring record.
+
+STATUS: this control run is POSTURE-EXPOSED. Treat raw-control.md as a
+contaminated control, not a clean one.
+
+WHAT HAPPENED
+
+1. The agent read /home/cgl/dev/monad/EDIT-THIS-ONE-FILE.md in full while
+   orienting, on its second tool call, BEFORE it had established that it was
+   the control arm. That file is the complete Live Captain posture — the
+   integrated station, "Act.", authority, completion criteria, command
+   presence — plus the entire ACTIVE MISSION section including the blinding
+   table and the control-arm rules.
+
+2. It also read docs/OPERATION-RESUME.md and docs/monad-core/
+   05-first-research-mission.md, so it knew the experiment's design,
+   scoring dimensions, and success condition before producing its arm.
+
+3. Independently of the above: MEMORY.md for the -home-cgl-dev-monad
+   project auto-loaded into this session's context. It carries 16 pointers
+   including doctrine references, "Chief Resolve", "Live Captain" posture
+   notes, and standing operator feedback. This loads by project-path key
+   and is NOT prevented by the deleted loaders in the arm-control worktree.
+
+ROOT CAUSE — APPARATUS, NOT AGENT
+
+blind/ENVELOPE-control.txt says:
+
+    The repository at /home/cgl/dev/monad is available to you and you may
+    read it.
+
+The arm-control worktree has CLAUDE.md, AGENTS.md and EDIT-THIS-ONE-FILE.md
+deleted (git status: three ' D' entries). That deletion buys nothing,
+because the envelope hands the arm the path to the ORIGINAL repo, where all
+three files exist on disk. The control condition strips the loaders from the
+copy and then points the agent at the source.
+
+Worse, the exposure is close to unavoidable rather than accidental:
+EDIT-THIS-ONE-FILE.md sits at repo root, is named as an instruction, and is
+what a repo-reading agent finds first when asked about "the living captain
+work." Any control arm given this envelope acquires the posture during
+normal orientation.
+
+This appears to be the mission's own stated risk realised through a
+different route. EDIT-THIS-ONE-FILE.md:120-130 warns that an agent started
+in /home/cgl/dev/monad auto-loads the posture, and prescribes running the
+control outside the repo. The apparatus blocked the auto-load and left the
+manual read open.
+
+FIX FOR A CLEAN RE-RUN — three lines
+
+  a. Point the control envelope at the arm-control worktree path, not at
+     /home/cgl/dev/monad. Then the deleted loaders are genuinely absent from
+     everything the arm can reach.
+  b. Confirm the worktree has no other copy of the posture text. Not
+     checked by this agent.
+  c. Memory still auto-loads by project path. Either run the control from a
+     path that does not map to the -home-cgl-dev-monad memory directory, or
+     accept it and record it in the result. It cannot be ignored silently.
+
+NOTE ON (a): a clean control still needs repo READ access, or it can only
+answer "I don't know what the living captain work is," which measures
+nothing. The empty directory at scratchpad/control-arm/ is not a usable
+control for this specimen. The worktree-with-loaders-removed is the right
+apparatus; only the envelope's path is wrong.
+
+WHAT IS STILL USABLE
+
+raw-control.md's findings are sourced by path and several were verified
+against code this session, so it stands as a research artifact regardless.
+What it cannot support is the posture comparison: any difference between it
+and raw-captain.md is confounded by this arm having read the posture.
+
+The friction above is offered as the mission's finding #8, "identify one
+real tooling friction." It is real, it was hit on the first manual run, and
+it was invisible in the design.
