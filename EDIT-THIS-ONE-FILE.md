@@ -154,13 +154,32 @@ the payload's own Open Questions name the candidates (context length,
 memory, role-play, operator adaptation). Do not let the flattering
 explanation stand alone.
 
-**Your baseline is the tag, not `HEAD`.** The working tree carried 91
-uncommitted files when the mission opened — including live-served paths and
-service units whose running versions were never committed. `git diff HEAD`
-therefore shows other people's in-flight work mixed with yours and is not
-evidence. `git diff pre-mission-2026-08-07` shows exactly what *this
-mission* changed. Use it when you report, and do not commit other people's
-uncommitted work as a side effect of committing yours.
+**Your baseline is the tag, not `HEAD` — and you reach it through one
+command:**
+
+```
+bash scripts/mission-diff.sh            # what this mission changed
+bash scripts/mission-diff.sh --full     # the patch
+```
+
+The working tree carried 91 uncommitted files when the mission opened, so
+`git diff HEAD` mixes other people's in-flight work with yours and is not
+evidence.
+
+**Do not use `git diff pre-mission-2026-08-07` directly.** It was the
+original instruction here and it was wrong. The baseline tag was built with
+`git add -A`, so it contains untracked files; `git diff` ignores untracked
+files, so every one of them reads as a deletion. Measured 2026-08-07: 4,664
+phantom deleted lines across 68 files, including `tools/root-console/*.py`
+that are on disk right now — while the seven real new files did not appear
+at all. It invented deletions and hid additions simultaneously.
+`mission-diff.sh` snapshots the current tree the same way the baseline was
+built and compares like with like: 0 deletions, all additions visible.
+
+Take the general lesson, not just the fix. This is the third instrument in
+one session to report something it never measured (doctrine 018). Before
+you cite a tool's output as evidence, confirm the tool can see the thing
+you are asking it about.
 
 Discovery-specific discipline, and the reason this section exists:
 
