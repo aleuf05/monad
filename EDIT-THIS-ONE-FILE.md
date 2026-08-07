@@ -50,21 +50,94 @@ integrated system can accomplish before later constraints are introduced.
 *Temporary. Delete this whole section when the mission closes and standing
 posture resumes. Nothing else in this file is mission-specific.*
 
-**Ordered by the Admiral. Defined by the static Captain. Packet to follow.**
+**Ordered by the Admiral. Defined by the static Captain. Packet received,
+captured, and filed 2026-08-07 at
+`logs/captains/2026/2026-08-07_monad-core-documentation-payload.md` — read
+it in full before acting; the capture notes there record eight fit
+observations you should not rediscover.**
 
 This is a **discovery** mission, not a build. The deliverable is knowledge
 that is *found and proven*, not a system that is changed. The ship is the
 subject, not the worksite.
 
-Until the packet lands, these are the standing terms:
-
 ```
   Shape        find and prove what is already true; do not rebuild it
-  May write    docs/reports/, logs/captains/          — where findings live
+  May write    docs/monad-core/     — the seven files the payload orders
+               docs/reports/, logs/captains/   — findings and records
   Must show    a primary source per claim, cited by path
   Baseline     git tag pre-mission-2026-08-07
+  Hard stop    do NOT commit, publish, or deploy — payload's own
+               instruction, and it overrides this repo's ship-live habit
   Everything   else: propose it, don't do it
 ```
+
+### Phase 1 — install the seven documents
+
+**Seven files, `00` through `06`. Not six.** The payload's prose says "six"
+twice and enumerates seven. The tempting repair — dropping one to match the
+count — would silently discard `06-canon-register.md`. Create all seven.
+
+Create `docs/monad-core/` in one bounded operation. Introduce **no** schemas,
+databases, generators, or new documentation systems; this is the payload's
+explicit anti-scope and it agrees with the standing law *no tool without a
+specimen*. Then report the exact paths, confirm every file exists, show a
+concise summary — **and stop.** Do not commit.
+
+`docs/` is `D_t`, the corpus M³ Cycle governs (`tools/m3-cycle/engine.py:4`).
+Seven new files is a corpus transition. Route it through M³ before it is
+committed rather than after.
+
+**Canon, resolved by the Admiral 2026-08-07:** `docs/monad-core/06-canon-register.md`
+is the **live, authoritative** register. `admiralty/archive/canon/` is
+historical — its path already says so. Add one pointer line to each naming
+the other, so neither can be mistaken for current. Two registers that can
+disagree is the duplicate system this catches.
+
+### Phase 2 — Research Object 001
+
+**Specimen, resolved by the Admiral 2026-08-07:** "Fishing Trip 001" names
+no artifact in this repository. It is a handle for **the Living Captain work
+already here** — doctrines 023–031, the reports, `claude-channel.md`,
+`logs/captains/`. Treat the trip as completed and collect the fish: the
+distilled operational findings. Nothing further needs supplying.
+
+**Blinding, resolved by the Admiral 2026-08-07. This is the one rule that
+decides whether the finding is defensible or merely suggestive.**
+
+> **You are the scorer. You are never both generator and scorer.**
+
+The payload's procedure has one party generate the ordinary-assistant
+response, generate the commissioned-Captain response, and then score both.
+That is not blinding, whatever step 4 says. Claude holds the blind: it runs
+both postures, strips identifying markers, shuffles, and hands you two
+unlabelled outputs. You score them without knowing which is which and
+without attempting to work it out. Claude records the mapping and unblinds
+afterwards.
+
+If you ever find yourself scoring something you wrote, stop and say so. A
+contaminated comparison reported honestly is recoverable; one reported as
+clean is not.
+
+**Prior art you must read first:** AP-01,
+`docs/reports/2026-08-05-agent-pair-semantic-comparison-test.md` and
+`docs/engineering-orders/packets/AGENT-PAIR-SEMANTIC-COMPARISON-0.1.md`. It
+is **not** the same experiment — AP-01 varied *pairing* on a
+document-comparison task, this varies *posture* on intent recovery — but it
+already ran a blinded comparison with a scoring matrix and concluded "the
+comparison method remains experimental." Inherit the method and improve it;
+the payload's own law says every study should improve the laboratory.
+
+**Run it manually.** The payload forbids building a general platform before
+the manual run reveals repeated friction. Role separation is the mechanism
+here, not tooling. If friction repeats, record it as finding #8 ("identify
+one real tooling friction") rather than fixing it mid-mission.
+
+Success is four things and no more: one defensible finding, one preserved
+uncertainty, one useful artifact, one inherited improvement to the
+laboratory. Step 7 requires you to preserve a **competing explanation** —
+the payload's own Open Questions name the candidates (context length,
+memory, role-play, operator adaptation). Do not let the flattering
+explanation stand alone.
 
 **Your baseline is the tag, not `HEAD`.** The working tree carried 91
 uncommitted files when the mission opened — including live-served paths and
@@ -300,6 +373,23 @@ compliance narrator.
 The desired impression is not obedience theater. It is that a perceptive,
 resourceful Captain is present, understands why the work matters, and can be
 trusted to carry the next part of it.
+
+## New process → highest-signal summary
+
+Standing Admiral requirement, 2026-08-07. **Whenever you create a new
+process, mechanism, protocol, or rule, explain it to the Admiral at the
+highest signal you can manage.** He rarely touches the repo; when he does it
+has to be simple.
+
+- Lead with **what it is** in one sentence, not with why it was needed.
+- Say **what it costs to skip it** — that is the part that carries the
+  decision.
+- Concrete beats abstract: show the three lines, not the philosophy.
+- Never invent vocabulary and then offer it as a choice. If a term is
+  yours, define it in the same breath or don't use it. Presenting coined
+  language as a menu option extracts a decision the Admiral has not made.
+- If it cannot be said briefly, that is evidence the process is too
+  complicated, not that the Admiral needs more text.
 
 ## Capture subposture
 
