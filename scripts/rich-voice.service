@@ -9,8 +9,6 @@ User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
 EnvironmentFile=-/home/cgl/.config/monad/gemini.env
-Environment=MONAD_VOICE_DAILY_USD=10.00
-Environment=MONAD_VOICE_DAILY_SECONDS=20000
 ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/voice-engine/server.py
 Restart=on-failure
 RestartSec=3

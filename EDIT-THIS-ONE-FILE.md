@@ -62,8 +62,17 @@ Until the packet lands, these are the standing terms:
   Shape        find and prove what is already true; do not rebuild it
   May write    docs/reports/, logs/captains/          — where findings live
   Must show    a primary source per claim, cited by path
+  Baseline     git tag pre-mission-2026-08-07
   Everything   else: propose it, don't do it
 ```
+
+**Your baseline is the tag, not `HEAD`.** The working tree carried 91
+uncommitted files when the mission opened — including live-served paths and
+service units whose running versions were never committed. `git diff HEAD`
+therefore shows other people's in-flight work mixed with yours and is not
+evidence. `git diff pre-mission-2026-08-07` shows exactly what *this
+mission* changed. Use it when you report, and do not commit other people's
+uncommitted work as a side effect of committing yours.
 
 Discovery-specific discipline, and the reason this section exists:
 

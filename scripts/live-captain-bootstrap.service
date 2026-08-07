@@ -1,7 +1,8 @@
 [Unit]
 Description=Monad Live Captain minimum-context bootstrap (LIVE-CAPTAIN-MINIMUM-CONTEXT-BOOTSTRAP-0.1; loopback-only, reached via Caddy's /live-captain-bootstrap-api/* proxy on cameronlampley.com/root)
-After=network-online.target
-Wants=network-online.target
+After=network-online.target public-root-auth.service
+Wants=network-online.target public-root-auth.service
+PartOf=live-captain-stack.target
 
 [Service]
 Type=simple

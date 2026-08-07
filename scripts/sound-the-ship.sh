@@ -47,8 +47,15 @@ for unit in scripts/*.service; do
   if ! diff -q "$unit" "$installed" >/dev/null 2>&1; then
     fault "drift: $name — installed copy differs from repo"
   fi
+  # This check compared installed units to the WORKING TREE only, so it
+  # reported "no drift" on 2026-08-07 while the host ran three units and a
+  # Caddyfile that existed nowhere in git history. Matching an uncommitted
+  # file is not provenance: reset the tree and the running config is gone.
+  if ! git show "HEAD:$unit" 2>/dev/null | diff -q - "$installed" >/dev/null 2>&1; then
+    fault "uncommitted: $name — installed copy is not in git history"
+  fi
 done
-note "drift check complete"
+note "drift check complete (installed vs working tree AND vs HEAD)"
 
 echo "=== 4. units the repo defines but the host never installed ==="
 for unit in scripts/*.service; do
