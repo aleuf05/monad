@@ -1,0 +1,16 @@
+[Unit]
+Description=Monad Viewer: Captain-Level Execution Engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/monad-viewer/monad_viewer.py 127.0.0.1 4780
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

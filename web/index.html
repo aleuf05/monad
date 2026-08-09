@@ -275,10 +275,43 @@
   .gasket-terminal input:focus { outline: none; }
   .gt-echo { margin-top: 6px; font-size: 10.5px; color: #6B7C93; min-height: 14px; }
   .gt-echo.matched { color: #4FD1C5; }
+  .master-bar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; margin: 0 -18px 18px; padding: 10px 18px;
+    background: rgba(5,8,14,.94); border-bottom: 1px solid #263750; backdrop-filter: blur(12px); }
+  .master-id { color: #5ED6BE; font-size: 11px; font-weight: 800; letter-spacing: .13em; }
+  .master-switch { display: flex; gap: 6px; }
+  .master-switch a { color: #7B8CA6; border: 1px solid #2F4258; border-radius: 999px;
+    padding: 5px 11px; text-decoration: none; font-size: 10px; letter-spacing: .08em; }
+  .master-switch a.on, .master-switch a.ready { color: #5ED6BE; border-color: #5ED6BE; background: #0F2A2C; }
+  .captain-center { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin: 0 0 22px;
+    padding: clamp(18px,4vw,34px); border: 1px solid #2F4258; border-radius: 12px;
+    background: radial-gradient(circle at 12% 10%,rgba(94,214,190,.14),transparent 45%),#0A111D; }
+  .captain-center .cc-kicker { color: #5ED6BE; font-size: 10px; letter-spacing: .16em; font-weight: 800; }
+  .captain-center h2 { margin: 8px 0; color: #EAF5FF; font-size: clamp(28px,5vw,54px); line-height: .95; }
+  .captain-center p { color: #9FB3CC; max-width: 650px; line-height: 1.6; }
+  .cc-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+  .cc-actions a, .cc-actions button { border: 1px solid #5ED6BE; border-radius: 6px; padding: 10px 14px;
+    background: #0F2A2C; color: #5ED6BE; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
+  .cc-state { align-self: stretch; display: grid; align-content: center; gap: 9px; padding: 15px;
+    border-left: 1px solid #263750; color: #9FB3CC; font-size: 11px; }
+  .cc-state strong { color: #EAF5FF; }
+  #masterOpsAlerts { display: grid; gap: 7px; margin-top: 4px; }
+  .master-alert { padding: 8px; border: 1px solid #E8746C; border-radius: 6px; color: #EAF5FF; line-height: 1.4; }
+  .master-alert.warning { border-color: #E8A33D; }
+  .master-alert small { display: block; color: #9FB3CC; margin-top: 3px; }
+  @media(max-width:760px){.captain-center{grid-template-columns:1fr}.cc-state{border-left:0;border-top:1px solid #263750}}
 </style>
 </head>
 <body>
   <div class="wrap">
+
+    <nav class="master-bar" aria-label="Monad master view">
+      <span class="master-id">MONAD MASTER PAGE</span>
+      <span class="master-switch">
+        <a class="on" href="/" aria-current="page">PUBLIC</a>
+        <a id="masterRootSwitch" href="/root/">ROOT · CHECKING</a>
+      </span>
+    </nav>
 
     <div class="banner">
       <div class="anchor-mark">⚓</div>
@@ -293,6 +326,29 @@
       <span>SERVED FROM: <span class="val">GRANITE</span></span>
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
+
+    <section class="captain-center" aria-labelledby="livingCaptainTitle">
+      <div>
+        <div class="cc-kicker">CENTRAL FOCUS · CAPTAIN ON THE BRIDGE</div>
+        <h2 id="livingCaptainTitle">LIVING CAPTAIN</h2>
+        <p>Monad's coherent operational presence: conversation, continuity, live events, voice, tools, evidence, and command—coming together through one Captain instead of scattering across instruments.</p>
+        <div class="cc-actions">
+          <a id="captainEnter" href="/root/">Enter Living Captain</a>
+          <button type="button" id="masterLiveSound">♪ Engage Live Sound</button>
+          <button type="button" id="masterCaptainVoice">⚓ Hear Live Captain</button>
+          <button type="button" id="masterFleetVoice">📻 Hear FleetNet</button>
+          <a href="#activeQueue">Current Course</a>
+        </div>
+      </div>
+      <div class="cc-state">
+        <span>HELM <strong>CODEX</strong></span>
+        <span>EVENT WIRE <strong>LIVE SSE</strong></span>
+        <span>VOICE <strong>UNGATED</strong></span>
+        <span>VIEW <strong id="masterViewState">DETECTING AUTHORITY…</strong></span>
+        <span>OPERATOR WATCH <strong id="masterOpsState">READING…</strong></span>
+        <div id="masterOpsAlerts"></div>
+      </div>
+    </section>
 
     <section class="gasket-stage" id="gasketStage">
       <div class="build-head">
@@ -332,7 +388,7 @@
           <label for="rigBend">Drive</label>
           <input type="range" id="rigBend" min="0" max="60" step="1" value="14">
           <span class="rb-deg" id="rigBendVal">14&deg;</span>
-          <button type="button" class="rb-sound" id="rigSound">&#9834; Sound: off</button>
+          <button type="button" class="rb-sound" id="rigSound">&#9834; Live Sound: off</button>
           <button type="button" class="rb-sound on" id="rigSkeleton">&#9679; Skeleton: on</button>
           <button type="button" class="rb-sound" id="rigClip">&#9888; Clipping: off</button>
           <button type="button" class="rb-sound" id="rigVoice">&#128266; Buddy: off</button>
@@ -430,6 +486,7 @@
       <div class="quick-label">Frequently used</div>
       <div class="quick-links">
         <a href="toys/bridge-station-3.0/">Bridge Station 3.0 — the live console</a>
+        <a href="toys/monad-viewer/">Monad Command & Control<span class="mn-new">NEW</span></a>
         <a href="ops.html">Ops Reader<span class="mn-new">NEW</span></a>
       </div>
     </div>
@@ -873,7 +930,7 @@
           voices.push({ osc: osc, gain: gain });
         }
         master.gain.setTargetAtTime(0.5, ctx.currentTime, 0.25);
-        return { ctx: ctx, master: master, voices: voices };
+        return { ctx: ctx, master: master, filter: filter, voices: voices };
       }
 
       function updateAudio() {
@@ -887,6 +944,48 @@
           var level = Math.min(speed * 0.55, 1) * 0.16;
           audio.voices[i].gain.gain.setTargetAtTime(level, now, 0.06);
         }
+      }
+
+      // Fleetnet events share the model viewer's unlocked AudioContext.
+      // Every tone is synthesized at event arrival from live event identity;
+      // there is no recording, sequence, or snapshot timestamp behind it.
+      function sonifyFleetEvent(event) {
+        if (!audio || !event) return;
+        var ctx = audio.ctx;
+        var identity = event.type === "codex_event"
+          ? (event.method || "codex_event") : (event.type || "event");
+        var hash = 0;
+        for (var i = 0; i < identity.length; i++) hash = ((hash * 31) + identity.charCodeAt(i)) >>> 0;
+        var scale = [146.83, 164.81, 196.00, 220.00, 261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+        var frequency = scale[hash % scale.length];
+        var strength = 0.035;
+        var duration = 0.16;
+        if (identity === "turn_started" || identity === "turn/started") {
+          frequency = 220; strength = 0.10; duration = 0.32;
+        } else if (identity === "item/completed") {
+          var item = (event.params || {}).item || {};
+          frequency = item.type === "agentMessage" ? 523.25 : 329.63;
+          strength = item.type === "agentMessage" ? 0.14 : 0.075;
+          duration = item.type === "agentMessage" ? 0.55 : 0.24;
+        } else if (identity === "turn/completed") {
+          var turn = (event.params || {}).turn || {};
+          frequency = turn.status === "failed" ? 110 : 392;
+          strength = turn.status === "failed" ? 0.18 : 0.09;
+          duration = turn.status === "failed" ? 0.8 : 0.4;
+        }
+        var now = ctx.currentTime;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = (hash % 3 === 0) ? "triangle" : "sine";
+        osc.frequency.setValueAtTime(frequency, now);
+        osc.frequency.exponentialRampToValueAtTime(frequency * 1.08, now + duration);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(strength, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        osc.connect(gain);
+        gain.connect(audio.filter);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
       }
 
       function resetDynamics(count) {
@@ -1330,6 +1429,45 @@
       // anything audible is going to work, this is it — so it is what every
       // control fires, and speech is layered on top rather than depended on.
       var chimeCtx = null;
+      var voicePlaybackCtx = null;
+      function unlockVoicePlayback() {
+        try {
+          var Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          if (!voicePlaybackCtx) voicePlaybackCtx = new Ctx();
+          if (voicePlaybackCtx.state === "suspended") voicePlaybackCtx.resume();
+          return voicePlaybackCtx;
+        } catch (e) { return null; }
+      }
+
+      function playVoiceArtifact(url, onplaying, onended, onerror) {
+        var ctx = voicePlaybackCtx;
+        if (!ctx || ctx.state === "closed") {
+          var fallback = new Audio(url);
+          fallback.onplaying = onplaying || null;
+          fallback.onended = onended || null;
+          fallback.onerror = onerror || null;
+          return fallback.play();
+        }
+        return fetch(url)
+          .then(function (response) {
+            if (!response.ok) throw new Error("audio artifact HTTP " + response.status);
+            return response.arrayBuffer();
+          })
+          .then(function (bytes) { return ctx.decodeAudioData(bytes); })
+          .then(function (buffer) {
+            var source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.onended = onended || null;
+            source.start();
+            if (onplaying) onplaying();
+          })
+          .catch(function (error) {
+            if (onerror) onerror(error);
+            throw error;
+          });
+      }
       function chime(kind) {
         try {
           var Ctx = window.AudioContext || window.webkitAudioContext;
@@ -1444,8 +1582,7 @@
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (a) {
             if (!a || !a.audio_url) throw new Error("no artifact");
-            var audio = new Audio(a.audio_url);
-            return audio.play().then(function () {
+            return playVoiceArtifact(a.audio_url, function () {
               neuralProven = true;
               if (voiceBtn) voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
             });
@@ -1483,24 +1620,32 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             transcript: payload.text_payload,
-            character: { name: "Little Buddy", voice_name: "Puck" },
-            performance: { intent: payload.priority_level >= DUCK_PRIORITY
-                             ? "urgent" : "calm" },
+            character_id: "captain.alpha",
+            performance: {
+              intent: payload.priority_level >= DUCK_PRIORITY
+                ? "deliver an urgent live Fleetnet warning" : "deliver a concise live Fleetnet report",
+              audience: "the Admiral",
+              setting: "the live Monad bridge",
+              affect: payload.priority_level >= DUCK_PRIORITY
+                ? "controlled urgency, precise and unmistakable" : "alert, present, tactically calm",
+              pace: payload.priority_level >= DUCK_PRIORITY ? "brisk and clear" : "natural and concise",
+              restraint: "realistic shipboard speech, never theatrical",
+            },
           }),
         })
           .then(function (r) { return r.ok ? r.json() : null; })
           .then(function (artifact) {
             if (!artifact || !artifact.audio_url) throw new Error("no artifact");
-            var audio = new Audio(artifact.audio_url);
-            audio.onended = audio.onerror = done;
-            audio.onplaying = function () {
-              clearTimeout(deadline);          // it is audibly playing; stand down
-              neuralProven = true;
-              if (voiceBtn && buddyOn) {
-                voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
-              }
-            };
-            return audio.play();
+            return playVoiceArtifact(
+              artifact.audio_url,
+              function () {
+                clearTimeout(deadline);        // it is audibly playing; stand down
+                neuralProven = true;
+                if (voiceBtn && buddyOn) voiceBtn.innerHTML = "&#128266; Buddy: on (neural)";
+              },
+              done,
+              null
+            );
           })
           .catch(function () {
             // Budget exhausted, render failed, gate said no, autoplay blocked.
@@ -1565,14 +1710,30 @@
       var fleetnet = null;
       var radioBtn = document.getElementById("rigRadio");
       // --- the Captain speaks -------------------------------------------
-      // Not the Buddy. The Live Captain's OWN words — the mirror-leg message
-      // it wrote to captain-channel.md on 2026-08-03 — rendered in its own
-      // voice (captain.monad / Kore, measured authority) rather than the
-      // Buddy's (captain.alpha / Puck). It is paused, so this is its record
-      // speaking, not the running service. Said plainly rather than implied.
+      // Not the Buddy: the latest Captain words received on the authenticated
+      // live event wire, rendered as captain.monad / Kore. Before the first
+      // live reply arrives, it reports present helm state without inventing a
+      // conversation artifact.
+      var lastLiveCaptainText = "";
+      var lastLiveCaptainAudioUrl = "";
+      function captainSpokenLead(text) {
+        var spoken = String(text || "")
+          .replace(/⟦(?:fx|metamorphose):[^⟧]*⟧/g, "")
+          .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+          .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+          .replace(/https?:\/\/\S+/g, "")
+          .replace(/[`*_#>|]/g, " ")
+          .replace(/^\s*[-+]\s+/gm, "")
+          .replace(/\s+/g, " ").trim();
+        if (spoken.length <= 320) return spoken;
+        var lead = spoken.slice(0, 320);
+        var end = Math.max(lead.lastIndexOf(". "), lead.lastIndexOf("! "), lead.lastIndexOf("? "));
+        return (end >= 100 ? lead.slice(0, end + 1) : lead.replace(/\s+\S*$/, "")) + "…";
+      }
       var captainBtn = document.getElementById("rigCaptain");
       if (captainBtn) {
         captainBtn.addEventListener("click", function () {
+          unlockVoicePlayback();
           chime("low");
           captainBtn.classList.add("on");
           captainBtn.innerHTML = "&#9875; rendering…";
@@ -1580,27 +1741,40 @@
             captainBtn.classList.remove("on");
             captainBtn.innerHTML = label || "&#9875; Captain Speaks";
           };
+          if (lastLiveCaptainAudioUrl) {
+            playVoiceArtifact(
+              lastLiveCaptainAudioUrl,
+              function () { captainBtn.innerHTML = "&#9875; speaking…"; },
+              function () { restore(); },
+              function () { restore("&#9875; playback failed"); }
+            ).catch(function () { restore("&#9875; playback failed"); });
+            return;
+          }
           fetch("/voice-api/render", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              transcript: "This is the Live Captain. This file is the mirror "
-                + "leg, Captain to Claude, written by me. If you are polling "
-                + "this path, the loop is closed. I remain paused, by order "
-                + "of the Admiral. Continuity is intact.",
+              transcript: captainSpokenLead(lastLiveCaptainText || "Aye, Admiral. I am running, present, and speaking from the live bridge. Fleetnet is stable; now we are tuning the Captain conversation itself."),
               character_id: "captain.monad",
-              performance: { intent: "reporting to the Admiral",
-                             affect: "measured, grounded, restrained warmth" },
+              performance: {
+                intent: "answer the Admiral directly and continue a live working conversation",
+                audience: "the Admiral, one person at the same bridge",
+                setting: "a close live exchange aboard Monad, not a broadcast or ceremony",
+                affect: "present, capable, candid, quietly warm, responsive to the immediate moment",
+                pace: "natural conversational pace with purposeful pauses; measured but never slow",
+                restraint: "no announcer voice, no theatrical gravitas, no exaggerated naval performance",
+              },
             }),
           })
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (a) {
               if (!a || !a.audio_url) throw new Error("no artifact");
-              captainBtn.innerHTML = "&#9875; speaking…";
-              var audio = new Audio(a.audio_url);
-              audio.onended = function () { restore(); };
-              audio.onerror = function () { restore("&#9875; playback failed"); };
-              return audio.play();
+              return playVoiceArtifact(
+                a.audio_url,
+                function () { captainBtn.innerHTML = "&#9875; speaking…"; },
+                function () { restore(); },
+                function () { restore("&#9875; playback failed"); }
+              );
             })
             .catch(function () {
               // Not logged in, or the render failed. Say so out loud rather
@@ -1627,69 +1801,112 @@
       function loadFleetnet() {
         return fetch("data/fleetnet.json", { cache: "no-store" })
           .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) { fleetnet = d; return d; })
+          .then(function (d) { fleetnet = d; renderOperatorWatch(d); return d; })
           .catch(function () { return null; });
+      }
+
+      function renderOperatorWatch(d) {
+        var state = document.getElementById("masterOpsState");
+        var list = document.getElementById("masterOpsAlerts");
+        if (!state || !list) return;
+        list.replaceChildren();
+        var ops = d && d.operations;
+        if (!ops) { state.textContent = "UNAVAILABLE"; return; }
+        state.textContent = ops.status === "clear" ? "CLEAR" : ops.alert_count + " ACTION REQUIRED";
+        state.style.color = ops.status === "clear" ? "#5ED6BE" : "#E8746C";
+        (ops.alerts || []).slice(0, 3).forEach(function (alert) {
+          var card = document.createElement("div");
+          card.className = "master-alert " + alert.severity;
+          card.textContent = alert.title;
+          var evidence = document.createElement("small");
+          evidence.textContent = "EVIDENCE · " + alert.evidence;
+          var action = document.createElement("small");
+          action.textContent = "ACTION · " + alert.action;
+          card.append(evidence, action);
+          list.appendChild(card);
+        });
       }
       loadFleetnet();
 
-      // --- always-on stream ---------------------------------------------
-      // A button you press is not alive. The snapshot is regenerated every
-      // 30s by fleetnet-snapshot.timer; this watches it and speaks only what
-      // CHANGED. A ship that reads its whole status every half minute is
-      // noise, and noise gets muted and then ignored — so silence is the
-      // default and a change is the event.
-      //
-      // Announcements use the free local voice deliberately. An always-on
-      // stream on a metered neural voice is a way to spend $0.10 without
-      // noticing.
+      // Master Page authority detection. Source IP is deliberately not used:
+      // this router's hairpin NAT makes it lie. The authenticated Root status
+      // boundary answers the useful question directly without exposing data.
+      (function wireMasterPage() {
+        var rootSwitch = document.getElementById("masterRootSwitch");
+        var viewState = document.getElementById("masterViewState");
+        var captainEnter = document.getElementById("captainEnter");
+        fetch("/root-console-api/api/status", { credentials: "same-origin", cache: "no-store" })
+          .then(function (response) {
+            if (!response.ok) throw new Error("root unavailable");
+            rootSwitch.classList.add("ready");
+            rootSwitch.textContent = "ROOT · READY";
+            viewState.textContent = "ROOT AUTHENTICATED";
+            captainEnter.textContent = "Enter Root Living Captain";
+            document.body.dataset.masterAuthority = "root";
+          })
+          .catch(function () {
+            rootSwitch.textContent = "ROOT · SIGN IN";
+            viewState.textContent = "PUBLIC";
+            document.body.dataset.masterAuthority = "public";
+          });
+
+        var liveSound = document.getElementById("masterLiveSound");
+        liveSound.addEventListener("click", function () {
+          var soundControl = document.getElementById("rigSound");
+          if (soundControl) soundControl.click();
+          var on = soundControl && soundControl.classList.contains("on");
+          liveSound.classList.toggle("on", on);
+          liveSound.textContent = on ? "● Live Sound Engaged" : "♪ Engage Live Sound";
+        });
+        var masterCaptainVoice = document.getElementById("masterCaptainVoice");
+        if (masterCaptainVoice) masterCaptainVoice.addEventListener("click", function () {
+          if (captainBtn) captainBtn.click();
+          masterCaptainVoice.textContent = "⚓ Captain speaking…";
+          setTimeout(function () { masterCaptainVoice.textContent = "⚓ Hear Live Captain"; }, 9000);
+        });
+        var masterFleetVoice = document.getElementById("masterFleetVoice");
+        if (masterFleetVoice) masterFleetVoice.addEventListener("click", function () {
+          if (!fleetRich && richBtn) richBtn.click();
+          else radioReport();
+          masterFleetVoice.textContent = "📻 FleetNet speaking…";
+          setTimeout(function () { masterFleetVoice.textContent = "📻 Hear FleetNet"; }, 12000);
+        });
+      })();
+
+      // --- live stream ---------------------------------------------------
+      // Live Captain bootstrap's authenticated SSE stream is the event wire.
+      // periodic snapshot below is health fallback only; it reports actual
+      // state transitions and never manufactures an event from a timestamp.
       var fleetLast = null;
       var fleetMuted = false;
-      // RICH MODE — the Admiral wants to hear everything, in the good voice.
-      // The stream was pinned to the free voice because an unattended 15s
-      // loop with a metered voice behind it is how a budget disappears.
-      // Rich mode lifts that, so it carries its own governor instead:
-      //   · opt-in, never the default
-      //   · a hard ceiling on renders per session
-      //   · a floor between renders, so a burst of changes cannot chain
-      //   · falls back to the free voice the moment either is hit
+      // Rich mode selects the good voice for real events. It does not change
+      // event frequency and has no render governor by Admiral order.
       var fleetRich = false;
-      var richRenders = 0;
-      var richLastAt = 0;
-      var RICH_MAX_RENDERS = 40;      // ~$0.20 at typical line length
-      var RICH_MIN_GAP_MS = 20000;
       var fleetDot = document.getElementById("rigRadioDot");
       var muteBtn = document.getElementById("rigMute");
-
-      // The full picture, spoken. Used by rich mode, which reports
-      // EVERYTHING rather than only what changed — the Admiral asked to hear
-      // it all before deciding whether it needs filtering. If it turns out
-      // spammy, the filter goes here: drop the lines that repeat unchanged.
-      function fleetFullReport(d) {
-        if (!d) return [];
-        return [
-          { priority: d.sound ? 3 : 8,
-            text: d.sound ? "FleetNet sound." : "FleetNet showing faults." },
-          { priority: 2, text: d.units.active + " units active of " +
-                              d.units.installed + ". " + d.units.expected_down +
-                              " parked by design, " + (d.units.oneshot || 0) +
-                              " one-shot." },
-          { priority: 2, text: d.ports + " ports held." },
-          { priority: 2, text: "All " + d.suites.passed + " test suites green." },
-          { priority: 2, text: d.tree.uncommitted
-              ? d.tree.uncommitted + " files uncommitted, head " + d.tree.head + "."
-              : "Working tree clean, head " + d.tree.head + "." },
-          { priority: 1, text: "Live Captain " + d.captain + "." },
-          { priority: 1, text: d.voice
-              ? "Voice budget " + d.voice.usd_used.toFixed(4) + " of " +
-                d.voice.usd_limit + " dollars."
-              : "Voice budget unreadable." },
-        ];
-      }
 
       function fleetChanges(prev, now) {
         if (!now) return [];
         var out = [];
         if (!prev) return out;                    // first read is not news
+        var previousAlerts = {};
+        var currentAlerts = {};
+        ((prev.operations || {}).alerts || []).forEach(function (alert) { previousAlerts[alert.id] = alert; });
+        ((now.operations || {}).alerts || []).forEach(function (alert) { currentAlerts[alert.id] = alert; });
+        Object.keys(currentAlerts).forEach(function (id) {
+          var alert = currentAlerts[id];
+          var before = previousAlerts[id];
+          if (!before || before.evidence !== alert.evidence) {
+            out.push({ priority: alert.severity === "critical" ? 9 : 7,
+                       text: "Operator alert. " + alert.title + ". Evidence: " +
+                             alert.evidence + ". Action: " + alert.action });
+          }
+        });
+        Object.keys(previousAlerts).forEach(function (id) {
+          if (!currentAlerts[id]) {
+            out.push({ priority: 6, text: "Operator recovery. " + previousAlerts[id].title + " cleared." });
+          }
+        });
         if (prev.sound !== now.sound) {
           out.push({ priority: now.sound ? 6 : 9,
                      text: now.sound ? "FleetNet. Ship is sound again."
@@ -1720,35 +1937,70 @@
         return out;
       }
 
-      // The wire: messages from Claude and the Captain, spoken as they land.
-      // Each entry carries an id derived from its content, so the stream says
-      // a thing once and then leaves it alone.
-      var wireSeen = {};
-      var wireFirstPass = true;
-
-      function wireTick() {
-        fetch("data/fleetnet-wire.json", { cache: "no-store" })
-          .then(function (r) { return r.ok ? r.json() : null; })
-          .then(function (d) {
-            if (!d || !d.entries) return;
-            var fresh = d.entries.filter(function (e) { return !wireSeen[e.id]; });
-            d.entries.forEach(function (e) { wireSeen[e.id] = 1; });
-            // The first pass only learns what is already there. Otherwise a
-            // page load reads out the entire backlog.
-            if (wireFirstPass) { wireFirstPass = false; return; }
-            if (fleetMuted || !fresh.length) return;
-            if (!buddyOn && voiceBtn) voiceBtn.click();
-            chime("ping");
-            fresh.forEach(function (e) {
-              var who = e.from === "captain" ? "Captain" :
-                        e.from === "claude" ? "Claude" : e.from;
-              buddySubmit(e.priority, who + " on the wire. " + e.text);
-            });
-          })
-          .catch(function () {});
+      function submitFleetEvents(events) {
+        if (fleetMuted || !events.length) return;
+        if (!buddyOn && voiceBtn) voiceBtn.click();
+        chime(events.some(function (e) { return e.priority >= 8; }) ? "alert" : "ping");
+        var wasNeural = neuralVoice;
+        if (fleetRich) neuralVoice = true;
+        events.forEach(function (event) { buddySubmit(event.priority, event.text); });
+        setTimeout(function () { neuralVoice = wasNeural; }, 50);
       }
-      wireTick();
-      setInterval(wireTick, 12000);
+
+      // Real Captain traffic. This connection is admitted only when the
+      // browser carries the Admiral's existing Root Console session; no
+      // private event content is projected into the public snapshot.
+      var fleetEventSource = null;
+      var liveTurnOpen = false;
+      function connectFleetEvents() {
+        if (fleetEventSource) return;
+        fleetEventSource = new EventSource("/live-captain-bootstrap-api/api/stream");
+        fleetEventSource.onopen = function () {
+          if (fleetDot) fleetDot.className = "rb-live";
+        };
+        fleetEventSource.onmessage = function (message) {
+          var event;
+          try { event = JSON.parse(message.data); } catch (e) { return; }
+          sonifyFleetEvent(event);
+          var news = [];
+          if (event.type === "turn_started" && !liveTurnOpen) {
+            liveTurnOpen = true;
+            news.push({ priority: 4, text: "Admiral directive received. Captain working live." });
+          } else if (event.type === "captain_handoff_available") {
+            news.push({ priority: 5, text: "Captain handoff arrived on the live wire." });
+          } else if (event.type === "captain_speech") {
+            if (event.phase === "ready" && event.artifact) {
+              lastLiveCaptainAudioUrl = event.artifact.audio_url || "";
+              lastLiveCaptainText = event.artifact.transcript || captainSpokenLead(event.text || "");
+            }
+          } else if (event.type === "codex_event") {
+            var method = event.method || "";
+            var params = event.params || {};
+            var item = params.item || {};
+            if (method === "item/completed" && item.type === "agentMessage" && item.text) {
+              lastLiveCaptainText = captainSpokenLead(item.text);
+            } else if (method === "item/completed" &&
+                       (item.type === "commandExecution" || item.type === "command")) {
+              news.push({ priority: 3, text: "Captain completed a live tool action." });
+            } else if (method === "turn/completed") {
+              liveTurnOpen = false;
+              var turn = params.turn || {};
+              if (turn.status === "failed") {
+                var error = turn.error || {};
+                news.push({ priority: 9, text: "Captain turn failed live. " +
+                  (error.message || "No error detail received.") });
+              }
+            }
+          }
+          submitFleetEvents(news);
+        };
+        fleetEventSource.onerror = function () {
+          // EventSource retries automatically. The health snapshot remains
+          // available, but it is never presented as live traffic.
+          if (fleetDot) fleetDot.className = "rb-live stale";
+        };
+      }
+      connectFleetEvents();
 
       function fleetTick() {
         fetch("data/fleetnet.json", { cache: "no-store" })
@@ -1756,34 +2008,13 @@
           .then(function (d) {
             if (!d) { if (fleetDot) fleetDot.className = "rb-live stale"; return; }
             fleetnet = d;
+            renderOperatorWatch(d);
             if (fleetDot) {
               fleetDot.className = "rb-live" + (d.sound ? "" : " fault");
             }
             var news = fleetChanges(fleetLast, d);
-            // Rich mode hears EVERYTHING: the whole state each time the
-            // snapshot moves, not only the deltas. Keyed on `generated` so a
-            // poll that finds the same snapshot stays quiet — otherwise the
-            // 15s poller would talk over a 30s timer.
-            var moved = !fleetLast || fleetLast.generated !== d.generated;
-            if (fleetRich && moved) news = fleetFullReport(d).concat(news);
             fleetLast = d;
-            if (fleetMuted || !news.length) return;
-            if (!buddyOn && voiceBtn) voiceBtn.click();   // something happened
-            chime(news.some(function (n) { return n.priority >= 8; }) ? "alert" : "ping");
-            var now = Date.now();
-            var richOk = fleetRich
-              && richRenders < RICH_MAX_RENDERS
-              && (now - richLastAt) > RICH_MIN_GAP_MS;
-            var wasNeural = neuralVoice;
-            if (richOk) { richRenders += 1; richLastAt = now; }
-            else { neuralVoice = false; }        // free voice; governor holds
-            news.forEach(function (n) { buddySubmit(n.priority, n.text); });
-            setTimeout(function () { neuralVoice = wasNeural; }, 50);
-            if (richBtn) {
-              richBtn.innerHTML = fleetRich
-                ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
-                : "&#127908; Rich voice";
-            }
+            submitFleetEvents(news);
           })
           .catch(function () { if (fleetDot) fleetDot.className = "rb-live stale"; });
       }
@@ -1794,17 +2025,17 @@
       var richBtn = document.getElementById("rigRich");
       if (richBtn) {
         richBtn.addEventListener("click", function () {
+          unlockVoicePlayback();
           fleetRich = !fleetRich;
           richBtn.classList.toggle("on", fleetRich);
           richBtn.innerHTML = fleetRich
-            ? "&#127908; Rich " + richRenders + "/" + RICH_MAX_RENDERS
+            ? "&#127908; Rich live"
             : "&#127908; Rich voice";
           if (fleetRich) {
             // Speak the whole state once on enable, so "everything" means
             // everything rather than only what happens to change next.
             if (!buddyOn && voiceBtn) voiceBtn.click();
             chime("ping");
-            richRenders += 1; richLastAt = Date.now();
             var d = fleetLast;
             if (d) {
               buddySubmit(4, "Rich voice engaged. " +
@@ -1830,6 +2061,7 @@
       }
 
       function radioReport() {
+        unlockVoicePlayback();
         var speak = function (d) {
           chime(d && d.sound ? "ping" : "alert");
           if (!d) { buddySubmit(8, "FleetNet unreachable. No snapshot."); return; }
@@ -2107,13 +2339,13 @@
             audio.ctx.close();
             audio = null;
             rigSound.classList.remove("on");
-            rigSound.innerHTML = "&#9834; Sound: off";
+            rigSound.innerHTML = "&#9834; Live Sound: off";
             return;
           }
           audio = startAudio(rigBones.length || 8);
           if (!audio) { rigSound.innerHTML = "&#9834; no audio support"; return; }
           rigSound.classList.add("on");
-          rigSound.innerHTML = "&#9834; Sound: on";
+          rigSound.innerHTML = "&#9834; Live Sound: on";
         });
       }
 

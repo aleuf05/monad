@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monad Viewer | Command & Control</title>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-tertiary: #030712;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-tertiary: #d1d5db;
+            --border-primary: #1f2937;
+            --border-secondary: #374151;
+            --accent-primary: #38bdf8;
+            --accent-secondary: #0284c7;
+            --accent-hover: #0369a1;
+            --success: #34d399;
+            --error: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--accent-primary);
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .badge-new {
+            display: inline-block;
+            background: var(--error);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 1.25rem;
+            color: var(--text-tertiary);
+            border-bottom: 1px solid var(--border-secondary);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-tertiary);
+            margin-bottom: 0.25rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.1);
+        }
+
+        button {
+            background: var(--accent-secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: var(--accent-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: var(--border-secondary);
+            cursor: not-allowed;
+        }
+
+        pre {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .formula {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--error);
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .status-ok {
+            background: var(--success);
+        }
+
+        .status-error {
+            background: var(--error);
+        }
+
+        .status-line {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-primary);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Project Monad: Command & Control <span class="badge-new">NEW</span></h1>
+        <div class="subtitle">Captain-Level Canonical Public View Interface</div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Pipeline Parameters</h2>
+            <div class="formula">E: X × Σ → Φ</div>
+            <div class="form-group">
+                <label for="examine">Examine Factor (X)</label>
+                <input type="number" id="examine" value="4.5" step="0.1" min="-10" max="10">
+            </div>
+            <div class="form-group">
+                <label for="select">Select Weight (Σ)</label>
+                <input type="number" id="select" value="2.0" step="0.1" min="-10" max="10">
+            </div>
+            <div class="form-group">
+                <label for="operate">Operate Intensity</label>
+                <input type="number" id="operate" value="1.0" step="0.1" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label class="checkbox-group">
+                    <input type="checkbox" id="override" checked>
+                    <span>Strict Human Verification Gate Override (Active Authorization)</span>
+                </label>
+            </div>
+            <button id="executeBtn" onclick="runPipeline()">Execute Pipeline Pass</button>
+            <div class="status-line">
+                <span class="status-indicator status-ok" id="statusDot"></span>
+                <span id="statusText">Ready</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Live Telemetry Viewer</h2>
+            <p>Execution state output and mapping logs:</p>
+            <pre id="output">System initialized. Awaiting pipeline execution trigger...</pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/monad-viewer-api';
+
+        async function runPipeline() {
+            const btn = document.getElementById('executeBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            btn.disabled = true;
+            statusDot.className = 'status-indicator';
+            statusText.innerText = 'Executing...';
+
+            const data = {
+                examine_val: parseFloat(document.getElementById('examine').value),
+                select_val: parseFloat(document.getElementById('select').value),
+                operate_intensity: parseFloat(document.getElementById('operate').value),
+                human_override: document.getElementById('override').checked
+            };
+
+            try {
+                const response = await fetch(API_BASE + '/api/execute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                document.getElementById('output').innerText = JSON.stringify(result, null, 2);
+
+                if (result.status === 'VERIFIED_SUCCESS') {
+                    statusDot.className = 'status-indicator status-ok';
+                    statusText.innerText = `✓ Success (Φ = ${result.codomain_phi})`;
+                } else {
+                    statusDot.className = 'status-indicator status-error';
+                    statusText.innerText = '✗ Gate Intercept';
+                }
+            } catch (err) {
+                document.getElementById('output').innerText = "Execution Error: " + err.message;
+                statusDot.className = 'status-indicator status-error';
+                statusText.innerText = '✗ Error: ' + err.message;
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Auto-execute on load for demo
+        window.addEventListener('load', () => {
+            document.getElementById('statusText').innerText = 'Ready';
+        });
+    </script>
+</body>
+</html>

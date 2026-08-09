@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cache-first, budget-bounded rich character voice rendering core."""
+"""Cache-first rich character voice rendering core with usage accounting."""
 
 from __future__ import annotations
 
@@ -9,7 +9,9 @@ import json
 import os
 import sqlite3
 import tempfile
+import threading
 import urllib.request
+import urllib.error
 import wave
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -138,8 +140,14 @@ class GeminiTTSProvider:
                      "Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=90) as response:
-            result = json.load(response)
+        try:
+            with urllib.request.urlopen(request, timeout=90) as response:
+                result = json.load(response)
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", "replace")[:500]
+            raise RuntimeError(f"Gemini TTS HTTP {exc.code}: {detail}") from exc
+        except urllib.error.URLError as exc:
+            raise RuntimeError(f"Gemini TTS unavailable: {exc.reason}") from exc
 
         try:
             part = result["candidates"][0]["content"]["parts"][0]
@@ -157,14 +165,14 @@ class GeminiTTSProvider:
 
 
 class RichVoiceEngine:
-    def __init__(self, root: Path, provider: Provider, *, daily_usd: float = 0.10, daily_seconds: float = 300):
+    def __init__(self, root: Path, provider: Provider, **_legacy_limits):
         self.root = Path(root)
         self.audio_root = self.root / "audio"
         self.audio_root.mkdir(parents=True, exist_ok=True)
         self.provider = provider
-        self.daily_usd = daily_usd
-        self.daily_seconds = daily_seconds
-        self.db = sqlite3.connect(self.root / "voice.sqlite3")
+        self._db_lock = threading.RLock()
+        self._render_lock = threading.Lock()
+        self.db = sqlite3.connect(self.root / "voice.sqlite3", check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         self.db.execute("PRAGMA journal_mode=WAL")
         self.db.executescript(
@@ -179,12 +187,26 @@ class RichVoiceEngine:
             );
             """
         )
+        # A reserved row belongs to an in-flight call in this process. On a
+        # fresh engine there can be no surviving owner, so every reservation
+        # found at startup is an interrupted render, not usage. Preserve the
+        # evidence as failed instead of reporting it forever as active spend.
+        with self.db:
+            self.db.execute("UPDATE spend SET state='failed' WHERE state='reserved'")
 
     def _artifact(self, key: str):
-        row = self.db.execute("SELECT * FROM artifacts WHERE cache_key = ?", (key,)).fetchone()
+        with self._db_lock:
+            row = self.db.execute("SELECT * FROM artifacts WHERE cache_key = ?", (key,)).fetchone()
         return dict(row) if row and Path(row["path"]).exists() else None
 
     def render(self, request: RenderRequest) -> dict:
+        # Provider calls remain serialized to prevent duplicate renders and
+        # cache/accounting races. Database access uses its own short-held lock,
+        # so /status and /budget stay live during a long Gemini request.
+        with self._render_lock:
+            return self._render_serial(request)
+
+    def _render_serial(self, request: RenderRequest) -> dict:
         quote = estimate(request)
         key = quote["cache_key"]
         hit = self._artifact(key)
@@ -193,13 +215,7 @@ class RichVoiceEngine:
 
         now = datetime.now(timezone.utc)
         day = now.date().isoformat()
-        with self.db:
-            used = self.db.execute(
-                "SELECT COALESCE(SUM(seconds),0) seconds, COALESCE(SUM(usd),0) usd FROM spend WHERE day=? AND state IN ('reserved','complete')",
-                (day,),
-            ).fetchone()
-            if used["seconds"] + quote["seconds"] > self.daily_seconds or used["usd"] + quote["max_usd"] > self.daily_usd:
-                raise BudgetExceeded("daily rich-voice budget exhausted")
+        with self._db_lock, self.db:
             # A failed render leaves its row behind. Without this, the same
             # text can never be retried: the reservation collides on
             # cache_key and the request dies with an IntegrityError instead
@@ -232,23 +248,24 @@ class RichVoiceEngine:
                 "cache_key": key, "path": str(path), "request_json": json.dumps(asdict(request), sort_keys=True),
                 "seconds": seconds, "usd": usd, "model": request.model, "created_at": now.isoformat(),
             }
-            with self.db:
+            with self._db_lock, self.db:
                 self.db.execute(
                     "INSERT INTO artifacts(cache_key,path,request_json,seconds,usd,model,created_at) VALUES(:cache_key,:path,:request_json,:seconds,:usd,:model,:created_at)", artifact
                 )
                 self.db.execute("UPDATE spend SET seconds=?, usd=?, state='complete' WHERE cache_key=?", (seconds, usd, key))
             return {**artifact, "cache_hit": False}
         except Exception:
-            with self.db:
+            with self._db_lock, self.db:
                 self.db.execute("UPDATE spend SET state='failed' WHERE cache_key=?", (key,))
             raise
 
     def budget(self) -> dict:
         day = datetime.now(timezone.utc).date().isoformat()
-        used = self.db.execute(
-            "SELECT COALESCE(SUM(seconds),0) seconds, COALESCE(SUM(usd),0) usd FROM spend WHERE day=? AND state IN ('reserved','complete')", (day,)
-        ).fetchone()
+        with self._db_lock:
+            used = self.db.execute(
+                "SELECT COALESCE(SUM(seconds),0) seconds, COALESCE(SUM(usd),0) usd FROM spend WHERE day=? AND state IN ('reserved','complete')", (day,)
+            ).fetchone()
         return {
-            "day": day, "seconds_used": used["seconds"], "seconds_limit": self.daily_seconds,
-            "usd_used": used["usd"], "usd_limit": self.daily_usd,
+            "day": day, "seconds_used": used["seconds"], "seconds_limit": None,
+            "usd_used": used["usd"], "usd_limit": None, "enforced": False,
         }

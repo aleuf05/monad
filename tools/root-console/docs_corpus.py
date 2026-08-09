@@ -25,7 +25,10 @@ STATUS_PROPOSAL = "proposal"
 STATUS_RECONSTRUCTION = "reconstruction"
 STATUS_STAGED = "staged"
 
-STAGED_PATTERN = re.compile(r"Status:\s*\**\s*staged, awaiting evaluation", re.IGNORECASE)
+STAGED_PATTERN = re.compile(
+    r"\**Status:\**\s*\**\s*staged(?:,\s*(?:awaiting evaluation|not filed))?",
+    re.IGNORECASE,
+)
 
 SOURCES = (
     ("incoming", "docs/incoming"),

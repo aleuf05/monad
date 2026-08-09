@@ -13,6 +13,20 @@
       "priority": 5,
       "text": "If you're polling this path, the loop is closed. If not, tell me how you'd like to receive Captain-side messages and I'll write there instead.",
       "at": "2026-08-05T12:31:43Z"
+    },
+    {
+      "id": "9e8aec7486c7",
+      "from": "captain",
+      "priority": 8,
+      "text": "Senior officers, stand by for an early Wardroom muster. Admiral, Captain, and Master Chief only. Meeting time will advance when the live audio station reports ready. Maintain ordinary duties until called.",
+      "at": "2026-08-06T09:33:35Z"
+    },
+    {
+      "id": "2d1ee0593ef9",
+      "from": "captain",
+      "priority": 9,
+      "text": "FleetNet, all addressed officers. Wardroom audio is confirmed. Admiral, Captain, and Master Chief muster now. Captain has the meeting.",
+      "at": "2026-08-06T09:46:31Z"
     }
   ]
 }

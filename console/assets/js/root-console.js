@@ -33,6 +33,45 @@ const promptRowEl = document.getElementById("prompt-row");
 const connEl = document.getElementById("conn");
 const connTextEl = document.getElementById("conn-text");
 const input = document.getElementById("input");
+const commandDraftInput = document.getElementById("command-draft-input");
+const commandDraftToggle = document.getElementById("command-draft-toggle");
+const commandDraftSend = document.getElementById("command-draft-send");
+let commandDraftMode = false;
+
+function activeCommandInput() { return commandDraftMode ? commandDraftInput : input; }
+function setCommandDraftMode(enabled) {
+  commandDraftMode = Boolean(enabled);
+  promptRowEl.classList.toggle("command-draft", commandDraftMode);
+  commandDraftToggle?.classList.toggle("on", commandDraftMode);
+  if (commandDraftToggle) commandDraftToggle.textContent = commandDraftMode ? "COMMAND DRAFT" : "LONG COMMAND";
+  captainPosture.textContent = commandDraftMode ? "Command Draft posture" : "Bridge posture";
+  activeCommandInput()?.focus();
+}
+commandDraftToggle?.addEventListener("click", () => setCommandDraftMode(!commandDraftMode));
+commandDraftSend?.addEventListener("click", () => submitDirective());
+const captainPresenceState = document.getElementById("captain-presence-state");
+const captainPresenceDetail = document.getElementById("captain-presence-detail");
+const captainPosture = document.getElementById("captain-posture");
+let currentCaptainState = "connecting";
+
+function setCaptainPresence(state, detail) {
+  currentCaptainState = state || "ready";
+  document.body.dataset.captainState = currentCaptainState;
+  const labels = {
+    connecting: "CONNECTING", ready: "ON WATCH", thinking: "THINKING",
+    researching: "RESEARCHING", speaking: "SPEAKING", fault: "FAULT",
+  };
+  captainPresenceState.textContent = labels[currentCaptainState] || currentCaptainState.toUpperCase();
+  if (detail) captainPresenceDetail.textContent = detail;
+}
+window.setCaptainPresence = setCaptainPresence;
+setCaptainPresence("connecting", "Establishing the watch…");
+
+function setActivePairMove(move) {
+  const action = document.getElementById("bridge-course-action");
+  if (action && move) action.textContent = move;
+}
+window.setActivePairMove = setActivePairMove;
 
 const telPid = document.getElementById("tel-pid");
 const telUptime = document.getElementById("tel-uptime");
@@ -59,6 +98,431 @@ const handoffDetailTitle = document.getElementById("handoff-detail-title");
 const handoffDetailBody = document.getElementById("handoff-detail-body");
 const handoffDetailClose = document.getElementById("handoff-detail-close");
 const dispatchViewLatest = document.getElementById("dispatch-view-latest");
+const captainCourseGrid = document.getElementById("captain-course-grid");
+const captainCourseRefresh = document.getElementById("captain-course-refresh");
+const objectiveState = document.getElementById("captain-objective-state");
+const objectiveText = document.getElementById("captain-objective-text");
+const objectiveProgress = document.getElementById("captain-objective-progress");
+const objectiveButtons = {
+  propose: document.getElementById("objective-propose"), approve: document.getElementById("objective-approve"),
+  pause: document.getElementById("objective-pause"), resume: document.getElementById("objective-resume"),
+  reject: document.getElementById("objective-reject"),
+};
+let currentObjective = null;
+
+function paintObjective(objective) {
+  currentObjective = objective;
+  objectiveState.textContent = objective ? objective.state.replaceAll("_", " ") : "NO OBJECTIVE";
+  objectiveText.textContent = objective ? objective.objective : "No bounded autonomous campaign is staged.";
+  objectiveProgress.textContent = objective ? `${objective.moves_used}/${objective.move_budget} autonomous moves · ${objective.scope}` : "";
+  objectiveButtons.propose.hidden = Boolean(objective && !["COMPLETE", "BLOCKED", "REJECTED"].includes(objective.state));
+  objectiveButtons.approve.hidden = !objective || !["AWAITING_ADMIRAL", "CHECKPOINT"].includes(objective.state);
+  objectiveButtons.pause.hidden = !objective || !["APPROVED", "ACTIVE"].includes(objective.state);
+  objectiveButtons.resume.hidden = !objective || objective.state !== "PAUSED";
+  objectiveButtons.reject.hidden = !objective || !["AWAITING_ADMIRAL", "CHECKPOINT", "PAUSED"].includes(objective.state);
+}
+
+async function objectiveRequest(payload) {
+  const response = await fetch(`${LIVE_CAPTAIN_API_BASE}/objective`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`);
+  paintObjective(body.objective);
+}
+
+async function refreshObjective() {
+  const response = await fetch(`${LIVE_CAPTAIN_API_BASE}/objective`, { cache: "no-store" });
+  if (response.ok) paintObjective((await response.json()).objective);
+}
+
+objectiveButtons.propose.addEventListener("click", () => objectiveRequest({
+  action: "propose",
+  objective: "Research how the live Semantic Document Viewer can better support deep reading, comprehension, comparison, and movement from documents into engineering action.",
+  scope: "console/documents.html and its existing document sources; reversible research instruments, measurements, prototypes, and tests only; no publication or unrelated work.",
+  success_criteria: ["Current viewer behavior and friction are inspected", "At least three distinct improvement concepts are compared", "One discriminating viewer probe or prototype is run", "Evidence and a recommended implementation course are returned"],
+  move_budget: 3,
+}).catch((error) => window.alert(error.message)));
+for (const action of ["approve", "pause", "resume", "reject"]) {
+  objectiveButtons[action].addEventListener("click", () => {
+    if (action === "approve" && !window.confirm("Authorize the Captain to execute this bounded objective now?")) return;
+    objectiveRequest({ action, id: currentObjective.id }).catch((error) => window.alert(error.message));
+  });
+}
+refreshObjective();
+const bridgeCourseRefresh = document.getElementById("bridge-course-refresh");
+
+async function refreshBridgeCourse() {
+  if (bridgeCourseRefresh) bridgeCourseRefresh.disabled = true;
+  try {
+    const response = await fetch(`${API_BASE}/course`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const course = await response.json();
+    setActivePairMove(course.captain_action);
+    const watch = course.watch || {};
+    document.getElementById("bridge-course-watch").textContent = watch.status === "clear"
+      ? "Clear · no action required" : `${watch.alert_count || 0} alert(s) · ${watch.next_action}`;
+    document.getElementById("bridge-watch-card").classList.toggle("warn", watch.status !== "clear");
+    document.getElementById("bridge-course-gate").textContent = course.human_gate;
+    const continuity = course.continuity || {};
+    const latest = continuity.latest_handoff;
+    document.getElementById("bridge-course-continuity").textContent = latest
+      ? `${latest.taskId} · ${latest.agent}` : "No completed handoff indexed";
+  } catch (error) {
+    document.getElementById("bridge-course-action").textContent = `Course unavailable · ${error.message}`;
+    document.getElementById("bridge-watch-card").classList.add("warn");
+  } finally {
+    if (bridgeCourseRefresh) bridgeCourseRefresh.disabled = false;
+  }
+}
+
+if (bridgeCourseRefresh) bridgeCourseRefresh.addEventListener("click", refreshBridgeCourse);
+
+async function refreshWorldIntake() {
+  const button = document.getElementById("world-intake-refresh");
+  const summary = document.getElementById("world-intake-summary");
+  const cards = document.getElementById("world-intake-cards");
+  const state = document.getElementById("world-intake-state");
+  if (!button || !summary || !cards || !state) return;
+  button.disabled = true;
+  try {
+    const response = await fetch(`${API_BASE}/intake`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const intake = await response.json();
+    const world = intake.world || {};
+    const packets = intake.packets || {};
+    summary.replaceChildren();
+    for (const [value, label, warn] of [
+      [world.pending ?? "?", "pending", world.pending > 0],
+      [world.individual_approval ?? "?", "individual", world.individual_approval > 0],
+      [packets.staged ?? "?", "packets staged", packets.staged > 0],
+    ]) {
+      const metric = document.createElement("div");
+      metric.className = `intake-metric${warn ? " warn" : ""}`;
+      const strong = document.createElement("strong"); strong.textContent = value;
+      const caption = document.createElement("span"); caption.textContent = label;
+      metric.append(strong, caption); summary.append(metric);
+    }
+    cards.replaceChildren();
+    for (const item of world.cards || []) {
+      const card = document.createElement("div");
+      card.className = `intake-card${item.individual_approval || item.conflicts ? " risk" : ""}`;
+      const head = document.createElement("div"); head.className = "intake-card-head";
+      const subject = document.createElement("strong"); subject.textContent = item.subject;
+      const kind = document.createElement("span"); kind.textContent = item.class;
+      head.append(subject, kind);
+      const meta = document.createElement("div"); meta.className = "intake-card-meta";
+      meta.textContent = `${item.operation || "proposal"} · ${Math.round((item.confidence || 0) * 100)}%${item.conflicts ? ` · ${item.conflicts} conflict(s)` : ""}${item.individual_approval ? " · individual approval" : ""}`;
+      card.append(head, meta); cards.append(card);
+    }
+    if (!(world.cards || []).length) cards.textContent = "No pending World Intake proposals.";
+    state.textContent = intake.status === "ready"
+      ? `${world.pending} pending · ${world.deferred} deferred · live API`
+      : `degraded · ${Object.keys(intake.errors || {}).join(", ")}`;
+  } catch (error) {
+    cards.textContent = `Intake unavailable · ${error.message}`;
+    state.textContent = "fault";
+  } finally {
+    button.disabled = false;
+  }
+}
+
+document.getElementById("world-intake-refresh")?.addEventListener("click", refreshWorldIntake);
+
+function courseItem(label, value, tone = "") {
+  const item = document.createElement("div");
+  item.className = `course-item ${tone}`.trim();
+  const heading = document.createElement("div");
+  heading.className = "course-label";
+  heading.textContent = label;
+  const body = document.createElement("div");
+  body.className = "course-value";
+  body.textContent = value;
+  item.append(heading, body);
+  return item;
+}
+
+async function refreshCaptainCourse() {
+  captainCourseRefresh.disabled = true;
+  const requests = await Promise.allSettled([
+    fetch(`${API_BASE}/course`, { cache: "no-store" }).then((r) => r.json()),
+    fetch("/m3-cycle-api/api/evaluate").then((r) => r.json()),
+  ]);
+  const value = (index, fallback) => requests[index].status === "fulfilled" ? requests[index].value : fallback;
+  const course = value(0, {});
+  const m3 = value(1, {}).result || null;
+  captainCourseGrid.replaceChildren();
+
+  const ops = course.watch || {};
+  captainCourseGrid.append(courseItem(
+    "Operator watch",
+    ops.status === "clear" ? "Clear — no action required." : `${ops.alert_count || 0} alert(s) — ${ops.next_action || "inspect Fleetnet"}`,
+    ops.status === "clear" ? "good" : "warn",
+  ));
+  captainCourseGrid.append(courseItem("Captain action", course.captain_action || "Course unavailable.", course.captain_action ? "good" : "warn"));
+  captainCourseGrid.append(courseItem("Human gate", course.human_gate || "No human gate reported.", (course.speech || {}).outcome === "fault" ? "warn" : ""));
+  const tree = course.engineering || {};
+  captainCourseGrid.append(courseItem(
+    "Engineering state",
+    `${tree.uncommitted ?? "?"} uncommitted files · head ${tree.head || "unknown"}`,
+    tree.uncommitted ? "warn" : "good",
+  ));
+  const latest = (course.continuity || {}).latest_handoff;
+  captainCourseGrid.append(courseItem(
+    "Latest completed work",
+    latest ? `${latest.agent} · ${latest.taskId} · ${latest.publicationState.toLowerCase()}` : "No handoff available.",
+    latest ? "good" : "",
+  ));
+  const newest = (course.continuity || {}).latest_log;
+  captainCourseGrid.append(courseItem(
+    "Latest preserved signal",
+    newest ? `${newest.title || newest.file} · ${newest.source}` : "Ship's Log unavailable.",
+    newest ? "good" : "warn",
+  ));
+  captainCourseGrid.append(courseItem(
+    "M³ counsel",
+    !m3 ? "Evaluation unavailable." : !m3.proposed ? "No docs change proposed." :
+      `${m3.verdict.toUpperCase()} · continuity ${m3.continuity.holds ? "holds" : "fails"} · value ${m3.valuation.before}→${m3.valuation.after} · Q ${m3.q_rev.holds ? "improves" : "fails"}`,
+    m3 && (m3.verdict === "commit" || !m3.proposed) ? "good" : "warn",
+  ));
+  captainCourseRefresh.disabled = false;
+}
+
+captainCourseRefresh.addEventListener("click", refreshCaptainCourse);
+
+// Living Captain stations are an attention model over the existing working
+// controls. They do not copy state or create alternate backends.
+(function wireCaptainStations() {
+  const labels = {
+    bridge: "Conversation has the deck.",
+    wardroom: "Captain leads · Admiral shapes and rules · Master Chief tests.",
+    course: "Orders, handoffs, record, and revision.",
+    intake: "New material enters under Captain review.",
+    research: "Live Research posture — inquire, probe, observe, adapt.",
+    systems: "Raw machinery and live execution signals.",
+  };
+  const buttons = Array.from(document.querySelectorAll(".captain-station"));
+  const bearing = document.getElementById("captain-station-bearing");
+  function select(station) {
+    if (!labels[station]) station = "bridge";
+    document.body.dataset.captainStation = station;
+    buttons.forEach((button) => button.classList.toggle("on", button.dataset.station === station));
+    bearing.textContent = labels[station];
+    captainPosture.textContent = `${station === "research" ? "Live Research" : station} posture`;
+    if (["ready", "connecting"].includes(currentCaptainState)) {
+      setCaptainPresence(currentCaptainState, labels[station]);
+    }
+    localStorage.setItem("monad.captainStation", station);
+    if (station === "course") refreshCaptainCourse();
+    if (station === "bridge") refreshBridgeCourse();
+    if (station === "wardroom" && window.refreshWardroom) window.refreshWardroom();
+    if (station === "intake") refreshWorldIntake();
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      terminalEl.animate(
+        station === "bridge"
+          ? [{ transform: "scale(.985)", opacity: .78 }, { transform: "scale(1)", opacity: 1 }]
+          : [{ transform: "translateX(-8px)", opacity: .82 }, { transform: "translateX(0)", opacity: 1 }],
+        { duration: 330, easing: "cubic-bezier(.2,.85,.25,1)" },
+      );
+      const panel = document.getElementById("status-panel");
+      if (station !== "bridge") panel.animate(
+        [{ transform: "translateX(22px)", opacity: 0 }, { transform: "translateX(0)", opacity: 1 }],
+        { duration: 420, easing: "cubic-bezier(.18,.9,.2,1)" },
+      );
+    }
+  }
+  window.selectCaptainStation = select;
+  buttons.forEach((button) => button.addEventListener("click", () => select(button.dataset.station)));
+  const requestedStation = new URLSearchParams(window.location.search).get("station");
+  select(requestedStation || localStorage.getItem("monad.captainStation") || "bridge");
+})();
+refreshCaptainCourse();
+
+// Wardroom is a meeting posture over the real Captain conversation. It owns
+// no alternate transcript or backend: every action enters the same command
+// seam, and every spoken answer uses the same verified Captain voice path.
+(function wireWardroom() {
+  const agenda = Array.from(document.querySelectorAll("#wardroom-agenda [data-phase]"));
+  const audioState = document.getElementById("wardroom-audio-state");
+  const fleetnetState = document.getElementById("wardroom-fleetnet-state");
+  const clock = document.getElementById("wardroom-clock");
+  if (!agenda.length || !audioState || !fleetnetState || !clock) return;
+  let fleetnetCursor = null;
+  let fleetnetPrimed = false;
+  let wardroomAudioArmed = false;
+  let wardroomAudioArmedAt = 0;
+  let wardroomRoomReady = false;
+  // Calling to order is a one-shot transition. Repeated clicks must be
+  // harmless rather than dispatching duplicate meeting commands.
+  let wardroomMeetingCalled = localStorage.getItem("monad.wardroomMeetingCalled") === "1";
+  const audioConfirm = document.getElementById("wardroom-audio-confirm");
+  const openMeeting = document.getElementById("wardroom-open");
+
+  function inject(text, dispatch = false) {
+    setCommandDraftMode(false);
+    input.value = text;
+    input.focus();
+    if (dispatch) submitDirective();
+  }
+
+  function refresh() {
+    const now = new Date();
+    const local = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York", hour: "2-digit", minute: "2-digit",
+      hour12: false, weekday: "short",
+    }).format(now);
+    clock.textContent = `Readiness muster · America/New_York · now ${local}`;
+    audioState.textContent = wardroomRoomReady
+      ? "Room audio confirmed · Wardroom may be called to order."
+      : wardroomAudioArmed
+        ? "Sound check dispatched · after hearing room sound, complete step 2."
+        : "READY FOR STEP 1 · Press Arm & test audio to unlock this device's speakers.";
+    audioState.classList.toggle("ready", wardroomAudioArmed);
+    fleetnetState.textContent = wardroomAudioArmed
+      ? "FleetNet receiver armed · new priority traffic will sound in this room."
+      : "FleetNet receiver awaiting audio arm.";
+    fleetnetState.classList.toggle("ready", wardroomAudioArmed);
+    document.getElementById("wardroom-step-audio")?.classList.toggle("ready", wardroomAudioArmed);
+    document.getElementById("wardroom-step-confirm")?.classList.toggle("ready", wardroomRoomReady);
+    document.getElementById("wardroom-step-open")?.classList.toggle("ready", wardroomRoomReady);
+    if (audioConfirm) audioConfirm.disabled = !wardroomAudioArmed || wardroomRoomReady;
+    if (openMeeting) {
+      openMeeting.disabled = !wardroomRoomReady || wardroomMeetingCalled;
+      openMeeting.textContent = wardroomMeetingCalled ? "meeting called ✓" : "call to order";
+    }
+  }
+  window.refreshWardroom = refresh;
+
+  document.getElementById("wardroom-sound-check")?.addEventListener("click", () => {
+    unlockCaptainVoice();
+    setCaptainVoice(true);
+    wardroomAudioArmed = true;
+    wardroomAudioArmedAt = Date.now();
+    refresh();
+    speakLocally("Wardroom audio path. Captain on watch. Room channel five by five.");
+  });
+  audioConfirm?.addEventListener("click", () => {
+    wardroomRoomReady = true;
+    refresh();
+  });
+  openMeeting?.addEventListener("click", () => {
+    if (!wardroomRoomReady) return;
+    if (wardroomMeetingCalled) return;
+    wardroomMeetingCalled = true;
+    localStorage.setItem("monad.wardroomMeetingCalled", "1");
+    refresh();
+    inject("Captain, call the Wardroom meeting to order. Confirm the muster, state the purpose and present position, then lead the first agenda phase concisely.", true);
+  });
+  document.getElementById("wardroom-readback")?.addEventListener("click", () => {
+    inject("Captain readback: summarize decisions, canon rulings, flexible practice, actions with acceptance conditions, and remaining gates. Do not promote an unstated ruling.", true);
+  });
+  document.querySelectorAll("[data-wardroom-marker]").forEach((button) => {
+    button.addEventListener("click", () => inject(button.dataset.wardroomMarker || ""));
+  });
+  agenda.forEach((button) => button.addEventListener("click", () => {
+    agenda.forEach((item) => item.classList.toggle("on", item === button));
+    localStorage.setItem("monad.wardroomPhase", button.dataset.phase);
+    inject(`Captain, proceed to Wardroom phase: ${button.textContent.trim()}. Lead this phase and preserve the current course.`);
+  }));
+  const saved = localStorage.getItem("monad.wardroomPhase") || "purpose";
+  agenda.find((button) => button.dataset.phase === saved)?.classList.add("on");
+
+  async function pollFleetnet() {
+    try {
+      const response = await fetch("/data/fleetnet-wire.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const entries = (await response.json()).entries || [];
+      if (!fleetnetPrimed) {
+        const savedCursor = localStorage.getItem("monad.fleetnetCursor");
+        const latest = entries.at(-1);
+        const recentPriorityMuster = latest && Number(latest.priority || 0) >= 7
+          && Date.now() - Date.parse(latest.at) < 15 * 60 * 1000;
+        fleetnetCursor = savedCursor || (recentPriorityMuster ? entries.at(-2)?.id || null : latest?.id || null);
+        fleetnetPrimed = true;
+      }
+      const cursorIndex = entries.findIndex((entry) => entry.id === fleetnetCursor);
+      const incoming = fleetnetCursor === null ? entries.slice(-1)
+        : cursorIndex >= 0 ? entries.slice(cursorIndex + 1) : entries.slice(-1);
+      if (!wardroomAudioArmed || Date.now() - wardroomAudioArmedAt < 4000) return;
+      for (const entry of incoming) {
+        if (Number(entry.priority || 0) < 4) continue;
+        const source = entry.from === "captain" ? "Captain" : String(entry.from || "FleetNet");
+        speakLocally(`FleetNet. ${source}. ${entry.text}`);
+        addRow("lifecycle", "fleetnet", `${source} · ${entry.text}`);
+        fleetnetState.textContent = `FleetNet sounded · ${source} · priority ${entry.priority}`;
+        fleetnetState.classList.add("ready");
+      }
+      if (entries.length) {
+        fleetnetCursor = entries.at(-1).id;
+        localStorage.setItem("monad.fleetnetCursor", fleetnetCursor);
+      }
+    } catch (error) {
+      fleetnetState.textContent = `FleetNet receiver fault · ${error.message}`;
+      fleetnetState.classList.remove("ready");
+    }
+  }
+  pollFleetnet();
+  window.setInterval(pollFleetnet, 3000);
+  refresh();
+})();
+
+// Universal helm: one low-friction entrance to every Captain posture and
+// active command surface. This is navigation plus command routing, not a
+// second conversation or copied state.
+(function wireHelmPalette() {
+  const palette = document.getElementById("command-palette");
+  const openButton = document.getElementById("helm-palette-open");
+  const paletteInput = document.getElementById("command-palette-input");
+  const choices = Array.from(document.querySelectorAll(".command-choice"));
+  const telemetryButton = document.getElementById("telemetry-toggle");
+  if (!palette || !paletteInput || !openButton) return;
+
+  function close() { palette.hidden = true; paletteInput.value = ""; choices.forEach((choice) => { choice.hidden = false; }); }
+  function open() { palette.hidden = false; requestAnimationFrame(() => paletteInput.focus()); }
+  function select(station) {
+    if (window.selectCaptainStation) window.selectCaptainStation(station);
+    close();
+    setTimeout(() => {
+      if (station === "research") document.getElementById("concept-input")?.focus();
+      else input.focus();
+    }, 80);
+  }
+  openButton.addEventListener("click", open);
+  palette.addEventListener("click", (event) => { if (event.target === palette) close(); });
+  choices.forEach((choice) => choice.addEventListener("click", () => select(choice.dataset.helmStation)));
+  paletteInput.addEventListener("input", () => {
+    const query = paletteInput.value.trim().toLowerCase();
+    choices.forEach((choice) => { choice.hidden = Boolean(query && !choice.textContent.toLowerCase().includes(query)); });
+  });
+  paletteInput.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") { close(); return; }
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const text = paletteInput.value.trim();
+    const visible = choices.find((choice) => !choice.hidden);
+    const exact = choices.find((choice) => choice.dataset.helmStation === text.toLowerCase());
+    if (exact || (!text && visible)) { select((exact || visible).dataset.helmStation); return; }
+    close();
+    const station = document.body.dataset.captainStation;
+    if (station === "research") {
+      const conceptInput = document.getElementById("concept-input");
+      if (conceptInput) { conceptInput.value = text; document.getElementById("concept-form")?.requestSubmit(); }
+    } else {
+      input.value = text; submitDirective();
+    }
+  });
+  document.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault(); palette.hidden ? open() : close();
+    } else if (event.key === "Escape" && !palette.hidden) close();
+  });
+  telemetryButton?.addEventListener("click", () => {
+    document.body.classList.toggle("telemetry-open");
+    const openState = document.body.classList.contains("telemetry-open");
+    telemetryButton.textContent = openState ? "◆ SYSTEMS" : "◇ SYSTEMS";
+    telemetryButton.setAttribute("aria-pressed", String(openState));
+  });
+})();
 let latestHandoffFile = null;
 const activityLights = {};
 for (const el of document.querySelectorAll(".status-widget")) {
@@ -67,7 +531,9 @@ for (const el of document.querySelectorAll(".status-widget")) {
 
 let authenticated = false;
 let statusPollHandle = null;
+let coursePollHandle = null;
 let streamSource = null;
+window.captainBridgeReady = false;
 
 function timestamp() {
   return new Date().toTimeString().slice(0, 8);
@@ -141,6 +607,7 @@ function identiconSvg(seed, size) {
 }
 
 function addRow(cssClass, src, body) {
+  if (["agent", "injected"].includes(cssClass)) document.body.classList.add("has-captain-dialogue");
   const row = document.createElement("div");
   row.className = `row ${cssClass}`;
   const ts = document.createElement("span");
@@ -609,6 +1076,8 @@ async function pollStatus() {
 
 function showLoginGate() {
   authenticated = false;
+  window.captainBridgeReady = false;
+  window.dispatchEvent(new Event("captain-bridge-unavailable"));
   loginGate.classList.remove("hidden");
   if (streamSource) {
     streamSource.close();
@@ -617,6 +1086,10 @@ function showLoginGate() {
   if (statusPollHandle) {
     clearInterval(statusPollHandle);
     statusPollHandle = null;
+  }
+  if (coursePollHandle) {
+    clearInterval(coursePollHandle);
+    coursePollHandle = null;
   }
 }
 
@@ -629,6 +1102,8 @@ function onAuthenticated() {
   if (!statusPollHandle) statusPollHandle = setInterval(pollStatus, 4000);
   pollHandoffs();
   pollShipLog();
+  refreshBridgeCourse();
+  if (!coursePollHandle) coursePollHandle = window.setInterval(refreshBridgeCourse, 30000);
   input.focus();
 }
 
@@ -727,6 +1202,7 @@ function handleCodexEvent(event) {
   const params = event.params || {};
 
   if (method === "item/agentMessage/delta") {
+    setCaptainPresence("thinking", "Forming the response live…");
     let bodyEl = streamingRows.get(params.itemId);
     if (!bodyEl) {
       stopThinking();
@@ -749,7 +1225,7 @@ function handleCodexEvent(event) {
       for (const [url, label] of imageArtifactsFrom(item, { scanFreeText: true })) addImageArtifact(url, label);
       runMetamorphosisTrigger(bodyEl);
       followTerminalBottom();
-      speakCaptain(item.text || "");
+      prepareCaptainSpeech(item.text || "");
       return;
     }
     if (item.type === "userMessage") return;
@@ -779,6 +1255,7 @@ function handleCodexEvent(event) {
   }
 
   if (method === "turn/started") {
+    setActivePairMove("Carrying Admiral intent through the live vessel…");
     recordActivity("thread", "turn", "started");
     return;
   }
@@ -788,7 +1265,10 @@ function handleCodexEvent(event) {
     const turn = params.turn || {};
     const status = turn.status || "completed";
     recordActivity("thread", "turn", `completed (${status})`);
+    window.dispatchEvent(new CustomEvent("captain-turn-completed", { detail: { status } }));
     if (status === "failed") {
+      setActivePairMove("Preserving fault evidence and selecting recovery.");
+      setCaptainPresence("fault", "Turn failed — evidence preserved.");
       // Turn.error is only populated when status is "failed" -- it's the
       // one place the actual reason lives. Previously this branch discarded
       // it and showed only the bare word "failed", making every failure
@@ -796,6 +1276,9 @@ function handleCodexEvent(event) {
       const error = turn.error || {};
       const detail = [error.message, error.additionalDetails].filter(Boolean).join(" -- ") || "no error detail provided by Codex";
       addRow("error", "error", `Turn failed: ${detail}`);
+    } else if (!pendingCaptainSpeech) {
+      setCaptainPresence("ready", "Turn complete · maintaining the shared watch.");
+      refreshBridgeCourse();
     }
     return;
   }
@@ -833,11 +1316,9 @@ function handleCodexEvent(event) {
 // SSE, /voice-api/render makes a 24kHz WAV, the browser plays it. This
 // connects four working things; it builds no new machinery.
 //
-// Both endpoints sit behind the same forward_auth as the rest of /root, so
-// this works for a logged-in operator and simply does nothing for anyone
-// else. That boundary is deliberate: turns cost model budget and renders
-// cost money, and an ungated endpoint is the only thing between a cap and a
-// bill.
+// Both endpoints sit behind the same forward_auth as the rest of /root. That
+// boundary protects private Captain traffic; voice generation itself is
+// ungated by spend or duration and retains usage accounting only.
 //
 // captain.monad / Kore — measured authority. Distinct from the front page
 // Buddy's captain.alpha / Puck, so you can tell who is talking.
@@ -849,6 +1330,59 @@ const CAPTAIN_VOICE_KEY = "monad.captainVoice";
 const captainVoiceStored = localStorage.getItem(CAPTAIN_VOICE_KEY);
 let captainVoiceOn = captainVoiceStored === null ? true : captainVoiceStored === "on";
 let captainAudio = null;
+let captainVoiceContext = null;
+
+function unlockCaptainVoice() {
+  try {
+    const Context = window.AudioContext || window.webkitAudioContext;
+    if (!Context) return null;
+    if (!captainVoiceContext) captainVoiceContext = new Context();
+    if (captainVoiceContext.state === "suspended") captainVoiceContext.resume();
+    return captainVoiceContext;
+  } catch (_) { return null; }
+}
+
+async function playCaptainArtifact(url, onDone) {
+  const context = captainVoiceContext;
+  if (!context || context.state === "closed") {
+    const audio = new Audio(url);
+    captainAudio = audio;
+    audio.onended = audio.onerror = onDone;
+    await audio.play();
+    return;
+  }
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`audio artifact HTTP ${response.status}`);
+  const buffer = await context.decodeAudioData(await response.arrayBuffer());
+  const source = context.createBufferSource();
+  let settled = false;
+  const finish = () => {
+    if (settled) return;
+    settled = true;
+    onDone();
+  };
+  source.buffer = buffer;
+  source.connect(context.destination);
+  source.onended = finish;
+  captainAudio = { pause: () => { try { source.stop(); } catch (_) {} finish(); } };
+  source.start();
+}
+
+function captainSpokenLead(text) {
+  let spoken = String(text || "")
+    .replace(/⟦(?:fx|metamorphose):[^⟧]*⟧/g, "")
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[`*_#>|]/g, " ")
+    .replace(/^\s*[-+]\s+/gm, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (spoken.length <= 320) return spoken;
+  const lead = spoken.slice(0, 320);
+  const sentenceEnd = Math.max(lead.lastIndexOf(". "), lead.lastIndexOf("! "), lead.lastIndexOf("? "));
+  return (sentenceEnd >= 100 ? lead.slice(0, sentenceEnd + 1) : lead.replace(/\s+\S*$/, "")) + "…";
+}
 
 function setCaptainVoice(on) {
   captainVoiceOn = on;
@@ -858,65 +1392,102 @@ function setCaptainVoice(on) {
     btn.classList.toggle("on", on);
     btn.textContent = on ? "⚓ Voice: on" : "⚓ Voice: off";
   }
-  if (!on && captainAudio) { captainAudio.pause(); captainAudio = null; }
+  if (!on && captainAudio) {
+    captainAudio.pause();
+    captainAudio = null;
+    // Stopping speech is also a turn-taking action. Without this resume the
+    // Live Bridge remained muted forever because a paused Audio element does
+    // not fire `ended`.
+    if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+  }
 }
 
-async function speakCaptain(text) {
-  if (!captainVoiceOn || !text) return;
-  // Long replies are expensive and tiring to listen to. Speak the opening,
-  // which is where a Captain puts the answer, and leave the rest on screen.
-  const spoken = text.trim().replace(/\s+/g, " ").slice(0, 600);
+let pendingCaptainSpeech = "";
+const consumedCaptainSpeech = new Set();
+
+function prepareCaptainSpeech(text) {
+  if (!captainVoiceOn || !text) {
+    if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+    return;
+  }
+  pendingCaptainSpeech = captainSpokenLead(text);
+  setCaptainPresence("speaking", "Preparing the spoken brief…");
+  if (window.liveBridgePauseForCaptain) window.liveBridgePauseForCaptain();
   const btn = document.getElementById("captain-voice-toggle");
+  if (btn) btn.textContent = "⚓ rendering…";
+}
+
+async function playCentralCaptainSpeech(event) {
+  const btn = document.getElementById("captain-voice-toggle");
+  const artifact = event.artifact || {};
+  // The artifact arrives over both the live event stream and the direct
+  // /api/turn response.  Either transport may be interrupted, but one render
+  // must still produce exactly one playback in this console.
+  const deliveryKey = artifact.audio_url || (event.thread_id ? `thread:${event.thread_id}` : "");
+  if (deliveryKey && consumedCaptainSpeech.has(deliveryKey)) return;
+  if (deliveryKey) consumedCaptainSpeech.add(deliveryKey);
+  const spoken = artifact.transcript || pendingCaptainSpeech || captainSpokenLead(event.text || "");
+  if (!captainVoiceOn) {
+    pendingCaptainSpeech = "";
+    if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+    return;
+  }
   try {
-    if (btn) btn.textContent = "⚓ rendering…";
-    const response = await fetch("/voice-api/render", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        transcript: spoken,
-        character_id: "captain.monad",
-        performance: {
-          intent: "reporting to the Admiral",
-          affect: "measured, grounded, restrained warmth",
-        },
-      }),
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const artifact = await response.json();
     if (!artifact.audio_url) throw new Error("no artifact");
     if (captainAudio) captainAudio.pause();      // a new reply supersedes the old
-    captainAudio = new Audio(artifact.audio_url);
     if (btn) btn.textContent = "⚓ speaking…";
-    captainAudio.onended = captainAudio.onerror = () => {
+    await playCaptainArtifact(artifact.audio_url, () => {
       if (btn) btn.textContent = "⚓ Voice: on";
-    };
-    await captainAudio.play();
+      captainAudio = null;
+      pendingCaptainSpeech = "";
+      if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+      setCaptainPresence("ready", "Spoken brief complete · awaiting command.");
+    });
   } catch (err) {
-    // Budget exhausted, not logged in, render failed. SPEAK ANYWAY — the
-    // browser's own voice is free, local, and always available. A Captain
-    // that goes silent because a spend cap was reached is a worse outcome
-    // than a Captain that sounds plainer. Same rule the front-page Buddy
-    // already follows: silence is never an acceptable degradation.
     if (btn) btn.textContent = "⚓ Voice: on (local)";
     speakLocally(spoken);
-    addRow("error", "voice", `neural voice unavailable (${err.message}) — using local voice`);
+    pendingCaptainSpeech = "";
+    addRow("error", "voice", `central Captain voice unavailable (${err.message}) — using local voice`);
   }
 }
 
 function speakLocally(text) {
-  if (!window.speechSynthesis || !text) return;
+  if (!window.speechSynthesis || !text) {
+    if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+    return;
+  }
   try {
     window.speechSynthesis.cancel();          // a new reply supersedes the old
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 0.97;
     utterance.pitch = 0.92;                   // lower: this is the Captain, not the Buddy
+    utterance.onend = utterance.onerror = () => {
+      if (window.liveBridgeResumeAfterCaptain) window.liveBridgeResumeAfterCaptain();
+      setCaptainPresence("ready", "Spoken brief complete · awaiting command.");
+    };
     window.speechSynthesis.speak(utterance);
   } catch (e) { /* no speech engine; nothing further to try */ }
 }
 
 function handleEvent(event) {
+  if (event.type === "concept_room") {
+    if (event.phase === "retrieving" || event.phase === "synthesizing") {
+      setCaptainPresence("researching", event.phase === "retrieving" ? "Searching the documentary world…" : `Synthesizing ${event.evidence_count || 0} grounded passage(s)…`);
+    } else if (event.phase === "failed") setCaptainPresence("fault", event.error || "Research turn failed.");
+    else if (event.phase === "completed") setCaptainPresence("ready", "Concept memory preserved · awaiting inquiry.");
+    window.dispatchEvent(new CustomEvent("concept-room-stream", { detail: event }));
+    return;
+  }
+  // Concept Room owns its own room-scoped rendering. These events still flow
+  // through the one Captain stream, but must never appear as injected Bridge
+  // prompts or duplicate Captain answers.
+  if (String(event.source || "").startsWith("concept-room:")) {
+    window.dispatchEvent(new CustomEvent("concept-room-stream", { detail: event }));
+    return;
+  }
   if (event.type === "turn_started") {
-    addRow("injected", "you", event.text);
+    if (event.source !== "captain-watch") addRow("injected", "you", event.text);
+    else addRow("tool", "watch", "Captain autonomous move started");
     return;
   }
   if (event.type === "codex_event") {
@@ -927,12 +1498,24 @@ function handleEvent(event) {
     pollHandoffs();
     return;
   }
+  if (event.type === "captain_speech") {
+    if (event.phase === "ready") playCentralCaptainSpeech(event);
+    else if (event.phase === "failed") playCentralCaptainSpeech({ text: event.text, artifact: {} });
+    return;
+  }
+  if (event.type === "captain_objective" || event.type === "captain_watch_move") {
+    refreshObjective();
+    return;
+  }
 }
 
 (function wireCaptainVoiceToggle() {
   const btn = document.getElementById("captain-voice-toggle");
   if (!btn) return;
-  btn.addEventListener("click", () => setCaptainVoice(!captainVoiceOn));
+  btn.addEventListener("click", () => {
+    unlockCaptainVoice();
+    setCaptainVoice(!captainVoiceOn);
+  });
   setCaptainVoice(captainVoiceOn);   // restore the remembered choice
 })();
 
@@ -960,10 +1543,32 @@ function handleEvent(event) {
     btn.disabled = true;
     return;
   }
+  btn.disabled = true;
+  btn.textContent = "⏳";
+  btn.setAttribute("aria-label", "Push to talk waiting for bridge");
+  btn.title = "Waiting for the authenticated Captain bridge";
 
   let recognition = null;
   let listening = false;
-  let committed = "";        // finalised text so far this press
+  let pttHeld = false;
+  let releasePending = false;
+  let releaseTimer = null;
+  let releaseCommitted = false;
+  let pressStartedAt = 0;
+  let recognitionBase = "";
+  const fatalRecognitionErrors = new Set([
+    "not-allowed", "service-not-allowed", "audio-capture",
+  ]);
+
+  function reportBridgeSignal(phase, pointer = "") {
+    fetch(`${API_BASE}/bridge-signal`, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phase, pointer, live_mode: false,
+        elapsed_ms: pressStartedAt ? Math.round(performance.now() - pressStartedAt) : 0,
+      }), keepalive: true,
+    }).catch(() => {});
+  }
 
   function stop() {
     listening = false;
@@ -972,27 +1577,58 @@ function handleEvent(event) {
     if (recognition) { try { recognition.stop(); } catch (e) {} }
   }
 
+  function commitReleasedUtterance() {
+    if (!releasePending || releaseCommitted) return;
+    releaseCommitted = true;
+    releasePending = false;
+    clearTimeout(releaseTimer);
+    const text = activeCommandInput().value.trim();
+    if (text) {
+      reportBridgeSignal("commit");
+      if (!commandDraftMode) submitDirective();
+      else activeCommandInput().focus();
+    } else activeCommandInput().focus();
+  }
+
   function start() {
     if (listening) return;
-    committed = "";
     recognition = new Recognition();
-    recognition.continuous = true;
+    recognition.continuous = commandDraftMode;
     recognition.interimResults = true;   // paint it as you speak
     recognition.lang = "en-GB";
+    recognitionBase = commandDraftMode ? activeCommandInput().value.trim() : "";
 
     recognition.onresult = (event) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const chunk = event.results[i][0].transcript;
-        if (event.results[i].isFinal) committed += chunk;
-        else interim += chunk;
+      // SpeechRecognitionResultList is the recogniser's current authoritative
+      // hypothesis set, not an append-only delta.  Chromium may replay result
+      // slots (including final ones) with resultIndex pointing before text we
+      // have already painted.  Appending those chunks recursively produced
+      // "find / find your / find your own ..." boot-loop directives.  Rebuild
+      // from indexed results every time so a revised hypothesis replaces its
+      // predecessor and every spoken segment appears exactly once.
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        const chunk = event.results[i][0].transcript.trim();
+        if (!chunk) continue;
+        // The live provider sometimes returns cumulative hypotheses in
+        // separate slots: "find", "find your", "find your own". Replace a
+        // prefix with its longer form; join genuinely separate segments.
+        if (!transcript) transcript = chunk;
+        else if (chunk === transcript || chunk.startsWith(`${transcript} `)) transcript = chunk;
+        else transcript = `${transcript} ${chunk}`;
       }
       // Show the live transcript in the real input, so you can see it hearing
       // you and correct before it goes anywhere.
-      input.value = (committed + interim).trim();
+      activeCommandInput().value = [recognitionBase, transcript].filter(Boolean).join(" ");
     };
     recognition.onerror = (event) => {
+      reportBridgeSignal("recognition-error");
+      releasePending = false;
+      clearTimeout(releaseTimer);
       stop();
+      if (fatalRecognitionErrors.has(event.error)) {
+        btn.title = `Push-to-talk unavailable: ${event.error}`;
+      }
       if (event.error !== "aborted" && event.error !== "no-speech") {
         addRow("error", "mic", `speech recognition: ${event.error}`);
       }
@@ -1002,35 +1638,96 @@ function handleEvent(event) {
       // sent from the pointerup handler, not from here — so a dropped
       // connection cannot silently submit something you did not finish.
       if (listening) stop();
+      if (releasePending) setTimeout(commitReleasedUtterance, 80);
     };
 
     listening = true;
     btn.classList.add("listening");
     btn.textContent = "●";
-    try { recognition.start(); }
-    catch (e) { stop(); addRow("error", "mic", String(e)); }
+    try {
+      recognition.start();
+      // Starting is synchronous admission, not proof of audio; onresult
+      // remains the evidence that recognition actually heard something.
+      reportBridgeSignal("recognition-start");
+    } catch (e) { stop(); addRow("error", "mic", String(e)); }
   }
 
   // Hold anywhere on the button; release sends. Pointer events cover mouse,
   // pen and touch in one path.
-  btn.addEventListener("pointerdown", (e) => { e.preventDefault(); start(); });
-  const release = () => {
-    if (!listening) return;
+  btn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    if (!authenticated || !window.captainBridgeReady || pttHeld) {
+      btn.title = "Captain bridge is not ready yet";
+      return;
+    }
+    pttHeld = true;
+    pressStartedAt = performance.now();
+    reportBridgeSignal("press", e.pointerType || "pointer");
+    releasePending = false;
+    releaseCommitted = false;
+    try { btn.setPointerCapture(e.pointerId); } catch (_) {}
+    unlockCaptainVoice();
+    // Physical hold-to-talk is also barge-in: cut Captain output immediately.
+    if (captainAudio) { captainAudio.pause(); captainAudio = null; }
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    start();
+  });
+  const release = (event) => {
+    if (!pttHeld) return;
+    pttHeld = false;
+    releasePending = true;
+    reportBridgeSignal("release", event?.pointerType || "pointer");
+    try { if (event && btn.hasPointerCapture(event.pointerId)) btn.releasePointerCapture(event.pointerId); } catch (_) {}
     stop();
-    // Give the recogniser a moment to flush its final result before sending.
-    setTimeout(() => {
-      if (input.value.trim()) submitDirective();
-      else input.focus();
-    }, 350);
+    // onend is the authoritative flush boundary. This fallback covers browser
+    // implementations that fail to emit onend after stop().
+    releaseTimer = setTimeout(commitReleasedUtterance, 700);
   };
   btn.addEventListener("pointerup", release);
-  btn.addEventListener("pointerleave", () => { if (listening) release(); });
+  btn.addEventListener("pointercancel", (event) => {
+    pttHeld = false;
+    releasePending = false;
+    reportBridgeSignal("cancel", event.pointerType || "pointer");
+    clearTimeout(releaseTimer);
+    try { if (btn.hasPointerCapture(event.pointerId)) btn.releasePointerCapture(event.pointerId); } catch (_) {}
+    stop();
+    input.focus();
+  });
+  window.addEventListener("blur", () => {
+    // Losing the physical interaction boundary cancels; it never submits.
+    if (!pttHeld) return;
+    pttHeld = false;
+    releasePending = false;
+    clearTimeout(releaseTimer);
+    stop();
+  });
+  window.addEventListener("captain-bridge-ready", () => {
+    btn.disabled = false;
+    btn.textContent = "🎙";
+    btn.setAttribute("aria-label", "Hold to speak, release to send");
+    btn.title = "Hold to speak · release to send · press again to interrupt";
+    reportBridgeSignal("armed");
+  });
+  window.addEventListener("captain-bridge-unavailable", () => {
+    btn.disabled = true;
+    pttHeld = false;
+    releasePending = false;
+    clearTimeout(releaseTimer);
+    stop();
+    reportBridgeSignal("disarmed");
+    btn.textContent = "⏳";
+    btn.setAttribute("aria-label", "Push to talk waiting for bridge");
+    btn.title = "Waiting for the authenticated Captain bridge";
+  });
+
 })();
 
 function connect() {
   if (streamSource) return;
   streamSource = new EventSource(`${LIVE_CAPTAIN_API_BASE}/stream`);
   streamSource.onopen = () => {
+    window.captainBridgeReady = true;
+    window.dispatchEvent(new Event("captain-bridge-ready"));
     connEl.classList.add("live");
     connTextEl.textContent = "live";
     // A fresh connection (first load OR a reconnect after the backend
@@ -1040,10 +1737,14 @@ function connect() {
     // about work still being done.
     stopThinking();
     stopImageGenIndicator();
+    setCaptainPresence("ready", "Captain connected · awaiting command.");
   };
   streamSource.onerror = () => {
+    window.captainBridgeReady = false;
+    window.dispatchEvent(new Event("captain-bridge-unavailable"));
     connEl.classList.remove("live");
     connTextEl.textContent = "reconnecting…";
+    setCaptainPresence("connecting", "Signal interrupted · reconnecting…");
   };
   streamSource.onmessage = (raw) => {
     try {
@@ -1055,30 +1756,57 @@ function connect() {
 }
 
 async function submitDirective() {
-  const text = input.value.trim();
+  unlockCaptainVoice();
+  const sourceInput = activeCommandInput();
+  const text = sourceInput.value.trim();
   if (!text) return;
-  input.value = "";
+  sourceInput.value = "";
   startThinking();
+  setCaptainPresence("thinking", "Interpreting Admiral intent…");
+  setActivePairMove("Interpreting signal and updating the shared course…");
   try {
     const response = await fetch(`${LIVE_CAPTAIN_API_BASE}/turn`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, interaction_mode: commandDraftMode ? "command_draft" : "bridge" }),
     });
     if (!response.ok) {
       stopThinking();
       const body = await response.json().catch(() => ({}));
       addRow("error", "error", body.error || `HTTP ${response.status}`);
+      setCaptainPresence("fault", body.error || `Turn refused · HTTP ${response.status}`);
+      window.dispatchEvent(new Event("captain-turn-submit-failed"));
+    } else {
+      // Do not make audible delivery depend on SSE remaining connected for the
+      // entire inference + render. playCentralCaptainSpeech deduplicates this
+      // against the normal captain_speech event.
+      const body = await response.json().catch(() => ({}));
+      if (body.speech_artifact) {
+        playCentralCaptainSpeech({
+          phase: "ready",
+          thread_id: body.thread_id,
+          text: body.text,
+          artifact: body.speech_artifact,
+        });
+      }
     }
   } catch (err) {
     stopThinking();
     addRow("error", "error", String(err));
+    setCaptainPresence("fault", String(err));
+    window.dispatchEvent(new Event("captain-turn-submit-failed"));
   }
-  input.focus();
+  activeCommandInput().focus();
 }
 
 input.addEventListener("keydown", (keyEvent) => {
   if (keyEvent.key === "Enter") {
+    keyEvent.preventDefault();
+    submitDirective();
+  }
+});
+commandDraftInput?.addEventListener("keydown", (keyEvent) => {
+  if (keyEvent.key === "Enter" && (keyEvent.ctrlKey || keyEvent.metaKey)) {
     keyEvent.preventDefault();
     submitDirective();
   }
@@ -1223,6 +1951,83 @@ docxDrop.addEventListener("drop", (dropEvent) => {
 });
 
 loadDocxRecent();
+
+// Private visual context gateway. It shares Root Console authentication but
+// has no commit/push action: upload is not canon, publication, or consent.
+(function wireContextImageDrop() {
+  const drop = document.getElementById("context-image-drop");
+  const input = document.getElementById("context-image-file");
+  const result = document.getElementById("context-image-result");
+  if (!drop || !input || !result) return;
+  function say(text, kind = "") { result.textContent = text; result.className = kind; }
+  async function upload(file) {
+    if (!file) return;
+    drop.classList.add("busy");
+    say(`Uploading ${file.name}…`);
+    try {
+      const form = new FormData(); form.append("file", file, file.name);
+      const response = await fetch(`${API_BASE}/context-image`, { method: "POST", body: form });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok || !body.ok) throw new Error(body.error || `HTTP ${response.status}`);
+      say(`✓ Received ${body.path} · ${body.bytes} bytes`, "ok");
+      addRow("injected", "context image", `Received ${body.path}; ready for Captain inspection.`);
+    } catch (error) { say(`✗ ${error.message}`, "err"); }
+    finally { drop.classList.remove("busy"); input.value = ""; }
+  }
+  drop.addEventListener("click", () => input.click());
+  drop.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); input.click(); } });
+  input.addEventListener("change", () => upload(input.files[0]));
+  ["dragenter", "dragover"].forEach((name) => drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.add("dragover"); }));
+  ["dragleave", "drop"].forEach((name) => drop.addEventListener(name, (event) => { event.preventDefault(); drop.classList.remove("dragover"); }));
+  drop.addEventListener("drop", (event) => upload(event.dataTransfer.files[0]));
+})();
+
+// --- full speech-loop acceptance -----------------------------------------
+// Automation can prove each wire but cannot prove what the Admiral heard.
+// These authenticated controls make that final human observation durable.
+(function wireSpeechAcceptance() {
+  const panel = document.getElementById("speech-acceptance");
+  const state = document.getElementById("speech-acceptance-state");
+  const pass = document.getElementById("speech-loop-pass");
+  const fault = document.getElementById("speech-loop-fault");
+  if (!panel || !state || !pass || !fault) return;
+
+  function paint(result) {
+    const outcome = result.outcome || "pending";
+    panel.dataset.outcome = outcome;
+    state.textContent = outcome === "passed" ? "speech loop: ✓ heard"
+      : outcome === "fault" ? "speech loop: ⚠ fault recorded"
+      : "speech loop: unverified";
+    panel.title = result.recorded_at
+      ? `${result.test} · ${result.recorded_at}${result.note ? ` · ${result.note}` : ""}`
+      : "Authenticated human acceptance record for the complete spoken loop";
+  }
+
+  async function record(outcome, note) {
+    const response = await fetch(`${API_BASE}/speech-acceptance`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ outcome, note: note || "" }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    paint(result);
+  }
+
+  pass.addEventListener("click", () => {
+    if (!window.confirm("Confirm you spoke naturally, the Captain understood, and you heard the spoken reply?")) return;
+    record("passed", "Full loop confirmed from the Root Bridge").catch((error) => addRow("error", "speech proof", error.message));
+  });
+  fault.addEventListener("click", () => {
+    const note = window.prompt("What failed? (optional)", "");
+    if (note === null) return;
+    record("fault", note).catch((error) => addRow("error", "speech proof", error.message));
+  });
+  fetch(`${API_BASE}/speech-acceptance`, { cache: "no-store" })
+    .then((response) => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
+    .then(paint)
+    .catch(() => paint({ outcome: "pending" }));
+})();
 
 // --- M³ cycle --------------------------------------------------------------
 // D_t is the docs corpus, H_t is git, and Δ_t is whatever the working tree

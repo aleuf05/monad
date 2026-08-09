@@ -413,15 +413,14 @@ class Handler(BaseHTTPRequestHandler):
             self._json(404, {"ok": False, "error": "not found"})
             return
         entries = []
-        if INCOMING_DIR.is_dir():
-            for path in sorted(INCOMING_DIR.glob("*.md"), reverse=True)[:10]:
-                stat = path.stat()
-                entries.append({
-                    "name": path.name,
-                    "path": str(path.relative_to(REPO_ROOT)),
-                    "bytes": stat.st_size,
-                    "mtime": int(stat.st_mtime),
-                })
+        for path in sorted(_staged_files(), reverse=True)[:10]:
+            stat = path.stat()
+            entries.append({
+                "name": path.name,
+                "path": str(path.relative_to(REPO_ROOT)),
+                "bytes": stat.st_size,
+                "mtime": int(stat.st_mtime),
+            })
         self._json(200, {"ok": True, "entries": entries})
 
     def _json(self, status: int, payload: dict) -> None:

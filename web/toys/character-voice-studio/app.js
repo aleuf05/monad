@@ -39,7 +39,7 @@ async function richRequest(path, payload) {
 fetch("/voice-api/status").then((response) => response.json()).then((status) => {
   richConfigured = status.configured;
   $("richStatus").textContent = status.configured
-    ? `Rich voice ready · Gemini · $${status.budget.usd_used.toFixed(4)} / $${status.budget.usd_limit.toFixed(2)} today`
+    ? `Rich voice ready · Gemini · ungated · $${status.budget.usd_used.toFixed(4)} usage today`
     : "Rich voice service online · Gemini key not commissioned · free rehearsal remains available";
 }).catch(() => { $("richStatus").textContent = "Rich voice service not commissioned · free rehearsal remains available"; });
 

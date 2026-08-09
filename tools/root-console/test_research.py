@@ -41,6 +41,13 @@ class ResearchPacketTests(unittest.TestCase):
         self.assertEqual(demo["dataMode"], "MOCK")
         self.assertEqual(demo["relatedCanonicalId"], "CAP-ARI-003")
 
+    def test_laptop_live_lab_packet_is_logged_but_not_commandable(self):
+        packet = research.get_arc("CAP-ARI-004")
+        self.assertEqual(packet["status"], "NEEDS_FURTHER_ENGINEERING")
+        self.assertIn("hand-gesture", packet["permittedActions"][0])
+        with self.assertRaisesRegex(research.ResearchError, "no Captain research-execution backend"):
+            research.run_command("CAP-ARI-004", "start")
+
 
 class DemoArcLifecycleTests(unittest.TestCase):
     def setUp(self):

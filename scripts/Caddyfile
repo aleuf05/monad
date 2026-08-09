@@ -108,6 +108,10 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4774
 		}
 
+		handle_path /monad-viewer-api/* {
+			reverse_proxy 127.0.0.1:4780
+		}
+
 		handle_path /live-captain-chat-api/* {
 			reverse_proxy 127.0.0.1:4776
 		}

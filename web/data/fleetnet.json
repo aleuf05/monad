@@ -1,51 +1,126 @@
 {
-  "generated": "2026-08-05T12:31:42Z",
+  "generated": "2026-08-09T11:07:30Z",
   "units": {
-    "installed": 24,
-    "active": 19,
+    "installed": 25,
+    "active": 20,
     "down": [],
     "expected_down": 4,
     "oneshot": 2
   },
   "ports": 17,
   "suites": {
-    "passed": 5,
+    "passed": 6,
     "failed": 0,
-    "total": 5
+    "total": 6
   },
   "tree": {
-    "uncommitted": 7,
-    "head": "5a628ed"
+    "uncommitted": 104,
+    "head": "013b505"
   },
   "captain": "running",
+  "captain_detail": {
+    "backend": "codex",
+    "voice_output": "heard-live-over-fleetnet",
+    "speech_round_trip": "awaiting-human-acceptance",
+    "event_wire": "authenticated-live-captain-sse",
+    "event_audio": "procedural-live-web-audio"
+  },
   "voice": {
-    "day": "2026-08-05",
-    "seconds_used": 204.2,
-    "seconds_limit": 20000.0,
-    "usd_used": 0.10210000000000001,
-    "usd_limit": 10.0
+    "day": "2026-08-09",
+    "seconds_used": 0,
+    "seconds_limit": null,
+    "usd_used": 0,
+    "usd_limit": null,
+    "enforced": false
+  },
+  "operations": {
+    "status": "clear",
+    "alerts": [],
+    "alert_count": 0,
+    "next_action": "Maintain watch; no operator action required.",
+    "probes": [
+      {
+        "name": "root-console",
+        "url": "http://127.0.0.1:4792/api/status",
+        "code": 401,
+        "ok": true,
+        "accepted": [
+          401
+        ]
+      },
+      {
+        "name": "live-captain",
+        "url": "http://127.0.0.1:4778/api/status",
+        "code": 401,
+        "ok": true,
+        "accepted": [
+          401
+        ]
+      },
+      {
+        "name": "rich-voice",
+        "url": "http://127.0.0.1:4775/status",
+        "code": 200,
+        "ok": true,
+        "accepted": [
+          200
+        ]
+      },
+      {
+        "name": "fleetcore",
+        "url": "http://127.0.0.1:4771/snapshot",
+        "code": 200,
+        "ok": true,
+        "accepted": [
+          200
+        ]
+      },
+      {
+        "name": "public-root-auth",
+        "url": "http://127.0.0.1:4779/check",
+        "code": 401,
+        "ok": true,
+        "accepted": [
+          401
+        ]
+      }
+    ],
+    "resources": {
+      "disk_used_percent": 20,
+      "disk_available": "171.2G",
+      "memory_available_percent": 70.2,
+      "load_1m": 0.85
+    }
   },
   "sound": true,
   "lines": [
     {
-      "priority": 3,
-      "text": "FleetNet. All 19 units active. 4 parked by design."
-    },
-    {
       "priority": 2,
-      "text": "19 of 24 units running on 17 ports."
-    },
-    {
-      "priority": 2,
-      "text": "All 5 test suites green."
+      "text": "Operator watch clear. No action required."
     },
     {
       "priority": 3,
-      "text": "7 files uncommitted."
+      "text": "FleetNet. All 20 units active. 4 parked by design."
+    },
+    {
+      "priority": 2,
+      "text": "20 of 25 units running on 17 ports."
+    },
+    {
+      "priority": 2,
+      "text": "All 6 test suites green."
+    },
+    {
+      "priority": 3,
+      "text": "104 files uncommitted."
     },
     {
       "priority": 1,
-      "text": "Voice budget, 0.1021 of 10.0 dollars used."
+      "text": "Voice ungated. 0.0 seconds generated today; usage remains accounted."
+    },
+    {
+      "priority": 3,
+      "text": "Live Captain helm codex. Voice output verified; live event audio connected; spoken round trip awaiting acceptance."
     }
   ]
 }
