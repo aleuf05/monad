@@ -181,3 +181,12 @@ recorded entry below. Full detail and sources in the entries that follow.
   `tools/live-captain/context_metabolism.py`,
   `tools/live-captain/test_live_captain.py`, persisted Admiral message 224, and
   `docs/logs/2026-08-02-cognitive-jiu-jitsu-exact-span.md` on 2026-08-02.
+- Live Captain Commissioning and Phone Terminal Sea Trial completed on 2026-08-16.
+  The Phone Terminal (`/captain/`) and Root Console (`/root/`) operate against
+  one shared identity kernel (`EDIT-THIS-ONE-FILE.md`), SQLite continuity database
+  (`data/live-captain/habitat.db`), and background Agent Job Engine (`data/live-captain/jobs.db`).
+  All 18 Sea Trial steps passed end-to-end with verified live SSE token streaming,
+  rich image uploads (`/captain-api/upload`), asynchronous AGY task delegation,
+  proactive notifications, and restart survival. 92/92 tests in `tools/live-captain/` passed.
+  Source: 2026-08-16 Live Captain Commissioning Sea Trial; `docs/manuals/LIVE_CAPTAIN_OPERATOR_MANUAL.md`;
+  `docs/reports/2026-08-16-live-captain-final-commissioning.md`.

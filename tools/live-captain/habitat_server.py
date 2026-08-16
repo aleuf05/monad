@@ -463,6 +463,22 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(404, "Job not found")
             return
 
+        if path.startswith("/captain-api/uploads/") or path.startswith("/uploads/"):
+            fname = path.split("/")[-1]
+            fpath = UPLOAD_DIR / fname
+            if fpath.exists() and fpath.is_file():
+                content = fpath.read_bytes()
+                mime = "image/png" if fname.endswith((".png", ".jpg", ".jpeg", ".webp")) else "application/octet-stream"
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(content)))
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                self.wfile.write(content)
+                return
+            self.send_error(404, "File not found")
+            return
+
         self.send_error(404, "Not Found")
 
     def do_POST(self) -> None:
@@ -542,10 +558,18 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
         if path in ("/upload", "/captain-api/upload"):
             content_len = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_len)
-            filename = f"upload_{int(time.time())}_{uuid.uuid4().hex[:6]}.bin"
+            header_fn = self.headers.get("X-Filename", "")
+            ext = ".bin"
+            if "." in header_fn:
+                ext = "." + header_fn.rsplit(".", 1)[-1].lower()
+            filename = f"upload_{int(time.time())}_{uuid.uuid4().hex[:6]}{ext}"
             file_path = UPLOAD_DIR / filename
             file_path.write_bytes(body)
-            self._send_json(200, {"filename": filename, "path": str(file_path)})
+            self._send_json(200, {
+                "filename": filename,
+                "path": str(file_path),
+                "url": f"/captain-api/uploads/{filename}"
+            })
             return
 
         if path in ("/chat", "/captain-api/chat"):
