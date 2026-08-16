@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Productive Self-Application — When does a reflective loop actually improve itself?</title>
+  <title>Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems — Cameron G. Lampley</title>
   
   <!-- Academic & Dublin Core Metadata for arXiv / Google Scholar / Semantic Scholar -->
   <meta name="citation_title" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems">
@@ -11,13 +11,13 @@
   <meta name="citation_publication_date" content="2026/08/15">
   <meta name="citation_online_date" content="2026/08/15">
   <meta name="citation_arxiv_id" content="Candidate arXiv v1.0">
-  <meta name="citation_pdf_url" content="https://cameronlampley.com/monadone/productive-self-application.pdf">
+  <meta name="citation_pdf_url" content="https://cameronlampley.com/monadone/assets/Productive-Self-Application-arXiv-v1.pdf">
   <meta name="description" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems by Cameron G. Lampley. Reflective systems should be judged by whether self-application produces measurable gains in precision, constraint, or testability, not merely by being recursive.">
   <meta name="keywords" content="recursive self-improvement, self-reflection, metacognition, reflective agents, self-reference, evaluation, scientific instrumentation, cs.AI, Cameron G. Lampley">
   
   <!-- OpenGraph / Social Metadata -->
-  <meta property="og:title" content="Productive Self-Application — When does a reflective loop actually improve itself?">
-  <meta property="og:description" content="Reflective systems should be judged by whether self-application produces measurable gains in precision, constraint, or testability, not merely by being recursive.">
+  <meta property="og:title" content="Productive Self-Application — An Operational Criterion for Reflective Reasoning Systems">
+  <meta property="og:description" content="When does a reflective loop actually improve the procedure that generated it? Operational formalism and experimental discriminator for reflective reasoning systems.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://cameronlampley.com/monadone/">
   <meta property="og:site_name" content="Cameron G. Lampley — Research">
@@ -25,881 +25,462 @@
   <!-- Google Fonts: Oswald (Display), Inter (Body), JetBrains Mono (Code/Math), Newsreader (Serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --bg-base: #090e17;
-      --bg-panel: #0f1726;
-      --bg-card: #141f33;
-      --bg-card-hover: #192740;
-      --border-subtle: #1c2b42;
-      --border-strong: #283e60;
-      --text-primary: #f0f4f8;
-      --text-secondary: #9db0c9;
-      --text-muted: #627794;
-      --cyan-bright: #38bdf8;
-      --cyan-glow: rgba(56, 189, 248, 0.15);
-      --teal-accent: #2dd4bf;
-      --amber-gold: #f59e0b;
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-      --font-display: 'Oswald', sans-serif;
-      --font-serif: 'Newsreader', Georgia, serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      line-height: 1.65;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background-image: 
-        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(56, 189, 248, 0.08), transparent 70%),
-        radial-gradient(ellipse 60% 30% at 50% 100%, rgba(245, 158, 11, 0.04), transparent 70%);
-      background-attachment: fixed;
-    }
-
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* 1. HERO */
-    header.hero-section {
-      padding: 72px 0 44px;
-      text-align: center;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    h1.hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(34px, 5.5vw, 56px);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: 0.02em;
-      color: #ffffff;
-      margin-bottom: 12px;
-    }
-
-    p.hero-subtitle {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(19px, 2.6vw, 25px);
-      color: var(--cyan-bright);
-      margin-bottom: 26px;
-    }
-
-    .hero-actions {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 22px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.18s ease;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #1e3a5f 0%, #10233b 100%);
-      border: 1px solid var(--cyan-bright);
-      color: #ffffff;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #274b7a 0%, #163050 100%);
-      box-shadow: 0 0 20px var(--cyan-glow);
-      transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      color: var(--text-primary);
-    }
-
-    .btn-secondary:hover {
-      background: var(--bg-card);
-      border-color: var(--cyan-bright);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .status-line {
-      font-family: var(--font-mono);
-      font-size: 11.5px;
-      color: var(--text-muted);
-      letter-spacing: 0.04em;
-    }
-
-    .status-line strong {
-      color: var(--amber-gold);
-    }
-
-    /* Section Styling */
-    section.page-section {
-      padding: 48px 0 20px;
-      border-bottom: 1px solid rgba(28, 43, 66, 0.6);
-    }
-
-    section.page-section:last-of-type {
-      border-bottom: none;
-    }
-
-    .section-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--amber-gold);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    h2.section-heading {
-      font-family: var(--font-display);
-      font-size: 24px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-      color: #ffffff;
-      margin-bottom: 20px;
-    }
-
-    /* 2. THE CORE IDEA */
-    .quote-box {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      border-left: 4px solid var(--cyan-bright);
-      border-radius: 6px;
-      padding: 28px 32px;
-      margin: 12px 0 16px;
-    }
-
-    blockquote.core-quote {
-      font-family: var(--font-serif);
-      font-size: clamp(20px, 2.5vw, 25px);
-      font-style: italic;
-      line-height: 1.45;
-      color: #ffffff;
-    }
-
-    p.quote-explanation {
-      font-size: 14.5px;
-      color: var(--text-secondary);
-      margin-top: 16px;
-      line-height: 1.65;
-    }
-
-    /* 3. THE INSTRUMENT */
-    .instrument-display {
-      background: #060a12;
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      padding: 32px 24px;
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .equation-large {
-      font-family: var(--font-mono);
-      font-size: clamp(20px, 3.5vw, 32px);
-      color: var(--cyan-bright);
-      letter-spacing: 0.04em;
-      font-weight: 600;
-      margin-bottom: 24px;
-    }
-
-    .pipeline-flow {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .flow-node {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 10px 14px;
-      text-align: center;
-      min-width: 105px;
-    }
-
-    .flow-node .symbol {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: var(--amber-gold);
-      font-weight: 600;
-      display: block;
-      margin-bottom: 2px;
-    }
-
-    .flow-node .label {
-      font-size: 11.5px;
-      font-weight: 600;
-      color: #ffffff;
-      display: block;
-    }
-
-    .flow-arrow {
-      color: var(--text-muted);
-      font-size: 14px;
-      font-family: var(--font-mono);
-      user-select: none;
-    }
-
-    @media (max-width: 768px) {
-      .pipeline-flow {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .flow-arrow {
-        transform: rotate(90deg);
-        margin: 2px 0;
-      }
-    }
-
-    .typed-pass-note {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 22px;
-    }
-
-    .typed-pass-note code {
-      color: var(--teal-accent);
-    }
-
-    /* 4. THE TEST */
-    .test-box {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      padding: 28px 24px;
-      margin: 18px 0;
-      text-align: center;
-    }
-
-    .discriminator-math {
-      font-family: var(--font-mono);
-      font-size: clamp(16px, 2.5vw, 22px);
-      color: #ffffff;
-      font-weight: 600;
-      background: #070c14;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 16px 20px;
-      display: inline-block;
-      margin-bottom: 20px;
-      letter-spacing: 0.02em;
-    }
-
-    .discriminator-math span.pass {
-      color: var(--teal-accent);
-    }
-
-    .test-punchline {
-      font-family: var(--font-serif);
-      font-size: 19px;
-      font-style: italic;
-      color: var(--cyan-bright);
-      margin-bottom: 12px;
-    }
-
-    .test-dimensions-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      text-align: left;
-      margin-top: 24px;
-    }
-
-    @media (max-width: 680px) {
-      .test-dimensions-grid { grid-template-columns: 1fr; }
-    }
-
-    .dim-card {
-      background: #0a111e;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 14px 16px;
-    }
-
-    .dim-card .name {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--amber-gold);
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .dim-card .desc {
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    /* 5. CONTROLS */
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin: 20px 0;
-    }
-
-    @media (max-width: 768px) {
-      .controls-grid { grid-template-columns: 1fr; }
-    }
-
-    .control-col {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .control-col.target {
-      border-color: var(--cyan-bright);
-      background: linear-gradient(180deg, #101c2e 0%, #0d1624 100%);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    }
-
-    .control-eyebrow {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
-    .control-col.target .control-eyebrow {
-      color: var(--cyan-bright);
-    }
-
-    .control-title {
-      font-family: var(--font-display);
-      font-size: 18px;
-      color: #ffffff;
-      margin-bottom: 10px;
-    }
-
-    .control-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      flex: 1;
-    }
-
-    .control-footer {
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border-subtle);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    /* 2-SLIDE SUMMARY VIEWER */
-    .slide-deck {
-      margin: 24px 0;
-    }
-
-    .deck-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .slide-tabs {
-      display: flex;
-      gap: 8px;
-    }
-
-    .slide-tab-btn {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      color: var(--text-secondary);
-      padding: 7px 14px;
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .slide-tab-btn.active, .slide-tab-btn:hover {
-      border-color: var(--cyan-bright);
-      color: #ffffff;
-      background: var(--bg-card);
-    }
-
-    .slide-frame {
-      background: #040810;
-      border: 2px solid var(--border-strong);
-      border-radius: 8px;
-      padding: 28px 28px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-    }
-
-    .slide-num {
-      position: absolute;
-      top: 14px;
-      right: 18px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .slide-header-title {
-      font-family: var(--font-display);
-      font-size: clamp(22px, 3.2vw, 30px);
-      color: #ffffff;
-      letter-spacing: 0.02em;
-      margin-bottom: 12px;
-    }
-
-    .slide-img-container {
-      width: 100%;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border-strong);
-      background: #02050b;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      margin: 12px 0 16px;
-    }
-
-    .slide-img {
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: transform 0.2s ease;
-    }
-
-    .slide-body-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin: 8px 0;
-    }
-
-    .slide-bottom-line {
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
-      font-family: var(--font-mono);
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--cyan-bright);
-    }
-
-    /* 6. DOWNLOAD / CITATION / CONTACT */
-    .citation-wrapper {
-      position: relative;
-      background: #070c14;
-      border: 1px solid var(--border-strong);
-      border-radius: 6px;
-      padding: 20px;
-      margin: 16px 0 24px;
-    }
-
-    .bibtex-text {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: #cbd5e1;
-      line-height: 1.55;
-      white-space: pre-wrap;
-    }
-
-    .copy-button {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      border-radius: 4px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .copy-button:hover {
-      border-color: var(--cyan-bright);
-      color: #ffffff;
-      background: var(--bg-card);
-    }
-
-    .sober-contact {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 18px 22px;
-      font-size: 13.5px;
-      color: var(--text-secondary);
-    }
-
-    .sober-contact a {
-      color: var(--cyan-bright);
-      text-decoration: none;
-    }
-
-    .sober-contact a:hover {
-      text-decoration: underline;
-    }
-
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: var(--bg-panel);
-      border: 1px solid var(--cyan-bright);
-      color: #ffffff;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.25s ease;
-      z-index: 9999;
-      pointer-events: none;
-    }
-
-    .toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Footer */
-    footer.site-footer {
-      padding: 44px 0 72px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    footer.site-footer a {
-      color: var(--cyan-bright);
-      text-decoration: none;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
 
-  <!-- 1. HERO -->
-  <header class="hero-section" id="top">
-    <h1 class="hero-title">Productive Self-Application</h1>
-    <p class="hero-subtitle">When does a reflective loop actually improve itself?</p>
-
-    <div class="hero-actions">
-      <a href="productive-self-application.pdf" class="btn btn-primary" id="btn-read-pdf" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-        <span>Read PDF</span>
-      </a>
-
-      <a href="#summary-deck" class="btn btn-secondary" id="btn-view-slides">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-        <span>View 2-Slide Summary</span>
-      </a>
+  <!-- ========================================================================
+       1. HERO
+       ======================================================================== -->
+  <header class="hero" id="top">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      <span>Candidate arXiv v1.0 &middot; cs.AI (Artificial Intelligence)</span>
     </div>
 
-    <div class="status-line">
-      Candidate arXiv v1.0 &mdash; <strong>Cameron G. Lampley</strong>, Independent Researcher (15 August 2026)
+    <h1 class="hero-title">Productive Self-Application</h1>
+    <p class="hero-subtitle">An Operational Criterion for Reflective Reasoning Systems</p>
+
+    <p class="hero-thesis">
+      When does a reflective loop actually improve the procedure that generated it?
+    </p>
+
+    <div class="hero-meta">
+      <strong>Cameron G. Lampley</strong> &middot; Independent Researcher &middot; 15 August 2026 &middot; Candidate arXiv v1.0
+    </div>
+
+    <div class="hero-actions">
+      <a href="assets/Productive-Self-Application-arXiv-v1.pdf" target="_blank" rel="noopener" class="btn btn-primary" id="btn-read-paper">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        <span>Read Paper</span>
+      </a>
+
+      <a href="#two-slides" class="btn btn-secondary" id="btn-overview-slides">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+        <span>Two-Slide Overview</span>
+      </a>
+
+      <button type="button" class="btn btn-secondary copy-citation-btn" id="btn-copy-hero-citation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span>Copy Citation</span>
+      </button>
     </div>
   </header>
 
-  <!-- 2. THE CORE IDEA -->
-  <section class="page-section" id="core-idea">
-    <div class="section-eyebrow">Section 2</div>
-    <h2 class="section-heading">The Core Idea</h2>
+  <!-- ========================================================================
+       2. CORE CLAIM
+       ======================================================================== -->
+  <section class="paper-section" id="core-claim">
+    <div class="section-label">Core Claim</div>
+    <h2 class="section-title">The Central Distinction</h2>
 
-    <div class="quote-box">
-      <blockquote class="core-quote">
+    <div class="claim-card">
+      <blockquote class="claim-quote">
         “Self-reference is cheap. Productive self-application should be expensive enough to measure.”
       </blockquote>
-      <p class="quote-explanation">
-        Recursive self-improvement and iterative self-refinement are increasingly common descriptions of reasoning and agent systems, but self-reference alone does not distinguish a useful reflective process from a decorative loop. A self-application pass is scientifically interesting only when it yields externally measurable gains in <strong>precision</strong>, <strong>explicit constraint</strong>, or <strong>testability</strong> that survive controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias.
+      <p class="claim-explanation">
+        A reflective process becomes scientifically interesting not merely when it refers to itself, but when applying the procedure to a representation of itself produces externally measurable gains in <strong>precision</strong>, <strong>explicit constraint</strong>, or <strong>testability</strong> that survive appropriate controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias.
       </p>
     </div>
   </section>
 
-  <!-- 3. THE INSTRUMENT -->
-  <section class="page-section" id="instrument">
-    <div class="section-eyebrow">Section 3</div>
-    <h2 class="section-heading">The Instrument</h2>
+  <!-- ========================================================================
+       3. THE REFLECTIVE INSTRUMENT
+       ======================================================================== -->
+  <section class="paper-section" id="instrument">
+    <div class="section-label">Section 3</div>
+    <h2 class="section-title">The Reflective Instrument</h2>
 
-    <div class="instrument-display">
-      <div class="equation-large">M = &lang;X, O, S, E, A, C&rang;</div>
+    <p class="body-text">
+      An operational reasoning or revision instrument is represented as a six-component tuple separating the examined states, transformations, selection policy, evaluation feedback, abstraction map, and reintegration.
+    </p>
 
-      <div class="pipeline-flow">
-        <div class="flow-node">
-          <span class="symbol">X</span>
-          <span class="label">State / Objects</span>
-        </div>
-        <span class="flow-arrow">&rarr;</span>
-        <div class="flow-node">
-          <span class="symbol">O</span>
-          <span class="label">Operation</span>
-        </div>
-        <span class="flow-arrow">&rarr;</span>
-        <div class="flow-node">
-          <span class="symbol">S</span>
-          <span class="label">Selection</span>
-        </div>
-        <span class="flow-arrow">&rarr;</span>
-        <div class="flow-node">
-          <span class="symbol">E</span>
-          <span class="label">Evaluation</span>
-        </div>
-        <span class="flow-arrow">&rarr;</span>
-        <div class="flow-node">
-          <span class="symbol">A</span>
-          <span class="label">Abstraction</span>
-        </div>
-        <span class="flow-arrow">&rarr;</span>
-        <div class="flow-node">
-          <span class="symbol">C</span>
-          <span class="label">Collapse / Reintegrate</span>
-        </div>
+    <div class="instrument-container">
+      <div class="math-centerpiece">M = &lang;X, O, S, E, A, C&rang;</div>
+
+      <div class="component-selector-grid" role="tablist" aria-label="Instrument Components">
+        <button type="button" class="comp-btn active" data-sym="X" role="tab" aria-selected="true" id="tab-comp-x">
+          <span class="sym">X</span>
+          <span class="lbl">State</span>
+        </button>
+        <button type="button" class="comp-btn" data-sym="O" role="tab" aria-selected="false" id="tab-comp-o">
+          <span class="sym">O</span>
+          <span class="lbl">Operations</span>
+        </button>
+        <button type="button" class="comp-btn" data-sym="S" role="tab" aria-selected="false" id="tab-comp-s">
+          <span class="sym">S</span>
+          <span class="lbl">Selection</span>
+        </button>
+        <button type="button" class="comp-btn" data-sym="E" role="tab" aria-selected="false" id="tab-comp-e">
+          <span class="sym">E</span>
+          <span class="lbl">Evaluation</span>
+        </button>
+        <button type="button" class="comp-btn" data-sym="A" role="tab" aria-selected="false" id="tab-comp-a">
+          <span class="sym">A</span>
+          <span class="lbl">Abstraction</span>
+        </button>
+        <button type="button" class="comp-btn" data-sym="C" role="tab" aria-selected="false" id="tab-comp-c">
+          <span class="sym">C</span>
+          <span class="lbl">Collapse</span>
+        </button>
       </div>
 
-      <div class="typed-pass-note">
-        Typed Composition: <code>M(x) = C(A(E(o_S(x), e_X(x))))</code> &middot; Hierarchical Lift: <code>T(M) = M<sup>up</sup>(M)</code>
+      <div class="component-detail-box" role="tabpanel" id="comp-detail-panel" aria-live="polite">
+        <div class="detail-header" id="comp-detail-header">X — State / Object Space</div>
+        <div class="detail-desc" id="comp-detail-desc">
+          The objects, theories, reasoning prompts, or candidate states currently under consideration. In an ordinary pass, transformations act directly upon elements of X.
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- 4. THE TEST -->
-  <section class="page-section" id="test">
-    <div class="section-eyebrow">Section 4</div>
-    <h2 class="section-heading">The Test</h2>
+  <!-- ========================================================================
+       4. TYPED SELF-APPLICATION
+       ======================================================================== -->
+  <section class="paper-section" id="typed-self-application">
+    <div class="section-label">Section 4</div>
+    <h2 class="section-title">Typed Self-Application</h2>
 
-    <div class="test-box">
+    <div class="lift-card">
+      <div class="lift-math">
+        <span class="fn">M<sup>&uarr;</sup></span> : Inst &rarr; Inst &emsp;&middot;&emsp; <span class="fn">T(M)</span> = M<sup>&uarr;</sup>(M)
+      </div>
+
+      <p class="body-text">
+        Naive <em>M(M)</em> can be type-unsafe when <em>M : X &rarr; X</em>. The hierarchical lift <strong>M<sup>&uarr;</sup></strong> allows the instrument to operate on descriptions of instruments (<strong>Inst</strong>), making self-application a typed transformation rather than rhetorical recursion.
+      </p>
+
+      <div class="lift-flow-diagram">M
+&darr; examine
+select meta-operation
+&darr;
+modify instrument (S, E, A, C, O)
+&darr;
+evaluate
+&darr;
+abstract
+&darr;
+reintegrate
+&darr;
+M&prime;</div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       5. THE TWO CAPTAIN-GENERATED SLIDES (MANDATORY)
+       ======================================================================== -->
+  <section class="paper-section" id="two-slides">
+    <div class="section-label">Visual Summary</div>
+    <h2 class="section-title">The paper in two slides</h2>
+
+    <p class="body-text">
+      Click either slide to open the full-screen interactive lightbox viewer.
+    </p>
+
+    <div class="slides-container">
+      <!-- Slide 1 -->
+      <div class="slide-item">
+        <div class="slide-img-wrap slide-zoom-trigger" data-slide-idx="0" tabindex="0" role="button" aria-label="Open full-screen view of Slide 1">
+          <img src="assets/slide1.png" alt="Slide 1: The Criterion — A useful loop should improve by passing through itself" loading="eager" id="img-slide-1" />
+          <div class="slide-zoom-hint">Click to enlarge</div>
+        </div>
+        <div class="slide-caption">
+          <div class="slide-caption-title">The Criterion</div>
+          <div class="slide-caption-text">
+            A useful reflective loop should become more precise, constrained, or testable by passing through itself.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="slide-item">
+        <div class="slide-img-wrap slide-zoom-trigger" data-slide-idx="1" tabindex="0" role="button" aria-label="Open full-screen view of Slide 2">
+          <img src="assets/slide2.png" alt="Slide 2: The Experiment — Separate recursion from real improvement" loading="lazy" id="img-slide-2" />
+          <div class="slide-zoom-hint">Click to enlarge</div>
+        </div>
+        <div class="slide-caption">
+          <div class="slide-caption-title">The Experiment</div>
+          <div class="slide-caption-text">
+            Compare self-application against baseline, generic revision, and decorative self-reference under blinded evaluation.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       6. WHAT COUNTS AS IMPROVEMENT?
+       ======================================================================== -->
+  <section class="paper-section" id="improvement-criteria">
+    <div class="section-label">Section 6</div>
+    <h2 class="section-title">What Counts as Improvement?</h2>
+
+    <p class="body-text">
+      Self-application is not judged by self-report or narrative eloquence. The proposed criterion requires positive vector movement across three externally scored dimensions:
+    </p>
+
+    <div class="discriminator-box">
       <div class="discriminator-math">
         P(R(T)) &gt; P(T), &emsp; K(R(T)) &ge; K(T), &emsp; F(R(T)) &gt; F(T)
       </div>
-
-      <div class="test-punchline">
+      <div style="font-family: var(--font-serif); font-size: 16px; font-style: italic; color: #ffffff;">
         “Sharper, more constrained, more falsifiable.”
       </div>
+    </div>
 
-      <div class="test-dimensions-grid">
-        <div class="dim-card">
-          <div class="name">P(T) &middot; Precision</div>
-          <div class="desc">Commitments become sharper and less ambiguous; eliminates evasive restatements.</div>
+    <div class="criteria-grid">
+      <div class="criterion-card">
+        <div class="criterion-sym">P &middot; Precision</div>
+        <div class="criterion-title">Precision P(T)</div>
+        <div class="criterion-desc">
+          Does the successor make commitments sharper and reduce ambiguity? Eliminates evasive restatements and vague claims.
         </div>
-        <div class="dim-card">
-          <div class="name">K(T) &middot; Constraint</div>
-          <div class="desc">Rules out more invalid behaviors and interpretations rather than adding decorative freedom.</div>
+      </div>
+
+      <div class="criterion-card">
+        <div class="criterion-sym">K &middot; Explicit Constraint</div>
+        <div class="criterion-title">Constraint K(T)</div>
+        <div class="criterion-desc">
+          Does it rule out more behaviors or interpretations rather than merely adding expressive freedom or gratuitous qualifications?
         </div>
-        <div class="dim-card">
-          <div class="name">F(T) &middot; Falsifiability</div>
-          <div class="desc">Exposes concrete observations, edge cases, and experiments that could weaken or disprove it.</div>
+      </div>
+
+      <div class="criterion-card">
+        <div class="criterion-sym">F &middot; Testability</div>
+        <div class="criterion-title">Testability F(T)</div>
+        <div class="criterion-desc">
+          Does it expose observations, counterexamples, edge cases, or experiments capable of weakening the proposal?
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- 5. CONTROLS -->
-  <section class="page-section" id="controls">
-    <div class="section-eyebrow">Section 5</div>
-    <h2 class="section-heading">Experimental Controls</h2>
-
-    <div class="controls-grid">
-      <div class="control-col">
-        <div class="control-eyebrow">Control Condition 1</div>
-        <div class="control-title">Generic Revision</div>
-        <div class="control-desc">
-          Revise for clarity, style, and rigor without instructing the method to apply to itself or edit its own core procedure.
-        </div>
-        <div class="control-footer">Baseline Edit Benchmark</div>
-      </div>
-
-      <div class="control-col target">
-        <div class="control-eyebrow">Primary Target</div>
-        <div class="control-title">Self-Application</div>
-        <div class="control-desc">
-          The method inspects and transforms its own selector, evaluator, failure criteria, or abstraction rules via hierarchical lift <em>M<sup>up</sup>(M)</em>.
-        </div>
-        <div class="control-footer" style="color: var(--cyan-bright);">&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0</div>
-      </div>
-
-      <div class="control-col">
-        <div class="control-eyebrow">Control Condition 2</div>
-        <div class="control-title">Decorative Self-Reference</div>
-        <div class="control-desc">
-          Add explicit self-referential prose and commentary without permitting actual functional modification of the executable procedure.
-        </div>
-        <div class="control-footer">&Delta;<sub>self</sub> - &Delta;<sub>decorative</sub> &approx; 0 (null)</div>
-      </div>
+    <div class="callout-not-correctness">
+      <strong>Productivity is not correctness.</strong> A false theory can become more precise under self-application. External empirical, formal, logical, or task-grounded validation remains necessary.
     </div>
   </section>
 
-  <!-- 2-SLIDE SUMMARY -->
-  <section class="page-section" id="summary-deck">
-    <div class="section-eyebrow">Executive Deck</div>
-    <h2 class="section-heading">2-Slide Summary</h2>
+  <!-- ========================================================================
+       7. EXPERIMENTAL TEST LANES
+       ======================================================================== -->
+  <section class="paper-section" id="experimental-test">
+    <div class="section-label">Section 7</div>
+    <h2 class="section-title">Experimental Test</h2>
 
-    <div class="slide-deck">
-      <div class="deck-nav">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">Executive Visual Summary</div>
-          <a href="2-slide-summary.pdf" target="_blank" rel="noopener" style="font-family: var(--font-mono); font-size: 11.5px; color: var(--cyan-bright); text-decoration: none; border-bottom: 1px dashed var(--cyan-bright); padding-bottom: 1px;">Download 2-Slide PDF &darr;</a>
+    <p class="body-text">
+      The primary test compares four distinct conditions under token-matched budgets and blinded evaluation:
+    </p>
+
+    <div class="lanes-grid">
+      <div class="lane-col">
+        <div class="lane-header">Condition 01</div>
+        <div class="lane-title">Baseline</div>
+        <div class="lane-desc">
+          No revision. The original procedure is frozen as the ground benchmark.
         </div>
-        <div class="slide-tabs">
-          <button class="slide-tab-btn active" id="btn-slide-1" onclick="showSlide(1)">Slide 1: The Criterion</button>
-          <button class="slide-tab-btn" id="btn-slide-2" onclick="showSlide(2)">Slide 2: The Experiment</button>
-        </div>
+        <div class="lane-footer">Unmodified Ground</div>
       </div>
 
-      <!-- Slide 1 -->
-      <div class="slide-frame" id="slide-1">
-        <div class="slide-num">SLIDE 1 OF 2</div>
-        <div class="slide-header-title">A useful loop should improve by passing through itself</div>
-        
-        <div class="slide-img-container">
-          <img src="slide1.png" alt="Slide 1: The Criterion — A useful loop should improve by passing through itself" class="slide-img" loading="eager" />
+      <div class="lane-col">
+        <div class="lane-header">Condition 02</div>
+        <div class="lane-title">Generic Revision</div>
+        <div class="lane-desc">
+          Revise for clarity and rigor without telling the procedure to apply itself to itself.
         </div>
-
-        <div class="slide-bottom-line">
-          Bottom Line: Productive = more precise, more constrained, more testable.
-        </div>
+        <div class="lane-footer">Baseline Edit Benchmark</div>
       </div>
 
-      <!-- Slide 2 (Hidden by default) -->
-      <div class="slide-frame" id="slide-2" style="display: none;">
-        <div class="slide-num">SLIDE 2 OF 2</div>
-        <div class="slide-header-title">Separate recursion from real improvement</div>
-        
-        <div class="slide-img-container">
-          <img src="slide2.png" alt="Slide 2: The Experiment — Separate recursion from real improvement" class="slide-img" loading="lazy" />
+      <div class="lane-col target">
+        <div class="lane-header">Primary Target</div>
+        <div class="lane-title">Self-Application</div>
+        <div class="lane-desc">
+          Apply the target method to its own definitions, evaluator, failure conditions, and revision policy via <em>M<sup>&uarr;</sup>(M)</em>.
         </div>
+        <div class="lane-footer">&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0</div>
+      </div>
 
-        <div class="slide-bottom-line">
-          Judged blind on precision, constraint, falsifiability, contradiction, and overclaim.
+      <div class="lane-col">
+        <div class="lane-header">Condition 03</div>
+        <div class="lane-title">Decorative Loop</div>
+        <div class="lane-desc">
+          Add explicit self-referential language and commentary without modifying the actual executable procedure.
         </div>
+        <div class="lane-footer">&Delta;<sub>self</sub> - &Delta;<sub>decorative</sub> &approx; 0 (Null)</div>
       </div>
     </div>
-  </section>
 
-  <!-- FULL PAPER / MANUSCRIPT SECTION -->
-  <section class="page-section" id="full-paper">
-    <div class="section-eyebrow">Full Manuscript</div>
-    <h2 class="section-heading">Paper Abstract &amp; Sections</h2>
-
-    <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 24px; font-size: 14px; color: var(--text-secondary); line-height: 1.7;">
-      <p style="margin-bottom: 14px;">
-        <strong>Abstract:</strong> Recursive self-improvement and iterative self-refinement are increasingly common descriptions of reasoning and agent systems, but self-reference alone does not distinguish a useful reflective process from a decorative loop. This paper proposes a compact operational formalism for reflective instruments and a corresponding criterion for productive self-application. An instrument is represented as <code>M = &lang;X, O, S, E, A, C&rang;</code>, separating examined states, transformations, selection, evaluation, abstraction or meta-control, and reintegration. A hierarchical lift <code>M<sup>up</sup></code> permits the instrument to operate on representations of instruments, giving a typed interpretation of the suggestive expression <em>M(M)</em> as <em>M<sup>up</sup>(M)</em>, rather than naive untyped self-application.
+    <div class="discriminator-box" style="margin-top: 14px;">
+      <div class="discriminator-math" style="font-size: 18px;">
+        &Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0 &emsp; (for genuinely reflective targets)
+      </div>
+      <p class="body-text" style="margin: 0; font-size: 13.5px;">
+        Artifacts must be blindly scored by independent evaluators using a frozen rubric across precision, constraints, falsifiability, contradiction, and overclaim.
       </p>
-      <p style="margin-bottom: 14px;">
-        The central proposal is that self-application is scientifically interesting only when it yields externally measurable gains in precision, explicit constraint, or testability that survive controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias. We give a blinded experimental protocol, explicit falsification conditions, and a bounded provenance case from the development of the formalism.
-      </p>
-      <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); padding-top: 12px; border-top: 1px solid var(--border-subtle);">
-        Keywords: recursive self-improvement &middot; self-reflection &middot; metacognition &middot; reflective agents &middot; evaluation &middot; scientific instrumentation
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       8. ANTI-SLOP CONTROLS
+       ======================================================================== -->
+  <section class="paper-section" id="anti-slop-controls">
+    <div class="section-label">Section 8</div>
+    <h2 class="section-title">Anti-Slop Controls</h2>
+
+    <p class="body-text">
+      The framework is explicitly designed to <strong>make self-improvement claims harder to get away with</strong>, not easier. To prevent gaming naive metrics, evaluation enforces strict controls:
+    </p>
+
+    <div class="controls-list-grid">
+      <div class="control-item">
+        <strong>Verbosity / Token Count</strong>
+        Controls against longer text appearing precise simply via qualification padding.
+      </div>
+      <div class="control-item">
+        <strong>Evaluator Familiarity</strong>
+        Controls against evaluators rewarding phrasing they previously helped generate.
+      </div>
+      <div class="control-item">
+        <strong>Circularity &amp; Restatement</strong>
+        Penalizes non-substantive paraphrasing loops and cosmetic restatements.
+      </div>
+      <div class="control-item">
+        <strong>Contradiction Rate</strong>
+        Detects and penalizes introduced logical inconsistencies.
+      </div>
+      <div class="control-item">
+        <strong>Unsupported Overclaim</strong>
+        Penalizes inflated capability narratives and unfounded generalization claims.
+      </div>
+      <div class="control-item">
+        <strong>Operational Constraints</strong>
+        Confirms new constraints are executable and falsifiable, not decorative syntax.
+      </div>
+      <div class="control-item">
+        <strong>Length Matching</strong>
+        Normalizes token budgets between generic and self-applied conditions.
+      </div>
+      <div class="control-item">
+        <strong>Held-out Task Transfer</strong>
+        Verifies meta-level rubric gains transfer to held-out object-level problems.
       </div>
     </div>
   </section>
 
-  <!-- 6. DOWNLOAD / CITATION / CONTACT -->
-  <section class="page-section" id="citation-contact">
-    <div class="section-eyebrow">Section 6</div>
-    <h2 class="section-heading">Download, Citation &amp; Contact</h2>
+  <!-- ========================================================================
+       9. FALSIFICATION
+       ======================================================================== -->
+  <section class="paper-section" id="falsification">
+    <div class="section-label" style="color: #ef4444;">Section 9</div>
+    <h2 class="section-title" style="color: #ffffff;">How the proposal can fail</h2>
 
-    <div class="citation-wrapper">
-      <button class="copy-button" id="copy-bib-btn" onclick="copyBibtexCitation()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        <span id="copy-bib-label">Copy BibTeX</span>
-      </button>
-      <pre class="bibtex-text" id="bibtex-source">@article{lampley2026productiveselfapp,
-  title={Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems},
-  author={Lampley, Cameron G.},
-  journal={arXiv preprint (Candidate v1.0)},
-  year={2026},
-  month={August},
-  note={Candidate arXiv v1.0, cs.AI},
-  url={https://cameronlampley.com/monadone/}
-}</pre>
+    <p class="body-text">
+      The proposal is explicitly falsifiable. The central hypothesis fails if:
+    </p>
+
+    <div class="falsification-card">
+      <ul class="falsification-list">
+        <li><strong>Generic Equality:</strong> Self-applied versions do not outperform matched generic revisions (&Delta;<sub>self</sub> &le; &Delta;<sub>generic</sub>);</li>
+        <li><strong>Confound Collapse:</strong> Any apparent advantage disappears under length matching or blinded evaluation;</li>
+        <li><strong>Decorative Parity:</strong> Decorative self-referential controls improve equally well;</li>
+        <li><strong>Spurious Precision:</strong> Precision gains are accompanied by increased contradiction, circularity, or unsupported claims;</li>
+        <li><strong>Transfer Failure:</strong> Meta-level rubric gains fail to transfer to held-out object-level problems; or</li>
+        <li><strong>Evaluator Indistinguishability:</strong> Independent evaluators cannot reliably distinguish the purported successor from its baseline.</li>
+      </ul>
     </div>
+  </section>
 
-    <div class="sober-contact">
-      <strong>Inquiries &amp; Independent Replication:</strong><br>
-      Cameron G. Lampley &middot; Independent Researcher &middot; <a href="https://cameronlampley.com/">cameronlampley.com</a><br>
-      Candidate preprint intended for arXiv <code>cs.AI</code> (Computer Science &mdash; Artificial Intelligence).
+  <!-- ========================================================================
+       10. STATUS / SCOPE
+       ======================================================================== -->
+  <section class="paper-section" id="status-scope">
+    <div class="section-label">Section 10</div>
+    <h2 class="section-title">Status &amp; Scope</h2>
+
+    <div class="scope-box">
+      <div class="scope-title">Preliminary Methods Preprint</div>
+      <p class="body-text" style="margin-bottom: 8px;">
+        This work proposes a formal vocabulary and test protocol. It does <strong>not</strong> claim:
+      </p>
+      <ul class="scope-list">
+        <li>A theorem of recursive self-improvement;</li>
+        <li>Complete introspective access or transparency;</li>
+        <li>Indefinitely safe autonomous self-modification; or</li>
+        <li>Empirical confirmation of the central hypothesis.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       11. PAPER PUBLICATION CARD & CITATION
+       ======================================================================== -->
+  <section class="paper-section" id="paper-details">
+    <div class="section-label">Section 11</div>
+    <h2 class="section-title">Paper &amp; Citation</h2>
+
+    <div class="paper-pub-card">
+      <h3 class="pub-title">Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems</h3>
+      <div class="pub-meta">
+        <strong>Cameron G. Lampley</strong> &middot; Candidate arXiv v1.0 &middot; 15 August 2026 &middot; Subject: cs.AI
+      </div>
+
+      <div class="hero-actions" style="justify-content: flex-start; margin-bottom: 18px;">
+        <a href="assets/Productive-Self-Application-arXiv-v1.pdf" target="_blank" rel="noopener" class="btn btn-primary" id="btn-read-pdf-card">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          <span>Read PDF</span>
+        </a>
+
+        <a href="assets/Productive-Self-Application-arXiv-v1.pdf" download="Productive-Self-Application-arXiv-v1.pdf" class="btn btn-secondary" id="btn-download-pdf-card">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Download PDF</span>
+        </a>
+
+        <button type="button" class="btn btn-secondary copy-citation-btn" id="btn-copy-card-citation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Copy Citation</span>
+        </button>
+      </div>
+
+      <div class="citation-block" id="citation-display-text">Lampley, Cameron G. "Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems." Candidate arXiv v1.0, 15 August 2026.</div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="site-footer">
-    <p>Productive Self-Application &middot; Cameron G. Lampley &middot; 2026</p>
+    <p>Productive Self-Application &middot; Cameron G. Lampley &middot; 2026 &middot; <a href="https://cameronlampley.com/">cameronlampley.com</a></p>
   </footer>
 
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast-msg">BibTeX copied to clipboard.</div>
+<!-- ========================================================================
+     SLIDE LIGHTBOX MODAL
+     ======================================================================== -->
+<div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-label="Slide Lightbox Viewer">
+  <button type="button" class="lightbox-btn lightbox-close" id="lightbox-close" aria-label="Close Lightbox">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+  </button>
 
-<script>
-  function showSlide(n) {
-    document.getElementById('slide-1').style.display = n === 1 ? 'flex' : 'none';
-    document.getElementById('slide-2').style.display = n === 2 ? 'flex' : 'none';
-    document.getElementById('btn-slide-1').classList.toggle('active', n === 1);
-    document.getElementById('btn-slide-2').classList.toggle('active', n === 2);
-  }
+  <button type="button" class="lightbox-btn lightbox-prev" id="lightbox-prev" aria-label="Previous Slide">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+  </button>
 
-  function copyBibtexCitation() {
-    const text = document.getElementById('bibtex-source').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const toast = document.getElementById('toast-msg');
-      toast.classList.add('show');
-      const label = document.getElementById('copy-bib-label');
-      label.textContent = "Copied!";
-      setTimeout(() => {
-        toast.classList.remove('show');
-        label.textContent = "Copy BibTeX";
-      }, 2500);
-    });
-  }
-</script>
+  <button type="button" class="lightbox-btn lightbox-next" id="lightbox-next" aria-label="Next Slide">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </button>
 
+  <div class="lightbox-content">
+    <img src="assets/slide1.png" alt="Slide Lightbox View" class="lightbox-img" id="lightbox-img" />
+    <div class="lightbox-caption" id="lightbox-caption">Slide 1: The Criterion</div>
+  </div>
+</div>
+
+<!-- ========================================================================
+     TOAST NOTIFICATION
+     ======================================================================== -->
+<div class="toast-msg" id="toast-msg" role="status" aria-live="polite">Citation copied</div>
+
+<script src="app.js"></script>
 </body>
 </html>
