@@ -259,6 +259,36 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollToBottom();
   }
 
+  function formatMarkdown(text) {
+    if (!text) return '';
+    let escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+
+    // Code blocks: ```lang ... ```
+    escaped = escaped.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/gi, (match, lang, code) => {
+      return `<pre class="code-block"><code class="lang-${lang}">${code}</code></pre>`;
+    });
+
+    // Inline code: `code`
+    escaped = escaped.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+    // Bold & Italic
+    escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    escaped = escaped.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+    // Images: ![alt](url)
+    escaped = escaped.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="message-inline-image" style="max-width:100%; border-radius:8px; margin:0.5rem 0;" loading="lazy">');
+
+    // Links: [text](url)
+    escaped = escaped.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--teal-accent);">$1</a>');
+
+    // Line breaks
+    escaped = escaped.replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>');
+    return `<p>${escaped}</p>`;
+  }
+
   function appendMessageToFeed(msg) {
     const bubble = document.createElement('div');
     bubble.className = `message-bubble ${msg.role}`;
@@ -269,14 +299,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const body = document.createElement('div');
     body.className = 'message-body';
-    body.innerText = msg.text;
+    body.innerHTML = formatMarkdown(msg.text);
+
+    // Render attachments if present
+    if (msg.attachments && msg.attachments.length > 0) {
+      msg.attachments.forEach(att => {
+        const attEl = document.createElement('div');
+        attEl.className = 'attachment-item-rendered';
+        attEl.style.cssText = 'font-size:0.8rem; opacity:0.8; margin-bottom:0.3rem;';
+        attEl.innerHTML = `📎 ${att.original_name || att.filename}`;
+        bubble.appendChild(attEl);
+      });
+    }
 
     // Render tool events if present
     if (msg.tool_events && msg.tool_events.length > 0) {
       msg.tool_events.forEach(t => {
         const toolBadge = document.createElement('div');
         toolBadge.className = 'tool-event-badge';
-        toolBadge.innerHTML = `<span>⚙️</span> <span class="tool-event-summary">${t.summary}</span>`;
+        toolBadge.innerHTML = `<span>⚙️</span> <span class="tool-event-summary">${t.summary || t.action || t.name}</span>`;
         bubble.appendChild(toolBadge);
       });
     }
@@ -369,9 +410,9 @@ document.addEventListener('DOMContentLoaded', () => {
           let eventData = '';
 
           for (const line of events) {
-            if (line.startswith('event: ')) {
+            if (line.startsWith('event: ')) {
               eventType = line.slice(7).trim();
-            } else if (line.startswith('data: ')) {
+            } else if (line.startsWith('data: ')) {
               eventData = line.slice(6).trim();
             }
           }
@@ -381,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
               const dataObj = JSON.parse(eventData);
               if (dataObj.content) {
                 accumulatedText += dataObj.content;
-                body.innerText = accumulatedText;
+                body.innerHTML = formatMarkdown(accumulatedText);
                 scrollToBottom();
               }
             } catch (err) {}
@@ -399,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      if (!accumulatedText.strip()) {
+      if (!accumulatedText.trim()) {
         body.innerText = '(Turn completed)';
       }
     } catch (err) {

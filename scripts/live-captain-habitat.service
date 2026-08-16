@@ -8,7 +8,7 @@ Type=simple
 User=cgl
 Group=cgl
 WorkingDirectory=/home/cgl/dev/monad
-ExecStart=/home/cgl/dev/monad/.venv/bin/python3 /home/cgl/dev/monad/tools/live-captain/habitat_server.py --port 4777
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/live-captain/habitat_server.py --port 4777
 Restart=on-failure
 RestartSec=3
 

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-16T16:02:53Z",
+  "generated": "2026-08-16T16:08:58Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -7,15 +7,15 @@
     "expected_down": 4,
     "oneshot": 2
   },
-  "ports": 18,
+  "ports": 19,
   "suites": {
     "passed": 6,
     "failed": 0,
     "total": 6
   },
   "tree": {
-    "uncommitted": 5,
-    "head": "9b32601"
+    "uncommitted": 4,
+    "head": "f1414cc"
   },
   "captain": "running",
   "captain_detail": {
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.5G",
-      "memory_available_percent": 72.0,
-      "load_1m": 1.0
+      "memory_available_percent": 73.4,
+      "load_1m": 4.08
     }
   },
   "sound": true,
@@ -104,7 +104,7 @@
     },
     {
       "priority": 2,
-      "text": "20 of 25 units running on 18 ports."
+      "text": "20 of 25 units running on 19 ports."
     },
     {
       "priority": 2,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "5 files uncommitted."
+      "text": "4 files uncommitted."
     },
     {
       "priority": 1,
