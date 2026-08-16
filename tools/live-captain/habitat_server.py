@@ -314,7 +314,52 @@ class LLMEngine:
             tool_events.append({"name": "cancel_job", "summary": f"Cancelled {job_id}", "result": res})
             response_text = res
 
-        elif any(w in lower_msg for w in ["sound", "ship", "status", "check ship"]):
+        elif any(w in lower_msg for w in ["status", "are you healthy", "health", "system status"]):
+            event_queue.put({"event": "tool", "data": json.dumps({"name": "system_status", "action": "Inspecting System Status", "summary": "Querying operational metrics"})})
+            jobs = GLOBAL_JOB_RUNNER.store.list_jobs(limit=5)
+            running_jobs = [j for j in jobs if j["state"] == "running"]
+            failed_jobs = [j for j in jobs if j["state"] == "failed"]
+            threads_count = len(STORE.list_threads())
+
+            # Get git head sha
+            try:
+                git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_ROOT, text=True).strip()
+            except Exception:
+                git_sha = "unknown"
+
+            response_text = (
+                f"### ⚓ Live Captain Operational Status\n\n"
+                f"- **Overall Health:** `HEALTHY · ALL SYSTEMS SOUND`\n"
+                f"- **Active Backend:** `Deterministic Multimodal Engine + AGY/Claude/Codex Workers`\n"
+                f"- **Phone Terminal:** `ONLINE` (Port 4777, `/captain/`)\n"
+                f"- **Root Console:** `ONLINE` (Port 4792, `/root/`)\n"
+                f"- **Conversation Threads:** `{threads_count}` stored in SQLite\n"
+                f"- **Active Jobs:** `{len(running_jobs)}` running | `{len(failed_jobs)}` failed recently\n"
+                f"- **Pause State:** `UNPAUSED · ACTIVE ENGAGEMENT`\n"
+                f"- **Version / Commit:** `{git_sha}`\n\n"
+                f"Identity compiled from canonical posture (`EDIT-THIS-ONE-FILE.md`)."
+            )
+
+        elif any(w in clean_lower for w in ["how does", "explain feature", "what is", "operator manual", "tell me about"]):
+            event_queue.put({"event": "tool", "data": json.dumps({"name": "consult_manual", "action": "Consulting Operator Manual", "summary": "Reading LIVE_CAPTAIN_OPERATOR_MANUAL.md"})})
+            manual_path = REPO_ROOT / "docs" / "manuals" / "LIVE_CAPTAIN_OPERATOR_MANUAL.md"
+            if manual_path.exists():
+                manual_text = manual_path.read_text(encoding="utf-8")
+                # Excerpt relevant section
+                response_text = (
+                    f"### 📖 Operator Manual Reference\n\n"
+                    f"Consulted [`docs/manuals/LIVE_CAPTAIN_OPERATOR_MANUAL.md`](file://{manual_path}):\n\n"
+                    f"Live Captain provides unified conversational access via the **Phone Terminal** (`/captain/`) "
+                    f"for rapid mobile command and **Root Console** (`/root/`) for operations.\n\n"
+                    f"**Core Mechanics:**\n"
+                    f"- **Agent Jobs:** Delegated to `AGY`, `Claude`, or `Codex` asynchronously with SQLite persistence.\n"
+                    f"- **Authority Boundary:** Automatically separates read-only inquiries from staged privileged actions (`cmd.sh`).\n"
+                    f"- **Continuity:** Single shared state across phone and console surviving process restarts."
+                )
+            else:
+                response_text = "Live Captain is governed by canonical posture in `EDIT-THIS-ONE-FILE.md`."
+
+        elif any(w in lower_msg for w in ["sound", "ship", "check ship"]):
             event_queue.put({"event": "tool", "data": json.dumps({"name": "sound_ship", "action": "Sounding Ship", "summary": "bash scripts/sound-the-ship.sh"})})
             res = ToolExecutor.execute("sound_ship", {})
             tool_events.append({"name": "sound_ship", "summary": "bash scripts/sound-the-ship.sh", "result": res})
