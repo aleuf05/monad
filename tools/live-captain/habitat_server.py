@@ -34,6 +34,17 @@ from context_compiler import (
     load_optional_text,
     compact_runtime_sources,
 )
+from comms import (
+    Action,
+    AuthorityBoundary,
+    AuthorityLevel,
+    InboundMessage,
+    OutboundMessage,
+    Urgency,
+    WebChannelAdapter,
+)
+from job_engine import GLOBAL_JOB_RUNNER
+from proactive import NOTIFIER
 
 DB_PATH = REPO_ROOT / "data" / "live-captain" / "habitat.db"
 STORE = HabitatStore(DB_PATH)
@@ -141,6 +152,41 @@ class ToolExecutor:
             except Exception as e:
                 return f"Error sounding ship: {e}"
 
+        elif tool_name in ("delegate_job", "dispatch_agent", "run_job"):
+            worker = args.get("worker", "agy")
+            request = args.get("request") or args.get("prompt") or ""
+            conversation_id = args.get("conversation_id")
+            if not request:
+                return "Error: Empty request for worker"
+            job = GLOBAL_JOB_RUNNER.submit(
+                worker=worker,
+                request=request,
+                conversation_id=conversation_id,
+                on_complete=lambda j: NOTIFIER.notify(
+                    text=f"⚙️ Worker `{j['worker']}` completed job `{j['id']}`.\n\n### Result\n```text\n{j['result'][:1200]}\n```",
+                    semantic_role="captain",
+                    thread_id=j.get("conversation_id"),
+                ),
+            )
+            return (
+                f"Dispatched.\n"
+                f"Job: `{job['id']}`\n"
+                f"Worker: `{job['worker']}`\n"
+                f"State: `{job['state']}`"
+            )
+
+        elif tool_name == "list_jobs":
+            jobs = GLOBAL_JOB_RUNNER.store.list_jobs(limit=10)
+            if not jobs:
+                return "No jobs registered."
+            lines = [f"- `{j['id']}` [{j['worker']}] ({j['state']}): {j['request'][:60]}" for j in jobs]
+            return "\n".join(lines)
+
+        elif tool_name == "cancel_job":
+            job_id = args.get("job_id", "").strip()
+            ok = GLOBAL_JOB_RUNNER.cancel(job_id)
+            return f"Job `{job_id}` cancellation request sent: {'success' if ok else 'failed'}"
+
         return f"Unknown tool: {tool_name}"
 
 
@@ -234,27 +280,60 @@ class LLMEngine:
     ) -> tuple[str, List[Dict[str, Any]]]:
         """Rule-based execution engine that can inspect real repository state & run tools."""
         last_admiral_msg = messages[-1]["text"].strip() if messages else ""
+        thread_id = messages[-1].get("thread_id") if messages else None
         tool_events = []
+        lower_msg = last_admiral_msg.lower()
+        clean_lower = re.sub(r'^(captain|live captain|please|hey captain)[,\s:]+', '', lower_msg).strip()
 
-        # Check if operator requested ship sounding or status
-        if any(w in last_admiral_msg.lower() for w in ["sound", "ship", "status", "check"]):
+        # Check for agent delegation (e.g. "have agy inspect ...", "have claude check ...")
+        if any(clean_lower.startswith(p) or p in lower_msg for p in ["have agy", "have claude", "have codex", "dispatch agy", "dispatch claude", "dispatch codex"]):
+            worker = "agy"
+            if "claude" in lower_msg:
+                worker = "claude"
+            elif "codex" in lower_msg:
+                worker = "codex"
+
+            # Strip worker prefix from task request
+            task_req = re.sub(r'^(.*?)(have|dispatch)\s+(agy|claude|codex)\s+(to\s+)?', '', last_admiral_msg, flags=re.IGNORECASE).strip(" ,:") or last_admiral_msg
+
+            event_queue.put({"event": "tool", "data": json.dumps({"name": "delegate_job", "action": f"Dispatching {worker.upper()} Job", "summary": f"Job delegated to {worker}"})})
+            res = ToolExecutor.execute("delegate_job", {"worker": worker, "request": task_req, "conversation_id": thread_id})
+            tool_events.append({"name": "delegate_job", "summary": f"Delegated to {worker}", "result": res})
+            response_text = f"### Agent Job Dispatched\n\n{res}\n\nTask: *\"{task_req}\"*\n\nUpdates will stream automatically upon completion."
+
+        elif any(w in lower_msg for w in ["list jobs", "show jobs", "check jobs", "job status"]):
+            event_queue.put({"event": "tool", "data": json.dumps({"name": "list_jobs", "action": "Listing Jobs", "summary": "Querying job engine"})})
+            res = ToolExecutor.execute("list_jobs", {})
+            tool_events.append({"name": "list_jobs", "summary": "Querying job engine", "result": res})
+            response_text = f"### Registered Jobs\n\n{res}"
+
+        elif "cancel job" in lower_msg:
+            job_id = last_admiral_msg.split("cancel job", 1)[-1].strip(" :`")
+            event_queue.put({"event": "tool", "data": json.dumps({"name": "cancel_job", "action": "Cancelling Job", "summary": f"Job {job_id}"})})
+            res = ToolExecutor.execute("cancel_job", {"job_id": job_id})
+            tool_events.append({"name": "cancel_job", "summary": f"Cancelled {job_id}", "result": res})
+            response_text = res
+
+        elif any(w in lower_msg for w in ["sound", "ship", "status", "check ship"]):
             event_queue.put({"event": "tool", "data": json.dumps({"name": "sound_ship", "action": "Sounding Ship", "summary": "bash scripts/sound-the-ship.sh"})})
             res = ToolExecutor.execute("sound_ship", {})
             tool_events.append({"name": "sound_ship", "summary": "bash scripts/sound-the-ship.sh", "result": res})
-            
             response_text = f"### Ship Soundness Report\n\n```text\n{res}\n```\n\nAll systems inspected against canonical posture."
-        elif any(w in last_admiral_msg.lower() for w in ["heart", "lesson", "persist"]):
+
+        elif any(w in lower_msg for w in ["heart", "lesson", "persist"]):
             event_queue.put({"event": "tool", "data": json.dumps({"name": "save_heart_lesson", "action": "Saving Heart Lesson", "summary": "Persisting operational lesson"})})
             res = ToolExecutor.execute("save_heart_lesson", {"lesson": last_admiral_msg, "source": "Admiral prompt"})
             tool_events.append({"name": "save_heart_lesson", "summary": "Persisting Heart Lesson", "result": res})
-            
             response_text = f"Persisted operational Heart lesson to storage.\n\nResult: `{res}`"
+
         else:
             # High-signal standard Captain response
+            auth_level = AuthorityBoundary.assess(last_admiral_msg)
             response_text = (
                 f"Received directive: **{last_admiral_msg[:100]}**\n\n"
-                f"Live Captain context compiled from `EDIT-THIS-ONE-FILE.md` and current bearing. "
-                f"Ready to inspect, modify, test, and ship targeted software slices."
+                f"- **Authority Level:** `{auth_level.value}`\n"
+                f"- **Context:** Compiled from `EDIT-THIS-ONE-FILE.md` & `current-bearing.md`.\n\n"
+                f"Live Captain ready to inspect, execute, or delegate."
             )
 
         # Stream response text in chunks
@@ -325,10 +404,62 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
             self._send_json(200, {"lessons": lessons})
             return
 
+        if path in ("/jobs", "/captain-api/jobs"):
+            jobs = GLOBAL_JOB_RUNNER.store.list_jobs(limit=30)
+            self._send_json(200, {"jobs": jobs})
+            return
+
+        if path.startswith("/captain-api/jobs/") or path.startswith("/jobs/"):
+            job_id = path.split("/")[-1]
+            job = GLOBAL_JOB_RUNNER.store.get_job(job_id)
+            if job:
+                self._send_json(200, job)
+            else:
+                self.send_error(404, "Job not found")
+            return
+
         self.send_error(404, "Not Found")
 
     def do_POST(self) -> None:
         path = self.path.split("?")[0].rstrip("/")
+
+        if path in ("/jobs", "/captain-api/jobs"):
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+            data = json.loads(body.decode("utf-8")) if body else {}
+            worker = data.get("worker", "agy")
+            request = data.get("request", "")
+            conversation_id = data.get("conversation_id")
+            if not request:
+                self._send_json(400, {"error": "Empty request"})
+                return
+            job = GLOBAL_JOB_RUNNER.submit(worker=worker, request=request, conversation_id=conversation_id)
+            self._send_json(200, job)
+            return
+
+        if (path.startswith("/captain-api/jobs/") or path.startswith("/jobs/")) and path.endswith("/cancel"):
+            job_id = path.split("/")[-2]
+            ok = GLOBAL_JOB_RUNNER.cancel(job_id)
+            self._send_json(200, {"status": "cancelled" if ok else "failed", "job_id": job_id})
+            return
+
+        if path in ("/notify", "/captain-api/notify"):
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+            data = json.loads(body.decode("utf-8")) if body else {}
+            text = data.get("text", "")
+            if not text:
+                self._send_json(400, {"error": "Empty notification text"})
+                return
+            res = NOTIFIER.notify(
+                text=text,
+                semantic_role=data.get("role", "captain"),
+                urgency=data.get("urgency", "normal"),
+                thread_id=data.get("thread_id"),
+                actions=data.get("actions"),
+            )
+            self._send_json(200, res)
+            return
 
         if path in ("/threads", "/captain-api/threads"):
             content_len = int(self.headers.get("Content-Length", 0))

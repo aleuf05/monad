@@ -25,7 +25,7 @@ The Live Captain operates as a unified operational intelligence connected to mul
        |  - Canonical Posture: EDIT-THIS-ONE-FILE.md                 |
        |  - Current Bearing: tools/live-captain/context/             |
        |  - Continuity Ledger & Heart Lessons: data/live-captain/    |
-       |  - Bootstrap API (port 4778) & Habitat Server (port 4777)   |
+       |  - Habitat Server (port 4777) & Bootstrap API (port 4778)   |
        +------------------------------+------------------------------+
                                       |
          +----------------------------+----------------------------+
@@ -41,7 +41,7 @@ The Live Captain operates as a unified operational intelligence connected to mul
 
 | Component | Port | Service Unit | Primary Function |
 |---|---|---|---|
-| **Captain Habitat API** | `4777` | `live-captain-habitat.service` (user unit) | Phone messaging SSE, multi-thread storage, tool execution, Heart lessons |
+| **Captain Habitat API** | `4777` | `live-captain-habitat.service` (user unit) | Phone messaging SSE, multi-thread storage, tool execution, Heart lessons, Job Engine |
 | **Live Captain Bootstrap** | `4778` | `live-captain-bootstrap.service` (system unit) | Root Console SSE turn pipeline, arbiter, objectives, pause state |
 | **Root Console Daemon** | `4792` | `root-console.service` (system unit) | Deep telemetry, corpus search, handoffs, generated-image trust mapper |
 | **Public Root Auth** | `4779` | `public-root-auth.service` (system unit) | Forward auth gatekeeper for `/root/` and privileged APIs |
@@ -81,7 +81,7 @@ The Phone Terminal is designed as the Admiral's primary mobile conversational in
    - Files are staged to `data/live-captain/uploads/` and referenced in context.
 
 6. **Tool Execution Badges:**
-   - When the Captain performs real actions (sounding the ship, reading/writing files, persisting rules), distinct tool badges render above the response with expandable summaries.
+   - When the Captain performs real actions (sounding the ship, reading/writing files, dispatching agent jobs, persisting rules), distinct tool badges render above the response with expandable summaries.
 
 7. **Captain Heart Modal (`❤️`):**
    - View durable operational lessons extracted from operator corrections.
@@ -89,24 +89,78 @@ The Phone Terminal is designed as the Admiral's primary mobile conversational in
 
 ---
 
-## 3. Root Console (`/root/`)
+## 3. Canonical Communication Model
 
-The Root Console remains the operational command deck for deep inspection, system configuration, diagnostics, and long-form outputs.
+Live Captain implements a transport-neutral semantic boundary (`tools/live-captain/comms.py`):
+$$\boxed{\text{Capability belongs to the message; presentation belongs to the channel.}}$$
 
-**URL:** `https://cameronlampley.com/root/`  
-**Authentication:** Gated by password cookie issued by `public-root-auth`.
+### Core Objects
 
-### Command Deck Capabilities
-
-- **Bridge / Command Draft Postures:** Switch between rapid conversational turn mode and structured long-form drafting.
-- **Push-to-Talk Voice:** Hold-to-speak audio capture with server-side transcription and voice playback.
-- **Corpus Search & Navigation:** Query live doctrine (`D_t`), reports, and Admiralty archive documents.
-- **Generated Images & 3D Stage:** Inspect rendered assets, glTF Kraken models, and previews.
-- **M³ Cycle Evaluator:** Review proposed repository mutations before committing.
+* **`InboundMessage`**: Semantic incoming payload containing `channel`, `sender`, `conversation_id`, `text`, `media[]`, `reply_to`, `timestamp`, and `channel_metadata`.
+* **`OutboundMessage`**: Semantic response containing `destination`, `text`, `media[]`, `actions[]`, `urgency` (`low`, `normal`, `high`, `emergency`), `reply_to`, and `semantic_role` (`captain`, `engineering`, `alert`).
+* **`Action`**: Semantic interactive control containing `id`, `label`, `intent`, and `authority_level`.
+* **`MediaItem`**: Transport-neutral rich asset reference (`image`, `document`, `audio`, `video`, `code`).
 
 ---
 
-## 4. Shared Identity & Continuity
+## 4. Trust & Authority Boundaries
+
+The Captain classifies all incoming operator directives into observable authority gates before execution:
+
+1. **Conversational (`AuthorityLevel.CONVERSATIONAL`):**
+   - Read-only explanations, questions, and analysis (e.g., *"Explain what restarting Caddy would do"*).
+   - Executes immediately without side effects.
+2. **Proposed (`AuthorityLevel.PROPOSED`):**
+   - Previews, diffs, and staging (e.g., *"Prepare to restart Caddy"*).
+   - Generates plan and stages artifacts without mutating live services.
+3. **Authorized Non-Privileged (`AuthorityLevel.AUTHORIZED`):**
+   - Direct repository inspections, soundings, file edits within workspace, and job dispatches.
+4. **Privileged / Sudo (`AuthorityLevel.PRIVILEGED_STAGED`):**
+   - System service management, host reboots, firewall modifications.
+   - **Strictly bounded:** Must be staged into [`/home/cgl/cmd.sh`](file:///home/cgl/cmd.sh) per commissioning doctrine.
+
+---
+
+## 5. Multi-Embodiment Agent & Job Routing
+
+Live Captain delegates asynchronous background tasks to available backend engines (`tools/live-captain/job_engine.py`):
+
+```text
+Admiral: "Captain, have AGY inspect the mobile streaming problem."
+Captain: "Dispatched. Job: job-62de0513 | Worker: agy | State: running"
+...
+[Background Worker executes non-interactively, persists stdout in SQLite]
+...
+Captain Notification: "⚙️ Worker agy completed job job-62de0513. Found: ..."
+```
+
+### Worker Engines
+
+* **`agy` (Antigravity CLI):** Dispatched via `/home/cgl/.local/bin/agy -p "<prompt>" --output-format text --dangerously-skip-permissions`.
+* **`claude` (Claude Code CLI):** Dispatched via `/home/cgl/.local/bin/claude -p "<prompt>" --permission-mode bypassPermissions`.
+* **`codex` (Codex CLI):** Dispatched via `/home/cgl/.local/bin/codex exec "<prompt>"`.
+* **`local` / `sound_ship`:** Dispatches local verification scripts and shell tooling.
+
+### Job API Endpoints
+
+- `GET /captain-api/jobs` — List recent background jobs.
+- `GET /captain-api/jobs/<id>` — Get status and output for a specific job.
+- `POST /captain-api/jobs` — Submit a new background job.
+- `POST /captain-api/jobs/<id>/cancel` — Cancel a running job.
+
+---
+
+## 6. Proactive Captain-Initiated Notifications
+
+Live Captain can initiate messages and alerts without waiting for user input (`tools/live-captain/proactive.py`):
+
+* **API Endpoint:** `POST /captain-api/notify`
+* **Payload:** `{"text": "...", "role": "captain|engineering|alert", "urgency": "normal|high"}`
+* Messages are persisted immediately to the active conversation thread in SQLite (`data/live-captain/habitat.db`) and appear instantly upon opening `/captain/`.
+
+---
+
+## 7. Shared Identity & Continuity
 
 The Live Captain operates under strict single-identity doctrine. Both the Phone Terminal and Root Console bind to the exact same governing state:
 
@@ -118,27 +172,27 @@ The Live Captain operates under strict single-identity doctrine. Both the Phone 
 
 ---
 
-## 5. Operations & Maintenance
+## 8. Verification & Diagnostics
 
 ### Sounding the Ship
-
-To verify repository syntax, service unit alignment, Caddy routing, and CLI loader wiring:
 
 ```bash
 bash scripts/sound-the-ship.sh
 ```
 
+### Running Test Suites
+
+```bash
+python3 -m unittest discover -s tools/live-captain -p "test_*.py"
+```
+
 ### Managing Services
 
 ```bash
-# User Services (Phone Terminal Runtime)
+# User Services (Phone Terminal Runtime & Habitat API)
 systemctl --user status live-captain-habitat.service
 systemctl --user restart live-captain-habitat.service
 
 # System Services (Root Console & Core Daemons)
 sudo systemctl status live-captain-bootstrap.service root-console.service
 ```
-
-### Privileged Action Handoffs
-
-Any operation requiring `sudo` privileges must be staged to [`/home/cgl/cmd.sh`](file:///home/cgl/cmd.sh) per standard commissioning doctrine.
