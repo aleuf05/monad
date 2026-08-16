@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <title>Captain Habitat — Live Monad Station</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="habitat-shell">
+    
+    <!-- LEFT SIDEBAR / THREAD DRAWER -->
+    <aside class="thread-drawer" id="threadDrawer">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span class="mark">⚓</span>
+          <h2>CAPTAIN THREADS</h2>
+        </div>
+        <button id="closeDrawerBtn" class="icon-btn" aria-label="Close Drawer">✕</button>
+      </div>
+
+      <div class="drawer-actions">
+        <button id="newThreadBtn" class="btn btn-primary btn-full">+ New Conversation</button>
+      </div>
+
+      <div class="thread-list" id="threadList">
+        <div class="list-empty">Loading threads...</div>
+      </div>
+
+      <div class="drawer-footer">
+        <button id="openHeartBtn" class="btn btn-subtle btn-full">❤️ Captain Heart Lessons</button>
+        <a href="../" class="back-link">← Public Monad Fleet</a>
+      </div>
+    </aside>
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+    <!-- MAIN CONVERSATION HABITAT -->
+    <main class="habitat-main">
+      
+      <!-- TOP MINIMAL HEADER CHROME -->
+      <header class="habitat-header">
+        <div class="header-left">
+          <button id="toggleDrawerBtn" class="icon-btn" title="Threads">☰</button>
+          <div class="header-brand">
+            <span class="brand-anchor">⚓</span>
+            <div class="brand-text">
+              <h1>CAPTAIN HABITAT</h1>
+              <span class="status-badge" id="statusBadge"><span class="dot">●</span> LIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button id="quickNewBtn" class="icon-btn" title="New Chat">+</button>
+          <button id="stopGenBtn" class="btn btn-danger btn-sm" style="display:none;">⏹ Stop</button>
+        </div>
+      </header>
+
+      <!-- MESSAGES FEED CONTAINER -->
+      <div class="feed-container" id="feedContainer">
+        <div class="feed-content" id="feedContent">
+          <!-- Messages & Tool Activity Rendered Here -->
+        </div>
+      </div>
+
+      <!-- COMPOSER AREA (Fixed above soft keyboard) -->
+      <footer class="composer-stage">
+        <form id="composerForm" class="composer-form">
+          
+          <div class="attachment-preview" id="attachmentPreview" style="display:none;">
+            <span id="attachmentName"></span>
+            <button type="button" id="removeAttachmentBtn" class="icon-btn-xs">✕</button>
+          </div>
+
+          <div class="composer-box">
+            <label for="fileInput" class="icon-btn file-btn" title="Attach file or image">
+              📎
+              <input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.txt,.md,.py,.json">
+            </label>
+
+            <textarea 
+              id="composerInput" 
+              rows="1" 
+              placeholder="Speak or type intent to the Captain..." 
+              autocomplete="off" 
+              autocorrect="on"
+              spellcheck="true"></textarea>
+
+            <button type="submit" id="sendBtn" class="send-btn" title="Send message">
+              <span class="send-icon">➔</span>
+            </button>
+          </div>
+        </form>
+      </footer>
+    </main>
+  </div>
+
+  <!-- HEART LESSONS MODAL DIALOG -->
+  <dialog id="heartDialog" class="heart-dialog">
+    <div class="dialog-header">
+      <h3>❤️ CAPTAIN HEART LESSONS</h3>
+      <button id="closeHeartBtn" class="icon-btn">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-hint">Durable operational rules persisted from operator corrections:</p>
+      <div id="heartList" class="heart-list">Loading...</div>
+
+      <div class="add-heart-box">
+        <h4>Persist New Lesson</h4>
+        <textarea id="newHeartText" rows="2" placeholder="Describe reusable rule or correction..."></textarea>
+        <button id="saveHeartBtn" class="btn btn-primary btn-sm">Save to Heart</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

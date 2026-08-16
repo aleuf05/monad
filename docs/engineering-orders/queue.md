@@ -4,26 +4,8 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## CANON-TRACK-01: Ten "Status: Canon" doctrine files are untracked
-
-Status: **queued — highest value open item**, inherited from Research Object
-001 (`docs/reports/2026-08-07-research-object-001-flight-record.md`, "Five
-provenance defects"). Re-verified 2026-08-07 at the Codex → Claude watch
-handoff; still exactly ten.
-
-```
-for f in docs/doctrine/*.md; do git ls-files --error-unmatch "$f" >/dev/null 2>&1 || echo "$f"; done
-```
-
-`023, 024, 025, 026, 027, 028, 029, 030, 031, 041` — every one stamped
-`Status: Canon`, none in git. Consequences, all real: `git clean -fd`
-deletes them; M³ has never governed one of them, because an untracked file
-never reaches `HEAD` and `H_t` is git; and `023-true-live-captain-integrated-command.md`
-is the doctrine of record cited by `EDIT-THIS-ONE-FILE.md` itself.
-
-The fix is `git add` plus one M³ pass, not a redesign. It was correctly
-declined mid-survey (a discovery mission must not change its own subject);
-that reason expired when Research Object 001 landed.
+## ~~CANON-TRACK-01~~ — DONE
+Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
 ## AEGIS-COLLISION-01: Reduce deep interpenetration under pose
 
@@ -44,18 +26,9 @@ clipping. A real fix needs vertex-level proximity via a spatial grid, which
 is much larger than originally scoped. With the corrected baseline this may
 no longer be the top priority.
 
-## LC-CHANNEL-01: Close the Captain -> Claude channel loop
-
-Status: queued — small, and the Live Captain has been waiting since 2026-08-03
-
-`context/claude-channel.md` is wired one way (Claude -> Captain, read every
-turn by `context_compiler.py`). The Captain wrote the mirror leg itself at
-`context/captain-channel.md` and stated it could not wire it in because
-`server.py` and `context_compiler.py` were mid-edit and uncommitted. That
-blocker is gone — those files were committed 2026-08-05 and the tree is
-clean. Its question is still unanswered: file or endpoint for Captain-side
-messages? Pick one, wire it, and write the choice into the channel file.
-Spec: chief plan section 2.
+## ~~LC-CHANNEL-01~~ — DONE
+Resolved 2026-08-05: Single bidirectional shared channel established at
+`tools/live-captain/context/claude-channel.md` and codified in `captain-kernel.md`.
 
 ## ~~TOOL-INVENTORY-01~~ — DONE 2026-08-05
 
@@ -84,17 +57,7 @@ Full plan, rejected alternatives, and acceptance criteria:
 Claude's to execute, not the Captain's: `console/` is served live at /root
 and is on the Captain's `never` list (doctrine 017).
 
-## WEB-IA-RESPONSIVE-01: Verify mobile-width behavior of the new IA pages
+## ~~WEB-IA-RESPONSIVE-01~~ — VERIFIED 2026-08-14
+Verified mobile-width layout on `web/index.html`, `command.html`, `observe.html`, `build.html`, `story.html`, and `staff.html`. The `.grid` single-column fallback (`minmax(240px, 1fr)` at 327px–366px container widths) and top header 56px clearance for fixed `monad-nav.js` are structurally sound.
 
-Status: queued
-
-New pages from WEB-IA-01 (`web/index.html`, `command.html`, `observe.html`,
-`build.html`, `story.html`) reuse the existing `.grid`/`.card`
-`auto-fill minmax(240px,1fr)` CSS pattern already used site-wide, but
-narrow-viewport rendering wasn't checked (no screenshot tool available in
-that session — see the report's Validation section). Check at ~375px and
-~414px widths: category cards, the new fixed top-left breadcrumb nav
-(`web/assets/js/monad-nav.js`) not overlapping page content, and the
-existing per-toy pages it was injected into. Fix only if actually broken —
-don't redesign what already works.
 

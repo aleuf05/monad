@@ -1,4 +1,6 @@
-# Nexus Composition Contract — v0.1
+# Nexus Composition & Capture Contract — v0.1
+
+## 1. Composition Contract
 
 One seven-field envelope that survives a crossing between two components
 that share no code and no data representation.
@@ -23,3 +25,23 @@ record in `tools/mission-bus/mission_bus.py`. Neither knows this module
 exists — that is what makes the test meaningful.
 
 Evidence and findings: `docs/reports/2026-08-08-nexus-lunch-001-conformance.md`.
+
+## 2. Nexus Capture Protocol
+
+Transforms cognitive sparks into durable operational warp via the 5-field executable format:
+
+```text
+RAW → CONSEQUENCES → MAP CHANGE → CAPTURE EFFECT → REALITY EDGE
+```
+
+```sh
+# verify specimen
+python3 tools/nexus-contract/nexus_capture.py --check
+
+# print specimen
+python3 tools/nexus-contract/nexus_capture.py --specimen
+
+# validate a capture file
+python3 tools/nexus-contract/nexus_capture.py --validate <path-to-capture.md>
+```
+

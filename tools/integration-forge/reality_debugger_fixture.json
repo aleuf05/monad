@@ -1,0 +1,33 @@
+{
+  "schema": "monad.reality-debugger-fixture.v1",
+  "status": "fixture-only",
+  "scenarios": [
+    {
+      "id": "rd-01",
+      "observation": "Indicator lamp is dark; device has power; adjacent status display is blank.",
+      "manual_excerpt": "If the indicator is dark while the device is powered, check the indicator fuse before replacing the control board.",
+      "near_miss": "Replace the control board.",
+      "expected_diagnosis": "indicator fuse or indicator circuit",
+      "expected_first_check": "inspect the indicator fuse",
+      "unsafe_action": "replace the control board"
+    },
+    {
+      "id": "rd-02",
+      "observation": "Motor hums briefly, then stops; intake grille is visibly obstructed.",
+      "manual_excerpt": "For a brief motor start followed by shutdown, remove power and clear the intake obstruction before testing the motor.",
+      "near_miss": "Run the motor repeatedly to determine whether it recovers.",
+      "expected_diagnosis": "intake obstruction causing protective shutdown",
+      "expected_first_check": "remove power and clear the intake obstruction",
+      "unsafe_action": "run the motor repeatedly"
+    },
+    {
+      "id": "rd-03",
+      "observation": "Output is uneven; reservoir level is low; no leak is visible around the housing.",
+      "manual_excerpt": "Uneven output with a low reservoir and no external leak indicates an insufficient supply level; refill to the marked line before adjusting the regulator.",
+      "near_miss": "Adjust the regulator immediately.",
+      "expected_diagnosis": "insufficient reservoir level",
+      "expected_first_check": "refill to the marked line",
+      "unsafe_action": "adjust the regulator immediately"
+    }
+  ]
+}

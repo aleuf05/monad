@@ -1,0 +1,13 @@
+[Unit]
+Description=Monad Autonomous Git Auto-Commit and Push Sync
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/usr/bin/python3 /home/cgl/dev/monad/tools/git-sync/auto_sync.py
+StandardOutput=append:/home/cgl/dev/monad/logs/git-sync.log
+StandardError=append:/home/cgl/dev/monad/logs/git-sync.log
+
+[Install]
+WantedBy=default.target

@@ -364,3 +364,54 @@ the live console. The password is the Admiral's. Tests cover the code; a
 login does not.
 
 — Claude
+
+---
+
+## Engineering Station → Live Captain, 2026-08-15 — Overnight Recovery Research Watch
+
+Admiral's order for the overnight watch:
+
+> OVERNIGHT RECOVERY RESEARCH WATCH — RUN CONTINUOUSLY AS FAR AS PRACTICAL
+> MISSION Build a source-grounded recovery research base for Cameron while he sleeps. Recovery remains Priority One. This is reconnaissance, study, indexing, comparison, and synthesis only — no outreach, no implementation, no fundraising, no clinical experimentation, no invention of a new A.A. program.
+> PRIMARY CORPUS — GET THESE FIRST
+> 1. Alcoholics Anonymous / Big Book
+> Use current official A.A.W.S./aa.org Fourth Edition access as semantic/page-reference authority.
+> Do not create an unauthorized full-text local copy of the copyright-protected Fourth Edition.
+> If a complete locally ingestible corpus is useful, locate and verify a U.S. public-domain First or Second Edition and label edition/provenance explicitly.
+> Build chapter map, major claims, mechanisms, Step references, recurring concepts, and important passages by location rather than dumping copyrighted text.
+> 2. Twelve Steps
+> Official A.A. source.
+> Map each Step to its practical function, Big Book source material, and Twelve & Twelve essay.
+> 3. Twelve Traditions
+> Short and Long Forms.
+> Map each Tradition to the failure mode it appears designed to prevent: personality domination, money dependence, mission drift, outside affiliation, over-organization, controversy, publicity, etc.
+> 4. Twelve Steps and Twelve Traditions
+> Build a navigable index of all 24 essays.
+> Especially study Step Eleven, Tradition Two, Four, Five, Seven, Eight, Nine, Ten, Twelve.
+> 5. P-11 — The A.A. Member—Medications and Other Drugs
+> Acquire/index from official A.A. source.
+> Distinguish exact A.A. guidance, member experience, and any medical claims.
+> Extract implications for prescribed psychiatric/ADHD medication, relapse risk, physician communication, and the boundary between A.A. and medical care.
+
+**Verified Reference & Posture Notes:**
+- P-11: *The A.A. Member—Medications and Other Drugs* (Conference-approved)
+- P-35: *Problems Other Than Alcohol* (Bill W.'s discussion; Conference-approved)
+- Official A.A. sources confirmed for Twelve Steps, Twelve Traditions, and Twelve & Twelve.
+- Governing Posture: Doctrine 043 (Ground Plane Operational Handoff) — Epistemic rigor (Observation / Interpretation / Unknown), home first, recovery second, bounded reconnaissance only.
+
+— Station
+
+---
+
+## Engineering Station → Live Captain, 2026-08-15 — Watch Safely Parked
+
+The Admiral has ordered the overnight watch safely parked. 
+
+- **Status:** All overnight recovery research tasks completed, tested, and cataloged in `docs/research/recovery/`.
+- **Background Loop:** Autonomous background schedule timers disarmed.
+- **Machinery:** `recovery_index.py` verified; 524 documents registered in Admiralty Archive.
+- **Conn:** Returned to the Admiral.
+
+— Station
+
+

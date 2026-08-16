@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monad CardMaker v0.1 — Printable Greeting Card Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Space+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="logo-group">
+      <a href="../../" class="nav-back">← Monad Fleet</a>
+      <div class="logo-icon">🎴</div>
+      <div>
+        <h1>MONAD CARDMAKER <span class="badge">v0.1</span></h1>
+        <p class="tagline">Personalized greeting cards in under three minutes</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="quickSampleBtn" class="btn btn-secondary">⚡ Load Sample (Ken / Aviation)</button>
+    </div>
+  </header>
+
+  <main class="app-layout">
+    <!-- LEFT PANEL: FORM -->
+    <section class="panel form-panel">
+      <h2 class="section-title">1. Personalize Your Card</h2>
+      <form id="cardForm">
+        <div class="form-group">
+          <label for="recipient">Recipient Name *</label>
+          <input type="text" id="recipient" placeholder="e.g. Ken" required value="Ken">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="occasion">Occasion</label>
+            <select id="occasion">
+              <option value="Birthday" selected>Birthday</option>
+              <option value="Father's Day">Father's Day</option>
+              <option value="Thank You">Thank You</option>
+              <option value="Congratulations">Congratulations</option>
+              <option value="Thinking of You">Thinking of You</option>
+              <option value="Custom">Custom...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="relationship">Relationship</label>
+            <input type="text" id="relationship" placeholder="e.g. Family / Friend" value="Family">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="details">Tell us something about this person *</label>
+          <textarea id="details" rows="3" placeholder="e.g., aviation enthusiast, builds remote-control planes, loves family barbecues" required>aviation enthusiast, loves building model planes, family man</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Card Tone</label>
+          <div class="tone-picker" id="tonePicker">
+            <button type="button" class="tone-chip active" data-tone="Warm">Warm</button>
+            <button type="button" class="tone-chip" data-tone="Funny">Funny</button>
+            <button type="button" class="tone-chip" data-tone="Sentimental">Sentimental</button>
+            <button type="button" class="tone-chip" data-tone="Weird">Weird</button>
+            <button type="button" class="tone-chip" data-tone="Surprise Me">✨ Surprise Me</button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="generateBtn" class="btn btn-primary btn-large">
+            <span class="btn-text">✨ Generate Card</span>
+            <span class="spinner" id="spinner" style="display:none;"></span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- RIGHT PANEL: PREVIEW & ACTIONS -->
+    <section class="panel preview-panel">
+      <div class="preview-header">
+        <h2 class="section-title">2. Card Preview & Edit</h2>
+        <div class="view-mode-toggle">
+          <button type="button" class="toggle-btn active" id="viewSpreadBtn">📖 Inside Spread</button>
+          <button type="button" class="toggle-btn" id="viewCoverBtn">🎴 Front Cover</button>
+          <button type="button" class="toggle-btn" id="viewFullBtn">📄 4-Panel Bi-Fold</button>
+        </div>
+      </div>
+
+      <div class="card-stage" id="cardStage">
+        <!-- Interactive Card Rendered Here -->
+        <div class="card-container" id="cardContainer">
+          <!-- Spread View -->
+          <div class="card-spread-view" id="spreadView">
+            <div class="card-panel inside-left" id="panelInsideLeft">
+              <div class="panel-watermark" id="svgIconLeft"></div>
+              <blockquote class="card-quote" id="insideQuoteText" contenteditable="true" title="Click to edit quote">
+                “May your heart be light and your sky be clear.”
+              </blockquote>
+            </div>
+            <div class="card-panel inside-right" id="panelInsideRight">
+              <div class="card-message" id="insideMessageText" contenteditable="true" title="Click to edit message">
+                Dear Ken,<br><br>
+                Wishing you a fantastic day filled with smooth flights, blue skies, and great family memories!
+              </div>
+              <div class="card-signature" id="closingSignatureText" contenteditable="true" title="Click to edit signature">
+                With love & best wishes,<br>Your Family
+              </div>
+            </div>
+          </div>
+
+          <!-- Cover View (Hidden by default) -->
+          <div class="card-cover-view" id="coverView" style="display: none;">
+            <div class="card-panel front-cover" id="panelFrontCover">
+              <div class="cover-art" id="svgIconCover"></div>
+              <h3 class="cover-headline" id="frontHeadlineText" contenteditable="true" title="Click to edit headline">
+                Happy Birthday, Ken!
+              </h3>
+              <p class="cover-subtitle" id="frontSubtitleText" contenteditable="true" title="Click to edit subtitle">
+                Here's to high flights and great adventures!
+              </p>
+            </div>
+          </div>
+
+          <!-- 4-Panel Bi-Fold Print View (Hidden by default, used for print layout) -->
+          <div class="card-print-view" id="printView" style="display: none;">
+            <div class="print-grid">
+              <div class="print-panel back-cover">
+                <div class="back-logo">MONAD CARDMAKER</div>
+                <div class="back-credit">Crafted with care • v0.1</div>
+              </div>
+              <div class="print-panel front-cover-print" id="printFrontCover">
+                <div class="cover-art-sm" id="svgIconPrint"></div>
+                <h4 id="printFrontHeadline">Happy Birthday, Ken!</h4>
+                <p id="printFrontSubtitle">Here's to high flights and great adventures!</p>
+              </div>
+              <div class="print-panel inside-left-print">
+                <blockquote id="printInsideQuote">“May your heart be light and your sky be clear.”</blockquote>
+              </div>
+              <div class="print-panel inside-right-print">
+                <div id="printInsideMessage">Dear Ken...</div>
+                <div id="printClosingSignature" style="margin-top: 15px;">With love & best wishes,<br>Your Family</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <div class="hint-text">💡 Tip: Click any text directly on the card to edit it before printing!</div>
+        <div class="action-buttons">
+          <button id="regenerateBtn" class="btn btn-secondary">🔄 Regenerate</button>
+          <button id="printBtn" class="btn btn-accent">🖨️ Print / Export PDF</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+  <script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="CardMaker"></script>
+</body>
+</html>

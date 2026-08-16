@@ -106,6 +106,13 @@
   .basin-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #C9E0A8; font-size: 23px; letter-spacing: .04em; }
   .basin-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
 
+  .cardmaker-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #1A243A, #111A2B 55%, #1C2D4A); border: 1px solid #3B82F6; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .cardmaker-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #3B82F633; }
+  .cardmaker-berth::after { content: "NEW · CARD GENERATOR"; position: absolute; right: 18px; top: 16px; color: #FFFFFF; background: #3B82F6; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .cardmaker-berth .project-kicker { color: #60A5FA; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .cardmaker-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .cardmaker-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
@@ -350,6 +357,12 @@
       </div>
     </section>
 
+    <a class="cardmaker-berth" href="toys/cardmaker/">
+      <div class="project-kicker">FEATURED WORK &middot; MONAD CARDMAKER v0.1</div>
+      <div class="project-title">MONAD CARDMAKER &mdash; GREETING CARD GENERATOR</div>
+      <div class="project-desc">Create, preview, edit, and print surprisingly personal greeting cards in under three minutes—complete with custom headlines, themes, inside messages, and 4-panel bi-fold PDF export.</div>
+    </a>
+
     <section class="gasket-stage" id="gasketStage">
       <div class="build-head">
         <span class="bh-title">Tonight's Build</span>
@@ -460,10 +473,20 @@
         <div class="cat-name">Build &amp; Research</div>
         <div class="cat-desc">Tools that make or study things — voices, shapes, assets, ideas. Not fleet control.</div>
       </a>
+      <a class="cat-card" href="monadone/" style="border-color:#4fd1c5">
+        <div class="cat-eyebrow" style="color:#4fd1c5">NEW &middot; arXiv Preprint</div>
+        <div class="cat-name">Monad-1 arXiv Homepage</div>
+        <div class="cat-desc">Continuous Cognitive Continuity &amp; Epistemic Verification — formal preprint project homepage, invariant algebra, interactive specimen, and BibTeX citation.</div>
+      </a>
       <a class="cat-card" href="toys/monad0-lab/" style="border-color:#71b7e6">
         <div class="cat-eyebrow">NEW · Experiment</div>
         <div class="cat-name">Monad-0 Nexus Laboratory</div>
         <div class="cat-desc">Play the seeded strange-loop experiment: compare four architectures, inject probes, inspect hypotheses, and review bounded contracts.</div>
+      </a>
+      <a class="cat-card" href="toys/cardmaker/" style="border-color:#3B82F6">
+        <div class="cat-eyebrow" style="color:#60A5FA">NEW &middot; BUILD</div>
+        <div class="cat-name">Monad CardMaker</div>
+        <div class="cat-desc">Personalized Greeting Card Generator — Create, preview, edit, and print tailored bi-fold greeting cards in under 3 minutes.</div>
       </a>
       <a class="cat-card" href="story.html">
         <div class="cat-eyebrow">Remember</div>
@@ -485,6 +508,7 @@
     <div class="quick">
       <div class="quick-label">Frequently used</div>
       <div class="quick-links">
+        <a href="toys/cardmaker/">Monad CardMaker<span class="mn-new">NEW</span></a>
         <a href="toys/bridge-station-3.0/">Bridge Station 3.0 — the live console</a>
         <a href="toys/monad-viewer/">Monad Command & Control<span class="mn-new">NEW</span></a>
         <a href="ops.html">Ops Reader<span class="mn-new">NEW</span></a>

@@ -49,6 +49,7 @@ or recover meaningful engineering work.
 - The private Root Console remains separated from public experimentation.
 - Historical formulations remain inspectable and are annotated rather than
   silently erased.
+- **ASIC Design Exclusion:** ASIC (Application-Specific Integrated Circuit) design, chip layout, custom silicon synthesis, and tapeout are explicitly out of scope. Project Monad remains focused on software systems, web platforms, deterministic world-models, and standard off-the-shelf infrastructure.
 
 See [Safety](safety/README.md), [Command Structure](command-structure.md), and
 [Historical Continuity](history/README.md).

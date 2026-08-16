@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-09T11:07:30Z",
+  "generated": "2026-08-16T02:52:08Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -7,15 +7,15 @@
     "expected_down": 4,
     "oneshot": 2
   },
-  "ports": 17,
+  "ports": 18,
   "suites": {
     "passed": 6,
     "failed": 0,
     "total": 6
   },
   "tree": {
-    "uncommitted": 104,
-    "head": "013b505"
+    "uncommitted": 39,
+    "head": "bd978e2"
   },
   "captain": "running",
   "captain_detail": {
@@ -26,7 +26,7 @@
     "event_audio": "procedural-live-web-audio"
   },
   "voice": {
-    "day": "2026-08-09",
+    "day": "2026-08-16",
     "seconds_used": 0,
     "seconds_limit": null,
     "usd_used": 0,
@@ -86,10 +86,10 @@
       }
     ],
     "resources": {
-      "disk_used_percent": 20,
-      "disk_available": "171.2G",
-      "memory_available_percent": 70.2,
-      "load_1m": 0.85
+      "disk_used_percent": 19,
+      "disk_available": "172.6G",
+      "memory_available_percent": 73.0,
+      "load_1m": 0.91
     }
   },
   "sound": true,
@@ -104,7 +104,7 @@
     },
     {
       "priority": 2,
-      "text": "20 of 25 units running on 17 ports."
+      "text": "20 of 25 units running on 18 ports."
     },
     {
       "priority": 2,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "104 files uncommitted."
+      "text": "39 files uncommitted."
     },
     {
       "priority": 1,

@@ -1,0 +1,16 @@
+[Unit]
+Description: Monad CardMaker: Greeting Card Generator Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=cgl
+Group=cgl
+WorkingDirectory=/home/cgl/dev/monad
+ExecStart=/home/cgl/dev/monad/.venv/bin/python3 /home/cgl/dev/monad/tools/cardmaker/server.py --port 4785
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

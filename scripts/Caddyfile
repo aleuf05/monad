@@ -112,6 +112,14 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4780
 		}
 
+		handle_path /captain-api/* {
+			reverse_proxy 127.0.0.1:4777
+		}
+
+		handle_path /cardmaker-api/* {
+			reverse_proxy 127.0.0.1:4785
+		}
+
 		handle_path /live-captain-chat-api/* {
 			reverse_proxy 127.0.0.1:4776
 		}

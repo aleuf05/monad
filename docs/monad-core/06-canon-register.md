@@ -22,6 +22,7 @@ Historical canon material is archived at `admiralty/archive/canon/`; this file i
 * Strong mission continuity reduces repeated operator explanation.
 * Metaphor can serve as an operational interface when translated back into plain mechanisms.
 * A bounded Captain posture can organize complex conceptual work.
+* Nexus Capture anchors cognitive sparks into executable operational warp via 5-field verified schemas (`tools/nexus-contract/nexus_capture.py`).
 
 ## Provisional
 
