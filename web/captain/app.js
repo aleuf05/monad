@@ -295,19 +295,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const speaker = document.createElement('span');
     speaker.className = 'message-speaker';
-    speaker.innerText = msg.role === 'admiral' ? 'ADMIRAL' : 'CAPTAIN';
-
-    const body = document.createElement('div');
-    body.className = 'message-body';
-    body.innerHTML = formatMarkdown(msg.text);
+    speaker.innerText = msg.role === 'admiral' ? 'ADMIRAL' : (msg.role === 'engineering' ? 'ENGINEERING' : (msg.role === 'alert' ? 'ALERT' : 'CAPTAIN'));
+    bubble.appendChild(speaker);
 
     // Render attachments if present
     if (msg.attachments && msg.attachments.length > 0) {
       msg.attachments.forEach(att => {
         const attEl = document.createElement('div');
         attEl.className = 'attachment-item-rendered';
-        attEl.style.cssText = 'font-size:0.8rem; opacity:0.8; margin-bottom:0.3rem;';
-        attEl.innerHTML = `📎 ${att.original_name || att.filename}`;
+        attEl.style.cssText = 'font-size:0.8rem; opacity:0.85; margin:0.3rem 0;';
+        if (att.url && (att.filename && att.filename.match(/\.(png|jpg|jpeg|webp|gif)$/i))) {
+          attEl.innerHTML = `<img src="${att.url}" alt="${att.original_name || att.filename}" style="max-width:100%; border-radius:6px; display:block; margin:4px 0;">`;
+        } else {
+          attEl.innerHTML = `📎 <a href="${att.url || '#'}" target="_blank" style="color:inherit; text-decoration:underline;">${att.original_name || att.filename}</a>`;
+        }
         bubble.appendChild(attEl);
       });
     }
@@ -322,8 +323,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    bubble.appendChild(speaker);
+    const body = document.createElement('div');
+    body.className = 'message-body';
+    body.innerHTML = formatMarkdown(msg.text);
     bubble.appendChild(body);
+
     feedContent.appendChild(bubble);
   }
 

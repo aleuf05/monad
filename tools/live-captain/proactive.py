@@ -57,10 +57,11 @@ class ProactiveNotifier:
             timestamp=time.time(),
         )
 
-        # Persist message to Habitat store
+        # Persist message to Habitat store adhering to role CHECK constraint
+        db_role = "captain" if semantic_role in ("captain", "engineering", "alert") else (semantic_role if semantic_role in ("admiral", "system") else "captain")
         saved_msg = self.store.add_message(
             thread_id=target_thread_id,
-            role=semantic_role,
+            role=db_role,
             text=text,
             attachments=[],
             tool_events=[{"name": "proactive_notification", "summary": f"Urgency: {urgency}", "role": semantic_role}],
