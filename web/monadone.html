@@ -463,8 +463,7 @@
       background: #040810;
       border: 2px solid var(--border-strong);
       border-radius: 8px;
-      padding: 36px 32px;
-      min-height: 320px;
+      padding: 28px 28px 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -485,7 +484,24 @@
       font-size: clamp(22px, 3.2vw, 30px);
       color: #ffffff;
       letter-spacing: 0.02em;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
+    }
+
+    .slide-img-container {
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      background: #02050b;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      margin: 12px 0 16px;
+    }
+
+    .slide-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.2s ease;
     }
 
     .slide-body-content {
@@ -493,12 +509,12 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin: 16px 0;
+      margin: 8px 0;
     }
 
     .slide-bottom-line {
-      margin-top: 24px;
-      padding-top: 16px;
+      margin-top: 16px;
+      padding-top: 14px;
       border-top: 1px solid var(--border-subtle);
       font-family: var(--font-mono);
       font-size: 13.5px;
@@ -780,16 +796,11 @@
       <div class="slide-frame" id="slide-1">
         <div class="slide-num">SLIDE 1 OF 2</div>
         <div class="slide-header-title">A useful loop should improve by passing through itself</div>
-        <div class="slide-body-content">
-          <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 20px; text-align: center;">
-            <div style="font-family: var(--font-mono); font-size: 20px; color: #38bdf8; font-weight: 600; margin-bottom: 12px;">
-              M = &lang;X, O, S, E, A, C&rang; &emsp;&circlearrowright;&emsp; M<sup>up</sup>(M) &rarr; M'
-            </div>
-            <div style="font-size: 13px; color: #9db0c9;">
-              State &rarr; Operation &rarr; Selection &rarr; Evaluation &rarr; Abstraction &rarr; Reintegration
-            </div>
-          </div>
+        
+        <div class="slide-img-container">
+          <img src="slide1.png" alt="Slide 1: The Criterion — A useful loop should improve by passing through itself" class="slide-img" loading="eager" />
         </div>
+
         <div class="slide-bottom-line">
           Bottom Line: Productive = more precise, more constrained, more testable.
         </div>
@@ -799,22 +810,11 @@
       <div class="slide-frame" id="slide-2" style="display: none;">
         <div class="slide-num">SLIDE 2 OF 2</div>
         <div class="slide-header-title">Separate recursion from real improvement</div>
-        <div class="slide-body-content">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; text-align: center;">
-            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
-              1. Baseline<br><span style="color:#627794;">(No revision)</span>
-            </div>
-            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
-              2. Generic Revision<br><span style="color:#627794;">(Clarity edit)</span>
-            </div>
-            <div style="background: #10233b; border: 1px solid #38bdf8; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #ffffff;">
-              3. Self-Application<br><span style="color:#38bdf8;">(Meta-level lift)</span>
-            </div>
-            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
-              4. Decorative Loop<br><span style="color:#627794;">(Surface syntax)</span>
-            </div>
-          </div>
+        
+        <div class="slide-img-container">
+          <img src="slide2.png" alt="Slide 2: The Experiment — Separate recursion from real improvement" class="slide-img" loading="lazy" />
         </div>
+
         <div class="slide-bottom-line">
           Judged blind on precision, constraint, falsifiability, contradiction, and overclaim.
         </div>
