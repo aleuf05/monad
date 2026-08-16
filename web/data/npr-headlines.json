@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-16T16:45:01.465292+00:00",
+  "fetched_at": "2026-08-16T19:00:01.844432+00:00",
   "items": [
+    {
+      "title": "Tommy John, namesake for a pioneering elbow surgery that saved his career, dies at 83",
+      "link": "https://www.npr.org/2026/08/16/g-s1-138941/tommy-john-elbow-surgery-baseball-pitcher-yankees-dodgers",
+      "pubDate": "Sun, 16 Aug 2026 14:58:25 -0400"
+    },
     {
       "title": "A good \u2013 and bad \u2013 week for Italy's art police and museum security",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5933052/sicily-art-heist-museum-parma",
@@ -36,11 +41,6 @@
     {
       "title": "Billions of sea stars have died. A Northwest tribe is trying to save the species",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5928398/endangered-sea-stars-release-pacific-ocean",
-      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Lindsay Clancy's trial highlights gaps in understanding, treating postpartum psychosis",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5931964/lindsay-clancy-trial-postpartum-psychosis-diagnosis",
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
     }
   ]
