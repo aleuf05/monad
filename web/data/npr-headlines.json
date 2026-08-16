@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-16T11:45:01.571211+00:00",
+  "fetched_at": "2026-08-16T12:00:02.358305+00:00",
   "items": [
+    {
+      "title": "As Trump blocks Medicaid funds, one trans teen's mom asks: What's next?",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5932491/transgender-health-care-medicaid-trump-oz",
+      "pubDate": "Sun, 16 Aug 2026 07:54:19 -0400"
+    },
     {
       "title": "Ukraine launches one of its largest aerial attacks of the war, killing at least 6 people in Russia",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5933006/ukraine-aerial-attack-6-dead-russia",
@@ -19,13 +24,13 @@
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "65 and older? Have a story to tell? Hit 'record' and send NPR your podcast",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5911853/npr-senior-podcast-challenge-for-65-and-older",
+      "title": "Billions of sea stars have died. A Northwest tribe is trying to save the species",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5928398/endangered-sea-stars-release-pacific-ocean",
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Billions of sea stars have died. A Northwest tribe is trying to save the species",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5928398/endangered-sea-stars-release-pacific-ocean",
+      "title": "65 and older? Have a story to tell? Hit 'record' and send NPR your podcast",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5911853/npr-senior-podcast-challenge-for-65-and-older",
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "State Department spokesperson on Iran war and U.S. visa revocations",
       "link": "https://www.npr.org/2026/08/15/nx-s1-5931811/state-department-spokesperson-on-iran-war-and-u-s-visa-revocations",
       "pubDate": "Sat, 15 Aug 2026 17:20:51 -0400"
-    },
-    {
-      "title": "The Midwest braces for more heavy flooding, as Indiana seeks federal aid",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5932552/midwest-flooding-indiana-fema",
-      "pubDate": "Sat, 15 Aug 2026 16:04:13 -0400"
     }
   ]
 }
