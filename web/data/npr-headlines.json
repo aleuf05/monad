@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-16T15:45:02.188728+00:00",
+  "fetched_at": "2026-08-16T16:00:02.026856+00:00",
   "items": [
+    {
+      "title": "Lala is again a tropical storm, sending drenching rain and winds across Hawaii",
+      "link": "https://www.npr.org/2026/08/16/g-s1-138926/lala-tropical-storm-hawaii-hurricane",
+      "pubDate": "Sun, 16 Aug 2026 11:47:58 -0400"
+    },
     {
       "title": "What really happened in Ceuta? Why we may never find out",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5927053/what-happened-in-ceuta",
@@ -37,11 +42,6 @@
       "title": "Lindsay Clancy's trial highlights gaps in understanding, treating postpartum psychosis",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5931964/lindsay-clancy-trial-postpartum-psychosis-diagnosis",
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Are robotaxis finally here?",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5918065/are-robotaxis-finally-here",
-      "pubDate": "Sat, 15 Aug 2026 17:30:21 -0400"
     }
   ]
 }
