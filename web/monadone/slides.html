@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Productive Self-Application — 2-Slide Summary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: 1600px 900px;
+      margin: 0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #060b14;
+      color: #f0f4f8;
+      font-family: 'Inter', sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .slide {
+      width: 1600px;
+      height: 900px;
+      padding: 70px 90px 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      position: relative;
+      background: radial-gradient(circle at 50% 0%, #0d192d 0%, #060b14 70%);
+      border: 1px solid #1c2b42;
+    }
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .slide-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #f59e0b;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .slide-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 46px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+    }
+    .slide-author {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #627794;
+      text-align: right;
+    }
+    .slide-author strong {
+      color: #38bdf8;
+    }
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 40px 0;
+    }
+    /* Slide 1 Diagram */
+    .loop-card {
+      background: #091220;
+      border: 2px solid #253d63;
+      border-radius: 12px;
+      padding: 40px 48px;
+      text-align: center;
+    }
+    .math-eq-hero {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 38px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.05em;
+      margin-bottom: 30px;
+    }
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .pipe-node {
+      background: #0f1c30;
+      border: 1px solid #1e3558;
+      border-radius: 8px;
+      padding: 16px 12px;
+    }
+    .pipe-node .sym {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      color: #f59e0b;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .pipe-node .lbl {
+      font-size: 13.5px;
+      color: #f0f4f8;
+      font-weight: 600;
+    }
+    .typed-lift-tag {
+      margin-top: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      color: #9db0c9;
+    }
+    .typed-lift-tag span {
+      color: #2dd4bf;
+      font-weight: 600;
+    }
+    /* Slide 2 Lanes */
+    .lanes-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .lane-card {
+      background: #091220;
+      border: 1px solid #1c2b42;
+      border-radius: 10px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .lane-card.target {
+      border: 2px solid #38bdf8;
+      background: linear-gradient(180deg, #122540 0%, #0b172a 100%);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+    }
+    .lane-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #f59e0b;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .lane-card.target .lane-num {
+      color: #38bdf8;
+    }
+    .lane-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+    .lane-desc {
+      font-size: 14px;
+      color: #9db0c9;
+      line-height: 1.55;
+    }
+    .lane-badge {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #1c2b42;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #627794;
+    }
+    .lane-card.target .lane-badge {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    /* Bottom Bar */
+    .slide-footer {
+      border-top: 2px solid #1e3558;
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bottom-line-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: 0.02em;
+    }
+    .bottom-line-text.gold {
+      color: #f59e0b;
+    }
+    .slide-idx {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #627794;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SLIDE 1: THE CRITERION -->
+  <div class="slide">
+    <div class="slide-header">
+      <div>
+        <div class="slide-eyebrow">Slide 1 &middot; The Criterion</div>
+        <div class="slide-title">A useful loop should improve by passing through itself</div>
+      </div>
+      <div class="slide-author">
+        Productive Self-Application<br>
+        <strong>Cameron G. Lampley</strong> &middot; arXiv cs.AI
+      </div>
+    </div>
+
+    <div class="slide-body">
+      <div class="loop-card">
+        <div class="math-eq-hero">M = &lang;X, O, S, E, A, C&rang; &emsp;&circlearrowright;&emsp; M<sup>up</sup>(M) &rarr; M'</div>
+        
+        <div class="pipeline-grid">
+          <div class="pipe-node">
+            <span class="sym">X</span>
+            <span class="lbl">State / Object</span>
+          </div>
+          <div class="pipe-node">
+            <span class="sym">O</span>
+            <span class="lbl">Operation</span>
+          </div>
+          <div class="pipe-node">
+            <span class="sym">S</span>
+            <span class="lbl">Selection</span>
+          </div>
+          <div class="pipe-node">
+            <span class="sym">E</span>
+            <span class="lbl">Evaluation</span>
+          </div>
+          <div class="pipe-node">
+            <span class="sym">A</span>
+            <span class="lbl">Abstraction</span>
+          </div>
+          <div class="pipe-node">
+            <span class="sym">C</span>
+            <span class="lbl">Reintegration</span>
+          </div>
+        </div>
+
+        <div class="typed-lift-tag">
+          Hierarchical Lift: <span>T(M) = M<sup>up</sup>(M)</span> &nbsp;&middot;&nbsp; Typed Composition: <span>M(x) = C(A(E(o_S(x), e_X(x))))</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div class="bottom-line-text">
+        Bottom line: Productive = more precise, more constrained, more testable.
+      </div>
+      <div class="slide-idx">1 / 2</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: THE EXPERIMENT -->
+  <div class="slide">
+    <div class="slide-header">
+      <div>
+        <div class="slide-eyebrow">Slide 2 &middot; The Experiment</div>
+        <div class="slide-title">Separate recursion from real improvement</div>
+      </div>
+      <div class="slide-author">
+        Productive Self-Application<br>
+        <strong>Cameron G. Lampley</strong> &middot; arXiv cs.AI
+      </div>
+    </div>
+
+    <div class="slide-body">
+      <div class="lanes-grid">
+        <div class="lane-card">
+          <div>
+            <div class="lane-num">Lane 01</div>
+            <div class="lane-name">Baseline</div>
+            <div class="lane-desc">Raw procedure before any revision. Frozen benchmark.</div>
+          </div>
+          <div class="lane-badge">No Revision</div>
+        </div>
+
+        <div class="lane-card">
+          <div>
+            <div class="lane-num">Lane 02</div>
+            <div class="lane-name">Generic Revision</div>
+            <div class="lane-desc">Clarity and rigor edit without self-application instruction.</div>
+          </div>
+          <div class="lane-badge">Control &Delta;<sub>generic</sub></div>
+        </div>
+
+        <div class="lane-card target">
+          <div>
+            <div class="lane-num">Target 03</div>
+            <div class="lane-name">Self-Application</div>
+            <div class="lane-desc">Method inspects and transforms its own selector, evaluator, and rules.</div>
+          </div>
+          <div class="lane-badge">&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0</div>
+        </div>
+
+        <div class="lane-card">
+          <div>
+            <div class="lane-num">Lane 04</div>
+            <div class="lane-name">Decorative Loop</div>
+            <div class="lane-desc">Explicit self-referential prose without functional procedure edits.</div>
+          </div>
+          <div class="lane-badge">Null Control (~ 0)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div class="bottom-line-text gold">
+        Judged blind on precision, constraint, falsifiability, contradiction, and overclaim.
+      </div>
+      <div class="slide-idx">2 / 2</div>
+    </div>
+  </div>
+
+</body>
+</html>
