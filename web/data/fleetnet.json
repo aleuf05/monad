@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-16T13:14:43Z",
+  "generated": "2026-08-16T13:20:58Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -15,7 +15,7 @@
   },
   "tree": {
     "uncommitted": 4,
-    "head": "55310a9"
+    "head": "a622012"
   },
   "captain": "running",
   "captain_detail": {
@@ -89,7 +89,7 @@
       "disk_used_percent": 19,
       "disk_available": "172.5G",
       "memory_available_percent": 73.1,
-      "load_1m": 0.6
+      "load_1m": 0.72
     }
   },
   "sound": true,
