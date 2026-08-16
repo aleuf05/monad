@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems — Cameron G. Lampley</title>
+  <title>Productive Self-Application — When does a reflective loop actually improve itself?</title>
   
   <!-- Academic & Dublin Core Metadata for arXiv / Google Scholar / Semantic Scholar -->
   <meta name="citation_title" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems">
@@ -12,38 +12,36 @@
   <meta name="citation_online_date" content="2026/08/15">
   <meta name="citation_arxiv_id" content="Candidate arXiv v1.0">
   <meta name="citation_pdf_url" content="https://cameronlampley.com/monadone/productive-self-application.pdf">
-  <meta name="description" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems. Proposes a 6-component operational decomposition M = <X, O, S, E, A, C>, typed hierarchical lift M^up, and an externally scored criterion for distinguishing productive self-application from decorative loops.">
-  <meta name="keywords" content="recursive self-improvement, self-reflection, metacognition, reflective agents, self-reference, evaluation, scientific instrumentation, cs.AI, Cameron G. Lampley, arXiv">
+  <meta name="description" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems by Cameron G. Lampley. Reflective systems should be judged by whether self-application produces measurable gains in precision, constraint, or testability, not merely by being recursive.">
+  <meta name="keywords" content="recursive self-improvement, self-reflection, metacognition, reflective agents, self-reference, evaluation, scientific instrumentation, cs.AI, Cameron G. Lampley">
   
   <!-- OpenGraph / Social Metadata -->
-  <meta property="og:title" content="Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems">
-  <meta property="og:description" content="An operational formalism for reflective instruments and a corresponding criterion for productive self-application. Cameron G. Lampley, 15 August 2026.">
+  <meta property="og:title" content="Productive Self-Application — When does a reflective loop actually improve itself?">
+  <meta property="og:description" content="Reflective systems should be judged by whether self-application produces measurable gains in precision, constraint, or testability, not merely by being recursive.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://cameronlampley.com/monadone/">
-  <meta property="og:site_name" content="Cameron Lampley — Research">
+  <meta property="og:site_name" content="Cameron G. Lampley — Research">
 
-  <!-- Google Fonts: Oswald (Display), Inter (Body), JetBrains Mono (Code/Math), Newsreader (Serif Body) -->
+  <!-- Google Fonts: Oswald (Display), Inter (Body), JetBrains Mono (Code/Math), Newsreader (Serif) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-base: #060b14;
-      --bg-panel: #0c1524;
-      --bg-card: #111d32;
-      --bg-card-hover: #162642;
-      --border-subtle: #192a44;
-      --border-strong: #253d63;
-      --text-primary: #e6eef8;
-      --text-secondary: #97aaca;
-      --text-muted: #647b9c;
-      --cyan-bright: #4fd1c5;
-      --cyan-dim: #1e4549;
-      --amber-gold: #e8a33d;
-      --amber-dim: #5c3f15;
-      --indigo-accent: #818cf8;
-      --crimson-accent: #f87171;
+      --bg-base: #090e17;
+      --bg-panel: #0f1726;
+      --bg-card: #141f33;
+      --bg-card-hover: #192740;
+      --border-subtle: #1c2b42;
+      --border-strong: #283e60;
+      --text-primary: #f0f4f8;
+      --text-secondary: #9db0c9;
+      --text-muted: #627794;
+      --cyan-bright: #38bdf8;
+      --cyan-glow: rgba(56, 189, 248, 0.15);
+      --teal-accent: #2dd4bf;
+      --amber-gold: #f59e0b;
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
       --font-display: 'Oswald', sans-serif;
@@ -56,173 +54,113 @@
       background-color: var(--bg-base);
       color: var(--text-primary);
       font-family: var(--font-sans);
-      line-height: 1.7;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(79, 209, 197, 0.07) 0%, transparent 50%),
-        radial-gradient(circle at 50% 100%, rgba(232, 163, 61, 0.04) 0%, transparent 40%);
+        radial-gradient(ellipse 80% 40% at 50% -10%, rgba(56, 189, 248, 0.08), transparent 70%),
+        radial-gradient(ellipse 60% 30% at 50% 100%, rgba(245, 158, 11, 0.04), transparent 70%);
       background-attachment: fixed;
     }
 
     .container {
-      max-width: 980px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 0 24px;
     }
 
-    /* Paper Header */
-    header.paper-header {
-      padding: 64px 0 32px;
+    /* 1. HERO */
+    header.hero-section {
+      padding: 72px 0 44px;
       text-align: center;
       border-bottom: 1px solid var(--border-subtle);
     }
 
-    .meta-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 14px;
-      background: rgba(232, 163, 61, 0.08);
-      border: 1px solid rgba(232, 163, 61, 0.35);
-      border-radius: 999px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--amber-gold);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    .meta-tag .dot {
-      width: 6px; height: 6px; background-color: var(--amber-gold); border-radius: 50%;
-    }
-
-    h1.paper-title {
+    h1.hero-title {
       font-family: var(--font-display);
-      font-size: clamp(30px, 5vw, 48px);
+      font-size: clamp(34px, 5.5vw, 56px);
       font-weight: 700;
-      line-height: 1.15;
+      line-height: 1.1;
       letter-spacing: 0.02em;
       color: #ffffff;
-      max-width: 900px;
-      margin: 0 auto 14px;
+      margin-bottom: 12px;
     }
 
-    .paper-subtitle {
+    p.hero-subtitle {
       font-family: var(--font-serif);
       font-style: italic;
-      font-size: clamp(17px, 2.2vw, 22px);
+      font-size: clamp(19px, 2.6vw, 25px);
       color: var(--cyan-bright);
-      margin: 0 auto 24px;
-      max-width: 780px;
+      margin-bottom: 26px;
     }
 
-    .author-block {
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
       margin-bottom: 24px;
     }
 
-    .author-name {
-      font-size: 18px;
-      font-weight: 600;
-      color: #ffffff;
-      text-decoration: none;
-    }
-
-    .author-name:hover {
-      color: var(--cyan-bright);
-    }
-
-    .author-affiliation {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      margin-top: 3px;
-    }
-
-    .date-venue {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .date-venue strong {
-      color: var(--amber-gold);
-    }
-
-    /* Action Buttons */
-    .action-links {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin: 28px 0 12px;
-    }
-
-    .btn-action {
+    .btn {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 18px;
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
+      padding: 11px 22px;
       border-radius: 6px;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
-      color: var(--text-primary);
       text-decoration: none;
       transition: all 0.18s ease;
       cursor: pointer;
     }
 
-    .btn-action:hover {
+    .btn-primary {
+      background: linear-gradient(135deg, #1e3a5f 0%, #10233b 100%);
+      border: 1px solid var(--cyan-bright);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #274b7a 0%, #163050 100%);
+      box-shadow: 0 0 20px var(--cyan-glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
       background: var(--bg-card);
       border-color: var(--cyan-bright);
       color: #ffffff;
       transform: translateY(-1px);
     }
 
-    .btn-action.btn-primary-arxiv {
-      background: linear-gradient(135deg, #18334e 0%, #0e2034 100%);
-      border-color: var(--cyan-bright);
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    .btn-action.btn-primary-arxiv:hover {
-      box-shadow: 0 0 18px rgba(79, 209, 197, 0.25);
-    }
-
-    /* Status Note Callout */
-    .status-callout {
-      background: rgba(232, 163, 61, 0.06);
-      border: 1px solid rgba(232, 163, 61, 0.3);
-      border-left: 4px solid var(--amber-gold);
-      border-radius: 6px;
-      padding: 16px 20px;
-      margin: 28px 0;
-      font-size: 13px;
-      color: #dfd8c8;
-      line-height: 1.6;
-    }
-
-    .status-callout strong {
-      color: var(--amber-gold);
-      text-transform: uppercase;
+    .status-line {
       font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.05em;
-      display: block;
-      margin-bottom: 4px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
     }
 
-    /* Section Typography */
-    section.paper-section {
-      padding: 38px 0 18px;
-      border-bottom: 1px solid rgba(25, 42, 68, 0.6);
+    .status-line strong {
+      color: var(--amber-gold);
     }
 
-    section.paper-section:last-of-type {
+    /* Section Styling */
+    section.page-section {
+      padding: 48px 0 20px;
+      border-bottom: 1px solid rgba(28, 43, 66, 0.6);
+    }
+
+    section.page-section:last-of-type {
       border-bottom: none;
     }
 
@@ -233,7 +171,7 @@
       color: var(--amber-gold);
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     h2.section-heading {
@@ -242,262 +180,343 @@
       font-weight: 600;
       letter-spacing: 0.04em;
       color: #ffffff;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      margin-bottom: 20px;
     }
 
-    h2.section-heading::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border-subtle);
-    }
-
-    h3.subsection-heading {
-      font-family: var(--font-display);
-      font-size: 18px;
-      letter-spacing: 0.03em;
-      color: #dbe6f5;
-      margin: 24px 0 10px;
-    }
-
-    p.body-p {
-      font-size: 14.5px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      line-height: 1.7;
-    }
-
-    p.body-p strong {
-      color: var(--text-primary);
-    }
-
-    /* Abstract Block */
-    .abstract-box {
+    /* 2. THE CORE IDEA */
+    .quote-box {
       background: var(--bg-panel);
       border: 1px solid var(--border-strong);
       border-left: 4px solid var(--cyan-bright);
       border-radius: 6px;
-      padding: 24px 28px;
-      margin: 12px 0 20px;
+      padding: 28px 32px;
+      margin: 12px 0 16px;
     }
 
-    .abstract-text {
+    blockquote.core-quote {
       font-family: var(--font-serif);
-      font-size: 16.5px;
-      line-height: 1.75;
-      color: #d8e2f0;
+      font-size: clamp(20px, 2.5vw, 25px);
+      font-style: italic;
+      line-height: 1.45;
+      color: #ffffff;
     }
 
-    .keywords-block {
+    p.quote-explanation {
+      font-size: 14.5px;
+      color: var(--text-secondary);
       margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
+      line-height: 1.65;
+    }
+
+    /* 3. THE INSTRUMENT */
+    .instrument-display {
+      background: #060a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 32px 24px;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .equation-large {
       font-family: var(--font-mono);
-      font-size: 11.5px;
-      color: var(--text-muted);
-    }
-
-    .keywords-block strong {
+      font-size: clamp(20px, 3.5vw, 32px);
       color: var(--cyan-bright);
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      margin-bottom: 24px;
     }
 
-    /* Cards & Grids */
-    .grid-2 {
+    .pipeline-flow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .flow-node {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 10px 14px;
+      text-align: center;
+      min-width: 105px;
+    }
+
+    .flow-node .symbol {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--amber-gold);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .flow-node .label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #ffffff;
+      display: block;
+    }
+
+    .flow-arrow {
+      color: var(--text-muted);
+      font-size: 14px;
+      font-family: var(--font-mono);
+      user-select: none;
+    }
+
+    @media (max-width: 768px) {
+      .pipeline-flow {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .flow-arrow {
+        transform: rotate(90deg);
+        margin: 2px 0;
+      }
+    }
+
+    .typed-pass-note {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 22px;
+    }
+
+    .typed-pass-note code {
+      color: var(--teal-accent);
+    }
+
+    /* 4. THE TEST */
+    .test-box {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 28px 24px;
+      margin: 18px 0;
+      text-align: center;
+    }
+
+    .discriminator-math {
+      font-family: var(--font-mono);
+      font-size: clamp(16px, 2.5vw, 22px);
+      color: #ffffff;
+      font-weight: 600;
+      background: #070c14;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: inline-block;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .discriminator-math span.pass {
+      color: var(--teal-accent);
+    }
+
+    .test-punchline {
+      font-family: var(--font-serif);
+      font-size: 19px;
+      font-style: italic;
+      color: var(--cyan-bright);
+      margin-bottom: 12px;
+    }
+
+    .test-dimensions-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      text-align: left;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 680px) {
+      .test-dimensions-grid { grid-template-columns: 1fr; }
+    }
+
+    .dim-card {
+      background: #0a111e;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .dim-card .name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--amber-gold);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .dim-card .desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* 5. CONTROLS */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin: 20px 0;
     }
 
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin: 20px 0;
-    }
-
     @media (max-width: 768px) {
-      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .controls-grid { grid-template-columns: 1fr; }
     }
 
-    .card {
+    .control-col {
       background: var(--bg-panel);
       border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 18px 20px;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
     }
 
-    .card-label {
+    .control-col.target {
+      border-color: var(--cyan-bright);
+      background: linear-gradient(180deg, #101c2e 0%, #0d1624 100%);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .control-eyebrow {
       font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--cyan-bright);
-      text-transform: uppercase;
+      font-size: 10px;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
       margin-bottom: 6px;
     }
 
-    .card h4 {
-      font-family: var(--font-display);
-      font-size: 16px;
-      color: #ffffff;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    /* Math / Formalism Box */
-    .math-card {
-      background: #08101d;
-      border: 1px solid var(--border-strong);
-      border-radius: 6px;
-      padding: 18px 22px;
-      margin: 18px 0;
-      font-family: var(--font-mono);
-      font-size: 13px;
-      color: #dce7f3;
-      overflow-x: auto;
-    }
-
-    .math-card .label {
-      font-size: 11px;
-      color: var(--amber-gold);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-    }
-
-    .code-eq {
-      color: #4fd1c5;
-      font-weight: 600;
-    }
-
-    /* Protocol & Falsification Lists */
-    ul.formal-list, ol.formal-list {
-      padding-left: 22px;
-      margin: 14px 0 20px;
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    ul.formal-list li, ol.formal-list li {
-      margin-bottom: 8px;
-      line-height: 1.6;
-    }
-
-    ul.formal-list li strong, ol.formal-list li strong {
-      color: var(--text-primary);
-    }
-
-    /* Notation Table */
-    table.table-custom {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin: 18px 0;
-    }
-
-    table.table-custom th {
-      background: var(--bg-panel);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      text-align: left;
-      padding: 10px 14px;
-      border-bottom: 2px solid var(--border-strong);
-    }
-
-    table.table-custom td {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-    }
-
-    table.table-custom td.symbol {
-      font-family: var(--font-mono);
+    .control-col.target .control-eyebrow {
       color: var(--cyan-bright);
-      font-weight: 600;
-      width: 140px;
     }
 
-    table.table-custom tr:hover td {
-      background: rgba(17, 29, 50, 0.4);
+    .control-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      color: #ffffff;
+      margin-bottom: 10px;
     }
 
-    /* Interactive Lift Inspector */
-    .interactive-box {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      padding: 22px;
+    .control-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .control-footer {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* 2-SLIDE SUMMARY VIEWER */
+    .slide-deck {
       margin: 24px 0;
     }
 
-    .interactive-header {
+    .deck-nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 14px;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 14px;
     }
 
-    .interactive-tabs {
+    .slide-tabs {
       display: flex;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .tab-btn {
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      padding: 5px 12px;
+    .slide-tab-btn {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      padding: 7px 14px;
       border-radius: 4px;
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       cursor: pointer;
       transition: all 0.15s;
     }
 
-    .tab-btn.active, .tab-btn:hover {
+    .slide-tab-btn.active, .slide-tab-btn:hover {
       border-color: var(--cyan-bright);
-      color: var(--cyan-bright);
+      color: #ffffff;
       background: var(--bg-card);
     }
 
-    .terminal-display {
+    .slide-frame {
       background: #040810;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 16px;
-      font-family: var(--font-mono);
-      font-size: 12.5px;
-      color: #93c5fd;
-      min-height: 220px;
-      white-space: pre-wrap;
-      line-height: 1.55;
+      border: 2px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 36px 32px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
     }
 
-    /* BibTeX Card */
-    .bibtex-card {
+    .slide-num {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .slide-header-title {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 3.2vw, 30px);
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      margin-bottom: 20px;
+    }
+
+    .slide-body-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .slide-bottom-line {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--cyan-bright);
+    }
+
+    /* 6. DOWNLOAD / CITATION / CONTACT */
+    .citation-wrapper {
       position: relative;
-      background: #08101d;
+      background: #070c14;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
       padding: 20px;
-      margin-top: 12px;
+      margin: 16px 0 24px;
     }
 
-    .bibtex-code {
+    .bibtex-text {
       font-family: var(--font-mono);
       font-size: 12px;
       color: #cbd5e1;
@@ -505,7 +524,7 @@
       white-space: pre-wrap;
     }
 
-    .copy-btn {
+    .copy-button {
       position: absolute;
       top: 12px;
       right: 12px;
@@ -523,12 +542,31 @@
       transition: all 0.15s;
     }
 
-    .copy-btn:hover {
+    .copy-button:hover {
       border-color: var(--cyan-bright);
       color: #ffffff;
       background: var(--bg-card);
     }
 
+    .sober-contact {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 18px 22px;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+    }
+
+    .sober-contact a {
+      color: var(--cyan-bright);
+      text-decoration: none;
+    }
+
+    .sober-contact a:hover {
+      text-decoration: underline;
+    }
+
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -553,39 +591,16 @@
       transform: translateY(0);
     }
 
-    /* References List */
-    ol.ref-list {
-      padding-left: 22px;
-      font-size: 13px;
-      color: var(--text-muted);
-      line-height: 1.65;
-    }
-
-    ol.ref-list li {
-      margin-bottom: 8px;
-    }
-
-    ol.ref-list a {
-      color: var(--cyan-bright);
-      text-decoration: none;
-    }
-
-    ol.ref-list a:hover {
-      text-decoration: underline;
-    }
-
     /* Footer */
-    footer.paper-footer {
-      margin-top: 60px;
-      padding: 40px 0 80px;
-      border-top: 1px solid var(--border-subtle);
+    footer.site-footer {
+      padding: 44px 0 72px;
       text-align: center;
       font-size: 12px;
       color: var(--text-muted);
       font-family: var(--font-mono);
     }
 
-    footer.paper-footer a {
+    footer.site-footer a {
       color: var(--cyan-bright);
       text-decoration: none;
     }
@@ -595,376 +610,244 @@
 
 <div class="container">
 
-  <!-- Header & Meta -->
-  <header class="paper-header" id="top">
-    <div class="meta-tag">
-      <span class="dot"></span>
-      <span>Candidate arXiv v1.0 &middot; Subject: cs.AI (Artificial Intelligence)</span>
-    </div>
+  <!-- 1. HERO -->
+  <header class="hero-section" id="top">
+    <h1 class="hero-title">Productive Self-Application</h1>
+    <p class="hero-subtitle">When does a reflective loop actually improve itself?</p>
 
-    <h1 class="paper-title">Productive Self-Application</h1>
-    <p class="paper-subtitle">An Operational Criterion for Reflective Reasoning Systems</p>
-
-    <div class="author-block">
-      <a href="https://cameronlampley.com/" class="author-name">Cameron G. Lampley</a>
-      <div class="author-affiliation">Independent Researcher</div>
-      <div class="date-venue">15 August 2026 &middot; <strong>Candidate arXiv v1.0</strong></div>
-    </div>
-
-    <!-- Action Links -->
-    <div class="action-links" role="navigation" aria-label="Paper Navigation and Artifacts">
-      <a href="#abstract" class="btn-action btn-primary-arxiv" id="btn-arxiv-action">
+    <div class="hero-actions">
+      <a href="#full-paper" class="btn btn-primary" id="btn-read-pdf">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-        <span>arXiv: cs.AI Preprint</span>
+        <span>Read Manuscript</span>
       </a>
 
-      <a href="#instrument" class="btn-action">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
-        <span>Formal Model &lang;X, O, S, E, A, C&rang;</span>
-      </a>
-
-      <a href="#protocol" class="btn-action">
+      <a href="#summary-deck" class="btn btn-secondary" id="btn-view-slides">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
-        <span>Blinded Protocol &amp; Controls</span>
-      </a>
-
-      <a href="#bibtex" class="btn-action">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-        <span>Cite / BibTeX</span>
+        <span>View 2-Slide Summary</span>
       </a>
     </div>
 
-    <!-- Status Note Callout -->
-    <div class="status-callout">
-      <strong>Status Note</strong>
-      This is a preliminary methods preprint. It proposes a formal vocabulary and test protocol. It does not claim a theorem of recursive self-improvement, complete introspective access, indefinitely safe autonomous self-modification, or empirical confirmation of the central hypothesis.
+    <div class="status-line">
+      Candidate arXiv v1.0 &mdash; <strong>Cameron G. Lampley</strong>, Independent Researcher (15 August 2026)
     </div>
   </header>
 
-  <!-- Abstract -->
-  <section class="paper-section" id="abstract">
-    <div class="section-eyebrow">Summary</div>
-    <h2 class="section-heading">Abstract</h2>
-
-    <div class="abstract-box">
-      <p class="abstract-text">
-        Recursive self-improvement and iterative self-refinement are increasingly common descriptions of reasoning and agent systems, but self-reference alone does not distinguish a useful reflective process from a decorative loop. This paper proposes a compact operational formalism for reflective instruments and a corresponding criterion for productive self-application. An instrument is represented as <strong>M = &lang;X, O, S, E, A, C&rang;</strong>, separating examined states, transformations, selection, evaluation, abstraction or meta-control, and reintegration. A hierarchical lift <strong>M<sup>up</sup></strong> permits the instrument to operate on representations of instruments, giving a typed interpretation of the suggestive expression <em>M(M)</em> as <em>M<sup>up</sup>(M)</em>, rather than naive untyped self-application. The central proposal is that self-application is scientifically interesting only when it yields externally measurable gains in precision, explicit constraint, or testability that survive controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias. We give a blinded experimental protocol, explicit falsification conditions, and a bounded provenance case from the development of the formalism. The contribution is not recursion itself, which is established, but an evaluation-oriented abstraction for asking whether a reflective loop improves the procedure that generated it.
-      </p>
-
-      <div class="keywords-block">
-        <strong>Keywords:</strong> recursive self-improvement; self-reflection; metacognition; reflective agents; self-reference; evaluation; scientific instrumentation.
-      </div>
-    </div>
-  </section>
-
-  <!-- 1. Introduction & Contributions -->
-  <section class="paper-section" id="introduction">
-    <div class="section-eyebrow">Section 1</div>
-    <h2 class="section-heading">Introduction &amp; Core Contributions</h2>
-
-    <p class="body-p">
-      Systems that revise their own outputs, prompts, skills, evaluators, or agentic procedures are now common enough that “self-improvement” covers several materially different phenomena. Iterative self-feedback can improve an output while leaving the revision procedure fixed. Self-referential agents can modify parts of their own logic. More recent systems explicitly evolve meta-skills or improvement procedures themselves [1–3]. These represent different degrees of loop closure.
-    </p>
-
-    <p class="body-p">
-      This paper asks a narrower question: <strong>when a method is applied to a representation of itself, what would make the self-application scientifically interesting rather than merely recursive?</strong> The proposed answer is operational rather than metaphysical. A self-application pass is productive when it produces a successor procedure that is more constrained, more precise, or more testable under an external evaluation protocol, and when the apparent improvement survives obvious controls.
-    </p>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-label">Contribution 01</div>
-        <h4>6-Component Representation</h4>
-        <p>A six-component operational representation <code>M = &lang;X, O, S, E, A, C&rang;</code> for a reasoning or revision instrument.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Contribution 02</div>
-        <h4>Hierarchical Lift M<sup>up</sup></h4>
-        <p>A typed hierarchical lift <code>M<sup>up</sup></code> that permits an instrument to transform representations of instruments, making <em>M(M)</em> shorthand for <em>M<sup>up</sup>(M)</em>.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Contribution 03</div>
-        <h4>Productivity Criterion</h4>
-        <p>A candidate criterion for productive self-application based on externally scored changes in precision, explicit constraint, and testability.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Contribution 04 &amp; 05</div>
-        <h4>Blinded Protocol &amp; Provenance</h4>
-        <p>An explicit falsification protocol distinguishing self-application from generic revision, plus a bounded provenance case from Project Monad.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. Related Work -->
-  <section class="paper-section" id="related-work">
+  <!-- 2. THE CORE IDEA -->
+  <section class="page-section" id="core-idea">
     <div class="section-eyebrow">Section 2</div>
-    <h2 class="section-heading">Related Work and Positioning</h2>
+    <h2 class="section-heading">The Core Idea</h2>
 
-    <p class="body-p">
-      <strong>Self-Refine</strong> uses a single language model as generator, feedback provider, and refiner across multiple tasks without additional training [1]. This establishes that repeated self-feedback can improve outputs, but does not require the procedure that generates feedback to become an editable object. <strong>Gödel Agent</strong> allows an agent to modify its own logic and behavior under high-level objectives [2]. <strong>MetaSkill-Evolve</strong> distinguishes a task skill from a meta-skill parameterizing the improvement pipeline, evolving that meta-skill under the same pipeline applied to itself [3].
-    </p>
-
-    <p class="body-p">
-      Surveys of recursive self-improvement emphasize evaluator quality and grounding as central bottlenecks [4]. Work on LLM self-reference distinguishes theoretical self-reference from the much stronger requirement of complete functional self-access [5], while empirical work shows that self-reflection can improve performance without settling when feedback is reliable [6].
-    </p>
-
-    <div class="status-callout" style="background: rgba(79, 209, 197, 0.05); border-left-color: var(--cyan-bright); border-color: rgba(79, 209, 197, 0.25);">
-      <strong style="color: var(--cyan-bright);">Two Key Grounding Constraints</strong>
-      First, “the procedure applies to itself” is neither novel nor sufficient evidence of improvement. Second, any useful claim about reflective productivity must be externally testable. The proposal is intentionally weaker than a recursion-theoretic theorem and stronger than a rhetorical claim of self-improvement.
+    <div class="quote-box">
+      <blockquote class="core-quote">
+        “Self-reference is cheap. Productive self-application should be expensive enough to measure.”
+      </blockquote>
+      <p class="quote-explanation">
+        Recursive self-improvement and iterative self-refinement are increasingly common descriptions of reasoning and agent systems, but self-reference alone does not distinguish a useful reflective process from a decorative loop. A self-application pass is scientifically interesting only when it yields externally measurable gains in <strong>precision</strong>, <strong>explicit constraint</strong>, or <strong>testability</strong> that survive controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias.
+      </p>
     </div>
   </section>
 
-  <!-- 3. Operational Reflective Instrument -->
-  <section class="paper-section" id="instrument">
+  <!-- 3. THE INSTRUMENT -->
+  <section class="page-section" id="instrument">
     <div class="section-eyebrow">Section 3</div>
-    <h2 class="section-heading">An Operational Reflective Instrument</h2>
+    <h2 class="section-heading">The Instrument</h2>
 
-    <p class="body-p">
-      Let an instrument be represented by <strong>M = &lang;X, O, S, E, A, C&rang;</strong>:
-    </p>
+    <div class="instrument-display">
+      <div class="equation-large">M = &lang;X, O, S, E, A, C&rang;</div>
 
-    <table class="table-custom">
-      <thead>
-        <tr>
-          <th>Symbol</th>
-          <th>Component Name</th>
-          <th>Operational Role</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="symbol">X</td>
-          <td><strong>Object Space</strong></td>
-          <td>Current objects or states under consideration.</td>
-        </tr>
-        <tr>
-          <td class="symbol">O</td>
-          <td><strong>Operations</strong></td>
-          <td>A space of available transformations.</td>
-        </tr>
-        <tr>
-          <td class="symbol">S</td>
-          <td><strong>Selector</strong></td>
-          <td>Policy choosing a transformation under the current context.</td>
-        </tr>
-        <tr>
-          <td class="symbol">E</td>
-          <td><strong>Evaluator</strong></td>
-          <td>Map producing feedback about a transformed state.</td>
-        </tr>
-        <tr>
-          <td class="symbol">A</td>
-          <td><strong>Abstraction Map</strong></td>
-          <td>Converts feedback into higher-level representation, rule, or revision proposal.</td>
-        </tr>
-        <tr>
-          <td class="symbol">C</td>
-          <td><strong>Collapse Map</strong></td>
-          <td>Reintegration map returning abstract result to object level as successor state/procedure.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="math-card">
-      <div class="label">Typed Composition Pass</div>
-      <div>e<sub>X</sub> : X &rarr; &Sigma;, &nbsp; S : &Sigma; &rarr; O</div>
-      <div>o : O &times; &Sigma; &rarr; X, &nbsp; E : X &times; &Sigma; &rarr; &Phi;</div>
-      <div>A : &Phi; &rarr; &Lambda;, &nbsp; C : &Lambda; &rarr; X</div>
-      <div style="margin-top: 8px;">o<sub>S</sub>(x) = o(S(e<sub>X</sub>(x)), e<sub>X</sub>(x))</div>
-      <div class="code-eq" style="margin-top: 4px;">M(x) = C(A(E(o<sub>S</sub>(x), e<sub>X</sub>(x))))</div>
-    </div>
-
-    <h3 class="subsection-heading">3.1 Hierarchical Lift &amp; Typed Self-Application</h3>
-    <p class="body-p">
-      Naively writing <em>M(M)</em> is type-unsafe when <em>M : X &rarr; X</em>. Introduce a space <strong>Inst</strong> of instrument descriptions and a hierarchical lift <strong>M<sup>up</sup> : Inst &rarr; Inst</strong> whose operations act on instrument descriptions rather than only on object-level states.
-    </p>
-
-    <div class="math-card">
-      <div class="label">Self-Application Transform</div>
-      <div>T : Inst &rarr; Inst &nbsp; defined by &nbsp; <span class="code-eq">T(M) = M<sup>up</sup>(M)</span></div>
-      <div style="margin-top: 6px; color: var(--text-muted); font-size: 12px;">
-        Pipeline: M &rarr; examine M &rarr; select meta-operation &rarr; modify M &rarr; evaluate &rarr; abstract &rarr; reintegrate &rarr; M'
-      </div>
-    </div>
-
-    <h3 class="subsection-heading">3.2 Iteration and Stabilization</h3>
-    <div class="math-card">
-      <div>M<sup>(0)</sup> = M</div>
-      <div>M<sup>(n+1)</sup> = T(M<sup>(n)</sup>)</div>
-      <div>d(M<sup>(n+1)</sup>, M<sup>(n)</sup>) &lt; &epsilon; &nbsp; &DoubleRightArrow; &nbsp; <span class="code-eq">M<sup>*</sup> = T(M<sup>*</sup>)</span></div>
-    </div>
-  </section>
-
-  <!-- 4. Productive Self-Application -->
-  <section class="paper-section" id="criterion">
-    <div class="section-eyebrow">Section 4</div>
-    <h2 class="section-heading">Productive Self-Application Criterion</h2>
-
-    <p class="body-p">
-      Self-application is not by itself evidence of progress. A method can redescribe itself, amplify its own assumptions, or generate additional prose without improving epistemic quality. We therefore propose an externally scored discriminator:
-    </p>
-
-    <div class="math-card">
-      <div class="label">Vector Comparison Discriminator</div>
-      <div>Let R(T) denote representation after one controlled pass:</div>
-      <div class="code-eq" style="margin-top: 6px;">R(T) &ne; T</div>
-      <div class="code-eq">P(R(T)) &gt; P(T) &nbsp; [Precision]</div>
-      <div class="code-eq">K(R(T)) &ge; K(T) &nbsp; [Explicit Constraint]</div>
-      <div class="code-eq">F(R(T)) &gt; F(T) &nbsp; [Testability / Falsifiability]</div>
-    </div>
-
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-label">Dimension 1</div>
-        <h4>Precision P(T)</h4>
-        <p>Asks whether ambiguous commitments become sharper.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Dimension 2</div>
-        <h4>Constraint K(T)</h4>
-        <p>Asks whether the successor rules out more behaviors rather than merely adding expressive freedom.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Dimension 3</div>
-        <h4>Testability F(T)</h4>
-        <p>Asks whether the successor exposes observations, counterexamples, or experiments that could weaken it.</p>
-      </div>
-    </div>
-
-    <h3 class="subsection-heading">4.2 Anti-Slop Controls</h3>
-    <ul class="formal-list">
-      <li><strong>Verbosity / Token Count:</strong> Controls against longer text appearing precise simply via qualification padding.</li>
-      <li><strong>Evaluator Familiarity:</strong> Controls against evaluators rewarding phrasing they previously helped generate.</li>
-      <li><strong>Circularity &amp; Restatement:</strong> Penalizes non-substantive paraphrasing loops.</li>
-      <li><strong>Contradiction Rate:</strong> Detects introduced logical inconsistencies.</li>
-      <li><strong>Unsupported Overclaim:</strong> Penalizes inflated capability claims.</li>
-      <li><strong>Operational Meaningfulness:</strong> Confirms new constraints are executable, not decorative.</li>
-    </ul>
-  </section>
-
-  <!-- 5. Experimental Protocol -->
-  <section class="paper-section" id="protocol">
-    <div class="section-eyebrow">Section 5</div>
-    <h2 class="section-heading">Experimental Protocol &amp; Falsification Conditions</h2>
-
-    <p class="body-p">
-      <strong>Hypotheses:</strong>
-      <br><strong>H<sub>0</sub>:</strong> Apparent gains from self-application are explained by restatement, verbosity, evaluator bias, or generic revision.
-      <br><strong>H<sub>1</sub>:</strong> Self-application produces additional constraints, sharper boundaries, or new falsifiable consequences beyond matched controls.
-    </p>
-
-    <h3 class="subsection-heading">5.1 Five Controlled Conditions</h3>
-    <ol class="formal-list">
-      <li><strong>Baseline:</strong> No revision.</li>
-      <li><strong>Generic Revision:</strong> Revise for clarity and rigor without instructing the method to apply to itself.</li>
-      <li><strong>Self-Application:</strong> Apply target method to its own definitions, evaluator, failure conditions, and revision policy.</li>
-      <li><strong>Decorative Loop Control:</strong> Add explicit self-referential language without allowing modification of the actual procedure.</li>
-      <li><strong>Optional External Critic:</strong> Use an independent critic or verifier to estimate dependence on external grounding.</li>
-    </ol>
-
-    <div class="math-card">
-      <div class="label">Blinded Primary Test</div>
-      <div>&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0 &nbsp; (for genuinely reflective targets)</div>
-      <div>&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &approx; 0 &nbsp; (for decorative controls)</div>
-    </div>
-
-    <h3 class="subsection-heading">5.3 Explicit Falsification Conditions</h3>
-    <ul class="formal-list">
-      <li>Self-applied versions do not outperform matched generic revisions;</li>
-      <li>Any advantage disappears under length matching or blinded evaluation;</li>
-      <li>Decorative self-referential controls improve equally;</li>
-      <li>Precision gains are accompanied by increased contradiction, circularity, or unsupported claims;</li>
-      <li>Meta-level rubric gains fail to transfer to held-out object-level problems; or</li>
-      <li>Independent evaluators cannot reliably distinguish the purported successor from its baseline.</li>
-    </ul>
-  </section>
-
-  <!-- Interactive Inspector -->
-  <section class="paper-section" id="interactive-demo">
-    <div class="section-eyebrow">Interactive Apparatus</div>
-    <h2 class="section-heading">Interactive Instrument Inspector</h2>
-
-    <div class="interactive-box">
-      <div class="interactive-header">
-        <div style="font-family: var(--font-display); font-size: 16px; color: #fff;">Formalism Inspector &amp; Provenance Tracer</div>
-        <div class="interactive-tabs">
-          <button class="tab-btn active" id="tab-model" onclick="switchInspector('model')">Instrument Model</button>
-          <button class="tab-btn" id="tab-lift" onclick="switchInspector('lift')">Hierarchical Lift M^up</button>
-          <button class="tab-btn" id="tab-prov" onclick="switchInspector('prov')">Provenance Case</button>
+      <div class="pipeline-flow">
+        <div class="flow-node">
+          <span class="symbol">X</span>
+          <span class="label">State / Objects</span>
+        </div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">
+          <span class="symbol">O</span>
+          <span class="label">Operation</span>
+        </div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">
+          <span class="symbol">S</span>
+          <span class="label">Selection</span>
+        </div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">
+          <span class="symbol">E</span>
+          <span class="label">Evaluation</span>
+        </div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">
+          <span class="symbol">A</span>
+          <span class="label">Abstraction</span>
+        </div>
+        <span class="flow-arrow">&rarr;</span>
+        <div class="flow-node">
+          <span class="symbol">C</span>
+          <span class="label">Collapse / Reintegrate</span>
         </div>
       </div>
-      <div class="terminal-display" id="terminal-view">Loading formal specification...</div>
+
+      <div class="typed-pass-note">
+        Typed Composition: <code>M(x) = C(A(E(o_S(x), e_X(x))))</code> &middot; Hierarchical Lift: <code>T(M) = M<sup>up</sup>(M)</code>
+      </div>
     </div>
   </section>
 
-  <!-- 6. Provenance & 7. Discussion -->
-  <section class="paper-section" id="provenance">
-    <div class="section-eyebrow">Sections 6–8</div>
-    <h2 class="section-heading">Provenance Case &amp; Limitations</h2>
+  <!-- 4. THE TEST -->
+  <section class="page-section" id="test">
+    <div class="section-eyebrow">Section 4</div>
+    <h2 class="section-heading">The Test</h2>
 
-    <p class="body-p">
-      <strong>Bounded Provenance Case:</strong> The originating Project Monad research record supplies an illustrative provenance case. The revision procedure attacked an early broad self-improvement description using its own stated goals: preserve viable invariants, expose testable obligations, reduce overclaim, and make limits explicit.
-    </p>
+    <div class="test-box">
+      <div class="discriminator-math">
+        P(R(T)) &gt; P(T), &emsp; K(R(T)) &ge; K(T), &emsp; F(R(T)) &gt; F(T)
+      </div>
 
-    <p class="body-p">
-      Implemented recursive state bookkeeping (branching transformation record <code>MONAD-KEEL-001</code>) stores parent/child relations, transformation histories, depths, values, and state hashes. Audited system reports record 15/15 focused Live Captain tests and 4/4 Monad-0 engine tests, supporting the existence of a state-bearing, repository-mediated development loop.
-    </p>
+      <div class="test-punchline">
+        “Sharper, more constrained, more falsifiable.”
+      </div>
 
-    <h3 class="subsection-heading">Immediate Experiment Plan</h3>
-    <ol class="formal-list">
-      <li>Freeze a short rubric for precision, constraints, falsifiability, contradiction, and overclaim;</li>
-      <li>Select 10–20 target procedures spanning genuinely meta-level and decorative controls;</li>
-      <li>Generate baseline, generic-revision, and self-application variants under token-matched budgets;</li>
-      <li>Blind the artifacts and obtain multiple independent evaluations;</li>
-      <li>Test transfer using revised procedures on held-out object-level tasks; and</li>
-      <li>Publish prompts, artifacts, scores, disagreement logs, and negative results.</li>
-    </ol>
-  </section>
-
-  <!-- AI Disclosure -->
-  <section class="paper-section" id="disclosure">
-    <div class="section-eyebrow">Provenance Statement</div>
-    <h2 class="section-heading">Research-Generation &amp; AI Disclosure</h2>
-
-    <div class="status-callout" style="background: rgba(129, 140, 248, 0.05); border-left-color: var(--indigo-accent); border-color: rgba(129, 140, 248, 0.25);">
-      <strong style="color: var(--indigo-accent);">Full Disclosure Statement</strong>
-      All substantive manuscript prose and formal drafting in this version were generated by generative-AI systems operating inside a human-directed Project Monad research process. The human author supplied and maintained the research objective, project records, constraints, interaction history, selection pressure, interpretation, verification decisions, and decision to disseminate the work. Generative-AI systems were used for retrieval, synthesis, theoretical development, adversarial critique, literature search, organization, drafting, editing, and typesetting. The human author adopts the manuscript as his scholarly work, assumes responsibility for its claims, references, errors, and publication, and does not list any generative-AI system as an author. This disclosure is intentionally stronger than a conventional writing-assistance statement because the depth of AI participation is itself relevant to the provenance of the research.
+      <div class="test-dimensions-grid">
+        <div class="dim-card">
+          <div class="name">P(T) &middot; Precision</div>
+          <div class="desc">Commitments become sharper and less ambiguous; eliminates evasive restatements.</div>
+        </div>
+        <div class="dim-card">
+          <div class="name">K(T) &middot; Constraint</div>
+          <div class="desc">Rules out more invalid behaviors and interpretations rather than adding decorative freedom.</div>
+        </div>
+        <div class="dim-card">
+          <div class="name">F(T) &middot; Falsifiability</div>
+          <div class="desc">Exposes concrete observations, edge cases, and experiments that could weaken or disprove it.</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- References -->
-  <section class="paper-section" id="references">
-    <div class="section-eyebrow">References</div>
-    <h2 class="section-heading">References</h2>
+  <!-- 5. CONTROLS -->
+  <section class="page-section" id="controls">
+    <div class="section-eyebrow">Section 5</div>
+    <h2 class="section-heading">Experimental Controls</h2>
 
-    <ol class="ref-list">
-      <li>Madaan, A., Tandon, N., Gupta, P., et al. <em>Self-Refine: Iterative Refinement with Self-Feedback</em>. <a href="https://arxiv.org/abs/2303.17651" target="_blank" rel="noopener">arXiv:2303.17651</a> (2023).</li>
-      <li>Yin, X., Wang, X., Pan, L., Wan, X., and Wang, W. Y. <em>Gödel Agent: A Self-Referential Agent Framework for Recursive Self-Improvement</em>. <a href="https://arxiv.org/abs/2410.04444" target="_blank" rel="noopener">arXiv:2410.04444</a> (2024).</li>
-      <li>Wang, Z., Yan, M., Bi, J., Yan, S., Tresp, V., and Ma, Y. <em>MetaSkill-Evolve: Recursive Self-Improvement of LLM Agents via Two-Timescale Meta-Skill Evolution</em>. <a href="https://arxiv.org/abs/2607.05297" target="_blank" rel="noopener">arXiv:2607.05297</a> (2026).</li>
-      <li>Chen, M., Wang, L., and Qu, B. <em>Recursive Self-Improvement in AI: From Bounded Self-Refinement to Autonomous Research Loops</em>. <a href="https://arxiv.org/abs/2607.07663" target="_blank" rel="noopener">arXiv:2607.07663</a> (2026).</li>
-      <li>Zhang, J., Yuan, B., and Zhang, Q. <em>Self-Reference in Large Language Models: The Introspection Threshold for Recursive Self-Improvement</em>. <a href="https://arxiv.org/abs/2607.04277" target="_blank" rel="noopener">arXiv:2607.04277</a> (2026).</li>
-      <li>Renze, M. and Guven, E. <em>Self-Reflection in LLM Agents: Effects on Problem-Solving Performance</em>. <a href="https://arxiv.org/abs/2405.06682" target="_blank" rel="noopener">arXiv:2405.06682</a> (2024).</li>
-      <li>Nivel, E., Thórisson, K. R., Steunebrink, B. R., et al. <em>Bounded Recursive Self-Improvement</em>. <a href="https://arxiv.org/abs/1312.6764" target="_blank" rel="noopener">arXiv:1312.6764</a> (2013).</li>
-      <li>Lampley, C. G. <em>M3: Monadic Meta-Revision Method - Canonical Record of the First Real-Time Reasoning Experiment</em>. Project Monad internal research record (4 Aug. 2026).</li>
-      <li>Lampley, C. G. <em>Productive Self-Application as a Discriminator of Genuine Recursive Structure</em>. Project Monad internal research record (4 Aug. 2026).</li>
-    </ol>
+    <div class="controls-grid">
+      <div class="control-col">
+        <div class="control-eyebrow">Control Condition 1</div>
+        <div class="control-title">Generic Revision</div>
+        <div class="control-desc">
+          Revise for clarity, style, and rigor without instructing the method to apply to itself or edit its own core procedure.
+        </div>
+        <div class="control-footer">Baseline Edit Benchmark</div>
+      </div>
+
+      <div class="control-col target">
+        <div class="control-eyebrow">Primary Target</div>
+        <div class="control-title">Self-Application</div>
+        <div class="control-desc">
+          The method inspects and transforms its own selector, evaluator, failure criteria, or abstraction rules via hierarchical lift <em>M<sup>up</sup>(M)</em>.
+        </div>
+        <div class="control-footer" style="color: var(--cyan-bright);">&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0</div>
+      </div>
+
+      <div class="control-col">
+        <div class="control-eyebrow">Control Condition 2</div>
+        <div class="control-title">Decorative Self-Reference</div>
+        <div class="control-desc">
+          Add explicit self-referential prose and commentary without permitting actual functional modification of the executable procedure.
+        </div>
+        <div class="control-footer">&Delta;<sub>self</sub> - &Delta;<sub>decorative</sub> &approx; 0 (null)</div>
+      </div>
+    </div>
   </section>
 
-  <!-- BibTeX -->
-  <section class="paper-section" id="bibtex">
-    <div class="section-eyebrow">Citation</div>
-    <h2 class="section-heading">BibTeX</h2>
+  <!-- 2-SLIDE SUMMARY -->
+  <section class="page-section" id="summary-deck">
+    <div class="section-eyebrow">Executive Deck</div>
+    <h2 class="section-heading">2-Slide Summary</h2>
 
-    <div class="bibtex-card">
-      <button class="copy-btn" id="copy-btn" onclick="copyBibtex()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-        <span id="copy-label">Copy BibTeX</span>
+    <div class="slide-deck">
+      <div class="deck-nav">
+        <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);">Executive Visual Summary</div>
+        <div class="slide-tabs">
+          <button class="slide-tab-btn active" id="btn-slide-1" onclick="showSlide(1)">Slide 1: The Criterion</button>
+          <button class="slide-tab-btn" id="btn-slide-2" onclick="showSlide(2)">Slide 2: The Experiment</button>
+        </div>
+      </div>
+
+      <!-- Slide 1 -->
+      <div class="slide-frame" id="slide-1">
+        <div class="slide-num">SLIDE 1 OF 2</div>
+        <div class="slide-header-title">A useful loop should improve by passing through itself</div>
+        <div class="slide-body-content">
+          <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 20px; text-align: center;">
+            <div style="font-family: var(--font-mono); font-size: 20px; color: #38bdf8; font-weight: 600; margin-bottom: 12px;">
+              M = &lang;X, O, S, E, A, C&rang; &emsp;&circlearrowright;&emsp; M<sup>up</sup>(M) &rarr; M'
+            </div>
+            <div style="font-size: 13px; color: #9db0c9;">
+              State &rarr; Operation &rarr; Selection &rarr; Evaluation &rarr; Abstraction &rarr; Reintegration
+            </div>
+          </div>
+        </div>
+        <div class="slide-bottom-line">
+          Bottom Line: Productive = more precise, more constrained, more testable.
+        </div>
+      </div>
+
+      <!-- Slide 2 (Hidden by default) -->
+      <div class="slide-frame" id="slide-2" style="display: none;">
+        <div class="slide-num">SLIDE 2 OF 2</div>
+        <div class="slide-header-title">Separate recursion from real improvement</div>
+        <div class="slide-body-content">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; text-align: center;">
+            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
+              1. Baseline<br><span style="color:#627794;">(No revision)</span>
+            </div>
+            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
+              2. Generic Revision<br><span style="color:#627794;">(Clarity edit)</span>
+            </div>
+            <div style="background: #10233b; border: 1px solid #38bdf8; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #ffffff;">
+              3. Self-Application<br><span style="color:#38bdf8;">(Meta-level lift)</span>
+            </div>
+            <div style="background: #08111e; border: 1px solid #1e314d; border-radius: 6px; padding: 12px 8px; font-family: var(--font-mono); font-size: 11.5px; color: #9db0c9;">
+              4. Decorative Loop<br><span style="color:#627794;">(Surface syntax)</span>
+            </div>
+          </div>
+        </div>
+        <div class="slide-bottom-line">
+          Judged blind on precision, constraint, falsifiability, contradiction, and overclaim.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FULL PAPER / MANUSCRIPT SECTION -->
+  <section class="page-section" id="full-paper">
+    <div class="section-eyebrow">Full Manuscript</div>
+    <h2 class="section-heading">Paper Abstract &amp; Sections</h2>
+
+    <div style="background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 6px; padding: 24px; font-size: 14px; color: var(--text-secondary); line-height: 1.7;">
+      <p style="margin-bottom: 14px;">
+        <strong>Abstract:</strong> Recursive self-improvement and iterative self-refinement are increasingly common descriptions of reasoning and agent systems, but self-reference alone does not distinguish a useful reflective process from a decorative loop. This paper proposes a compact operational formalism for reflective instruments and a corresponding criterion for productive self-application. An instrument is represented as <code>M = &lang;X, O, S, E, A, C&rang;</code>, separating examined states, transformations, selection, evaluation, abstraction or meta-control, and reintegration. A hierarchical lift <code>M<sup>up</sup></code> permits the instrument to operate on representations of instruments, giving a typed interpretation of the suggestive expression <em>M(M)</em> as <em>M<sup>up</sup>(M)</em>, rather than naive untyped self-application.
+      </p>
+      <p style="margin-bottom: 14px;">
+        The central proposal is that self-application is scientifically interesting only when it yields externally measurable gains in precision, explicit constraint, or testability that survive controls for generic revision, verbosity, circularity, unsupported overclaim, and evaluator bias. We give a blinded experimental protocol, explicit falsification conditions, and a bounded provenance case from the development of the formalism.
+      </p>
+      <div style="font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); padding-top: 12px; border-top: 1px solid var(--border-subtle);">
+        Keywords: recursive self-improvement &middot; self-reflection &middot; metacognition &middot; reflective agents &middot; evaluation &middot; scientific instrumentation
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. DOWNLOAD / CITATION / CONTACT -->
+  <section class="page-section" id="citation-contact">
+    <div class="section-eyebrow">Section 6</div>
+    <h2 class="section-heading">Download, Citation &amp; Contact</h2>
+
+    <div class="citation-wrapper">
+      <button class="copy-button" id="copy-bib-btn" onclick="copyBibtexCitation()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span id="copy-bib-label">Copy BibTeX</span>
       </button>
-      <pre class="bibtex-code" id="bibtex-code">@article{lampley2026productiveselfapp,
+      <pre class="bibtex-text" id="bibtex-source">@article{lampley2026productiveselfapp,
   title={Productive Self-Application: An Operational Criterion for Reflective Reasoning Systems},
   author={Lampley, Cameron G.},
   journal={arXiv preprint (Candidate v1.0)},
@@ -974,77 +857,38 @@
   url={https://cameronlampley.com/monadone/}
 }</pre>
     </div>
+
+    <div class="sober-contact">
+      <strong>Inquiries &amp; Independent Replication:</strong><br>
+      Cameron G. Lampley &middot; Independent Researcher &middot; <a href="https://cameronlampley.com/">cameronlampley.com</a><br>
+      Candidate preprint intended for arXiv <code>cs.AI</code> (Computer Science &mdash; Artificial Intelligence).
+    </div>
   </section>
 
   <!-- Footer -->
-  <footer class="paper-footer">
-    <p>Productive Self-Application &middot; Research Manuscript &middot; <a href="https://cameronlampley.com/">Cameron G. Lampley</a></p>
-    <p style="margin-top: 8px;">
-      <a href="/">Home</a> &middot; 
-      <a href="/build.html">Build &amp; Research</a> &middot; 
-      <a href="/toys/monad0-lab/">Monad-0 Sandbox</a> &middot; 
-      <a href="https://github.com/aleuf05/monad" target="_blank" rel="noopener">GitHub</a>
-    </p>
+  <footer class="site-footer">
+    <p>Productive Self-Application &middot; Cameron G. Lampley &middot; 2026</p>
   </footer>
 
 </div>
 
 <!-- Toast -->
-<div class="toast" id="toast">BibTeX citation copied to clipboard.</div>
+<div class="toast" id="toast-msg">BibTeX copied to clipboard.</div>
 
 <script>
-  const CONTENT = {
-    model: `OPERATIONAL REFLECTIVE INSTRUMENT DECOMPOSITION:
-M = <X, O, S, E, A, C>
-
-- X (Objects/States): Examined representations and candidate structures.
-- O (Operations): Available transformation space.
-- S (Selector): Policy choosing transformations under current context Sigma.
-- E (Evaluator): Produces feedback Phi on transformed state (X x Sigma -> Phi).
-- A (Abstraction): Meta-control converting feedback to higher-level rules Lambda.
-- C (Collapse/Reintegration): Returns abstract result Lambda -> X as successor procedure.
-
-Composition:
-  o_S(x) = o(S(e_X(x)), e_X(x))
-  M(x)   = C(A(E(o_S(x), e_X(x))))`,
-
-    lift: `HIERARCHICAL LIFT & TYPED TRANSFORMATION:
-M^up : Inst -> Inst
-
-To avoid type confusion in naive M(M):
-- Inst: Space of instrument descriptions.
-- M^up operates on instrument representations (modifying S, E, A, C, O).
-- T(M) = M^up(M)
-
-Stabilization & Fixed-Point Target:
-  M^(0) = M
-  M^(n+1) = T(M^(n))
-  d(M^(n+1), M^(n)) < epsilon  =>  M* = T(M*)`,
-
-    prov: `PROJECT MONAD PROVENANCE CASE:
-- Branching Transformation Record: MONAD-KEEL-001
-  Stores parent/child relations, transformation histories, depths, values, state hashes.
-- Audited Systems Report (2 Aug 2026):
-  15/15 focused Live Captain tests passing.
-  4/4 Monad-0 engine tests passing.
-- State-bearing, repository-mediated development loop confirmed present.`
-  };
-
-  function switchInspector(tab) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('terminal-view').textContent = CONTENT[tab];
+  function showSlide(n) {
+    document.getElementById('slide-1').style.display = n === 1 ? 'flex' : 'none';
+    document.getElementById('slide-2').style.display = n === 2 ? 'flex' : 'none';
+    document.getElementById('btn-slide-1').classList.toggle('active', n === 1);
+    document.getElementById('btn-slide-2').classList.toggle('active', n === 2);
   }
 
-  // Initialize
-  switchInspector('model');
-
-  function copyBibtex() {
-    const text = document.getElementById('bibtex-code').textContent;
+  function copyBibtexCitation() {
+    const text = document.getElementById('bibtex-source').textContent;
     navigator.clipboard.writeText(text).then(() => {
-      const toast = document.getElementById('toast');
+      const toast = document.getElementById('toast-msg');
       toast.classList.add('show');
-      const label = document.getElementById('copy-label');
+      const label = document.getElementById('copy-bib-label');
       label.textContent = "Copied!";
       setTimeout(() => {
         toast.classList.remove('show');
@@ -1054,6 +898,5 @@ Stabilization & Fixed-Point Target:
   }
 </script>
 
-<script src="../assets/js/monad-nav.js" data-root="../" data-section="build" data-page="Productive Self-Application"></script>
 </body>
 </html>
