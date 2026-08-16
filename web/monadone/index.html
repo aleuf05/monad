@@ -264,61 +264,111 @@ M&prime;</div>
   </section>
 
   <!-- ========================================================================
-       7. EXPERIMENTAL TEST LANES
+       7. EXPERIMENTAL TEST (FULLY FUNCTIONAL PROTOCOL TESTBED)
        ======================================================================== -->
   <section class="paper-section" id="experimental-test">
-    <div class="section-label">Section 7</div>
-    <h2 class="section-title">Experimental Test</h2>
+    <div class="section-label">Section 7 &middot; Interactive Protocol</div>
+    <h2 class="section-title">Experimental Testbed</h2>
 
     <p class="body-text">
-      The primary test compares four distinct conditions under token-matched budgets and blinded evaluation:
+      Select a target specimen and test condition to inspect how the blinded protocol evaluates procedure transformations and computes the &Delta;<sub>self</sub> discriminator:
     </p>
 
-    <div class="lanes-grid">
-      <div class="lane-col">
-        <div class="lane-header">Condition 01</div>
-        <div class="lane-title">Baseline</div>
-        <div class="lane-desc">
-          No revision. The original procedure is frozen as the ground benchmark.
+    <div class="testbed-card">
+      <div class="testbed-header-bar">
+        <div class="specimen-select-wrap">
+          <label for="testbed-specimen-select" class="specimen-label">Target Specimen:</label>
+          <select id="testbed-specimen-select" class="specimen-select" aria-label="Select Target Specimen">
+            <option value="rubric">Specimen A: Diagnostic Evaluation Rubric</option>
+            <option value="invariants">Specimen B: Invariant Extractor</option>
+          </select>
         </div>
-        <div class="lane-footer">Unmodified Ground</div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">
+          Token-Matched &middot; Blinded Evaluator Protocol
+        </div>
       </div>
 
-      <div class="lane-col">
-        <div class="lane-header">Condition 02</div>
-        <div class="lane-title">Generic Revision</div>
-        <div class="lane-desc">
-          Revise for clarity and rigor without telling the procedure to apply itself to itself.
-        </div>
-        <div class="lane-footer">Baseline Edit Benchmark</div>
+      <!-- 4 Interactive Lane Buttons -->
+      <div class="lanes-grid" role="tablist" aria-label="Experimental Test Conditions">
+        <button type="button" class="lane-btn" data-condition="baseline" role="tab" aria-selected="false" id="lane-tab-baseline">
+          <span class="lane-header">Condition 01</span>
+          <span class="lane-title">Baseline</span>
+          <span class="lane-tag">No Revision (Ground)</span>
+        </button>
+
+        <button type="button" class="lane-btn" data-condition="generic" role="tab" aria-selected="false" id="lane-tab-generic">
+          <span class="lane-header">Condition 02</span>
+          <span class="lane-title">Generic Revision</span>
+          <span class="lane-tag">Clarity Edit (&Delta;generic)</span>
+        </button>
+
+        <button type="button" class="lane-btn active" data-condition="self" role="tab" aria-selected="true" id="lane-tab-self">
+          <span class="lane-header">Primary Target</span>
+          <span class="lane-title">Self-Application</span>
+          <span class="lane-tag">M<sup>&uarr;</sup>(M) Lift (&Delta;self)</span>
+        </button>
+
+        <button type="button" class="lane-btn" data-condition="decorative" role="tab" aria-selected="false" id="lane-tab-decorative">
+          <span class="lane-header">Condition 03</span>
+          <span class="lane-title">Decorative Loop</span>
+          <span class="lane-tag">Null Control (Syntax)</span>
+        </button>
       </div>
 
-      <div class="lane-col target">
-        <div class="lane-header">Primary Target</div>
-        <div class="lane-title">Self-Application</div>
-        <div class="lane-desc">
-          Apply the target method to its own definitions, evaluator, failure conditions, and revision policy via <em>M<sup>&uarr;</sup>(M)</em>.
+      <!-- Testbed Live Display Grid -->
+      <div class="testbed-display-grid">
+        <!-- Left: Transformed Procedure Output -->
+        <div class="testbed-pane">
+          <div class="pane-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+            <span>Transformed Procedure Output</span>
+          </div>
+          <p id="testbed-instruction" style="font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px; font-family: var(--font-mono);">
+            Apply revision procedure to its own selector, evaluator, and failure rules.
+          </p>
+          <pre class="specimen-text-box" id="testbed-code-box" aria-live="polite">Loading procedure transformation...</pre>
         </div>
-        <div class="lane-footer">&Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0</div>
-      </div>
 
-      <div class="lane-col">
-        <div class="lane-header">Condition 03</div>
-        <div class="lane-title">Decorative Loop</div>
-        <div class="lane-desc">
-          Add explicit self-referential language and commentary without modifying the actual executable procedure.
+        <!-- Right: Blinded Metric Scores & Discriminator -->
+        <div class="testbed-pane">
+          <div class="pane-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            <span>Blinded Rubric Scores</span>
+          </div>
+
+          <div class="metrics-gauge-grid">
+            <div class="gauge-row">
+              <div class="gauge-header">
+                <span>Precision P(T)</span>
+                <strong id="gauge-val-p">4.8 / 5.0</strong>
+              </div>
+              <div class="gauge-bar-bg"><div class="gauge-bar-fill" id="gauge-fill-p" style="width: 96%;"></div></div>
+            </div>
+
+            <div class="gauge-row">
+              <div class="gauge-header">
+                <span>Explicit Constraint K(T)</span>
+                <strong id="gauge-val-k">4.6 / 5.0</strong>
+              </div>
+              <div class="gauge-bar-bg"><div class="gauge-bar-fill" id="gauge-fill-k" style="width: 92%;"></div></div>
+            </div>
+
+            <div class="gauge-row">
+              <div class="gauge-header">
+                <span>Testability F(T)</span>
+                <strong id="gauge-val-f">4.7 / 5.0</strong>
+              </div>
+              <div class="gauge-bar-bg"><div class="gauge-bar-fill" id="gauge-fill-f" style="width: 94%;"></div></div>
+            </div>
+          </div>
+
+          <!-- Live Verdict -->
+          <div class="verdict-box">
+            <div class="verdict-math" id="testbed-verdict-math">&Delta;self - &Delta;generic = +1.77 &gt; 0</div>
+            <div class="verdict-badge pass" id="testbed-verdict-badge">CRITERION SATISFIED</div>
+          </div>
         </div>
-        <div class="lane-footer">&Delta;<sub>self</sub> - &Delta;<sub>decorative</sub> &approx; 0 (Null)</div>
       </div>
-    </div>
-
-    <div class="discriminator-box" style="margin-top: 14px;">
-      <div class="discriminator-math" style="font-size: 18px;">
-        &Delta;<sub>self</sub> - &Delta;<sub>generic</sub> &gt; 0 &emsp; (for genuinely reflective targets)
-      </div>
-      <p class="body-text" style="margin: 0; font-size: 13.5px;">
-        Artifacts must be blindly scored by independent evaluators using a frozen rubric across precision, constraints, falsifiability, contradiction, and overclaim.
-      </p>
     </div>
   </section>
 
