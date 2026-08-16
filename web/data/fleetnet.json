@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-16T16:35:08Z",
+  "generated": "2026-08-16T16:36:49Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 3,
-    "head": "939b327"
+    "uncommitted": 5,
+    "head": "fda706c"
   },
   "captain": "running",
   "captain_detail": {
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.5G",
-      "memory_available_percent": 73.0,
-      "load_1m": 4.82
+      "memory_available_percent": 73.4,
+      "load_1m": 2.59
     }
   },
   "sound": true,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "3 files uncommitted."
+      "text": "5 files uncommitted."
     },
     {
       "priority": 1,

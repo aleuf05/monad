@@ -36,6 +36,7 @@ from context_compiler import (
 )
 from habitat_store import HabitatStore
 from job_engine import GLOBAL_JOB_RUNNER
+from manual_reader import MANUAL_READER
 from proactive import NOTIFIER
 
 KERNEL_PATH = REPO_ROOT / "EDIT-THIS-ONE-FILE.md"
@@ -118,6 +119,11 @@ class CaptainApplicationService:
             ok = GLOBAL_JOB_RUNNER.cancel(job_id)
             return f"Job `{job_id}` cancellation request sent: {'success' if ok else 'failed'}"
 
+        elif tool_name in ("consult_operator_manual", "read_manual"):
+            query = args.get("query") or args.get("question") or ""
+            res = MANUAL_READER.query(query)
+            return res.get("summary", "")
+
         elif tool_name == "save_heart_lesson":
             lesson = args.get("lesson", "")
             source = args.get("source", "Operator")
@@ -194,20 +200,13 @@ class CaptainApplicationService:
             )
             return OutboundMessage(destination=msg.channel, text=resp_text, reply_to=msg.reply_to)
 
-        if any(w in clean_lower for w in ["how does", "explain", "what is", "operator manual"]):
-            if MANUAL_PATH.exists():
-                resp_text = (
-                    f"### 📖 Operator Manual Reference\n\n"
-                    f"Consulted [`docs/manuals/LIVE_CAPTAIN_OPERATOR_MANUAL.md`](file://{MANUAL_PATH}):\n\n"
-                    f"Live Captain provides unified conversational access via the **Phone Terminal** (`/captain/`) "
-                    f"and **Root Console** (`/root/`).\n\n"
-                    f"**Core Mechanics:**\n"
-                    f"- **Agent Jobs:** Delegated to `AGY`, `Claude`, or `Codex` asynchronously with SQLite persistence.\n"
-                    f"- **Authority Boundary:** Automatically separates read-only inquiries from staged privileged actions (`cmd.sh`).\n"
-                    f"- **Continuity:** Single shared state across phone and console surviving process restarts."
-                )
-            else:
-                resp_text = "Live Captain is governed by canonical posture in `EDIT-THIS-ONE-FILE.md`."
+        if any(w in clean_lower for w in ["how does", "explain", "what is", "operator manual", "what does", "button", "help"]):
+            manual_res = MANUAL_READER.query(text)
+            resp_text = (
+                f"### 📖 Grounded Operator Manual Reference\n\n"
+                f"{manual_res['summary']}\n\n"
+                f"*Source: [`docs/manuals/LIVE_CAPTAIN_OPERATOR_MANUAL.md`](file://{MANUAL_READER.manual_path})*"
+            )
             return OutboundMessage(destination=msg.channel, text=resp_text, reply_to=msg.reply_to)
 
         # Standard Captain Turn

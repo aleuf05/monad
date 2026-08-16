@@ -43,6 +43,7 @@ from comms import (
     Urgency,
     WebChannelAdapter,
 )
+from captain_app import CAPTAIN_APP
 from job_engine import GLOBAL_JOB_RUNNER
 from proactive import NOTIFIER
 
@@ -278,108 +279,31 @@ class LLMEngine:
         cancel_event: threading.Event,
         event_queue: queue.Queue
     ) -> tuple[str, List[Dict[str, Any]]]:
-        """Rule-based execution engine that can inspect real repository state & run tools."""
+        """Processes turn through canonical CaptainApplicationService."""
         last_admiral_msg = messages[-1]["text"].strip() if messages else ""
         thread_id = messages[-1].get("thread_id") if messages else None
+
+        inbound = InboundMessage(
+            channel="phone_web",
+            sender="admiral",
+            conversation_id=thread_id or "default",
+            text=last_admiral_msg,
+        )
+
+        outbound = CAPTAIN_APP.process_inbound(inbound)
+        response_text = outbound.text
         tool_events = []
-        lower_msg = last_admiral_msg.lower()
-        clean_lower = re.sub(r'^(captain|live captain|please|hey captain)[,\s:]+', '', lower_msg).strip()
 
-        # Check for agent delegation (e.g. "have agy inspect ...", "have claude check ...")
-        if any(clean_lower.startswith(p) or p in lower_msg for p in ["have agy", "have claude", "have codex", "dispatch agy", "dispatch claude", "dispatch codex"]):
-            worker = "agy"
-            if "claude" in lower_msg:
-                worker = "claude"
-            elif "codex" in lower_msg:
-                worker = "codex"
+        # Stream response text in chunks
+        chunk_size = 25
+        for i in range(0, len(response_text), chunk_size):
+            if cancel_event.is_set():
+                break
+            chunk = response_text[i:i + chunk_size]
+            event_queue.put({"event": "delta", "data": json.dumps({"content": chunk})})
+            time.sleep(0.02)
 
-            # Strip worker prefix from task request
-            task_req = re.sub(r'^(.*?)(have|dispatch)\s+(agy|claude|codex)\s+(to\s+)?', '', last_admiral_msg, flags=re.IGNORECASE).strip(" ,:") or last_admiral_msg
-
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "delegate_job", "action": f"Dispatching {worker.upper()} Job", "summary": f"Job delegated to {worker}"})})
-            res = ToolExecutor.execute("delegate_job", {"worker": worker, "request": task_req, "conversation_id": thread_id})
-            tool_events.append({"name": "delegate_job", "summary": f"Delegated to {worker}", "result": res})
-            response_text = f"### Agent Job Dispatched\n\n{res}\n\nTask: *\"{task_req}\"*\n\nUpdates will stream automatically upon completion."
-
-        elif any(w in lower_msg for w in ["list jobs", "show jobs", "check jobs", "job status"]):
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "list_jobs", "action": "Listing Jobs", "summary": "Querying job engine"})})
-            res = ToolExecutor.execute("list_jobs", {})
-            tool_events.append({"name": "list_jobs", "summary": "Querying job engine", "result": res})
-            response_text = f"### Registered Jobs\n\n{res}"
-
-        elif "cancel job" in lower_msg:
-            job_id = last_admiral_msg.split("cancel job", 1)[-1].strip(" :`")
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "cancel_job", "action": "Cancelling Job", "summary": f"Job {job_id}"})})
-            res = ToolExecutor.execute("cancel_job", {"job_id": job_id})
-            tool_events.append({"name": "cancel_job", "summary": f"Cancelled {job_id}", "result": res})
-            response_text = res
-
-        elif any(w in lower_msg for w in ["status", "are you healthy", "health", "system status"]):
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "system_status", "action": "Inspecting System Status", "summary": "Querying operational metrics"})})
-            jobs = GLOBAL_JOB_RUNNER.store.list_jobs(limit=5)
-            running_jobs = [j for j in jobs if j["state"] == "running"]
-            failed_jobs = [j for j in jobs if j["state"] == "failed"]
-            threads_count = len(STORE.list_threads())
-
-            # Get git head sha
-            try:
-                git_sha = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=REPO_ROOT, text=True).strip()
-            except Exception:
-                git_sha = "unknown"
-
-            response_text = (
-                f"### ⚓ Live Captain Operational Status\n\n"
-                f"- **Overall Health:** `HEALTHY · ALL SYSTEMS SOUND`\n"
-                f"- **Active Backend:** `Deterministic Multimodal Engine + AGY/Claude/Codex Workers`\n"
-                f"- **Phone Terminal:** `ONLINE` (Port 4777, `/captain/`)\n"
-                f"- **Root Console:** `ONLINE` (Port 4792, `/root/`)\n"
-                f"- **Conversation Threads:** `{threads_count}` stored in SQLite\n"
-                f"- **Active Jobs:** `{len(running_jobs)}` running | `{len(failed_jobs)}` failed recently\n"
-                f"- **Pause State:** `UNPAUSED · ACTIVE ENGAGEMENT`\n"
-                f"- **Version / Commit:** `{git_sha}`\n\n"
-                f"Identity compiled from canonical posture (`EDIT-THIS-ONE-FILE.md`)."
-            )
-
-        elif any(w in clean_lower for w in ["how does", "explain feature", "what is", "operator manual", "tell me about"]):
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "consult_manual", "action": "Consulting Operator Manual", "summary": "Reading LIVE_CAPTAIN_OPERATOR_MANUAL.md"})})
-            manual_path = REPO_ROOT / "docs" / "manuals" / "LIVE_CAPTAIN_OPERATOR_MANUAL.md"
-            if manual_path.exists():
-                manual_text = manual_path.read_text(encoding="utf-8")
-                # Excerpt relevant section
-                response_text = (
-                    f"### 📖 Operator Manual Reference\n\n"
-                    f"Consulted [`docs/manuals/LIVE_CAPTAIN_OPERATOR_MANUAL.md`](file://{manual_path}):\n\n"
-                    f"Live Captain provides unified conversational access via the **Phone Terminal** (`/captain/`) "
-                    f"for rapid mobile command and **Root Console** (`/root/`) for operations.\n\n"
-                    f"**Core Mechanics:**\n"
-                    f"- **Agent Jobs:** Delegated to `AGY`, `Claude`, or `Codex` asynchronously with SQLite persistence.\n"
-                    f"- **Authority Boundary:** Automatically separates read-only inquiries from staged privileged actions (`cmd.sh`).\n"
-                    f"- **Continuity:** Single shared state across phone and console surviving process restarts."
-                )
-            else:
-                response_text = "Live Captain is governed by canonical posture in `EDIT-THIS-ONE-FILE.md`."
-
-        elif any(w in lower_msg for w in ["sound", "ship", "check ship"]):
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "sound_ship", "action": "Sounding Ship", "summary": "bash scripts/sound-the-ship.sh"})})
-            res = ToolExecutor.execute("sound_ship", {})
-            tool_events.append({"name": "sound_ship", "summary": "bash scripts/sound-the-ship.sh", "result": res})
-            response_text = f"### Ship Soundness Report\n\n```text\n{res}\n```\n\nAll systems inspected against canonical posture."
-
-        elif any(w in lower_msg for w in ["heart", "lesson", "persist"]):
-            event_queue.put({"event": "tool", "data": json.dumps({"name": "save_heart_lesson", "action": "Saving Heart Lesson", "summary": "Persisting operational lesson"})})
-            res = ToolExecutor.execute("save_heart_lesson", {"lesson": last_admiral_msg, "source": "Admiral prompt"})
-            tool_events.append({"name": "save_heart_lesson", "summary": "Persisting Heart Lesson", "result": res})
-            response_text = f"Persisted operational Heart lesson to storage.\n\nResult: `{res}`"
-
-        else:
-            # High-signal standard Captain response
-            auth_level = AuthorityBoundary.assess(last_admiral_msg)
-            response_text = (
-                f"Received directive: **{last_admiral_msg[:100]}**\n\n"
-                f"- **Authority Level:** `{auth_level.value}`\n"
-                f"- **Context:** Compiled from `EDIT-THIS-ONE-FILE.md` & `current-bearing.md`.\n\n"
-                f"Live Captain ready to inspect, execute, or delegate."
-            )
+        return response_text, tool_events
 
         # Stream response text in chunks
         chunk_size = 25

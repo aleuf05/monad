@@ -59,7 +59,23 @@ class TestCaptainApplicationService(unittest.TestCase):
         )
         outbound = self.app.process_inbound(msg)
         self.assertIn("Operator Manual Reference", outbound.text)
-        self.assertIn("Agent Jobs", outbound.text)
+        self.assertIn("Agent", outbound.text)
+
+    def test_manual_reader_tool_execution(self):
+        summary = self.app.execute_tool("consult_operator_manual", {"query": "phone messaging terminal"})
+        self.assertIn("Section", summary)
+        self.assertIn("Phone", summary)
+
+    def test_inbound_button_explanation(self):
+        msg = InboundMessage(
+            channel="phone_web",
+            sender="admiral",
+            conversation_id="thread-btn",
+            text="Captain, what does the stop button do?",
+        )
+        outbound = self.app.process_inbound(msg)
+        self.assertIn("Operator Manual Reference", outbound.text)
+        self.assertIn("Stop", outbound.text)
 
     def test_inbound_streaming(self):
         msg = InboundMessage(
