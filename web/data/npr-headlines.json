@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-15T23:30:01.621405+00:00",
+  "fetched_at": "2026-08-16T09:15:01.929329+00:00",
   "items": [
+    {
+      "title": "Billions of sea stars have died. A Northwest tribe is trying to save the species",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5928398/endangered-sea-stars-release-pacific-ocean",
+      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Doctors and women who've had it call for more attention on postpartum psychosis",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5931964/lindsay-clancy-trial-postpartum-psychosis-diagnosis",
+      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "NPR Senior Podcast Challenge: Official Rules",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5929441/npr-senior-podcast-challenge-official-rules",
+      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "65 and older? Have a story to tell? Hit 'record' and send NPR your podcast",
+      "link": "https://www.npr.org/2026/08/16/nx-s1-5911853/npr-senior-podcast-challenge-for-65-and-older",
+      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Are robotaxis finally here?",
       "link": "https://www.npr.org/2026/08/15/nx-s1-5918065/are-robotaxis-finally-here",
@@ -22,26 +42,6 @@
       "title": "Families of USS Lincoln crew say Trump should be 'ashamed' of conditions on board",
       "link": "https://www.npr.org/2026/08/15/nx-s1-5932539/uss-lincoln-trump-dire-conditions",
       "pubDate": "Sat, 15 Aug 2026 14:21:32 -0400"
-    },
-    {
-      "title": "Trump administration wants to allow companies to hack foreign cybercriminals",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5930311/trump-companies-hack-foreign-cybercriminals",
-      "pubDate": "Sat, 15 Aug 2026 13:25:34 -0400"
-    },
-    {
-      "title": "Jason Arday, Cambridge professor accused of plagiarism, is found dead",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5932488/jason-arday-dead",
-      "pubDate": "Sat, 15 Aug 2026 13:04:43 -0400"
-    },
-    {
-      "title": "ICE detained a Venezuelan soccer pro. His case shows the immigration backlog crisis",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5928322/ice-detained-a-venezuelan-soccer-pro-his-case-shows-the-immigration-backlog-crisis",
-      "pubDate": "Sat, 15 Aug 2026 06:10:00 -0400"
-    },
-    {
-      "title": "5 exercises that can prevent (and relieve!) pregnancy pain",
-      "link": "https://www.npr.org/2026/08/15/nx-s1-5930423/strength-exercises-to-relieve-prevent-pregnancy-pain",
-      "pubDate": "Sat, 15 Aug 2026 05:04:00 -0400"
     }
   ]
 }
