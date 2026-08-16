@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-16T19:00:01.844432+00:00",
+  "fetched_at": "2026-08-16T20:30:01.687002+00:00",
   "items": [
+    {
+      "title": "Kushner meets with Hamas on the Gaza road map ahead of talks with Netanyahu",
+      "link": "https://www.npr.org/2026/08/16/g-s1-138948/kushner-gaza-hamas-netanyahu-egypt-talks",
+      "pubDate": "Sun, 16 Aug 2026 16:20:22 -0400"
+    },
     {
       "title": "Tommy John, namesake for a pioneering elbow surgery that saved his career, dies at 83",
       "link": "https://www.npr.org/2026/08/16/g-s1-138941/tommy-john-elbow-surgery-baseball-pitcher-yankees-dodgers",
@@ -36,11 +41,6 @@
     {
       "title": "NPR Senior Podcast Challenge: Official Rules",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5929441/npr-senior-podcast-challenge-official-rules",
-      "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Billions of sea stars have died. A Northwest tribe is trying to save the species",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5928398/endangered-sea-stars-release-pacific-ocean",
       "pubDate": "Sun, 16 Aug 2026 05:00:00 -0400"
     }
   ]
