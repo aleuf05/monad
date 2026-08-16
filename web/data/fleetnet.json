@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-16T05:32:18Z",
+  "generated": "2026-08-16T05:34:03Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 0,
-    "head": "9dbac72"
+    "uncommitted": 1,
+    "head": "e8dec6a"
   },
   "captain": "running",
   "captain_detail": {
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.5G",
-      "memory_available_percent": 72.5,
-      "load_1m": 1.33
+      "memory_available_percent": 72.8,
+      "load_1m": 1.04
     }
   },
   "sound": true,
@@ -111,8 +111,8 @@
       "text": "All 6 test suites green."
     },
     {
-      "priority": 2,
-      "text": "Working tree clean."
+      "priority": 3,
+      "text": "1 files uncommitted."
     },
     {
       "priority": 1,
