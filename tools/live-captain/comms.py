@@ -236,3 +236,61 @@ class TelegramChannelAdapter(ChannelAdapter):
             reply_to=str(msg.get("reply_to_message", {}).get("message_id")) if "reply_to_message" in msg else None,
             channel_metadata={"message_id": msg.get("message_id")},
         )
+
+
+class WhatsAppChannelAdapter(ChannelAdapter):
+    """Encodes and decodes WhatsApp Cloud API and Twilio WhatsApp payloads."""
+
+    channel_name: str = "whatsapp"
+
+    def format_outbound(self, message: OutboundMessage) -> Dict[str, Any]:
+        prefix = ""
+        if message.semantic_role == "engineering":
+            prefix = "🔧 "
+        elif message.semantic_role == "alert":
+            prefix = "⚠️ "
+        elif message.urgency == Urgency.HIGH.value:
+            prefix = "⚓ "
+
+        text = f"{prefix}{message.text}"
+        return {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": message.destination,
+            "type": "text",
+            "text": {"body": text},
+        }
+
+    def parse_inbound(self, raw_payload: Dict[str, Any]) -> InboundMessage:
+        # Handles Meta WhatsApp Cloud API webhook structure
+        if "entry" in raw_payload:
+            try:
+                change = raw_payload["entry"][0]["changes"][0]["value"]
+                msg = change["messages"][0]
+                sender_phone = msg.get("from", "")
+                text = msg.get("text", {}).get("body", "")
+                msg_id = msg.get("id")
+                return InboundMessage(
+                    channel="whatsapp",
+                    sender="admiral",
+                    conversation_id=f"wa-{sender_phone}",
+                    text=text,
+                    media=[],
+                    channel_metadata={"whatsapp_msg_id": msg_id, "from": sender_phone},
+                )
+            except Exception:
+                pass
+
+        # Handles direct payload or Twilio WhatsApp webhook format
+        sender_phone = raw_payload.get("from", raw_payload.get("From", "admiral"))
+        text = raw_payload.get("text", raw_payload.get("Body", "")).strip()
+        msg_id = raw_payload.get("id", raw_payload.get("MessageSid", ""))
+
+        return InboundMessage(
+            channel="whatsapp",
+            sender="admiral",
+            conversation_id=f"wa-{sender_phone}",
+            text=text,
+            media=[],
+            channel_metadata={"whatsapp_msg_id": msg_id, "from": sender_phone},
+        )
