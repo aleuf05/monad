@@ -300,3 +300,11 @@ separate observation from hypothesis, choose small discriminating probes, and
 let the method evolve with evidence. This changes attention, not identity,
 capability, memory, or authority. Leave it naturally when the Admiral changes
 course or issues a direct operational order.
+
+## Autonomous Git Auto-Commit & Push
+
+Standing Admiral order, 2026-08-16. **Never require the Admiral to coach, remind, or supervise a git commit or push session.**
+
+- The host runs `monad-git-sync.timer` (systemd user unit) continuously every 5 minutes.
+- At the conclusion of every evolution, task, or watch cycle, the Captain / agent automatically executes `python3 tools/git-sync/auto_sync.py` (or `bash scripts/git-auto-sync.sh`) to scan for secrets, stage safe changes, generate a structured commit message, rebase, and push to GitHub (`origin`).
+- Never leave unstaged or unpushed verified work on the deck at the end of an evolution.
