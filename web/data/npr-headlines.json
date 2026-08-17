@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T12:00:01.788455+00:00",
+  "fetched_at": "2026-08-17T12:30:02.170075+00:00",
   "items": [
     {
       "title": "USS Washington to relieve USS Lincoln. And, Jared Kushner to meet with Netanyahu",
@@ -14,13 +14,23 @@
       "pubDate": "Mon, 17 Aug 2026 06:00:10 -0400"
     },
     {
-      "title": "Elon Musk's Starbase wants to expand in south Texas",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
+      "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Meta heads to court in a landmark trial about kids and social media addiction",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
       "title": "As wildfires get worse, some states are struggling to pass fire protection rules",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5923975/wildfires-western-community-protection",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Elon Musk's Starbase wants to expand in south Texas",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
@@ -31,16 +41,6 @@
     {
       "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Meta heads to court in a landmark trial about kids and social media addiction",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
