@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T10:15:01.680583+00:00",
+  "fetched_at": "2026-08-17T11:00:01.755779+00:00",
   "items": [
     {
       "title": "Hayden Panettiere, who starred in 'Heroes' and 'Nashville,' dies at 36",
@@ -29,8 +29,8 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
+      "title": "Elon Musk's Starbase wants to expand in south Texas",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +39,8 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Elon Musk's Starbase wants to expand in south Texas",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
+      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
