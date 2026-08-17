@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T21:00:02.171297+00:00",
+  "fetched_at": "2026-08-17T21:15:01.840814+00:00",
   "items": [
+    {
+      "title": "Former federal prosecutor is suing DOJ for 'unlawful and retaliatory' firing",
+      "link": "https://www.npr.org/2026/08/17/g-s1-138997/former-federal-prosecutor-sue-doj-retaliatory-firing",
+      "pubDate": "Mon, 17 Aug 2026 17:01:54 -0400"
+    },
     {
       "title": "Democrat Rep. Jimmy Gomez being investigated over sexual misconduct allegations",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5935513/jimmy-gomez-house-ethics-investigation",
@@ -36,11 +41,6 @@
     {
       "title": "Elon Musk's Starbase wants to expand in south Texas",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Advocates worry new bans on student IDs will trip up younger voters",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
