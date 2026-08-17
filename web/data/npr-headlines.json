@@ -1,47 +1,47 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T09:00:01.918340+00:00",
+  "fetched_at": "2026-08-17T09:15:01.609269+00:00",
   "items": [
+    {
+      "title": "As wildfires get worse, some states are struggling to pass fire protection rules",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5923975/wildfires-western-community-protection",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Meta heads to court in a landmark trial about kids and social media addiction",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Car problems? No childcare? How an app is helping people get to work",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Can a student ID be used for voting? More Republican-led states are banning it",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Elon Musk's Starbase wants to expand in south Texas",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5930235/morning-news-brief",
       "pubDate": "Mon, 17 Aug 2026 04:49:18 -0400"
-    },
-    {
-      "title": "Trump orders Pentagon to scale back joint exercises with South Korea",
-      "link": "https://www.npr.org/2026/08/17/g-s1-138969/trump-exercises-south-korea",
-      "pubDate": "Mon, 17 Aug 2026 01:21:39 -0400"
-    },
-    {
-      "title": "Multiple people dead as flooding continues in Indiana",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5934670/indiana-flooding-deaths",
-      "pubDate": "Sun, 16 Aug 2026 16:38:40 -0400"
-    },
-    {
-      "title": "Kushner meets with Hamas on the Gaza road map ahead of talks with Netanyahu",
-      "link": "https://www.npr.org/2026/08/16/g-s1-138948/kushner-gaza-hamas-netanyahu-egypt-talks",
-      "pubDate": "Sun, 16 Aug 2026 16:20:22 -0400"
-    },
-    {
-      "title": "Tommy John, namesake for a pioneering elbow surgery that saved his career, dies at 83",
-      "link": "https://www.npr.org/2026/08/16/g-s1-138941/tommy-john-elbow-surgery-baseball-pitcher-yankees-dodgers",
-      "pubDate": "Sun, 16 Aug 2026 14:58:25 -0400"
-    },
-    {
-      "title": "A good \u2013 and bad \u2013 week for Italy's art police and museum security",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5933052/sicily-art-heist-museum-parma",
-      "pubDate": "Sun, 16 Aug 2026 12:27:54 -0400"
-    },
-    {
-      "title": "Lala is again a tropical storm, sending drenching rain and winds across Hawaii",
-      "link": "https://www.npr.org/2026/08/16/g-s1-138926/lala-tropical-storm-hawaii-hurricane",
-      "pubDate": "Sun, 16 Aug 2026 11:47:58 -0400"
-    },
-    {
-      "title": "What really happened in Ceuta? Why we may never find out",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5927053/what-happened-in-ceuta",
-      "pubDate": "Sun, 16 Aug 2026 11:38:22 -0400"
     }
   ]
 }
