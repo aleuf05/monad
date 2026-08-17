@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-16T20:45:01.380634+00:00",
+  "fetched_at": "2026-08-17T05:30:01.540517+00:00",
   "items": [
+    {
+      "title": "Trump orders Pentagon to scale back joint exercises with South Korea",
+      "link": "https://www.npr.org/2026/08/17/g-s1-138969/trump-exercises-south-korea",
+      "pubDate": "Mon, 17 Aug 2026 01:21:39 -0400"
+    },
     {
       "title": "Multiple people dead as flooding continues in Indiana",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5934670/indiana-flooding-deaths",
@@ -37,11 +42,6 @@
       "title": "'What are we going to do?' The mom of a trans teen grapples with Trump's Medicaid move",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5932491/transgender-health-care-medicaid-trump-oz",
       "pubDate": "Sun, 16 Aug 2026 07:54:19 -0400"
-    },
-    {
-      "title": "Ukraine launches one of its largest aerial attacks of the war, killing at least 6 people in Russia",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5933006/ukraine-aerial-attack-6-dead-russia",
-      "pubDate": "Sun, 16 Aug 2026 06:12:09 -0400"
     }
   ]
 }
