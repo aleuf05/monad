@@ -6,6 +6,7 @@ experiment's test surface.
 
 from __future__ import annotations
 
+import os
 import sys
 import tempfile
 import unittest
@@ -33,7 +34,7 @@ from persistence import (
     load_admiral_attestation_read_only,
 )
 from run_tests import append_report, build_report
-from server import LiveCaptainHandler, browser_sse_payload, load_context_sources
+from server import LiveCaptainHandler, browser_sse_payload, create_daemon, load_context_sources
 from auth import COOKIE_NAME, AuthConfig
 from objectives import ObjectiveStore
 from turn_arbiter import TurnArbiter
@@ -53,9 +54,10 @@ from context_metabolism import (
     ingest_attested_candidate,
 )
 
-# server's import of claude_daemon (tools/root-console) appends that
+# server's import of claude_daemon/agy_daemon (tools/root-console) appends that
 # directory to sys.path as a side effect; import it directly here too.
 import claude_daemon  # noqa: E402
+import agy_daemon  # noqa: E402
 
 
 class _FakeStdin:
@@ -180,6 +182,79 @@ class ClaudeDaemonConcurrencyTests(unittest.TestCase):
         self.assertFalse(errors, f"unexpected errors: {errors}")
         self.assertEqual(results["a"]["text"], "REPLY-A")
         self.assertEqual(results["b"]["text"], "REPLY-B")
+
+
+class AgyDaemonConcurrencyTests(unittest.TestCase):
+    """Regression test ensuring concurrent AgyDaemon turns do not cross-deliver
+    events or replies."""
+
+    def test_concurrent_turns_do_not_cross_deliver_replies(self):
+        import threading
+        import time
+
+        daemon = agy_daemon.AgyDaemon(cwd=Path("."))
+        results: dict[str, dict] = {}
+        errors: list[Exception] = []
+
+        def mock_run_turn_sync(text, thread_id, source):
+            time.sleep(0.05)
+            daemon._item_completed({"id": "text-final", "type": "agentMessage", "text": f"REPLY-FOR-{text}"}, source=source)
+            daemon._codex_event("turn/completed", {"threadId": thread_id, "turn": {"status": "completed"}}, source=source)
+
+        daemon._run_turn_sync = mock_run_turn_sync
+
+        def run_turn(label, input_text):
+            try:
+                results[label] = daemon.send_and_wait(input_text, timeout=5)
+            except Exception as exc:
+                errors.append(exc)
+
+        t1 = threading.Thread(target=run_turn, args=("1", "FIRST"))
+        t2 = threading.Thread(target=run_turn, args=("2", "SECOND"))
+        t1.start()
+        time.sleep(0.01)
+        t2.start()
+
+        t1.join(timeout=3)
+        t2.join(timeout=3)
+
+        self.assertFalse(errors, f"unexpected errors: {errors}")
+        self.assertEqual(results["1"]["text"], "REPLY-FOR-FIRST")
+        self.assertEqual(results["2"]["text"], "REPLY-FOR-SECOND")
+
+
+class BackendDispatchSelectionTests(unittest.TestCase):
+    """Tests preventing regression to binary selection or silent fallback."""
+
+    def test_explicit_dispatch_agy(self):
+        with mock.patch("agy_daemon.AgyDaemon.__init__", return_value=None):
+            daemon = create_daemon("agy")
+            self.assertIsInstance(daemon, agy_daemon.AgyDaemon)
+
+    def test_explicit_dispatch_claude(self):
+        with mock.patch("claude_daemon.ClaudeDaemon.__init__", return_value=None):
+            daemon = create_daemon("claude")
+            self.assertIsInstance(daemon, claude_daemon.ClaudeDaemon)
+
+    def test_explicit_dispatch_codex(self):
+        from codex_daemon import CodexDaemon
+        with mock.patch("codex_daemon.CodexDaemon.__init__", return_value=None):
+            daemon = create_daemon("codex")
+            self.assertIsInstance(daemon, CodexDaemon)
+
+    def test_unknown_backend_fails_loudly(self):
+        for bad_backend in ["unknown", "gemini", "gpt-4", "something_else", ""]:
+            with self.assertRaises(ValueError) as ctx:
+                create_daemon(bad_backend)
+            self.assertIn("Unknown CAPTAIN_BACKEND", str(ctx.exception))
+
+    def test_default_backend_is_agy(self):
+        with mock.patch.dict(os.environ, {}, clear=True):
+            if "CAPTAIN_BACKEND" in os.environ:
+                del os.environ["CAPTAIN_BACKEND"]
+            with mock.patch("agy_daemon.AgyDaemon.__init__", return_value=None):
+                daemon = create_daemon()
+                self.assertIsInstance(daemon, agy_daemon.AgyDaemon)
 
 
 class LedgerAuditTests(unittest.TestCase):

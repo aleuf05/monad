@@ -53,6 +53,7 @@ if str(ROOT_CONSOLE_DIR) not in sys.path:
     sys.path.append(str(ROOT_CONSOLE_DIR))
 from generated_images import map_generated_images  # noqa: E402
 from claude_daemon import ClaudeDaemon  # noqa: E402
+from agy_daemon import AgyDaemon, AgyError  # noqa: E402
 import docs_corpus  # noqa: E402
 
 HOST = "127.0.0.1"
@@ -234,6 +235,8 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     "label": STATUS_LABEL,
                     **{f"pause_{k}" if k != "paused" else k: v
                        for k, v in pause_state.read().items()},
+                    "backend": self.daemon.status().get("backend", "unknown"),
+                    "daemon": self.daemon.status(),
                     "codex": self.daemon.status(),
                     "kernel_path": str(KERNEL_PATH),
                     "kernel_digest": self.kernel_digest,
@@ -573,15 +576,29 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                          "speech_artifact": speech_artifact})
 
 
+def create_daemon(backend: str | None = None, cwd: Path = REPO_ROOT) -> AgyDaemon | ClaudeDaemon | CodexDaemon:
+    """Explicit backend dispatch for Live Captain: agy (primary default),
+    claude, or codex. Fails loudly on any unknown backend."""
+    if backend is None:
+        backend = os.environ.get("CAPTAIN_BACKEND", "agy")
+    key = backend.strip().lower()
+    if key == "agy":
+        return AgyDaemon(cwd=cwd)
+    elif key == "claude":
+        return ClaudeDaemon(cwd=cwd)
+    elif key == "codex":
+        return CodexDaemon(cwd=cwd)
+    else:
+        raise ValueError(
+            f"Unknown CAPTAIN_BACKEND: {backend!r}. "
+            f"Supported backends are 'agy', 'claude', 'codex'."
+        )
+
+
 def main() -> None:
     sources = load_context_sources()
     store = LiveCaptainStore(DB_PATH)
-    # Default is Anthropic, per doctrine 010: the Live Captain is Claude-only
-    # for now, and OpenAI/Codex is reserved for the Admiral's explicit
-    # per-instance authorization. A fallback that silently selects the
-    # reserved vendor is the exact out-of-policy pattern that doctrine names.
-    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
-    daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
+    daemon = create_daemon(cwd=REPO_ROOT)
     objectives = ObjectiveStore(DB_PATH)
     concepts = ConceptEngine(DB_PATH, REPO_ROOT, docs_corpus)
     arbiter = TurnArbiter()

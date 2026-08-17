@@ -29,6 +29,7 @@ from urllib.parse import parse_qs, urlsplit
 from auth import COOKIE_NAME, AuthConfig, LoginLimiter
 from codex_daemon import CodexDaemon, CodexError
 from claude_daemon import ClaudeDaemon
+from agy_daemon import AgyDaemon, AgyError
 import docs_corpus
 import course_projection
 import handoff
@@ -473,13 +474,27 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
         self._send_json({"thread_id": thread_id}, status=202)
 
 
+def create_daemon(backend: str | None = None, cwd: Path = REPO_ROOT) -> AgyDaemon | ClaudeDaemon | CodexDaemon:
+    """Explicit backend dispatch for Root Console: agy (primary default),
+    claude, or codex. Fails loudly on any unknown backend."""
+    if backend is None:
+        backend = os.environ.get("CAPTAIN_BACKEND", "agy")
+    key = backend.strip().lower()
+    if key == "agy":
+        return AgyDaemon(cwd=cwd)
+    elif key == "claude":
+        return ClaudeDaemon(cwd=cwd)
+    elif key == "codex":
+        return CodexDaemon(cwd=cwd)
+    else:
+        raise ValueError(
+            f"Unknown CAPTAIN_BACKEND: {backend!r}. "
+            f"Supported backends are 'agy', 'claude', 'codex'."
+        )
+
+
 def main() -> None:
-    # Default is Anthropic, per doctrine 010: the Live Captain is Claude-only
-    # for now, and OpenAI/Codex is reserved for the Admiral's explicit
-    # per-instance authorization. A fallback that silently selects the
-    # reserved vendor is the exact out-of-policy pattern that doctrine names.
-    backend = os.environ.get("CAPTAIN_BACKEND", "claude")
-    daemon = ClaudeDaemon(cwd=REPO_ROOT) if backend == "claude" else CodexDaemon(cwd=REPO_ROOT)
+    daemon = create_daemon(cwd=REPO_ROOT)
     RootConsoleHandler.daemon = daemon
     RootConsoleHandler.auth = AuthConfig.from_environment()
     RootConsoleHandler.login_limiter = LoginLimiter()
