@@ -183,6 +183,7 @@ bash scripts/sound-the-ship.sh
 ### Running Test Suites
 
 ```bash
+python3 -m unittest discover -s tools/root-console
 python3 -m unittest discover -s tools/live-captain -p "test_*.py"
 ```
 
@@ -195,4 +196,48 @@ systemctl --user restart live-captain-habitat.service
 
 # System Services (Root Console & Core Daemons)
 sudo systemctl status live-captain-bootstrap.service root-console.service
+sudo systemctl restart live-captain-bootstrap.service root-console.service
 ```
+
+---
+
+## 9. Captain Backend Selection & Execution Architecture
+
+Live Captain utilizes an explicit backend dispatch model (`tools/root-console/agy_daemon.py`, `tools/root-console/claude_daemon.py`, `tools/live-captain/codex_daemon.py`).
+
+### Supported Backends
+
+* **`CAPTAIN_BACKEND=agy` (Primary Default):** Google Antigravity CLI (`/home/cgl/.local/bin/agy`) using `gemini-3.7-flash-high` (or configured `CAPTAIN_AGY_MODEL`). Fast, deterministic, multimodal execution with automated permission bypass.
+* **`CAPTAIN_BACKEND=claude`:** Anthropic Claude Code CLI (`/home/cgl/.local/bin/claude`) using `CAPTAIN_CLAUDE_MODEL` (e.g. `opus` or `sonnet`).
+* **`CAPTAIN_BACKEND=codex`:** OpenAI Codex CLI app-server (`/home/cgl/.local/bin/codex`).
+
+### Current Default
+
+The active commissioning configuration defaults to:
+$$\boxed{\text{CAPTAIN\_BACKEND}=\text{agy}}$$
+Configured in `/home/cgl/.config/monad/root-console.env` and loaded by `live-captain-bootstrap.service` and `root-console.service`.
+
+### Identifying the Active Backend
+
+Query `/api/status` on either service with authenticated session headers:
+
+```bash
+# Live Captain Bootstrap (Port 4778)
+curl -s -b "monad_root_session=<cookie>" http://127.0.0.1:4778/api/status | jq '{backend: .backend, model: .daemon.model, running: .daemon.running}'
+
+# Root Console (Port 4792)
+curl -s -b "monad_root_session=<cookie>" http://127.0.0.1:4792/api/status | jq '{backend: .backend, model: .model, running: .running}'
+```
+
+### Fallback Policy: No Silent Fallback
+
+Per strict doctrine (doctrine 010 & commissioning mandate):
+* There is **zero silent fallback** between backends. AGY will never silently fall back to Claude or Codex.
+* Any unknown or misspelled backend value (e.g. `CAPTAIN_BACKEND=unknown`) **fails closed and loudly** at service startup with a descriptive `ValueError: Unknown CAPTAIN_BACKEND`.
+
+### Failure & Recovery Behavior
+
+1. **Turn Execution Errors:** If an inference fails or times out (default 180s timeout), the active daemon broadcasts a failed turn event, terminates any hung subprocess cleanly, logs the failure in `data/live-captain/instruction-sources.log`, and returns a `502 Bad Gateway` error with full diagnostic detail.
+2. **Process Crashes:** If a daemon subprocess exits unexpectedly, `systemd` automatically restarts the service (`Restart=on-failure`, `RestartSec=3`).
+3. **Continuity Safety:** Context compilation occurs strictly from persistent storage (`EDIT-THIS-ONE-FILE.md`, `current-bearing.md`, `continuity-ledger.md`, `live-captain.db`), ensuring turns are idempotent across backend swaps or service restarts.
+
