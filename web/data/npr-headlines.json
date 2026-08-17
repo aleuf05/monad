@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T19:30:01.429673+00:00",
+  "fetched_at": "2026-08-17T19:45:02.158249+00:00",
   "items": [
     {
       "title": "DHS defends investigating agency critics and giving them warning notices",
@@ -19,13 +19,13 @@
       "pubDate": "Mon, 17 Aug 2026 06:00:10 -0400"
     },
     {
-      "title": "Meta heads to court in a landmark trial about kids and social media addiction",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
+      "title": "Missed shifts were costly to this McDonald's. An app has fixed the problem",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Missed shifts were costly to this McDonald's. An app has fixed the problem",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
+      "title": "Advocates worry new bans on student IDs will trip up younger voters",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +39,8 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Advocates worry new bans on student IDs will trip up younger voters",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
+      "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
