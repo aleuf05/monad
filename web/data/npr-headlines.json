@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T10:00:02.011849+00:00",
+  "fetched_at": "2026-08-17T10:15:01.680583+00:00",
   "items": [
+    {
+      "title": "Hayden Panettiere, who starred in 'Heroes' and 'Nashville,' dies at 36",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5935226/hayden-panettiere-dies",
+      "pubDate": "Mon, 17 Aug 2026 06:00:10 -0400"
+    },
     {
       "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
@@ -11,11 +16,6 @@
     {
       "title": "Car problems? No childcare? How an app is helping people get to work",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Elon Musk's Starbase wants to expand in south Texas",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
@@ -39,9 +39,9 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5930235/morning-news-brief",
-      "pubDate": "Mon, 17 Aug 2026 04:49:18 -0400"
+      "title": "Elon Musk's Starbase wants to expand in south Texas",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
 }
