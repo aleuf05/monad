@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T05:30:01.540517+00:00",
+  "fetched_at": "2026-08-17T09:00:01.918340+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5930235/morning-news-brief",
+      "pubDate": "Mon, 17 Aug 2026 04:49:18 -0400"
+    },
     {
       "title": "Trump orders Pentagon to scale back joint exercises with South Korea",
       "link": "https://www.npr.org/2026/08/17/g-s1-138969/trump-exercises-south-korea",
@@ -37,11 +42,6 @@
       "title": "What really happened in Ceuta? Why we may never find out",
       "link": "https://www.npr.org/2026/08/16/nx-s1-5927053/what-happened-in-ceuta",
       "pubDate": "Sun, 16 Aug 2026 11:38:22 -0400"
-    },
-    {
-      "title": "'What are we going to do?' The mom of a trans teen grapples with Trump's Medicaid move",
-      "link": "https://www.npr.org/2026/08/16/nx-s1-5932491/transgender-health-care-medicaid-trump-oz",
-      "pubDate": "Sun, 16 Aug 2026 07:54:19 -0400"
     }
   ]
 }
