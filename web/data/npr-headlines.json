@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T13:45:01.716384+00:00",
+  "fetched_at": "2026-08-17T14:45:01.600735+00:00",
   "items": [
     {
       "title": "DHS defends investigating agency critics and giving them warning notices",
@@ -29,11 +29,6 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
       "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5913980/nuns-dc-affordable-housing",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
@@ -41,6 +36,11 @@
     {
       "title": "Meta heads to court in a landmark trial about kids and social media addiction",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Advocates worry new bans on student IDs will trip up young voters",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
