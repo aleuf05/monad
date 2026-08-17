@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T12:30:02.170075+00:00",
+  "fetched_at": "2026-08-17T12:45:01.913598+00:00",
   "items": [
     {
       "title": "USS Washington to relieve USS Lincoln. And, Jared Kushner to meet with Netanyahu",
@@ -29,11 +29,6 @@
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Elon Musk's Starbase wants to expand in south Texas",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5910496/elon-musk-starbase-texas-spacex",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
       "title": "Missed shifts were costly to this McDonald's. An app has fixed the problem",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
@@ -41,6 +36,11 @@
     {
       "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Advocates worry new bans on student IDs will trip up young voters",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5791740/college-student-voting-voter-id",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     }
   ]
