@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-17T09:45:02.236107+00:00",
+  "fetched_at": "2026-08-17T10:00:02.011849+00:00",
   "items": [
     {
       "title": "Living with nuns: Priced out of D.C., young women found low rent with unlikely roommates",
@@ -11,16 +11,6 @@
     {
       "title": "Car problems? No childcare? How an app is helping people get to work",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5893721/workers-mcdonalds-work-app-jobs-ai",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
-      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As wildfires get worse, some states are struggling to pass fire protection rules",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5923975/wildfires-western-community-protection",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
@@ -36,6 +26,16 @@
     {
       "title": "Meta heads to court in a landmark trial about kids and social media addiction",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5930701/meta-trial-kids-social-media-addiction",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Cialis is an erectile dysfunction drug. Could it also help you live longer?",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5928263/cialis-viagra-tadalafil-longevity-heart-health",
+      "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As wildfires get worse, some states are struggling to pass fire protection rules",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5923975/wildfires-western-community-protection",
       "pubDate": "Mon, 17 Aug 2026 05:00:00 -0400"
     },
     {
