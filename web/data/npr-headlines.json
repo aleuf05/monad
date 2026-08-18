@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T18:00:01.630644+00:00",
+  "fetched_at": "2026-08-18T18:15:02.323093+00:00",
   "items": [
     {
       "title": "'Profits won.' The child safety trial against Meta kicks off in federal court",
@@ -34,13 +34,13 @@
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
+      "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
+      "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     }
   ]
