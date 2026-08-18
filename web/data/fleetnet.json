@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-18T21:43:38Z",
+  "generated": "2026-08-18T21:49:58Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 4,
-    "head": "e601686"
+    "uncommitted": 5,
+    "head": "5afbfe5"
   },
   "captain": "running",
   "captain_detail": {
@@ -89,7 +89,7 @@
       "disk_used_percent": 19,
       "disk_available": "172.5G",
       "memory_available_percent": 80.3,
-      "load_1m": 0.73
+      "load_1m": 0.92
     }
   },
   "sound": true,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "4 files uncommitted."
+      "text": "5 files uncommitted."
     },
     {
       "priority": 1,
