@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T12:00:01.771912+00:00",
+  "fetched_at": "2026-08-18T12:30:02.264798+00:00",
   "items": [
     {
       "title": "U.S. and Iran miss peace talks deadline. And, Alaska, Florida and Wyoming primaries",
@@ -19,11 +19,6 @@
       "pubDate": "Tue, 18 Aug 2026 05:30:00 -0400"
     },
     {
-      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
-      "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
-    },
-    {
       "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
@@ -31,6 +26,11 @@
     {
       "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
+      "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
