@@ -1,21 +1,26 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T09:30:01.630705+00:00",
+  "fetched_at": "2026-08-18T09:45:02.345366+00:00",
   "items": [
+    {
+      "title": "In Portland, this soap box derby combines downhill speed with extreme pageantry",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5935518/portland-oregon-soap-box-derby-race-pdx",
+      "pubDate": "Tue, 18 Aug 2026 05:30:00 -0400"
+    },
     {
       "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
+      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
+      "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "Part of a key firearms law lapsed following a federal court decision. What happens now?",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5935562/firearms-law-lapsed-federal-court-ruling",
       "pubDate": "Mon, 17 Aug 2026 18:37:58 -0400"
-    },
-    {
-      "title": "Palestinian family in West Bank fear settler violence will rob them of home",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5933860/palestinian-american-family-in-west-bank-fear-settler-violence-will-rob-them-of-home",
-      "pubDate": "Mon, 17 Aug 2026 17:27:58 -0400"
     }
   ]
 }
