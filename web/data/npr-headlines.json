@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T20:00:02.257390+00:00",
+  "fetched_at": "2026-08-18T20:15:01.948792+00:00",
   "items": [
+    {
+      "title": "Embattled Florida Republican Rep. Cory Mills fights to keep his House seat",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5936435/mills-elijah-florida-republican-primary",
+      "pubDate": "Tue, 18 Aug 2026 16:04:18 -0400"
+    },
     {
       "title": "ABC and Disney sue FCC, alleging First Amendment violations",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5936406/abc-and-disney-sue-fcc-alleging-first-amendment-violations",
@@ -36,11 +41,6 @@
     {
       "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
-      "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     }
   ]
