@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T06:15:01.383786+00:00",
+  "fetched_at": "2026-08-18T09:00:02.210064+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5931251/morning-news-brief",
+      "pubDate": "Tue, 18 Aug 2026 04:41:19 -0400"
+    },
     {
       "title": "A dispute about fact vs. fiction at the trial over Tupac Shakur's 1996 killing",
       "link": "https://www.npr.org/2026/08/18/g-s1-139061/tupac-shakur-killing-trial",
@@ -37,11 +42,6 @@
       "title": "DHS defends investigating agency critics and giving them warning notices",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5934692/dhs-free-speech-investigations",
       "pubDate": "Mon, 17 Aug 2026 09:31:13 -0400"
-    },
-    {
-      "title": "USS Washington to relieve USS Lincoln. And, Jared Kushner to meet with Netanyahu",
-      "link": "https://www.npr.org/2026/08/17/g-s1-138973/up-first-newsletter-uss-lincoln-meta-israel-hamas-ukraine-russia",
-      "pubDate": "Mon, 17 Aug 2026 07:48:21 -0400"
     }
   ]
 }
