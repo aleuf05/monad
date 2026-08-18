@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T06:00:01.683431+00:00",
+  "fetched_at": "2026-08-18T06:15:01.383786+00:00",
   "items": [
     {
       "title": "A dispute about fact vs. fiction at the trial over Tupac Shakur's 1996 killing",
@@ -17,6 +17,11 @@
       "title": "Part of a key firearms law lapsed following a federal court decision. What happens now?",
       "link": "https://www.npr.org/2026/08/17/nx-s1-5935562/firearms-law-lapsed-federal-court-ruling",
       "pubDate": "Mon, 17 Aug 2026 18:37:58 -0400"
+    },
+    {
+      "title": "Palestinian family in West Bank fear settler violence will rob them of home",
+      "link": "https://www.npr.org/2026/08/17/nx-s1-5933860/palestinian-american-family-in-west-bank-fear-settler-violence-will-rob-them-of-home",
+      "pubDate": "Mon, 17 Aug 2026 17:27:58 -0400"
     },
     {
       "title": "Former federal prosecutor is suing DOJ for 'unlawful and retaliatory' firing",
@@ -37,11 +42,6 @@
       "title": "USS Washington to relieve USS Lincoln. And, Jared Kushner to meet with Netanyahu",
       "link": "https://www.npr.org/2026/08/17/g-s1-138973/up-first-newsletter-uss-lincoln-meta-israel-hamas-ukraine-russia",
       "pubDate": "Mon, 17 Aug 2026 07:48:21 -0400"
-    },
-    {
-      "title": "Sen. Mark Kelly says USS Lincoln sailors 'can't get basic needs met'",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5933015/mark-kelly-navy-lincoln-sailors-investigation",
-      "pubDate": "Mon, 17 Aug 2026 06:49:59 -0400"
     }
   ]
 }
