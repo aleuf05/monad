@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T19:30:01.887666+00:00",
+  "fetched_at": "2026-08-18T20:00:02.257390+00:00",
   "items": [
+    {
+      "title": "ABC and Disney sue FCC, alleging First Amendment violations",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5936406/abc-and-disney-sue-fcc-alleging-first-amendment-violations",
+      "pubDate": "Tue, 18 Aug 2026 15:51:27 -0400"
+    },
     {
       "title": "'Profits won.' The child safety trial against Meta kicks off in federal court",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5935458/meta-child-safety-social-media-addiction-trial-opening",
@@ -31,11 +36,6 @@
     {
       "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
-      "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     },
     {
