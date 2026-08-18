@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T09:45:02.345366+00:00",
+  "fetched_at": "2026-08-18T10:45:02.272619+00:00",
   "items": [
+    {
+      "title": "The grueling fight over who profits from AI music",
+      "link": "https://www.npr.org/sections/planet-money/2026/08/18/g-s1-138852/grueling-fight-over-who-profits-from-ai-music",
+      "pubDate": "Tue, 18 Aug 2026 06:30:00 -0400"
+    },
     {
       "title": "In Portland, this soap box derby combines downhill speed with extreme pageantry",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5935518/portland-oregon-soap-box-derby-race-pdx",
@@ -37,11 +42,6 @@
       "title": "Palestinian American returns to his West Bank home, under siege by Israeli settlers",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5936098/palestinian-american-return-west-bank",
       "pubDate": "Tue, 18 Aug 2026 01:51:50 -0400"
-    },
-    {
-      "title": "Part of a key firearms law lapsed following a federal court decision. What happens now?",
-      "link": "https://www.npr.org/2026/08/17/nx-s1-5935562/firearms-law-lapsed-federal-court-ruling",
-      "pubDate": "Mon, 17 Aug 2026 18:37:58 -0400"
     }
   ]
 }
