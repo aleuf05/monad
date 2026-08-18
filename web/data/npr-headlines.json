@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T22:45:02.180975+00:00",
+  "fetched_at": "2026-08-18T23:00:01.950176+00:00",
   "items": [
     {
       "title": "Embattled Florida Republican Rep. Cory Mills fights to keep his House seat",
@@ -39,8 +39,8 @@
       "pubDate": "Tue, 18 Aug 2026 05:30:00 -0400"
     },
     {
-      "title": "She told no one about her agony except ChatGPT. What her death reveals about AI risks",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5929575/ai-suicide-risks-mental-health",
+      "title": "This crowded Republican primary in Florida has drawn a unique cast of candidates",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5930699/florida-republican-19th-district-carpetbaggers",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
     }
   ]
