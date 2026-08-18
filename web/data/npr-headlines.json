@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-18T17:45:01.886664+00:00",
+  "fetched_at": "2026-08-18T18:00:01.630644+00:00",
   "items": [
+    {
+      "title": "'Profits won.' The child safety trial against Meta kicks off in federal court",
+      "link": "https://www.npr.org/2026/08/18/nx-s1-5935458/meta-child-safety-social-media-addiction-trial-opening",
+      "pubDate": "Tue, 18 Aug 2026 13:39:29 -0400"
+    },
     {
       "title": "S. Korea stresses US alliance amid confusion over Trump drill cut",
       "link": "https://www.npr.org/2026/08/18/g-s1-139096/s-korea-stresses-us-alliance-amid-confusion-over-trump-drill-cut",
@@ -37,11 +42,6 @@
       "title": "Many recent grads say AI is making it harder to get a job. Economists aren't so sure",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5910677/recent-college-graduates-employment-job-artificial-intelligence",
       "pubDate": "Tue, 18 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5931251/morning-news-brief",
-      "pubDate": "Tue, 18 Aug 2026 04:41:19 -0400"
     }
   ]
 }
