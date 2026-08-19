@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T02:15:02.315815+00:00",
+  "fetched_at": "2026-08-19T05:15:02.244660+00:00",
   "items": [
+    {
+      "title": "Trump says U.S. and Canada reached deal to delay 50% U.S. tariffs on Canadian imports",
+      "link": "https://www.npr.org/2026/08/19/g-s1-139156/trump-canada-tariffs",
+      "pubDate": "Wed, 19 Aug 2026 00:55:08 -0400"
+    },
     {
       "title": "Key results from Florida primaries, so far",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5936403/what-to-watch-for-in-the-florida-primaries",
@@ -37,11 +42,6 @@
       "title": "The grueling fight over who profits from AI music",
       "link": "https://www.npr.org/sections/planet-money/2026/08/18/g-s1-138852/grueling-fight-over-who-profits-from-ai-music",
       "pubDate": "Tue, 18 Aug 2026 06:30:00 -0400"
-    },
-    {
-      "title": "In Portland, this soap box derby combines downhill speed with extreme pageantry",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5935518/portland-oregon-soap-box-derby-race-pdx",
-      "pubDate": "Tue, 18 Aug 2026 05:30:00 -0400"
     }
   ]
 }
