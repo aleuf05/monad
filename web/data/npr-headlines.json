@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T05:15:02.244660+00:00",
+  "fetched_at": "2026-08-19T07:15:01.349872+00:00",
   "items": [
+    {
+      "title": "Liberia agrees to take 1,200 third-country deportees from the U.S.",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5937389/liberia-to-take-deportees-from-us",
+      "pubDate": "Wed, 19 Aug 2026 02:57:51 -0400"
+    },
     {
       "title": "Trump says U.S. and Canada reached deal to delay 50% U.S. tariffs on Canadian imports",
       "link": "https://www.npr.org/2026/08/19/g-s1-139156/trump-canada-tariffs",
@@ -37,11 +42,6 @@
       "title": "U.S. and Iran miss peace talks deadline. And, Alaska, Florida and Wyoming primaries",
       "link": "https://www.npr.org/2026/08/18/g-s1-139072/up-first-newsletter-iran-south-korea-jared-kushner-florida-wyoming-alaska-primaries-luigi-mangione",
       "pubDate": "Tue, 18 Aug 2026 07:40:35 -0400"
-    },
-    {
-      "title": "The grueling fight over who profits from AI music",
-      "link": "https://www.npr.org/sections/planet-money/2026/08/18/g-s1-138852/grueling-fight-over-who-profits-from-ai-music",
-      "pubDate": "Tue, 18 Aug 2026 06:30:00 -0400"
     }
   ]
 }
