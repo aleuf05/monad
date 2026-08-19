@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T16:30:01.475690+00:00",
+  "fetched_at": "2026-08-19T17:15:01.478903+00:00",
   "items": [
+    {
+      "title": "Why Aitana's 'Superestrella' is the surprise Latin hit song of the summer",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5937925/aitana-superestrella-song-of-the-summer",
+      "pubDate": "Wed, 19 Aug 2026 13:03:41 -0400"
+    },
     {
       "title": "Why does the U.S. military seem stymied in the war with Iran?",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937516/why-does-the-u-s-military-seem-stymied-in-the-war-with-iran",
@@ -37,11 +42,6 @@
       "title": "Striking hospital employees sound alarm over workplace violence",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5930385/nurses-strike-hospital-workplace-violence-patient-attacks",
       "pubDate": "Wed, 19 Aug 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Congo's Ebola outbreak reaches 5,000 cases as it outpaces response efforts",
-      "link": "https://www.npr.org/2026/08/19/g-s1-139164/congo-ebola-outbreak",
-      "pubDate": "Wed, 19 Aug 2026 05:29:40 -0400"
     }
   ]
 }
