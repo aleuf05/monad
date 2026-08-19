@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T11:15:02.078863+00:00",
+  "fetched_at": "2026-08-19T11:30:01.866089+00:00",
   "items": [
+    {
+      "title": "U.S. delays 50% tariff on Canadian imports. And, takeaways from Florida's primaries",
+      "link": "https://www.npr.org/2026/08/19/g-s1-139173/up-first-newsletter-florida-primary-canada-tariffs-trump-meta-trial",
+      "pubDate": "Wed, 19 Aug 2026 07:14:31 -0400"
+    },
     {
       "title": "How India's blocking of a film exposing real-life police abuses backfired",
       "link": "https://www.npr.org/2026/08/19/g-s1-138787/how-indias-blocking-of-a-film-exposing-real-life-police-abuses-backfired",
@@ -37,11 +42,6 @@
       "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Israel strikes an air base in Syria to prevent Turkish troops from deploying",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937400/israel-strikes-syria",
-      "pubDate": "Wed, 19 Aug 2026 03:51:59 -0400"
     }
   ]
 }
