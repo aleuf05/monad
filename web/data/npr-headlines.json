@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T21:30:01.911057+00:00",
+  "fetched_at": "2026-08-19T21:45:01.699887+00:00",
   "items": [
+    {
+      "title": "Experts raise alarms over Census Bureau report Trump is touting on noncitizen voting",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5938799/trump-census-bureau-noncitizen-voting",
+      "pubDate": "Wed, 19 Aug 2026 17:27:51 -0400"
+    },
     {
       "title": "Whistleblower Arturo B\u00e9jar leads testimony in landmark trial against Meta",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936648/meta-trial-arturo-bejar-whistleblower-testimony",
@@ -37,11 +42,6 @@
       "title": "This high-speed star is whipping around the black hole in the middle of our galaxy",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936479/fastest-star-galaxy-black-hole-sagittarius-a-milky-way",
       "pubDate": "Wed, 19 Aug 2026 11:38:57 -0400"
-    },
-    {
-      "title": "A real-world study of Oregon's nonmedical psilocybin program shows promise",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5936443/oregon-psilocybin-ptsd-depression-anxiety",
-      "pubDate": "Wed, 19 Aug 2026 11:22:35 -0400"
     }
   ]
 }
