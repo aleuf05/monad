@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T08:00:01.675453+00:00",
+  "fetched_at": "2026-08-19T09:15:02.036827+00:00",
   "items": [
+    {
+      "title": "Feeling restless? Level up your life by starting a side quest",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5936241/feeling-restless-level-up-your-life-start-side-quest",
+      "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
+    },
+    {
+      "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
+      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
+      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
+      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Israel strikes an air base in Syria to prevent Turkish troops from deploying",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937400/israel-strikes-syria",
@@ -22,26 +42,6 @@
       "title": "Key results from Florida primaries, so far",
       "link": "https://www.npr.org/2026/08/18/nx-s1-5936403/what-to-watch-for-in-the-florida-primaries",
       "pubDate": "Tue, 18 Aug 2026 17:01:17 -0400"
-    },
-    {
-      "title": "Embattled Florida Republican Rep. Cory Mills loses his fight to keep his House seat",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5936435/mills-elijah-florida-republican-primary",
-      "pubDate": "Tue, 18 Aug 2026 16:04:18 -0400"
-    },
-    {
-      "title": "ABC and Disney sue FCC, alleging First Amendment violations",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5936406/abc-and-disney-sue-fcc-alleging-first-amendment-violations",
-      "pubDate": "Tue, 18 Aug 2026 15:51:27 -0400"
-    },
-    {
-      "title": "'Profits won.' The child safety trial against Meta kicks off in federal court",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5935458/meta-child-safety-social-media-addiction-trial-opening",
-      "pubDate": "Tue, 18 Aug 2026 13:39:29 -0400"
-    },
-    {
-      "title": "S. Korea stresses US alliance amid confusion over Trump drill cut",
-      "link": "https://www.npr.org/2026/08/18/g-s1-139096/s-korea-stresses-us-alliance-amid-confusion-over-trump-drill-cut",
-      "pubDate": "Tue, 18 Aug 2026 11:19:40 -0400"
     }
   ]
 }
