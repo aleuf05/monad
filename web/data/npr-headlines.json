@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T10:15:01.981471+00:00",
+  "fetched_at": "2026-08-19T10:30:01.873918+00:00",
   "items": [
     {
       "title": "How India's blocking of a film exposing real-life police abuses backfired",
@@ -24,11 +24,6 @@
       "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
     },
     {
-      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
-      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
-    },
-    {
       "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
@@ -36,6 +31,11 @@
     {
       "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
+      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     },
     {
