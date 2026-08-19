@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T18:15:02.389457+00:00",
+  "fetched_at": "2026-08-19T20:00:01.378046+00:00",
   "items": [
+    {
+      "title": "Former Fauci adviser Dr. David Morens pleads guilty to concealing COVID-related records",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5936636/covid-research-fauci-morens-foia-guilty",
+      "pubDate": "Wed, 19 Aug 2026 15:45:11 -0400"
+    },
     {
       "title": "In new filings, Kennedy Center says it won't try to put Trump's name on facade until Sept. 8",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937912/kennedy-center-president-trump-name",
@@ -37,11 +42,6 @@
       "title": "U.S. delays 50% tariff on Canadian imports. And, takeaways from Florida's primaries",
       "link": "https://www.npr.org/2026/08/19/g-s1-139173/up-first-newsletter-florida-primary-canada-tariffs-trump-meta-trial",
       "pubDate": "Wed, 19 Aug 2026 07:14:31 -0400"
-    },
-    {
-      "title": "How India's blocking of a film exposing real-life police abuses backfired",
-      "link": "https://www.npr.org/2026/08/19/g-s1-138787/how-indias-blocking-of-a-film-exposing-real-life-police-abuses-backfired",
-      "pubDate": "Wed, 19 Aug 2026 06:02:00 -0400"
     }
   ]
 }
