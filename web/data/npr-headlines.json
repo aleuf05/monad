@@ -1,15 +1,20 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T15:45:02.133678+00:00",
+  "fetched_at": "2026-08-19T16:30:01.475690+00:00",
   "items": [
+    {
+      "title": "Why does the U.S. military seem stymied in the war with Iran?",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5937516/why-does-the-u-s-military-seem-stymied-in-the-war-with-iran",
+      "pubDate": "Wed, 19 Aug 2026 12:18:35 -0400"
+    },
     {
       "title": "This high-speed star is whipping around the black hole in the middle of our galaxy",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936479/fastest-star-galaxy-black-hole-sagittarius-a-milky-way",
       "pubDate": "Wed, 19 Aug 2026 11:38:57 -0400"
     },
     {
-      "title": "Real-world study of Oregon's nonmedical psilocybin program shows promise",
+      "title": "A real-world study of Oregon's nonmedical psilocybin program shows promise",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936443/oregon-psilocybin-ptsd-depression-anxiety",
       "pubDate": "Wed, 19 Aug 2026 11:22:35 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "Congo's Ebola outbreak reaches 5,000 cases as it outpaces response efforts",
       "link": "https://www.npr.org/2026/08/19/g-s1-139164/congo-ebola-outbreak",
       "pubDate": "Wed, 19 Aug 2026 05:29:40 -0400"
-    },
-    {
-      "title": "Feeling restless? Level up your life by starting a side quest",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5936241/feeling-restless-level-up-your-life-start-side-quest",
-      "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
     }
   ]
 }
