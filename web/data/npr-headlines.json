@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T13:15:01.801861+00:00",
+  "fetched_at": "2026-08-19T13:30:01.546449+00:00",
   "items": [
     {
       "title": "U.S. delays 50% tariff on Canadian imports. And, takeaways from Florida's primaries",
@@ -34,13 +34,13 @@
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
+      "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
+      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     }
   ]
