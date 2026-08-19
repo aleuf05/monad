@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T15:30:01.506410+00:00",
+  "fetched_at": "2026-08-19T15:45:02.133678+00:00",
   "items": [
+    {
+      "title": "This high-speed star is whipping around the black hole in the middle of our galaxy",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5936479/fastest-star-galaxy-black-hole-sagittarius-a-milky-way",
+      "pubDate": "Wed, 19 Aug 2026 11:38:57 -0400"
+    },
     {
       "title": "Real-world study of Oregon's nonmedical psilocybin program shows promise",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936443/oregon-psilocybin-ptsd-depression-anxiety",
@@ -37,11 +42,6 @@
       "title": "Feeling restless? Level up your life by starting a side quest",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936241/feeling-restless-level-up-your-life-start-side-quest",
       "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
-    },
-    {
-      "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
-      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     }
   ]
 }
