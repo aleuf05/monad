@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T10:00:02.332489+00:00",
+  "fetched_at": "2026-08-19T10:15:01.981471+00:00",
   "items": [
+    {
+      "title": "How India's blocking of a film exposing real-life police abuses backfired",
+      "link": "https://www.npr.org/2026/08/19/g-s1-138787/how-indias-blocking-of-a-film-exposing-real-life-police-abuses-backfired",
+      "pubDate": "Wed, 19 Aug 2026 06:02:00 -0400"
+    },
+    {
+      "title": "Striking hospital employees sound alarm over workplace violence",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5930385/nurses-strike-hospital-workplace-violence-patient-attacks",
+      "pubDate": "Wed, 19 Aug 2026 06:00:00 -0400"
+    },
     {
       "title": "Congo's Ebola outbreak reaches 5,000 cases as it outpaces response efforts",
       "link": "https://www.npr.org/2026/08/19/g-s1-139164/congo-ebola-outbreak",
@@ -32,16 +42,6 @@
       "title": "Israel strikes an air base in Syria to prevent Turkish troops from deploying",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937400/israel-strikes-syria",
       "pubDate": "Wed, 19 Aug 2026 03:51:59 -0400"
-    },
-    {
-      "title": "Liberia agrees to take 1,200 third-country deportees from the U.S.",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937389/liberia-to-take-deportees-from-us",
-      "pubDate": "Wed, 19 Aug 2026 02:57:51 -0400"
-    },
-    {
-      "title": "Trump says U.S. and Canada reached deal to delay 50% U.S. tariffs on Canadian imports",
-      "link": "https://www.npr.org/2026/08/19/g-s1-139156/trump-canada-tariffs",
-      "pubDate": "Wed, 19 Aug 2026 00:55:08 -0400"
     }
   ]
 }
