@@ -1,12 +1,22 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T09:30:01.750443+00:00",
+  "fetched_at": "2026-08-19T09:45:01.357784+00:00",
   "items": [
+    {
+      "title": "Congo's Ebola outbreak reaches 5,000 cases as it outpaces response efforts",
+      "link": "https://www.npr.org/2026/08/19/g-s1-139164/congo-ebola-outbreak",
+      "pubDate": "Wed, 19 Aug 2026 05:29:40 -0400"
+    },
     {
       "title": "Feeling restless? Level up your life by starting a side quest",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5936241/feeling-restless-level-up-your-life-start-side-quest",
       "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
+    },
+    {
+      "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
+      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     },
     {
       "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
@@ -16,11 +26,6 @@
     {
       "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
-      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "Trump says U.S. and Canada reached deal to delay 50% U.S. tariffs on Canadian imports",
       "link": "https://www.npr.org/2026/08/19/g-s1-139156/trump-canada-tariffs",
       "pubDate": "Wed, 19 Aug 2026 00:55:08 -0400"
-    },
-    {
-      "title": "Key results from Florida primaries, so far",
-      "link": "https://www.npr.org/2026/08/18/nx-s1-5936403/what-to-watch-for-in-the-florida-primaries",
-      "pubDate": "Tue, 18 Aug 2026 17:01:17 -0400"
     }
   ]
 }
