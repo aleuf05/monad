@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T17:15:01.478903+00:00",
+  "fetched_at": "2026-08-19T18:15:02.389457+00:00",
   "items": [
+    {
+      "title": "In new filings, Kennedy Center says it won't try to put Trump's name on facade until Sept. 8",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5937912/kennedy-center-president-trump-name",
+      "pubDate": "Wed, 19 Aug 2026 14:01:03 -0400"
+    },
     {
       "title": "Why Aitana's 'Superestrella' is the surprise Latin hit song of the summer",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937925/aitana-superestrella-song-of-the-summer",
@@ -37,11 +42,6 @@
       "title": "How India's blocking of a film exposing real-life police abuses backfired",
       "link": "https://www.npr.org/2026/08/19/g-s1-138787/how-indias-blocking-of-a-film-exposing-real-life-police-abuses-backfired",
       "pubDate": "Wed, 19 Aug 2026 06:02:00 -0400"
-    },
-    {
-      "title": "Striking hospital employees sound alarm over workplace violence",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5930385/nurses-strike-hospital-workplace-violence-patient-attacks",
-      "pubDate": "Wed, 19 Aug 2026 06:00:00 -0400"
     }
   ]
 }
