@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T15:00:02.044326+00:00",
+  "fetched_at": "2026-08-19T15:30:01.506410+00:00",
   "items": [
+    {
+      "title": "Real-world study of Oregon's nonmedical psilocybin program shows promise",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5936443/oregon-psilocybin-ptsd-depression-anxiety",
+      "pubDate": "Wed, 19 Aug 2026 11:22:35 -0400"
+    },
     {
       "title": "Greetings from Trouville-sur-Mer, a beach town little changed since Monet painted it",
       "link": "https://www.npr.org/2026/08/19/g-s1-139174/trouville-sur-mer-france-normandy-monet-beach",
@@ -34,13 +39,8 @@
       "pubDate": "Wed, 19 Aug 2026 05:02:00 -0400"
     },
     {
-      "title": "Why more than 400,000 kids are on waitlists for federal childcare assistance",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5920326/childcare-assistance-waitlists",
-      "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "15 states have laws that allow corporal punishment in schools. Here's where, and why",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5803505/school-corporal-punishment-policy-tracker",
+      "title": "Elbridge who? How the name of a forgotten founder lives on in the word 'gerrymander'",
+      "link": "https://www.npr.org/2026/08/19/nx-s1-5930301/gerrymandering-elbridge-gerry-redistricting",
       "pubDate": "Wed, 19 Aug 2026 05:00:00 -0400"
     }
   ]
