@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T15:30:01.786614+00:00",
+  "fetched_at": "2026-08-20T16:00:02.105754+00:00",
   "items": [
     {
       "title": "D.C.'s IndyCar race will zoom past museums. Some worry it could harm the art inside",
@@ -34,13 +34,13 @@
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Privacy advocates call on Maryland to investigate data brokers",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
+      "title": "The system meant to protect ICE detainees has collapsed",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "The system meant to protect ICE detainees has collapsed",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
+      "title": "Privacy advocates call on Maryland to investigate data brokers",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     }
   ]
