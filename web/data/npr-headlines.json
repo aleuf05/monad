@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-19T23:30:02.137027+00:00",
+  "fetched_at": "2026-08-20T06:00:02.405572+00:00",
   "items": [
+    {
+      "title": "Israeli military launches criminal probes into killings of 5-year-old and paramedics",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5939310/israeli-military-criminal-probes",
+      "pubDate": "Thu, 20 Aug 2026 01:50:53 -0400"
+    },
     {
       "title": "California passes toughest wildfire rules in the U.S. for home landscaping",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937926/california-wildfire-rules-zone-zero-vegetation",
@@ -37,11 +42,6 @@
       "title": "Why Aitana's 'Superestrella' is the surprise Latin hit song of the summer",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937925/aitana-superestrella-song-of-the-summer",
       "pubDate": "Wed, 19 Aug 2026 13:03:41 -0400"
-    },
-    {
-      "title": "Why does the U.S. military seem stymied in the war with Iran?",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937516/why-does-the-u-s-military-seem-stymied-in-the-war-with-iran",
-      "pubDate": "Wed, 19 Aug 2026 12:18:35 -0400"
     }
   ]
 }
