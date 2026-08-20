@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T06:00:02.405572+00:00",
+  "fetched_at": "2026-08-20T06:30:01.873975+00:00",
   "items": [
+    {
+      "title": "Prince Harry and Meghan are returning to the U.K. with their children",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5939320/harry-meghan-return-uk",
+      "pubDate": "Thu, 20 Aug 2026 02:17:42 -0400"
+    },
     {
       "title": "Israeli military launches criminal probes into killings of 5-year-old and paramedics",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5939310/israeli-military-criminal-probes",
@@ -37,11 +42,6 @@
       "title": "In new filings, Kennedy Center says it won't try to put Trump's name on facade until Sept. 8",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5937912/kennedy-center-president-trump-name",
       "pubDate": "Wed, 19 Aug 2026 14:01:03 -0400"
-    },
-    {
-      "title": "Why Aitana's 'Superestrella' is the surprise Latin hit song of the summer",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937925/aitana-superestrella-song-of-the-summer",
-      "pubDate": "Wed, 19 Aug 2026 13:03:41 -0400"
     }
   ]
 }
