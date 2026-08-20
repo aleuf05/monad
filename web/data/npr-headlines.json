@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T11:30:02.213202+00:00",
+  "fetched_at": "2026-08-20T11:45:01.837129+00:00",
   "items": [
+    {
+      "title": "U.S. debt tops $40 trillion. And, new census report Trump is touting raises concerns",
+      "link": "https://www.npr.org/2026/08/20/g-s1-139388/up-first-newsletter-us-debt-venezuela-oil-deals-census-bureau-trump-voting-claims",
+      "pubDate": "Thu, 20 Aug 2026 07:30:18 -0400"
+    },
     {
       "title": "North Korea fires a suspected missile toward the sea, Japan says",
       "link": "https://www.npr.org/2026/08/20/g-s1-139381/north-korea-suspected-missile",
@@ -37,11 +42,6 @@
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5931261/morning-news-brief",
       "pubDate": "Thu, 20 Aug 2026 04:52:29 -0400"
-    },
-    {
-      "title": "Tech billionaires push back against proposed wealth tax in California",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5935597/tech-billionaires-push-back-against-proposed-wealth-tax-in-california",
-      "pubDate": "Thu, 20 Aug 2026 04:45:47 -0400"
     }
   ]
 }
