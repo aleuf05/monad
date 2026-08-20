@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-20T04:31:58Z",
+  "generated": "2026-08-20T04:37:43Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 4,
-    "head": "ca44044"
+    "uncommitted": 2,
+    "head": "fcda923"
   },
   "captain": "running",
   "captain_detail": {
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.4G",
-      "memory_available_percent": 79.8,
-      "load_1m": 0.52
+      "memory_available_percent": 80.5,
+      "load_1m": 0.74
     }
   },
   "sound": true,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "4 files uncommitted."
+      "text": "2 files uncommitted."
     },
     {
       "priority": 1,
