@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T12:15:02.304192+00:00",
+  "fetched_at": "2026-08-20T12:30:01.998722+00:00",
   "items": [
     {
       "title": "U.S. debt tops $40 trillion. And, new census report Trump is touting raises concerns",
@@ -19,13 +19,13 @@
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Here's how the system to report problems in ICE detention has failed immigrants",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
+      "title": "The bond market is signaling trouble ahead. This is why you should pay attention",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5937600/economy-bonds-inflation-debt-consumers",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "The bond market is signaling trouble ahead. This is why you should pay attention",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5937600/economy-bonds-inflation-debt-consumers",
+      "title": "Disabled adults learn and work in their communities. That right is under threat",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5891791/disability-rights-community-living-integration-trump",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
@@ -34,8 +34,8 @@
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Disabled adults learn and work in their communities. That right is under threat",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5891791/disability-rights-community-living-integration-trump",
+      "title": "Here's how the system to report problems in ICE detention has failed immigrants",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
