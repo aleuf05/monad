@@ -1,8 +1,33 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T09:00:02.086114+00:00",
+  "fetched_at": "2026-08-20T09:15:01.726249+00:00",
   "items": [
+    {
+      "title": "The bond market is signaling trouble ahead. This is why you should pay attention",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5937600/economy-bonds-inflation-debt-consumers",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Disabled adults learn and work in their communities. That right is under threat",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5891791/disability-rights-community-living-integration-trump",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Which country makes the best jollof rice? D.C. foodies put it to a blind test",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5936436/which-country-makes-the-best-jollof-rice-d-c-foodies-put-it-to-a-blind-test",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Here's how the system to report problems in ICE detention has failed immigrants",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Privacy advocates call on Maryland to investigate data brokers",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5931261/morning-news-brief",
@@ -17,31 +42,6 @@
       "title": "Prince Harry and Meghan are returning to the U.K. with their children",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5939320/harry-meghan-return-uk",
       "pubDate": "Thu, 20 Aug 2026 02:17:42 -0400"
-    },
-    {
-      "title": "Israeli military launches criminal probes into killings of 5-year-old and paramedics",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5939310/israeli-military-criminal-probes",
-      "pubDate": "Thu, 20 Aug 2026 01:50:53 -0400"
-    },
-    {
-      "title": "California passes toughest wildfire rules in the U.S. for home landscaping",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937926/california-wildfire-rules-zone-zero-vegetation",
-      "pubDate": "Wed, 19 Aug 2026 19:19:12 -0400"
-    },
-    {
-      "title": "Experts raise alarms over Census Bureau report Trump is touting on noncitizen voting",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5938799/trump-census-bureau-noncitizen-voting",
-      "pubDate": "Wed, 19 Aug 2026 17:27:51 -0400"
-    },
-    {
-      "title": "Whistleblower Arturo B\u00e9jar leads testimony in landmark trial against Meta",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5936648/meta-trial-arturo-bejar-whistleblower-testimony",
-      "pubDate": "Wed, 19 Aug 2026 17:20:15 -0400"
-    },
-    {
-      "title": "The U.S. debt tops a record-shattering $40 trillion. Yes, with a T",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5937552/the-u-s-debt-tops-a-record-shattering-40-trillion-yes-with-a-t",
-      "pubDate": "Wed, 19 Aug 2026 16:09:39 -0400"
     }
   ]
 }
