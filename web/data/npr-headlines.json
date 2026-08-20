@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T19:45:02.189720+00:00",
+  "fetched_at": "2026-08-20T20:00:02.140635+00:00",
   "items": [
+    {
+      "title": "Record cyclosporiasis outbreak tests the response of a 'weakened' health system",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5930462/trump-health-foodborne-illness-outbreak-cyclospora",
+      "pubDate": "Thu, 20 Aug 2026 15:54:19 -0400"
+    },
     {
       "title": "The Iran war and tariffs are costing farmers. Will Republicans pay in November?",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5914684/farmers-trump-pennsylvania-midterms",
@@ -36,11 +41,6 @@
     {
       "title": "Which country makes the best jollof rice? D.C. foodies put it to a blind test",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5936436/which-country-makes-the-best-jollof-rice-d-c-foodies-put-it-to-a-blind-test",
-      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "They grew up with disability rights. Now, they're fighting to keep them",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5891791/disability-rights-community-living-integration-trump",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     }
   ]
