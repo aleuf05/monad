@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-20T13:15:02.084698+00:00",
+  "fetched_at": "2026-08-20T13:30:01.909459+00:00",
   "items": [
     {
       "title": "U.S. debt tops $40 trillion. And, new census report Trump is touting raises concerns",
@@ -14,23 +14,23 @@
       "pubDate": "Thu, 20 Aug 2026 05:24:45 -0400"
     },
     {
-      "title": "Privacy advocates call on Maryland to investigate data brokers",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
-      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
-    },
-    {
       "title": "The bond market is signaling trouble ahead. This is why you should pay attention",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5937600/economy-bonds-inflation-debt-consumers",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Here's how the system to report problems in ICE detention has failed immigrants",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
+      "title": "Privacy advocates call on Maryland to investigate data brokers",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
       "title": "Which country makes the best jollof rice? D.C. foodies put it to a blind test",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5936436/which-country-makes-the-best-jollof-rice-d-c-foodies-put-it-to-a-blind-test",
+      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Here's how the system to report problems in ICE detention has failed immigrants",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5850361/grievance-ice-detention-immigrants",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     },
     {
