@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T09:15:01.783393+00:00",
+  "fetched_at": "2026-08-21T10:30:01.558694+00:00",
   "items": [
     {
       "title": "What to know about this weekend's IndyCar race on the National Mall",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5939443/dc-indycar-race-overview-watch-politics",
       "pubDate": "Fri, 21 Aug 2026 05:01:00 -0400"
+    },
+    {
+      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
+      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
       "title": "Federal government thins the herds of wild horses in Colorado",
@@ -21,11 +26,6 @@
     {
       "title": "As Trump courts Kim, Pyongyang ups price while Seoul fears being sidelined",
       "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
-      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
