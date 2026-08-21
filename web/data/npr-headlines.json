@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T17:45:01.877362+00:00",
+  "fetched_at": "2026-08-21T19:00:01.417842+00:00",
   "items": [
+    {
+      "title": "Supreme Court allows Trump's ballroom construction to continue for now",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5935417/supreme-court-allows-trumps-ballroom-construction-to-continue-for-now",
+      "pubDate": "Fri, 21 Aug 2026 14:47:48 -0400"
+    },
     {
       "title": "Beatty files emergency request to stop Trump's name from returning to Kennedy Center",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940799/kennedy-center-president-trump-filing",
@@ -36,11 +41,6 @@
     {
       "title": "As Trump courts Kim, Pyongyang ups the price, while Seoul fears being sidelined",
       "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
-      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     }
   ]
