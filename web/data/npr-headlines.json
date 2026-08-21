@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T11:45:02.053927+00:00",
+  "fetched_at": "2026-08-21T12:00:01.775509+00:00",
   "items": [
+    {
+      "title": "Top Iran official says US focus on economic warfare shows it has failed militarily",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5940610/iran-us-threat-economic-warfare",
+      "pubDate": "Fri, 21 Aug 2026 07:42:10 -0400"
+    },
     {
       "title": "Trump declares economic warfare on Iran. And, SCOTUS to rule on White House ballroom",
       "link": "https://www.npr.org/2026/08/21/g-s1-139542/up-first-newsletter-trump-iran-economy-white-house-ballroom-bond-market",
@@ -24,24 +29,19 @@
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
+      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
+      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5931262/morning-news-brief",
       "pubDate": "Fri, 21 Aug 2026 04:46:00 -0400"
-    },
-    {
-      "title": "Mom and best friend remember girl killed in a mass shooting one year later",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5938076/mom-and-best-friend-remember-girl-killed-in-a-mass-shooting-one-year-later",
-      "pubDate": "Fri, 21 Aug 2026 04:44:49 -0400"
     }
   ]
 }
