@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T11:00:01.778905+00:00",
+  "fetched_at": "2026-08-21T11:15:01.631169+00:00",
   "items": [
     {
       "title": "What to know about this weekend's IndyCar race on the National Mall",
@@ -19,13 +19,13 @@
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
+      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
+      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
@@ -34,14 +34,14 @@
       "pubDate": "Fri, 21 Aug 2026 04:46:00 -0400"
     },
     {
+      "title": "Mom and best friend remember girl killed in a mass shooting one year later",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5938076/mom-and-best-friend-remember-girl-killed-in-a-mass-shooting-one-year-later",
+      "pubDate": "Fri, 21 Aug 2026 04:44:49 -0400"
+    },
+    {
       "title": "Charter plane crash kills 8 near remote radar site in western Alaska, military says",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940552/charter-plane-crash-kills-8-alaska-military",
       "pubDate": "Fri, 21 Aug 2026 02:41:33 -0400"
-    },
-    {
-      "title": "'Survival mode': Indiana residents endure a ninth day without power",
-      "link": "https://www.npr.org/2026/08/21/g-s1-139527/indiana-storm-outages",
-      "pubDate": "Fri, 21 Aug 2026 02:40:26 -0400"
     }
   ]
 }
