@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T16:30:02.107086+00:00",
+  "fetched_at": "2026-08-21T17:00:01.512656+00:00",
   "items": [
+    {
+      "title": "Beatty files emergency request to stop Trump's name from returning to Kennedy Center",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5940799/kennedy-center-president-trump-filing",
+      "pubDate": "Fri, 21 Aug 2026 12:40:59 -0400"
+    },
     {
       "title": "Top Iran official says US focus on economic warfare shows it has failed militarily",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940610/iran-us-threat-economic-warfare",
@@ -37,11 +42,6 @@
       "title": "As Trump courts Kim, Pyongyang ups the price, while Seoul fears being sidelined",
       "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5931262/morning-news-brief",
-      "pubDate": "Fri, 21 Aug 2026 04:46:00 -0400"
     }
   ]
 }
