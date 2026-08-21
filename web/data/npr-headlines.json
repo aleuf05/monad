@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T06:45:01.877673+00:00",
+  "fetched_at": "2026-08-21T09:00:02.093361+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5931262/morning-news-brief",
+      "pubDate": "Fri, 21 Aug 2026 04:46:00 -0400"
+    },
     {
       "title": "Charter plane crash kills 8 near remote radar site in western Alaska, military says",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940552/charter-plane-crash-kills-8-alaska-military",
@@ -37,11 +42,6 @@
       "title": "3 things to know about the $40 trillion federal debt",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5939473/40-trillion-federal-debt",
       "pubDate": "Thu, 20 Aug 2026 12:50:41 -0400"
-    },
-    {
-      "title": "What to know about Dr. Heidi Overton, Trump's pick to lead the FDA",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5939549/heidi-overton-fda-commissioner-trump-senate-nomination",
-      "pubDate": "Thu, 20 Aug 2026 12:49:11 -0400"
     }
   ]
 }
