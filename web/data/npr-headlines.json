@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T05:45:01.749724+00:00",
+  "fetched_at": "2026-08-21T06:00:01.482166+00:00",
   "items": [
+    {
+      "title": "Federal agents seize devices from ex-Rep. Eric Swalwell in sexual misconduct probe, AP source says",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5940542/federal-agents-seize-eric-swalwell-sexual-misconduct-probe",
+      "pubDate": "Fri, 21 Aug 2026 01:49:48 -0400"
+    },
+    {
+      "title": "Jurors hear 'Keffe D' say his nephew fired fatal shots at Tupac Shakur in 1996 drive-by shooting",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5940538/jurors-hear-keffe-d-say-his-nephew-fired-fatal-shots-at-tupac-shakur-in-1996-drive-by-shooting",
+      "pubDate": "Fri, 21 Aug 2026 01:41:15 -0400"
+    },
     {
       "title": "Record cyclosporiasis outbreak tests the response of a 'weakened' health system",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5930462/trump-health-foodborne-illness-outbreak-cyclospora",
@@ -32,16 +42,6 @@
       "title": "U.S. debt tops $40 trillion. And, new census report Trump is touting raises concerns",
       "link": "https://www.npr.org/2026/08/20/g-s1-139388/up-first-newsletter-us-debt-venezuela-oil-deals-census-bureau-trump-voting-claims",
       "pubDate": "Thu, 20 Aug 2026 07:30:18 -0400"
-    },
-    {
-      "title": "North Korea fires a suspected missile toward the sea, Japan says",
-      "link": "https://www.npr.org/2026/08/20/g-s1-139381/north-korea-suspected-missile",
-      "pubDate": "Thu, 20 Aug 2026 05:24:45 -0400"
-    },
-    {
-      "title": "Privacy advocates call on Maryland to investigate data brokers",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5938822/maryland-privacy-data-brokers",
-      "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     }
   ]
 }
