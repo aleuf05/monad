@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T06:00:01.482166+00:00",
+  "fetched_at": "2026-08-21T06:45:01.877673+00:00",
   "items": [
+    {
+      "title": "Charter plane crash kills 8 near remote radar site in western Alaska, military says",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5940552/charter-plane-crash-kills-8-alaska-military",
+      "pubDate": "Fri, 21 Aug 2026 02:41:33 -0400"
+    },
+    {
+      "title": "'Survival mode': Indiana residents endure a ninth day without power",
+      "link": "https://www.npr.org/2026/08/21/g-s1-139527/indiana-storm-outages",
+      "pubDate": "Fri, 21 Aug 2026 02:40:26 -0400"
+    },
     {
       "title": "Federal agents seize devices from ex-Rep. Eric Swalwell in sexual misconduct probe, AP source says",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940542/federal-agents-seize-eric-swalwell-sexual-misconduct-probe",
@@ -32,16 +42,6 @@
       "title": "What to know about Dr. Heidi Overton, Trump's pick to lead the FDA",
       "link": "https://www.npr.org/2026/08/20/nx-s1-5939549/heidi-overton-fda-commissioner-trump-senate-nomination",
       "pubDate": "Thu, 20 Aug 2026 12:49:11 -0400"
-    },
-    {
-      "title": "D.C.'s IndyCar race will zoom past museums. Some worry it could harm the art inside",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5939431/dc-indycar-race-museums-art-vibration",
-      "pubDate": "Thu, 20 Aug 2026 11:18:21 -0400"
-    },
-    {
-      "title": "U.S. debt tops $40 trillion. And, new census report Trump is touting raises concerns",
-      "link": "https://www.npr.org/2026/08/20/g-s1-139388/up-first-newsletter-us-debt-venezuela-oil-deals-census-bureau-trump-voting-claims",
-      "pubDate": "Thu, 20 Aug 2026 07:30:18 -0400"
     }
   ]
 }
