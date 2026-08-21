@@ -1,8 +1,33 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T09:00:02.093361+00:00",
+  "fetched_at": "2026-08-21T09:15:01.783393+00:00",
   "items": [
+    {
+      "title": "What to know about this weekend's IndyCar race on the National Mall",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5939443/dc-indycar-race-overview-watch-politics",
+      "pubDate": "Fri, 21 Aug 2026 05:01:00 -0400"
+    },
+    {
+      "title": "Federal government thins the herds of wild horses in Colorado",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5920407/colorado-wild-horses-federal-government-roundup",
+      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
+      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As Trump courts Kim, Pyongyang ups price while Seoul fears being sidelined",
+      "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
+      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
+      "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5931262/morning-news-brief",
@@ -17,31 +42,6 @@
       "title": "'Survival mode': Indiana residents endure a ninth day without power",
       "link": "https://www.npr.org/2026/08/21/g-s1-139527/indiana-storm-outages",
       "pubDate": "Fri, 21 Aug 2026 02:40:26 -0400"
-    },
-    {
-      "title": "Federal agents seize devices from ex-Rep. Eric Swalwell in sexual misconduct probe, AP source says",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5940542/federal-agents-seize-eric-swalwell-sexual-misconduct-probe",
-      "pubDate": "Fri, 21 Aug 2026 01:49:48 -0400"
-    },
-    {
-      "title": "Jurors hear 'Keffe D' say his nephew fired fatal shots at Tupac Shakur in 1996 drive-by shooting",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5940538/jurors-hear-keffe-d-say-his-nephew-fired-fatal-shots-at-tupac-shakur-in-1996-drive-by-shooting",
-      "pubDate": "Fri, 21 Aug 2026 01:41:15 -0400"
-    },
-    {
-      "title": "Record cyclosporiasis outbreak tests the response of a 'weakened' health system",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5930462/trump-health-foodborne-illness-outbreak-cyclospora",
-      "pubDate": "Thu, 20 Aug 2026 15:54:19 -0400"
-    },
-    {
-      "title": "The Iran war and tariffs are costing farmers. Will Republicans pay in November?",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5914684/farmers-trump-pennsylvania-midterms",
-      "pubDate": "Thu, 20 Aug 2026 15:22:20 -0400"
-    },
-    {
-      "title": "3 things to know about the $40 trillion federal debt",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5939473/40-trillion-federal-debt",
-      "pubDate": "Thu, 20 Aug 2026 12:50:41 -0400"
     }
   ]
 }
