@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-21T02:30:02.197350+00:00",
+  "fetched_at": "2026-08-21T02:45:01.933541+00:00",
   "items": [
     {
       "title": "Record cyclosporiasis outbreak tests the response of a 'weakened' health system",
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 20 Aug 2026 05:24:45 -0400"
     },
     {
-      "title": "The bond market is signaling trouble ahead. This is why you should pay attention",
-      "link": "https://www.npr.org/2026/08/20/nx-s1-5937600/economy-bonds-inflation-debt-consumers",
+      "title": "Which country makes the best jollof rice? D.C. foodies put it to a blind test",
+      "link": "https://www.npr.org/2026/08/20/nx-s1-5936436/which-country-makes-the-best-jollof-rice-d-c-foodies-put-it-to-a-blind-test",
       "pubDate": "Thu, 20 Aug 2026 05:00:00 -0400"
     }
   ]
