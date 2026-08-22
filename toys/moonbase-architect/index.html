@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Monad Education 001 — Moonbase Architect v0.1: Interactive Lunar Habitat & ECLSS Engineering Simulator." />
+  <title>Moonbase Architect v0.1 — Monad Education 001</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <div class="mh-left">
+        <a class="back" href="../../index.html">← Fleet Monad</a>
+        <div class="eyebrow">Monad Education 001 · Admiral Approved · v0.1</div>
+        <h1>Moonbase Architect</h1>
+        <p>Design, simulate, and stress-test permanent lunar settlements against realistic lunar physics, 708-hour diurnal cycles, radiation hazards, and closed-loop ECLSS life support.</p>
+      </div>
+      <div class="mh-actions">
+        <button id="btnFormulas" class="btn">📐 Physics &amp; Formulas</button>
+        <button id="btnExport" class="btn">📄 Export Manifest</button>
+        <button id="btnMute" class="btn">🔊 Sound: On</button>
+        <button id="btnReset" class="btn danger">↺ Reset Base</button>
+      </div>
+    </header>
+
+    <section class="scenario-ribbon" aria-label="Mission Configuration">
+      <div class="sr-left">
+        <span class="sr-label">Mission Sector:</span>
+        <select id="scenarioSelect" class="sr-select"></select>
+        <span id="scenarioLocation" class="sr-location">Shackleton Crater Rim</span>
+      </div>
+      <div class="sr-right">
+        <div class="clock-display">
+          <span class="sr-label">Clock:</span>
+          <span id="simClock" class="clock-val">T+0.0h (0% Diurnal)</span>
+        </div>
+        <div class="time-controls">
+          <button id="btnPause" class="time-btn">⏸ Pause</button>
+          <button class="time-btn active" data-scale="1">1x</button>
+          <button class="time-btn" data-scale="10">10x</button>
+          <button class="time-btn" data-scale="50">50x</button>
+          <button class="time-btn" data-scale="200">200x</button>
+        </div>
+      </div>
+    </section>
+
+    <main class="workbench-grid">
+      <!-- Left Panel: Module Palette & Tools -->
+      <aside class="panel">
+        <div class="panel-header">
+          <span class="panel-title">01 · Module Palette</span>
+          <span id="hudBudget" class="budget-badge">5,000k Cr</span>
+        </div>
+        <div id="toolList" class="tool-list">
+          <!-- Dynamically populated by app.js -->
+        </div>
+        <div class="action-tools">
+          <button id="btnInspect" class="btn" style="flex:1;">🔍 Inspect</button>
+          <button id="btnDemolish" class="btn danger" style="flex:1;">🗑 Reclaim</button>
+        </div>
+      </aside>
+
+      <!-- Center Panel: Tactical Surface Stage -->
+      <section class="stage-panel">
+        <div class="canvas-container">
+          <canvas id="lunarCanvas"></canvas>
+        </div>
+        <div class="overlay-bar">
+          <div class="overlay-toggles">
+            <span class="overlay-label">Visual Layers:</span>
+            <button class="layer-btn active" data-layer="tactical">Tactical</button>
+            <button class="layer-btn" data-layer="radiation">☢️ Radiation</button>
+            <button class="layer-btn" data-layer="thermal">🌡️ Thermal</button>
+            <button class="layer-btn" data-layer="power">⚡ Power Grid</button>
+            <button class="layer-btn" data-layer="stress">🛡️ Pressure</button>
+          </div>
+          <span style="font-size:10px; color:#6B7C93;">Click to place · Click existing to inspect</span>
+        </div>
+      </section>
+
+      <!-- Right Panel: Telemetry HUD & Objectives -->
+      <aside class="telemetry-sidebar">
+        <!-- Power Grid -->
+        <div class="metric-card">
+          <div class="mc-header">
+            <span class="mc-title">Power Grid Telemetry</span>
+            <span id="hudPowerVal" class="mc-value green">+12.4 kW</span>
+          </div>
+          <div class="mc-bar"><div id="hudPowerBar" class="mc-fill" style="width: 75%;"></div></div>
+          <div id="hudPowerSub" class="mc-subtext">
+            <span>Gen: <strong>45 kW</strong></span>
+            <span>Req: <strong>32 kW</strong></span>
+            <span>Batt: <strong>400 kWh</strong></span>
+          </div>
+        </div>
+
+        <!-- Life Support & ECLSS -->
+        <div class="metric-card">
+          <div class="mc-header">
+            <span class="mc-title">ECLSS Atmosphere &amp; H2O</span>
+            <span id="hudEclssVal" class="mc-value green">O2: +0.4 kg/d (Surplus)</span>
+          </div>
+          <div class="mc-bar"><div id="hudEclssBar" class="mc-fill" style="width: 80%;"></div></div>
+          <div id="hudEclssSub" class="mc-subtext">
+            <span>O2 Stored: <strong>300 kg</strong></span>
+            <span>H2O: <strong>1,500 L</strong></span>
+            <span>Crew: <strong>4/4</strong></span>
+          </div>
+        </div>
+
+        <!-- Radiation & Environmental Safety -->
+        <div class="metric-card">
+          <div class="mc-header">
+            <span class="mc-title">Cosmic Radiation Exposure</span>
+            <span id="hudRadVal" class="mc-value green">18.5 mSv/yr</span>
+          </div>
+          <div class="mc-bar"><div id="hudRadBar" class="mc-fill" style="width: 90%;"></div></div>
+          <div id="hudRadSub" class="mc-subtext">
+            <span>Shielding: <strong>94%</strong></span>
+            <span>Ref: <strong>700 mSv/yr</strong></span>
+          </div>
+        </div>
+
+        <!-- Thermal Dissipation -->
+        <div class="metric-card">
+          <div class="mc-header">
+            <span class="mc-title">Thermal Equilibrium</span>
+            <span id="hudThermVal" class="mc-value green">+15.0 kW Dispersal</span>
+          </div>
+          <div class="mc-bar"><div id="hudThermBar" class="mc-fill" style="width: 85%;"></div></div>
+          <div id="hudThermSub" class="mc-subtext">
+            <span>Dissipated: <strong>45 kW</strong></span>
+            <span>Internal: <strong>30 kW</strong></span>
+          </div>
+        </div>
+
+        <!-- Scenario Objectives -->
+        <div class="objectives-card">
+          <div class="mc-header">
+            <span class="mc-title">Mission Objectives</span>
+            <span id="survivalScoreVal" class="mc-value green">100%</span>
+          </div>
+          <div id="objectivesList" class="obj-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
+      <div class="footer-motto">Monad Education 001 — Moonbase Architect · Designed for living exploration.</div>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Moonbase Architect"></script>
+</body>
+</html>
