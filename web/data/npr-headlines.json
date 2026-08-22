@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-22T10:00:02.174582+00:00",
+  "fetched_at": "2026-08-22T10:15:01.771396+00:00",
   "items": [
     {
       "title": "U.S.-Canada trade talks collapse just before deadline for tariffs",
@@ -39,8 +39,8 @@
       "pubDate": "Fri, 21 Aug 2026 05:01:00 -0400"
     },
     {
-      "title": "Federal government thins the herds of wild horses in Colorado",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5920407/colorado-wild-horses-federal-government-roundup",
+      "title": "As Trump courts Kim, Pyongyang ups the price, while Seoul fears being sidelined",
+      "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     }
   ]
