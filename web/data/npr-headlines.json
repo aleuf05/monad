@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-22T05:30:01.676847+00:00",
+  "fetched_at": "2026-08-22T05:45:01.373575+00:00",
   "items": [
     {
       "title": "U.S. imposes 50% tariffs on $20 billion worth of Canadian products",
@@ -34,13 +34,13 @@
       "pubDate": "Fri, 21 Aug 2026 05:01:00 -0400"
     },
     {
-      "title": "As Trump courts Kim, Pyongyang ups the price, while Seoul fears being sidelined",
-      "link": "https://www.npr.org/2026/08/21/g-s1-139466/as-trump-courts-kim-pyongyang-ups-price-while-seoul-fears-being-sidelined",
+      "title": "Federal government thins the herds of wild horses in Colorado",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5920407/colorado-wild-horses-federal-government-roundup",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     },
     {
-      "title": "As USS Lincoln heads home, mental health experts tally the stressors of life at sea",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5936445/uss-lincoln-returns-mental-health-stressors-life-sea",
+      "title": "Amid intense backlash, people are vandalizing Flock surveillance cameras",
+      "link": "https://www.npr.org/2026/08/21/nx-s1-5939851/flock-cameras-police-block-surveillance-vandalize",
       "pubDate": "Fri, 21 Aug 2026 05:00:00 -0400"
     }
   ]
