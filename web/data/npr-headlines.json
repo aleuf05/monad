@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-22T16:30:01.922944+00:00",
+  "fetched_at": "2026-08-22T17:30:01.787136+00:00",
   "items": [
     {
       "title": "Opinion: Mr. Rogers keeps finding a new neighborhood",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5932426/opinion-mr-rogers-keeps-finding-a-new-neighborhood",
       "pubDate": "Sat, 22 Aug 2026 08:00:00 -0400"
+    },
+    {
+      "title": "As Flock battles public scrutiny, other police surveillance companies see an opening",
+      "link": "https://www.npr.org/2026/08/22/nx-s1-5931446/flock-fallout-competitors-see-opportunity",
+      "pubDate": "Sat, 22 Aug 2026 07:43:32 -0400"
     },
     {
       "title": "Hours after U.S. imposes tariffs, Canada says it'll strike back starting Sept. 8",
@@ -37,11 +42,6 @@
       "title": "Trump declares economic warfare on Iran. And, SCOTUS to rule on White House ballroom",
       "link": "https://www.npr.org/2026/08/21/g-s1-139542/up-first-newsletter-trump-iran-economy-white-house-ballroom-bond-market",
       "pubDate": "Fri, 21 Aug 2026 07:25:10 -0400"
-    },
-    {
-      "title": "What to know about this weekend's IndyCar race on the National Mall",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5939443/dc-indycar-race-overview-watch-politics",
-      "pubDate": "Fri, 21 Aug 2026 05:01:00 -0400"
     }
   ]
 }
