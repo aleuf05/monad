@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-22T17:30:01.787136+00:00",
+  "fetched_at": "2026-08-22T21:00:01.593074+00:00",
   "items": [
+    {
+      "title": "Trump administration's 75-country visa ban was illegal, judge rules",
+      "link": "https://www.npr.org/2026/08/22/nx-s1-5941765/trump-immigration-visa-ban-75-countries",
+      "pubDate": "Sat, 22 Aug 2026 16:53:19 -0400"
+    },
     {
       "title": "Opinion: Mr. Rogers keeps finding a new neighborhood",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5932426/opinion-mr-rogers-keeps-finding-a-new-neighborhood",
@@ -37,11 +42,6 @@
       "title": "Top Iran official says U.S. focus on economic warfare shows it has failed militarily",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940610/iran-us-threat-economic-warfare",
       "pubDate": "Fri, 21 Aug 2026 07:42:10 -0400"
-    },
-    {
-      "title": "Trump declares economic warfare on Iran. And, SCOTUS to rule on White House ballroom",
-      "link": "https://www.npr.org/2026/08/21/g-s1-139542/up-first-newsletter-trump-iran-economy-white-house-ballroom-bond-market",
-      "pubDate": "Fri, 21 Aug 2026 07:25:10 -0400"
     }
   ]
 }
