@@ -1,0 +1,494 @@
+/**
+ * Moonbase Architect v0.1
+ * UI Styles — Monad Design System & Fourth Grade Common Core World
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  background: #0B1220;
+  color: #DCE6F2;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+/* --- Header ------------------------------------------------------ */
+.masthead {
+  padding: 44px 0 16px;
+  border-bottom: 1px solid #1E2C42;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.back {
+  display: inline-block;
+  color: #4FD1C5;
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+  transition: color 150ms ease;
+}
+
+.back:hover {
+  color: #E8A33D;
+}
+
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #E8A33D;
+}
+
+.masthead h1 {
+  font-family: 'Oswald', sans-serif;
+  font-size: 32px;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #F6C76D;
+  text-transform: uppercase;
+}
+
+.masthead p {
+  font-size: 12px;
+  color: #8A9BB4;
+  max-width: 600px;
+}
+
+.btn {
+  background: #111A2B;
+  border: 1px solid #1E2C42;
+  color: #DCE6F2;
+  font: inherit;
+  font-size: 11px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 150ms ease;
+}
+
+.btn:hover {
+  border-color: #4FD1C5;
+  color: #4FD1C5;
+}
+
+.btn.primary {
+  background: #163836;
+  border-color: #4FD1C5;
+  color: #4FD1C5;
+  font-weight: 600;
+}
+
+/* --- Mission Ribbon / Selector ---------------------------------- */
+.mission-ribbon {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 14px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.mission-tab {
+  background: #0E1626;
+  border: 1px solid #1E2C42;
+  color: #8A9BB4;
+  font-family: 'Oswald', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 120ms ease;
+}
+
+.mission-tab:hover {
+  border-color: #4FD1C5;
+  color: #DCE6F2;
+}
+
+.mission-tab.active {
+  background: #17283A;
+  border-color: #F6C76D;
+  color: #F6C76D;
+  font-weight: 600;
+  box-shadow: 0 0 18px rgba(246, 199, 109, 0.15);
+}
+
+/* --- Mission Objective Prompt Banner ---------------------------- */
+.prompt-banner {
+  background: linear-gradient(120deg, #16243A, #111A2B 65%, #182C24);
+  border: 1px solid #4FD1C5;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pb-left {
+  max-width: 800px;
+}
+
+.pb-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 18px;
+  color: #F6C76D;
+  letter-spacing: 0.04em;
+}
+
+.pb-sub {
+  font-size: 11.5px;
+  color: #9AACBF;
+  margin-top: 3px;
+}
+
+.badge-record {
+  background: #F6C76D;
+  color: #0B1220;
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* --- Main Layout Grid -------------------------------------------- */
+.main-stage {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 18px;
+}
+
+@media (max-width: 960px) {
+  .main-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Canvas Card ------------------------------------------------- */
+.canvas-card {
+  background: #070D18;
+  border: 1px solid #1E2C42;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+}
+
+.canvas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #0B1220;
+  border-bottom: 1px solid #1E2C42;
+  font-size: 10px;
+  color: #6B7C93;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+canvas#lunarCanvas {
+  display: block;
+}
+
+/* Dimension Controls Bar below canvas */
+.dimension-toolbar {
+  background: #0B1220;
+  border-top: 1px solid #1E2C42;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .dimension-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dim-control-group {
+  background: #111A2B;
+  border: 1px solid #1E2C42;
+  border-radius: 8px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dim-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.dim-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #6B7C93;
+  text-transform: uppercase;
+}
+
+.dim-value {
+  font-family: 'Oswald', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #4FD1C5;
+}
+
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stepper-btn {
+  background: #0B1220;
+  border: 1px solid #1E2C42;
+  color: #DCE6F2;
+  font-size: 18px;
+  font-weight: 700;
+  width: 42px;
+  height: 38px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  transition: all 120ms ease;
+}
+
+.stepper-btn:hover {
+  border-color: #4FD1C5;
+  color: #4FD1C5;
+  background: #122133;
+}
+
+.stepper-btn:active {
+  transform: scale(0.95);
+}
+
+.dim-slider {
+  flex: 1;
+  accent-color: #4FD1C5;
+  cursor: pointer;
+}
+
+/* --- Right Sidebar: Instruments & MARA ---------------------------- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.instrument-panel {
+  background: #111A2B;
+  border: 1px solid #1E2C42;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.ip-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6B7C93;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #1E2C42;
+}
+
+.readout-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.readout-card {
+  background: #0B1220;
+  border: 1px solid #1E2C42;
+  border-radius: 8px;
+  padding: 10px 14px;
+  transition: border-color 150ms ease;
+}
+
+.readout-card.highlight {
+  border-color: #F6C76D;
+  background: #162438;
+}
+
+.rc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.rc-label {
+  font-size: 10px;
+  color: #6B7C93;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.rc-formula {
+  font-size: 9.5px;
+  color: #4FD1C5;
+}
+
+.rc-main {
+  font-family: 'Oswald', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #F6C76D;
+  margin-top: 2px;
+}
+
+.rc-sub {
+  font-size: 10.5px;
+  color: #8A9BB4;
+  margin-top: 2px;
+}
+
+/* --- MARA Assistant Box ------------------------------------------ */
+.mara-box {
+  background: linear-gradient(120deg, #142338, #0E1A2C);
+  border: 1px solid #3B82F6;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.mara-avatar {
+  font-size: 24px;
+  background: #0B1220;
+  border: 1px solid #3B82F6;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mara-content {
+  flex: 1;
+}
+
+.mara-name {
+  font-family: 'Oswald', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #60A5FA;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.mara-speech {
+  font-size: 11.5px;
+  color: #DCE6F2;
+  line-height: 1.45;
+}
+
+/* --- Factor Pair Discovery Collection Rack ---------------------- */
+.discovery-rack {
+  background: #0B1220;
+  border: 1px solid #1E2C42;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.dr-title {
+  font-size: 10px;
+  color: #6B7C93;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.stamps-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.factor-stamp {
+  background: #111A2B;
+  border: 1px solid #4FD1C5;
+  color: #4FD1C5;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: stamp-pop 200ms ease;
+}
+
+@keyframes stamp-pop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- Footer ------------------------------------------------------ */
+footer {
+  text-align: center;
+  margin-top: 50px;
+  padding-top: 24px;
+  border-top: 1px solid #1E2C42;
+  font-size: 11px;
+  color: #3A4C68;
+  letter-spacing: 0.05em;
+}
+
+.footer-motto {
+  margin-top: 4px;
+  color: #6B7C93;
+  font-style: italic;
+}

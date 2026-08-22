@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Moonbase Architect: 4th Grade Common Core Math Laboratory — Explore Area, Perimeter, Factors & Optimization on the Moon." />
+  <title>Moonbase Architect — Monad Education 001</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="masthead">
+      <div>
+        <a class="back" href="../index.html">← Fleet Monad</a>
+        <div class="eyebrow">Monad Education 001 · 4th Grade Mathematics</div>
+        <h1>Moonbase Architect</h1>
+        <p>Manipulate the lunar habitat in real time. Explore floor tiles (area), meteor shielding (perimeter), and engineering optimization.</p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button id="btnResetMission" class="btn danger" style="font-weight: 600;">↺ Reset Mission</button>
+        <button id="btnMute" class="btn">🔊 Sound On</button>
+        <button id="btnTelemetry" class="btn" style="color: #6B7C93;">📊 Logs</button>
+      </div>
+    </header>
+
+    <!-- Mission Selector Tabs -->
+    <nav class="mission-ribbon" id="missionRibbon" aria-label="Mission Select"></nav>
+
+    <!-- Active Mission Prompt Banner -->
+    <section class="prompt-banner" aria-live="polite">
+      <div class="pb-left">
+        <div class="pb-title" id="promptTitle">The crew needs exactly 48 floor tiles. Build a habitat that fits!</div>
+        <div class="pb-sub" id="promptSub">Find any rectangle with an area of 48. There are multiple solutions!</div>
+      </div>
+      <div id="promptBadge" class="badge-record" hidden>✓ SOLVED!</div>
+    </section>
+
+    <!-- Main Construction Stage -->
+    <main class="main-stage">
+      <!-- Left: Interactive Canvas & Dimension Steppers -->
+      <section class="canvas-card">
+        <div class="canvas-header">
+          <span>Lunar Construction Sector 01</span>
+          <span>Drag corner handle or use steppers below</span>
+        </div>
+        
+        <div class="canvas-wrap">
+          <canvas id="lunarCanvas"></canvas>
+        </div>
+
+        <!-- Large, Obvious Dimension Toolbar -->
+        <div class="dimension-toolbar">
+          <!-- Width Control Group -->
+          <div class="dim-control-group">
+            <div class="dim-label-row">
+              <span class="dim-title">Width (West–East)</span>
+              <span id="valWidth" class="dim-value">6 m</span>
+            </div>
+            <div class="stepper-row">
+              <button id="btnWidthDec" class="stepper-btn" aria-label="Decrease Width">−</button>
+              <input id="sliderWidth" type="range" class="dim-slider" min="1" max="24" value="6" aria-label="Width slider" />
+              <button id="btnWidthInc" class="stepper-btn" aria-label="Increase Width">+</button>
+            </div>
+          </div>
+
+          <!-- Length Control Group -->
+          <div class="dim-control-group">
+            <div class="dim-label-row">
+              <span class="dim-title">Length (North–South)</span>
+              <span id="valLength" class="dim-value">8 m</span>
+            </div>
+            <div class="stepper-row">
+              <button id="btnLengthDec" class="stepper-btn" aria-label="Decrease Length">−</button>
+              <input id="sliderLength" type="range" class="dim-slider" min="1" max="24" value="8" aria-label="Length slider" />
+              <button id="btnLengthInc" class="stepper-btn" aria-label="Increase Length">+</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Engineering Instrument Panel & MARA Assistant -->
+      <aside class="sidebar">
+        <!-- Instrument Panel -->
+        <div class="instrument-panel">
+          <div class="ip-title">Engineering Instrument Panel</div>
+          <div class="readout-grid">
+            <!-- Width & Length Readout -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Dimensions</span>
+                <span class="rc-formula">Width × Length</span>
+              </div>
+              <div class="rc-main"><span id="ipWidth">6 m</span> × <span id="ipLength">8 m</span></div>
+            </div>
+
+            <!-- Floor Tiles / Area Readout -->
+            <div class="readout-card highlight">
+              <div class="rc-head">
+                <span class="rc-label">Floor Tiles (Area)</span>
+                <span id="ipAreaFormula" class="rc-formula">area = 6 × 8 = 48</span>
+              </div>
+              <div id="ipArea" class="rc-main">48 tiles</div>
+              <div class="rc-sub">Total interior living &amp; equipment space</div>
+            </div>
+
+            <!-- Outside Wall / Perimeter Readout -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Outside Wall (Perimeter)</span>
+                <span id="ipPerimeterFormula" class="rc-formula">perimeter = 2 × (6 + 8) = 28</span>
+              </div>
+              <div id="ipPerimeter" class="rc-main">28 m</div>
+              <div class="rc-sub">Total exterior meteor shielding boundary</div>
+            </div>
+
+            <!-- Shielding Cost Readout with Humor -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Shielding Cost</span>
+                <span class="rc-formula">$10,000 / meter</span>
+              </div>
+              <div id="ipCost" class="rc-main" style="color: #4FD1C5;">$280,000</div>
+              <div class="rc-sub">Earth Accounting Department: <em>Shielding isn't free.</em></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MARA Assistant Speech Box -->
+        <div class="mara-box">
+          <div class="mara-avatar">🤖</div>
+          <div class="mara-content">
+            <div class="mara-name">MARA · Lunar Research Assistant</div>
+            <div id="maraSpeech" class="mara-speech">
+              “Welcome Architect! We need exactly 48 floor tiles for the crew quarters. Adjust the width and length to build the habitat!”
+            </div>
+          </div>
+        </div>
+
+        <!-- Discovered Factor Pairs Rack -->
+        <div class="discovery-rack">
+          <div class="dr-title">Discovered Factor Solutions</div>
+          <div id="stampsList" class="stamps-list">
+            <!-- Dynamically populated with badges -->
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
+      <div class="footer-motto">Monad Education 001 — Moonbase Architect · Deterministic Mathematical Laboratory.</div>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+  <script src="../assets/js/monad-nav.js" data-root="../" data-section="build" data-page="Moonbase Architect"></script>
+</body>
+</html>
