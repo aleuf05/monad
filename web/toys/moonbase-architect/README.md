@@ -1,33 +1,33 @@
 # Monad Education 001 — Moonbase Architect v0.1
 
-An interactive, physics-grounded lunar habitat engineering and ECLSS simulator designed for Project Monad.
+**Audience**: Fourth grade  
+**Subject**: Common Core Mathematics  
+**Focus**: Area, perimeter, multiplication, factors, optimization
 
-## Overview
+## Core Principle
 
-Moonbase Architect models the real thermodynamic, diurnal, life support, and radiation constraints of establishing a permanent human settlement on the Moon.
+The child manipulates a mathematical world directly rather than answering worksheets.
+The mathematics is deterministic and implemented directly in code.
 
-## Key Capabilities
+## User Experience
 
-1. **Environmental Physics**:
-   - 708.7-hour lunar diurnal cycle (14 Earth days day / 14 Earth days night).
-   - Solar irradiance tracking with varying latitude, sun elevation, and polar illumination factors (e.g. Shackleton Crater Rim 88% solar availability).
-   - Deep-space radiative heat rejection ($Q = \epsilon \sigma A T^4$).
-   - Galactic Cosmic Ray (GCR) and Solar Particle Event (SPE) attenuation through sintered regolith arches ($I = I_0 e^{-\mu \rho x}$).
+- Instant lunar construction environment (no login, onboarding sequence, curriculum picker, or manual).
+- Interactive square grid representing the habitat.
+- Direct manipulation via mouse, touch, stepper buttons, and sliders.
+- Instant calculation updates on the Compact Engineering Instrument Panel:
+  - `WIDTH`
+  - `LENGTH`
+  - `FLOOR TILES / AREA` ($W \times L$)
+  - `OUTSIDE WALL / PERIMETER` ($2W + 2L$)
+  - `SHIELDING COST` ($P \times \$10,000$)
 
-2. **Life Support & ECLSS Closed-Loop Mass Balance**:
-   - Oxygen consumption (0.84 kg/day per crew member) vs. Electrolysis and Molten Regolith Extraction.
-   - Water consumption (2.5 L/day per crew member) vs. Cryo-Regolith extraction and Vapor Compression Distillation recovery.
-   - Food production via vertical aeroponic towers and spirulina photobioreactors.
+## Missions
 
-3. **Power Grid & Thermal Management**:
-   - Dual-axis tracking triple-junction GaAs photovoltaic arrays.
-   - Regenerative fuel cell (RFC) cryo-storage banks for 354-hour lunar night survivability.
-   - Fission Surface Power (Kilopower 40 kW Stirling reactor).
-   - Two-phase ammonia thermal radiators.
+1. **Mission 1 — BUILD IT**: Build an area of exactly 48 floor tiles (accepts all factor pairs: $6 \times 8$, $4 \times 12$, $3 \times 16$, $2 \times 24$, $1 \times 48$, etc.).
+2. **Mission 2 — MAKE IT CHEAPER**: Keep 48 floor tiles while minimizing the exterior wall perimeter. Discovers the $6 \times 8$ minimum perimeter ($P = 28\text{m}$) engineering record.
+3. **Mission 3 — BEAT THE ENGINEERS**: Given a fixed exterior wall budget ($P \le 24\text{m}$), build the largest possible floor area (discovers the $6 \times 6 = 36$ square maximum area).
+4. **Sandbox — FREE BUILD**: Freeform manipulation up to $24 \times 24$.
 
-4. **Interactive Architecture**:
-   - 2.5D tactical lunar canvas with dynamic lighting, shadows, and resource conduit animation.
-   - Visual inspection cutaway diagrams showing structural pressure hulls, Whipple micrometeorite bumpers, and regolith overburden.
-   - Visual overlay layers (Radiation hazard heatmap, thermal flow, power network, hoop stress).
-   - Pre-configured mission scenarios (Artemis Base Camp, Marius Hills Lava Tube, Shackleton ISRU Refinery, and Sandbox).
-   - Real-time Web Audio synthesizer feedback.
+## MARA (Moonbase Architecture & Research Assistant)
+
+Deterministic, state-aware responses triggered by actual behavior to guide observation rather than revealing answers.

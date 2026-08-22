@@ -1,6 +1,6 @@
 /**
- * Monad Education 001 — Moonbase Architect v0.1
- * Synthesizer & Web Audio Sound System
+ * Moonbase Architect v0.1
+ * Synthesizer & Web Audio System
  */
 
 export class MoonbaseAudio {
@@ -19,7 +19,7 @@ export class MoonbaseAudio {
     }
   }
 
-  playPlace() {
+  playStep() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
@@ -29,86 +29,17 @@ export class MoonbaseAudio {
     const gain = this.ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(440, t);
-    osc.frequency.exponentialRampToValueAtTime(880, t + 0.08);
-
-    gain.gain.setValueAtTime(0.12, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.12);
-  }
-
-  playDemolish() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sawtooth';
     osc.frequency.setValueAtTime(320, t);
-    osc.frequency.exponentialRampToValueAtTime(110, t + 0.14);
-
-    gain.gain.setValueAtTime(0.14, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.15);
-  }
-
-  playClick() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(1200, t);
-
-    gain.gain.setValueAtTime(0.05, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(t);
-    osc.stop(t + 0.03);
-  }
-
-  playAlert() {
-    if (this.isMuted) return;
-    this.init();
-    if (!this.ctx) return;
-
-    const t = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(650, t);
-    osc.frequency.setValueAtTime(800, t + 0.1);
-    osc.frequency.setValueAtTime(650, t + 0.2);
+    osc.frequency.exponentialRampToValueAtTime(580, t + 0.05);
 
     gain.gain.setValueAtTime(0.08, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
 
     osc.connect(gain);
     gain.connect(this.ctx.destination);
 
     osc.start(t);
-    osc.stop(t + 0.35);
+    osc.stop(t + 0.06);
   }
 
   playSuccess() {
@@ -121,19 +52,67 @@ export class MoonbaseAudio {
     notes.forEach((freq, i) => {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      const noteTime = t + i * 0.07;
+      const noteTime = t + i * 0.08;
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, noteTime);
 
-      gain.gain.setValueAtTime(0.08, noteTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.2);
+      gain.gain.setValueAtTime(0.1, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.25);
 
       osc.connect(gain);
       gain.connect(this.ctx.destination);
 
       osc.start(noteTime);
-      osc.stop(noteTime + 0.2);
+      osc.stop(noteTime + 0.25);
     });
+  }
+
+  playRecordFanfare() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const chord = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // Major triad arpeggio + top E6
+    chord.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const noteTime = t + i * 0.09;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.12, noteTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + 0.45);
+    });
+  }
+
+  playClick() {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(800, t);
+
+    gain.gain.setValueAtTime(0.04, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(t);
+    osc.stop(t + 0.03);
   }
 }

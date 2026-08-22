@@ -3,146 +3,142 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Monad Education 001 — Moonbase Architect v0.1: Interactive Lunar Habitat & ECLSS Engineering Simulator." />
-  <title>Moonbase Architect v0.1 — Monad Education 001</title>
+  <meta name="description" content="Moonbase Architect: 4th Grade Common Core Math Laboratory — Explore Area, Perimeter, Factors & Optimization on the Moon." />
+  <title>Moonbase Architect — Monad Education 001</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="wrap">
     <header class="masthead">
-      <div class="mh-left">
+      <div>
         <a class="back" href="../../index.html">← Fleet Monad</a>
-        <div class="eyebrow">Monad Education 001 · Admiral Approved · v0.1</div>
+        <div class="eyebrow">Monad Education 001 · 4th Grade Mathematics</div>
         <h1>Moonbase Architect</h1>
-        <p>Design, simulate, and stress-test permanent lunar settlements against realistic lunar physics, 708-hour diurnal cycles, radiation hazards, and closed-loop ECLSS life support.</p>
+        <p>Manipulate the lunar habitat in real time. Explore floor tiles (area), meteor shielding (perimeter), and engineering optimization.</p>
       </div>
-      <div class="mh-actions">
-        <button id="btnFormulas" class="btn">📐 Physics &amp; Formulas</button>
-        <button id="btnExport" class="btn">📄 Export Manifest</button>
-        <button id="btnMute" class="btn">🔊 Sound: On</button>
-        <button id="btnReset" class="btn danger">↺ Reset Base</button>
+      <div>
+        <button id="btnMute" class="btn">🔊 Sound On</button>
       </div>
     </header>
 
-    <section class="scenario-ribbon" aria-label="Mission Configuration">
-      <div class="sr-left">
-        <span class="sr-label">Mission Sector:</span>
-        <select id="scenarioSelect" class="sr-select"></select>
-        <span id="scenarioLocation" class="sr-location">Shackleton Crater Rim</span>
+    <!-- Mission Selector Tabs -->
+    <nav class="mission-ribbon" id="missionRibbon" aria-label="Mission Select"></nav>
+
+    <!-- Active Mission Prompt Banner -->
+    <section class="prompt-banner" aria-live="polite">
+      <div class="pb-left">
+        <div class="pb-title" id="promptTitle">The crew needs exactly 48 floor tiles. Build a habitat that fits!</div>
+        <div class="pb-sub" id="promptSub">Find any rectangle with an area of 48. There are multiple solutions!</div>
       </div>
-      <div class="sr-right">
-        <div class="clock-display">
-          <span class="sr-label">Clock:</span>
-          <span id="simClock" class="clock-val">T+0.0h (0% Diurnal)</span>
-        </div>
-        <div class="time-controls">
-          <button id="btnPause" class="time-btn">⏸ Pause</button>
-          <button class="time-btn active" data-scale="1">1x</button>
-          <button class="time-btn" data-scale="10">10x</button>
-          <button class="time-btn" data-scale="50">50x</button>
-          <button class="time-btn" data-scale="200">200x</button>
-        </div>
-      </div>
+      <div id="promptBadge" class="badge-record" hidden>✓ SOLVED!</div>
     </section>
 
-    <main class="workbench-grid">
-      <!-- Left Panel: Module Palette & Tools -->
-      <aside class="panel">
-        <div class="panel-header">
-          <span class="panel-title">01 · Module Palette</span>
-          <span id="hudBudget" class="budget-badge">5,000k Cr</span>
+    <!-- Main Construction Stage -->
+    <main class="main-stage">
+      <!-- Left: Interactive Canvas & Dimension Steppers -->
+      <section class="canvas-card">
+        <div class="canvas-header">
+          <span>Lunar Construction Sector 01</span>
+          <span>Drag corner or use buttons below</span>
         </div>
-        <div id="toolList" class="tool-list">
-          <!-- Dynamically populated by app.js -->
-        </div>
-        <div class="action-tools">
-          <button id="btnInspect" class="btn" style="flex:1;">🔍 Inspect</button>
-          <button id="btnDemolish" class="btn danger" style="flex:1;">🗑 Reclaim</button>
-        </div>
-      </aside>
-
-      <!-- Center Panel: Tactical Surface Stage -->
-      <section class="stage-panel">
-        <div class="canvas-container">
+        
+        <div class="canvas-wrap">
           <canvas id="lunarCanvas"></canvas>
         </div>
-        <div class="overlay-bar">
-          <div class="overlay-toggles">
-            <span class="overlay-label">Visual Layers:</span>
-            <button class="layer-btn active" data-layer="tactical">Tactical</button>
-            <button class="layer-btn" data-layer="radiation">☢️ Radiation</button>
-            <button class="layer-btn" data-layer="thermal">🌡️ Thermal</button>
-            <button class="layer-btn" data-layer="power">⚡ Power Grid</button>
-            <button class="layer-btn" data-layer="stress">🛡️ Pressure</button>
+
+        <!-- Large, Obvious Dimension Toolbar -->
+        <div class="dimension-toolbar">
+          <!-- Width Control Group -->
+          <div class="dim-control-group">
+            <div class="dim-label-row">
+              <span class="dim-title">Width (West–East)</span>
+              <span id="valWidth" class="dim-value">6 m</span>
+            </div>
+            <div class="stepper-row">
+              <button id="btnWidthDec" class="stepper-btn" aria-label="Decrease Width">−</button>
+              <input id="sliderWidth" type="range" class="dim-slider" min="1" max="24" value="6" aria-label="Width slider" />
+              <button id="btnWidthInc" class="stepper-btn" aria-label="Increase Width">+</button>
+            </div>
           </div>
-          <span style="font-size:10px; color:#6B7C93;">Click to place · Click existing to inspect</span>
+
+          <!-- Length Control Group -->
+          <div class="dim-control-group">
+            <div class="dim-label-row">
+              <span class="dim-title">Length (North–South)</span>
+              <span id="valLength" class="dim-value">8 m</span>
+            </div>
+            <div class="stepper-row">
+              <button id="btnLengthDec" class="stepper-btn" aria-label="Decrease Length">−</button>
+              <input id="sliderLength" type="range" class="dim-slider" min="1" max="24" value="8" aria-label="Length slider" />
+              <button id="btnLengthInc" class="stepper-btn" aria-label="Increase Length">+</button>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Right Panel: Telemetry HUD & Objectives -->
-      <aside class="telemetry-sidebar">
-        <!-- Power Grid -->
-        <div class="metric-card">
-          <div class="mc-header">
-            <span class="mc-title">Power Grid Telemetry</span>
-            <span id="hudPowerVal" class="mc-value green">+12.4 kW</span>
-          </div>
-          <div class="mc-bar"><div id="hudPowerBar" class="mc-fill" style="width: 75%;"></div></div>
-          <div id="hudPowerSub" class="mc-subtext">
-            <span>Gen: <strong>45 kW</strong></span>
-            <span>Req: <strong>32 kW</strong></span>
-            <span>Batt: <strong>400 kWh</strong></span>
+      <!-- Right: Engineering Instrument Panel & MARA Assistant -->
+      <aside class="sidebar">
+        <!-- Instrument Panel -->
+        <div class="instrument-panel">
+          <div class="ip-title">Engineering Instrument Panel</div>
+          <div class="readout-grid">
+            <!-- Width & Length Readout -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Dimensions</span>
+                <span class="rc-formula">Width × Length</span>
+              </div>
+              <div class="rc-main"><span id="ipWidth">6 m</span> × <span id="ipLength">8 m</span></div>
+            </div>
+
+            <!-- Floor Tiles / Area Readout -->
+            <div class="readout-card highlight">
+              <div class="rc-head">
+                <span class="rc-label">Floor Tiles (Area)</span>
+                <span id="ipAreaFormula" class="rc-formula">6 × 8 = 48</span>
+              </div>
+              <div id="ipArea" class="rc-main">48 tiles</div>
+              <div class="rc-sub">Total usable living &amp; equipment space</div>
+            </div>
+
+            <!-- Outside Wall / Perimeter Readout -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Outside Wall (Perimeter)</span>
+                <span id="ipPerimeterFormula" class="rc-formula">2(6 + 8)</span>
+              </div>
+              <div id="ipPerimeter" class="rc-main">28 m</div>
+              <div class="rc-sub">Total exterior boundary distance</div>
+            </div>
+
+            <!-- Shielding Cost Readout -->
+            <div class="readout-card">
+              <div class="rc-head">
+                <span class="rc-label">Shielding Cost</span>
+                <span class="rc-formula">$10,000 / meter</span>
+              </div>
+              <div id="ipCost" class="rc-main" style="color: #4FD1C5;">$280,000</div>
+              <div class="rc-sub">Cost to reinforce exterior walls against meteors</div>
+            </div>
           </div>
         </div>
 
-        <!-- Life Support & ECLSS -->
-        <div class="metric-card">
-          <div class="mc-header">
-            <span class="mc-title">ECLSS Atmosphere &amp; H2O</span>
-            <span id="hudEclssVal" class="mc-value green">O2: +0.4 kg/d (Surplus)</span>
-          </div>
-          <div class="mc-bar"><div id="hudEclssBar" class="mc-fill" style="width: 80%;"></div></div>
-          <div id="hudEclssSub" class="mc-subtext">
-            <span>O2 Stored: <strong>300 kg</strong></span>
-            <span>H2O: <strong>1,500 L</strong></span>
-            <span>Crew: <strong>4/4</strong></span>
+        <!-- MARA Assistant Speech Box -->
+        <div class="mara-box">
+          <div class="mara-avatar">🤖</div>
+          <div class="mara-content">
+            <div class="mara-name">MARA · Lunar Research Assistant</div>
+            <div id="maraSpeech" class="mara-speech">
+              “Welcome Architect! We need exactly 48 floor tiles for the crew quarters. Adjust the width and length to build the habitat!”
+            </div>
           </div>
         </div>
 
-        <!-- Radiation & Environmental Safety -->
-        <div class="metric-card">
-          <div class="mc-header">
-            <span class="mc-title">Cosmic Radiation Exposure</span>
-            <span id="hudRadVal" class="mc-value green">18.5 mSv/yr</span>
-          </div>
-          <div class="mc-bar"><div id="hudRadBar" class="mc-fill" style="width: 90%;"></div></div>
-          <div id="hudRadSub" class="mc-subtext">
-            <span>Shielding: <strong>94%</strong></span>
-            <span>Ref: <strong>700 mSv/yr</strong></span>
-          </div>
-        </div>
-
-        <!-- Thermal Dissipation -->
-        <div class="metric-card">
-          <div class="mc-header">
-            <span class="mc-title">Thermal Equilibrium</span>
-            <span id="hudThermVal" class="mc-value green">+15.0 kW Dispersal</span>
-          </div>
-          <div class="mc-bar"><div id="hudThermBar" class="mc-fill" style="width: 85%;"></div></div>
-          <div id="hudThermSub" class="mc-subtext">
-            <span>Dissipated: <strong>45 kW</strong></span>
-            <span>Internal: <strong>30 kW</strong></span>
-          </div>
-        </div>
-
-        <!-- Scenario Objectives -->
-        <div class="objectives-card">
-          <div class="mc-header">
-            <span class="mc-title">Mission Objectives</span>
-            <span id="survivalScoreVal" class="mc-value green">100%</span>
-          </div>
-          <div id="objectivesList" class="obj-list">
-            <!-- Dynamically populated -->
+        <!-- Discovered Factor Pairs Rack -->
+        <div class="discovery-rack">
+          <div class="dr-title">Discovered Factor Solutions</div>
+          <div id="stampsList" class="stamps-list">
+            <!-- Dynamically populated with badges -->
           </div>
         </div>
       </aside>
@@ -150,7 +146,7 @@
 
     <footer>
       REALITY DECIDES. CLAIMS REQUIRE EVIDENCE.
-      <div class="footer-motto">Monad Education 001 — Moonbase Architect · Designed for living exploration.</div>
+      <div class="footer-motto">Monad Education 001 — Moonbase Architect · Deterministic Mathematical Laboratory.</div>
     </footer>
   </div>
 
