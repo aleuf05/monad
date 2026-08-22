@@ -10,14 +10,17 @@ export class MoonbaseCanvasRenderer {
     this.engine = mathEngine;
 
     this.isDragging = false;
-    this.dragTarget = null; // 'handle-corner' | 'handle-right' | 'handle-bottom'
+    this.dragTarget = null;
 
     this.particles = [];
     this.animationPhase = 0.0;
+    this.lastWidth = mathEngine.width;
+    this.lastLength = mathEngine.length;
+    this.constructionGlow = 0.0;
 
     this.gridOriginX = 0;
     this.gridOriginY = 0;
-    this.tileSize = 24; // dynamically computed
+    this.tileSize = 24;
 
     this.init();
   }
@@ -31,7 +34,7 @@ export class MoonbaseCanvasRenderer {
     const rect = this.canvas.parentElement.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
     const width = rect.width;
-    const height = Math.max(440, Math.min(620, window.innerHeight * 0.54));
+    const height = Math.max(420, Math.min(580, window.innerHeight * 0.52));
 
     this.canvas.width = width * dpr;
     this.canvas.height = height * dpr;
@@ -46,19 +49,17 @@ export class MoonbaseCanvasRenderer {
   }
 
   computeLayout() {
-    // We want to fit up to 24x24 tiles comfortably in the center
     const maxDimension = 24;
-    const availableW = this.width - 120;
-    const availableH = this.height - 100;
+    const availableW = this.width - 130;
+    const availableH = this.height - 110;
 
     this.tileSize = Math.max(14, Math.min(32, Math.floor(Math.min(availableW / maxDimension, availableH / maxDimension))));
     
     const habitatPixelW = this.engine.width * this.tileSize;
     const habitatPixelH = this.engine.length * this.tileSize;
 
-    // Center habitat in view
     this.gridOriginX = Math.round((this.width - habitatPixelW) / 2);
-    this.gridOriginY = Math.round((this.height - habitatPixelH) / 2) + 10;
+    this.gridOriginY = Math.round((this.height - habitatPixelH) / 2) + 12;
   }
 
   triggerCelebration() {
@@ -67,20 +68,24 @@ export class MoonbaseCanvasRenderer {
     const cx = this.gridOriginX + (this.engine.width * this.tileSize) / 2;
     const cy = this.gridOriginY + (this.engine.length * this.tileSize) / 2;
 
-    for (let i = 0; i < 75; i++) {
+    for (let i = 0; i < 85; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 6;
+      const speed = 2.5 + Math.random() * 6.5;
       this.particles.push({
         x: cx,
         y: cy,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1.5,
+        vy: Math.sin(angle) * speed - 1.8,
         color: colors[Math.floor(Math.random() * colors.length)],
         size: 3 + Math.random() * 4,
         alpha: 1.0,
-        decay: 0.015 + Math.random() * 0.02
+        decay: 0.015 + Math.random() * 0.018
       });
     }
+  }
+
+  notifyDimensionChange() {
+    this.constructionGlow = 1.0;
   }
 
   getHandleBounds() {
@@ -88,12 +93,10 @@ export class MoonbaseCanvasRenderer {
     const gy = this.gridOriginY;
     const gw = this.engine.width * this.tileSize;
     const gh = this.engine.length * this.tileSize;
-    const hs = 16; // handle radius / size
+    const hs = 18;
 
     return {
-      corner: { x: gx + gw, y: gy + gh, radius: hs },
-      right: { x: gx + gw, y: gy + gh / 2, radius: hs },
-      bottom: { x: gx + gw / 2, y: gy + gh, radius: hs }
+      corner: { x: gx + gw, y: gy + gh, radius: hs }
     };
   }
 
@@ -112,19 +115,23 @@ export class MoonbaseCanvasRenderer {
 
   render(timestamp) {
     this.animationPhase = (timestamp / 1000.0);
+    if (this.constructionGlow > 0) {
+      this.constructionGlow = Math.max(0, this.constructionGlow - 0.04);
+    }
+
     this.computeLayout();
 
     const ctx = this.ctx;
     const w = this.width;
     const h = this.height;
 
-    // 1. Sky & Space Backdrop
+    // 1. Sky & Stars Backdrop
     this.drawBackdrop(ctx, w, h);
 
-    // 2. Lunar Surface Bed
+    // 2. Lunar Surface Bed with Terrain texture & Craters
     this.drawLunarBed(ctx, w, h);
 
-    // 3. Habitat Floor Grid (Individual Tiles)
+    // 3. Habitat Floor Grid (Tiles)
     this.drawHabitatTiles(ctx);
 
     // 4. Glowing Meteor Shielding Exterior Wall
@@ -136,8 +143,8 @@ export class MoonbaseCanvasRenderer {
     // 6. Interactive Drag Handles
     this.drawHandles(ctx);
 
-    // 7. Astronaut Avatar inside Habitat
-    this.drawAstronaut(ctx);
+    // 7. Tiny Astronaut & Rover
+    this.drawAstronautAndRover(ctx);
 
     // 8. Celebration Particle System
     this.drawParticles(ctx);
@@ -151,9 +158,9 @@ export class MoonbaseCanvasRenderer {
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, w, h);
 
-    // Stars
+    // Twinkling stars
     ctx.fillStyle = '#FFFFFF';
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 45; i++) {
       const sx = ((i * 187.3) % w);
       const sy = ((i * 97.1) % (h * 0.55));
       const size = (i % 3 === 0) ? 1.5 : 1.0;
@@ -165,7 +172,7 @@ export class MoonbaseCanvasRenderer {
 
     // Earth in the sky
     const earthX = w - 55;
-    const earthY = 45;
+    const earthY = 42;
     const earthRadius = 18;
     const earthGrad = ctx.createRadialGradient(earthX - 4, earthY - 4, 3, earthX, earthY, earthRadius);
     earthGrad.addColorStop(0, '#60A5FA');
@@ -184,9 +191,9 @@ export class MoonbaseCanvasRenderer {
   }
 
   drawLunarBed(ctx, w, h) {
-    // Subtle background guide grid
     ctx.save();
-    ctx.strokeStyle = 'rgba(30, 44, 66, 0.4)';
+    // Subtle background grid
+    ctx.strokeStyle = 'rgba(30, 44, 66, 0.35)';
     ctx.lineWidth = 1;
     const step = this.tileSize;
 
@@ -205,6 +212,17 @@ export class MoonbaseCanvasRenderer {
       ctx.lineTo(w, y);
       ctx.stroke();
     }
+
+    // Lunar terrain ridges / craters
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.beginPath();
+    ctx.ellipse(60, h - 40, 50, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.ellipse(w - 70, h - 50, 65, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
     ctx.restore();
   }
 
@@ -216,18 +234,23 @@ export class MoonbaseCanvasRenderer {
     const sz = this.tileSize;
 
     ctx.save();
-    // Habitat foundation shadow
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    // Foundation shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.fillRect(gx + 6, gy + 6, cols * sz, rows * sz);
 
-    // Floor tile fill
+    // Floor tiles
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const tx = gx + c * sz;
         const ty = gy + r * sz;
         const isChecker = (c + r) % 2 === 0;
 
-        ctx.fillStyle = isChecker ? '#122338' : '#0F1C2E';
+        let tileBg = isChecker ? '#14273E' : '#0F1E32';
+        if (this.constructionGlow > 0) {
+          tileBg = isChecker ? '#1A3B5C' : '#14314E';
+        }
+
+        ctx.fillStyle = tileBg;
         ctx.fillRect(tx, ty, sz, sz);
 
         // Tile border
@@ -235,9 +258,9 @@ export class MoonbaseCanvasRenderer {
         ctx.lineWidth = 1;
         ctx.strokeRect(tx, ty, sz, sz);
 
-        // Small tech dot in each tile center if size allows
-        if (sz >= 20) {
-          ctx.fillStyle = 'rgba(79, 209, 197, 0.35)';
+        // Center tech dot
+        if (sz >= 18) {
+          ctx.fillStyle = 'rgba(79, 209, 197, 0.4)';
           ctx.fillRect(tx + sz / 2 - 1, ty + sz / 2 - 1, 2, 2);
         }
       }
@@ -252,20 +275,18 @@ export class MoonbaseCanvasRenderer {
     const gh = this.engine.length * this.tileSize;
 
     ctx.save();
-    // Outer glow
     const calc = this.engine.getCalculations();
-    const glowColor = calc.missionPassed ? 'rgba(79, 209, 197, 0.8)' : 'rgba(232, 163, 61, 0.7)';
+    const glowColor = calc.missionPassed ? 'rgba(79, 209, 197, 0.85)' : 'rgba(232, 163, 61, 0.7)';
     const borderColor = calc.missionPassed ? '#4FD1C5' : '#E8A33D';
 
     ctx.shadowColor = glowColor;
-    ctx.shadowBlur = 12;
+    ctx.shadowBlur = 14;
     ctx.strokeStyle = borderColor;
     ctx.lineWidth = 4;
     ctx.strokeRect(gx, gy, gw, gh);
 
-    // Inner bevel
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#FFFFFF44';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
     ctx.lineWidth = 1;
     ctx.strokeRect(gx + 2, gy + 2, gw - 4, gh - 4);
     ctx.restore();
@@ -282,48 +303,44 @@ export class MoonbaseCanvasRenderer {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // 1. Top Width Bar (WIDTH)
+    // 1. Top Width Bar
     const topY = gy - 20;
     ctx.strokeStyle = '#4FD1C5';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(gx, topY);
     ctx.lineTo(gx + gw, topY);
-    // Ticks
     ctx.moveTo(gx, topY - 5);
     ctx.lineTo(gx, topY + 5);
     ctx.moveTo(gx + gw, topY - 5);
     ctx.lineTo(gx + gw, topY + 5);
     ctx.stroke();
 
-    // Badge
     ctx.fillStyle = '#0B1220';
-    ctx.fillRect(gx + gw / 2 - 45, topY - 10, 90, 20);
+    ctx.fillRect(gx + gw / 2 - 48, topY - 10, 96, 20);
     ctx.strokeStyle = '#4FD1C5';
-    ctx.strokeRect(gx + gw / 2 - 45, topY - 10, 90, 20);
+    ctx.strokeRect(gx + gw / 2 - 48, topY - 10, 96, 20);
     ctx.fillStyle = '#4FD1C5';
     ctx.fillText(`WIDTH: ${this.engine.width} m`, gx + gw / 2, topY);
 
-    // 2. Left Length Bar (LENGTH)
+    // 2. Left Length Bar
     const leftX = gx - 24;
     ctx.beginPath();
     ctx.moveTo(leftX, gy);
     ctx.lineTo(leftX, gy + gh);
-    // Ticks
     ctx.moveTo(leftX - 5, gy);
     ctx.lineTo(leftX + 5, gy);
     ctx.moveTo(leftX - 5, gy + gh);
     ctx.lineTo(leftX + 5, gy + gh);
     ctx.stroke();
 
-    // Badge
     ctx.save();
     ctx.translate(leftX, gy + gh / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = '#0B1220';
-    ctx.fillRect(-45, -10, 90, 20);
+    ctx.fillRect(-48, -10, 96, 20);
     ctx.strokeStyle = '#4FD1C5';
-    ctx.strokeRect(-45, -10, 90, 20);
+    ctx.strokeRect(-48, -10, 96, 20);
     ctx.fillStyle = '#4FD1C5';
     ctx.fillText(`LENGTH: ${this.engine.length} m`, 0, 0);
     ctx.restore();
@@ -335,7 +352,7 @@ export class MoonbaseCanvasRenderer {
     const cx = gx + gw / 2;
     const cy = gy + gh / 2;
 
-    ctx.fillStyle = 'rgba(11, 18, 32, 0.75)';
+    ctx.fillStyle = 'rgba(11, 18, 32, 0.8)';
     ctx.beginPath();
     ctx.roundRect(cx - 55, cy - 14, 110, 28, 6);
     ctx.fill();
@@ -352,17 +369,15 @@ export class MoonbaseCanvasRenderer {
     const handles = this.getHandleBounds();
 
     ctx.save();
-    // Corner handle (controls both width and length)
     ctx.fillStyle = '#E8A33D';
     ctx.strokeStyle = '#FFFFFF';
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-    ctx.arc(handles.corner.x, handles.corner.y, 8, 0, Math.PI * 2);
+    ctx.arc(handles.corner.x, handles.corner.y, 9, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
 
-    // Plus icon in handle
     ctx.strokeStyle = '#0B1220';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -375,20 +390,37 @@ export class MoonbaseCanvasRenderer {
     ctx.restore();
   }
 
-  drawAstronaut(ctx) {
+  drawAstronautAndRover(ctx) {
     const gx = this.gridOriginX;
     const gy = this.gridOriginY;
+    const gw = this.engine.width * this.tileSize;
+    const gh = this.engine.length * this.tileSize;
     const sz = this.tileSize;
 
-    // Place astronaut on the top-left tile
+    ctx.save();
+    // 1. Tiny Astronaut inside room (tile 0,0)
     const ax = gx + sz * 0.5;
     const ay = gy + sz * 0.5;
-
-    ctx.save();
-    ctx.font = `${Math.max(14, sz * 0.8)}px monospace`;
+    ctx.font = `${Math.max(14, sz * 0.85)}px monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('👨‍🚀', ax, ay);
+
+    // 2. Tiny Rover outside on the lunar soil (bottom right of canvas)
+    const rx = Math.min(this.width - 45, gx + gw + 35);
+    const ry = Math.min(this.height - 35, gy + gh + 15);
+    ctx.font = '20px monospace';
+    ctx.fillText('🚜', rx, ry);
+
+    // Blinking rover antenna light
+    const isBlink = Math.sin(this.animationPhase * 4) > 0;
+    if (isBlink) {
+      ctx.fillStyle = '#EF4444';
+      ctx.beginPath();
+      ctx.arc(rx - 4, ry - 14, 2.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     ctx.restore();
   }
 
@@ -400,7 +432,7 @@ export class MoonbaseCanvasRenderer {
       const p = this.particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.vy += 0.1; // gravity
+      p.vy += 0.1;
       p.alpha -= p.decay;
 
       if (p.alpha <= 0) {

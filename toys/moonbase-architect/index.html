@@ -16,8 +16,10 @@
         <h1>Moonbase Architect</h1>
         <p>Manipulate the lunar habitat in real time. Explore floor tiles (area), meteor shielding (perimeter), and engineering optimization.</p>
       </div>
-      <div>
+      <div style="display: flex; gap: 8px;">
+        <button id="btnResetMission" class="btn danger" style="font-weight: 600;">↺ Reset Mission</button>
         <button id="btnMute" class="btn">🔊 Sound On</button>
+        <button id="btnTelemetry" class="btn" style="color: #6B7C93;">📊 Logs</button>
       </div>
     </header>
 
@@ -39,7 +41,7 @@
       <section class="canvas-card">
         <div class="canvas-header">
           <span>Lunar Construction Sector 01</span>
-          <span>Drag corner or use buttons below</span>
+          <span>Drag corner handle or use steppers below</span>
         </div>
         
         <div class="canvas-wrap">
@@ -95,30 +97,30 @@
             <div class="readout-card highlight">
               <div class="rc-head">
                 <span class="rc-label">Floor Tiles (Area)</span>
-                <span id="ipAreaFormula" class="rc-formula">6 × 8 = 48</span>
+                <span id="ipAreaFormula" class="rc-formula">area = 6 × 8 = 48</span>
               </div>
               <div id="ipArea" class="rc-main">48 tiles</div>
-              <div class="rc-sub">Total usable living &amp; equipment space</div>
+              <div class="rc-sub">Total interior living &amp; equipment space</div>
             </div>
 
             <!-- Outside Wall / Perimeter Readout -->
             <div class="readout-card">
               <div class="rc-head">
                 <span class="rc-label">Outside Wall (Perimeter)</span>
-                <span id="ipPerimeterFormula" class="rc-formula">2(6 + 8)</span>
+                <span id="ipPerimeterFormula" class="rc-formula">perimeter = 2 × (6 + 8) = 28</span>
               </div>
               <div id="ipPerimeter" class="rc-main">28 m</div>
-              <div class="rc-sub">Total exterior boundary distance</div>
+              <div class="rc-sub">Total exterior meteor shielding boundary</div>
             </div>
 
-            <!-- Shielding Cost Readout -->
+            <!-- Shielding Cost Readout with Humor -->
             <div class="readout-card">
               <div class="rc-head">
                 <span class="rc-label">Shielding Cost</span>
                 <span class="rc-formula">$10,000 / meter</span>
               </div>
               <div id="ipCost" class="rc-main" style="color: #4FD1C5;">$280,000</div>
-              <div class="rc-sub">Cost to reinforce exterior walls against meteors</div>
+              <div class="rc-sub">Earth Accounting Department: <em>Shielding isn't free.</em></div>
             </div>
           </div>
         </div>
