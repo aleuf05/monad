@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-22T23:55:43Z",
+  "generated": "2026-08-23T00:01:48Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 2,
-    "head": "cb5de3e0"
+    "uncommitted": 4,
+    "head": "b1298aab"
   },
   "captain": "running",
   "captain_detail": {
@@ -26,7 +26,7 @@
     "event_audio": "procedural-live-web-audio"
   },
   "voice": {
-    "day": "2026-08-22",
+    "day": "2026-08-23",
     "seconds_used": 0,
     "seconds_limit": null,
     "usd_used": 0,
@@ -87,9 +87,9 @@
     ],
     "resources": {
       "disk_used_percent": 19,
-      "disk_available": "172.2G",
-      "memory_available_percent": 79.4,
-      "load_1m": 1.18
+      "disk_available": "172.3G",
+      "memory_available_percent": 79.1,
+      "load_1m": 1.34
     }
   },
   "sound": true,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "2 files uncommitted."
+      "text": "4 files uncommitted."
     },
     {
       "priority": 1,
