@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-23T16:30:01.469662+00:00",
+  "fetched_at": "2026-08-23T17:00:02.092042+00:00",
   "items": [
+    {
+      "title": "Thousands in northwest Indiana still without power nearly two weeks after storm",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5942292/thousands-in-northwest-indiana-still-without-power-nearly-two-weeks-after-storm",
+      "pubDate": "Sun, 23 Aug 2026 12:55:37 -0400"
+    },
     {
       "title": "Nonprofits are helping musicians pay for insurance in Austin, Texas, and beyond",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5901338/health-alliance-austin-musicians-texas-health-premiums-obamacare-marketplace-uninsured",
@@ -37,11 +42,6 @@
       "title": "As Flock battles public scrutiny, other police surveillance companies see an opening",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5931446/flock-fallout-competitors-see-opportunity",
       "pubDate": "Sat, 22 Aug 2026 07:43:32 -0400"
-    },
-    {
-      "title": "As Canada readies retaliatory tariffs, Mark Carney says his nation is 'at war' with U.S.",
-      "link": "https://www.npr.org/2026/08/22/nx-s1-5941584/us-canada-tariffs",
-      "pubDate": "Sat, 22 Aug 2026 00:36:27 -0400"
     }
   ]
 }
