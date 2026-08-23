@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-22T21:00:01.593074+00:00",
+  "fetched_at": "2026-08-23T09:15:01.375548+00:00",
   "items": [
+    {
+      "title": "Body cam shows federal agent was 'unjustified' in Memphis shooting, attorney says",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5936573/memphis-task-force-shooting-video-jonah-neal",
+      "pubDate": "Sun, 23 Aug 2026 05:00:00 -0400"
+    },
     {
       "title": "Trump administration's 75-country visa ban was illegal, judge rules",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5941765/trump-immigration-visa-ban-75-countries",
@@ -37,11 +42,6 @@
       "title": "Beatty files emergency request to stop Trump's name from returning to Kennedy Center",
       "link": "https://www.npr.org/2026/08/21/nx-s1-5940799/kennedy-center-president-trump-filing",
       "pubDate": "Fri, 21 Aug 2026 12:40:59 -0400"
-    },
-    {
-      "title": "Top Iran official says U.S. focus on economic warfare shows it has failed militarily",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5940610/iran-us-threat-economic-warfare",
-      "pubDate": "Fri, 21 Aug 2026 07:42:10 -0400"
     }
   ]
 }
