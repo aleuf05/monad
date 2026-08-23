@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-23T14:00:01.834810+00:00",
+  "fetched_at": "2026-08-23T16:30:01.469662+00:00",
   "items": [
+    {
+      "title": "Nonprofits are helping musicians pay for insurance in Austin, Texas, and beyond",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5901338/health-alliance-austin-musicians-texas-health-premiums-obamacare-marketplace-uninsured",
+      "pubDate": "Sun, 23 Aug 2026 12:15:30 -0400"
+    },
     {
       "title": "Becerra, running for governor of California, faces a health insurance problem",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5941143/california-governor-xavier-becerra-health-insurance",
@@ -37,11 +42,6 @@
       "title": "As Canada readies retaliatory tariffs, Mark Carney says his nation is 'at war' with U.S.",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5941584/us-canada-tariffs",
       "pubDate": "Sat, 22 Aug 2026 00:36:27 -0400"
-    },
-    {
-      "title": "A battle over 'Italian brainrot' could shape who owns AI art",
-      "link": "https://www.npr.org/2026/08/19/nx-s1-5867638/artificial-intelligence-brainrot-memes-copyright-spyder-tung-tung-sahur",
-      "pubDate": "Fri, 21 Aug 2026 18:16:46 -0400"
     }
   ]
 }
