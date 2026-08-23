@@ -2,7 +2,7 @@
   "schema_version": "monad.fleetStatus.v1",
   "status": "green",
   "summary": "All systems nominal.",
-  "checked_at": "2026-08-23T19:52:18.822519Z",
+  "checked_at": "2026-08-23T19:57:18.822562Z",
   "hostname": "granite",
-  "git_commit": "025702fd6b702b89027e72c6502fd26a23f4fadf"
+  "git_commit": "dbf7e3fc207fd22285b953df839a2ac9dba66fbc"
 }
