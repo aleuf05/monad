@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-23T09:15:01.375548+00:00",
+  "fetched_at": "2026-08-23T13:00:01.834448+00:00",
   "items": [
+    {
+      "title": "Becerra, running for governor of California, faces a health insurance problem",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5941143/california-governor-xavier-becerra-health-insurance",
+      "pubDate": "Sun, 23 Aug 2026 08:50:09 -0400"
+    },
+    {
+      "title": "Tropical Storm Moke to cause more flooding as Hawaii recovers from Lala",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5941769/tropical-storm-moke-hawaii",
+      "pubDate": "Sun, 23 Aug 2026 08:48:05 -0400"
+    },
     {
       "title": "Body cam shows federal agent was 'unjustified' in Memphis shooting, attorney says",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5936573/memphis-task-force-shooting-video-jonah-neal",
@@ -32,16 +42,6 @@
       "title": "A battle over 'Italian brainrot' could shape who owns AI art",
       "link": "https://www.npr.org/2026/08/19/nx-s1-5867638/artificial-intelligence-brainrot-memes-copyright-spyder-tung-tung-sahur",
       "pubDate": "Fri, 21 Aug 2026 18:16:46 -0400"
-    },
-    {
-      "title": "Supreme Court allows Trump's ballroom construction to continue for now",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5935417/supreme-court-allows-trumps-ballroom-construction-to-continue-for-now",
-      "pubDate": "Fri, 21 Aug 2026 14:47:48 -0400"
-    },
-    {
-      "title": "Beatty files emergency request to stop Trump's name from returning to Kennedy Center",
-      "link": "https://www.npr.org/2026/08/21/nx-s1-5940799/kennedy-center-president-trump-filing",
-      "pubDate": "Fri, 21 Aug 2026 12:40:59 -0400"
     }
   ]
 }
