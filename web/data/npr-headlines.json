@@ -1,15 +1,20 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T10:00:01.733606+00:00",
+  "fetched_at": "2026-08-24T11:45:01.870103+00:00",
   "items": [
+    {
+      "title": "U.S. to detail new economic pressures on Iran. And, Canada to impose tariffs on U.S.",
+      "link": "https://www.npr.org/2026/08/24/g-s1-139736/up-first-newsletter-iran-economic-pressures-canada-tariffs-trump-visa-ban",
+      "pubDate": "Mon, 24 Aug 2026 07:27:44 -0400"
+    },
     {
       "title": "Washington, D.C.'s first IndyCar race packed the National Mall",
       "link": "https://www.npr.org/2026/08/24/nx-s1-5939827/washington-d-c-s-first-indycar-race-packed-the-national-mall",
       "pubDate": "Mon, 24 Aug 2026 05:36:13 -0400"
     },
     {
-      "title": "'It embarrasses me to be involved': Inside the National Guard D.C. deployment",
+      "title": "In candid interviews, National Guard members speak out about D.C. deployment",
       "link": "https://www.npr.org/2026/08/24/nx-s1-5939973/national-guard-members-washington-dc-deployment",
       "pubDate": "Mon, 24 Aug 2026 05:00:00 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "Thousands in northwest Indiana still without power nearly two weeks after storm",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5942292/thousands-in-northwest-indiana-still-without-power-nearly-two-weeks-after-storm",
       "pubDate": "Sun, 23 Aug 2026 12:55:37 -0400"
-    },
-    {
-      "title": "Nonprofits are helping musicians pay for insurance in Austin, Texas, and beyond",
-      "link": "https://www.npr.org/2026/08/23/nx-s1-5901338/health-alliance-austin-musicians-texas-health-premiums-obamacare-marketplace-uninsured",
-      "pubDate": "Sun, 23 Aug 2026 12:15:30 -0400"
     }
   ]
 }
