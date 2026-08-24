@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T22:15:01.391832+00:00",
+  "fetched_at": "2026-08-24T22:45:01.791230+00:00",
   "items": [
+    {
+      "title": "Six months on, U.S. Navy families who evacauated Bahrain remain in limbo",
+      "link": "https://www.npr.org/2026/08/24/nx-s1-5943188/six-months-on-u-s-navy-families-who-evacauated-bahrain-remain-in-limbo",
+      "pubDate": "Mon, 24 Aug 2026 18:22:13 -0400"
+    },
+    {
+      "title": "Penn State bust put focus on cocaine but on most campuses the big risk is alcohol",
+      "link": "https://www.npr.org/2026/08/24/nx-s1-5942987/cocaine-use-is-down-but-alcohol-is-still-being-abused-by-young-adults",
+      "pubDate": "Mon, 24 Aug 2026 17:17:31 -0400"
+    },
     {
       "title": "Supreme Court pauses lower court ruling on Trump's mail voting order as hurdles loom",
       "link": "https://www.npr.org/2026/08/24/nx-s1-5909592/trump-mail-voting-order-supreme-court",
@@ -32,16 +42,6 @@
       "title": "Sean Grayson, former deputy convicted of killing Sonya Massey, dies in prison, lawyer says",
       "link": "https://www.npr.org/2026/08/24/g-s1-139734/sonya-massey-convicted-deputy",
       "pubDate": "Mon, 24 Aug 2026 04:53:36 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/08/24/nx-s1-5939834/morning-news-brief",
-      "pubDate": "Mon, 24 Aug 2026 04:46:05 -0400"
-    },
-    {
-      "title": "U.S. businesses are getting tariff refunds. Will customers get any money back?",
-      "link": "https://www.npr.org/2026/08/24/nx-s1-5939518/u-s-businesses-are-getting-tariff-refunds-will-customers-get-any-money-back",
-      "pubDate": "Mon, 24 Aug 2026 04:45:49 -0400"
     }
   ]
 }
