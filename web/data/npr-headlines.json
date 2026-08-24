@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T09:15:01.734233+00:00",
+  "fetched_at": "2026-08-24T10:00:01.733606+00:00",
   "items": [
+    {
+      "title": "Washington, D.C.'s first IndyCar race packed the National Mall",
+      "link": "https://www.npr.org/2026/08/24/nx-s1-5939827/washington-d-c-s-first-indycar-race-packed-the-national-mall",
+      "pubDate": "Mon, 24 Aug 2026 05:36:13 -0400"
+    },
     {
       "title": "'It embarrasses me to be involved': Inside the National Guard D.C. deployment",
       "link": "https://www.npr.org/2026/08/24/nx-s1-5939973/national-guard-members-washington-dc-deployment",
@@ -37,11 +42,6 @@
       "title": "Nonprofits are helping musicians pay for insurance in Austin, Texas, and beyond",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5901338/health-alliance-austin-musicians-texas-health-premiums-obamacare-marketplace-uninsured",
       "pubDate": "Sun, 23 Aug 2026 12:15:30 -0400"
-    },
-    {
-      "title": "Becerra, running for governor of California, faces a health insurance problem",
-      "link": "https://www.npr.org/2026/08/23/nx-s1-5941143/california-governor-xavier-becerra-health-insurance",
-      "pubDate": "Sun, 23 Aug 2026 08:50:09 -0400"
     }
   ]
 }
