@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-23T17:00:02.092042+00:00",
+  "fetched_at": "2026-08-24T02:45:01.559077+00:00",
   "items": [
+    {
+      "title": "Learning to live in a post-American world",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5939846/learning-to-live-in-a-post-american-world",
+      "pubDate": "Sun, 23 Aug 2026 17:21:23 -0400"
+    },
     {
       "title": "Thousands in northwest Indiana still without power nearly two weeks after storm",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5942292/thousands-in-northwest-indiana-still-without-power-nearly-two-weeks-after-storm",
@@ -37,11 +42,6 @@
       "title": "Opinion: Mr. Rogers keeps finding a new neighborhood",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5932426/opinion-mr-rogers-keeps-finding-a-new-neighborhood",
       "pubDate": "Sat, 22 Aug 2026 08:00:00 -0400"
-    },
-    {
-      "title": "As Flock battles public scrutiny, other police surveillance companies see an opening",
-      "link": "https://www.npr.org/2026/08/22/nx-s1-5931446/flock-fallout-competitors-see-opportunity",
-      "pubDate": "Sat, 22 Aug 2026 07:43:32 -0400"
     }
   ]
 }
