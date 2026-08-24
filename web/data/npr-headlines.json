@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T14:30:02.267600+00:00",
+  "fetched_at": "2026-08-24T15:00:01.646679+00:00",
   "items": [
     {
       "title": "Treasury Secretary Scott Bessent to unveil new economic sanctions on Iran",
@@ -34,14 +34,14 @@
       "pubDate": "Mon, 24 Aug 2026 04:46:05 -0400"
     },
     {
+      "title": "High-intensity sprints can trigger molecular changes in the bloodstream",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5939943/high-intensity-hiit-heart-health-exercise",
+      "pubDate": "Mon, 24 Aug 2026 04:45:44 -0400"
+    },
+    {
       "title": "Thousands forced to evacuate parts of Reno, Nevada, as new wildfire rages",
       "link": "https://www.npr.org/2026/08/23/g-s1-139729/thousands-forced-to-evacuate-parts-of-reno-nevada-as-new-wildfire-rages",
       "pubDate": "Sun, 23 Aug 2026 23:47:04 -0400"
-    },
-    {
-      "title": "Climate change is unearthing archaeological discoveries, while also threatening them",
-      "link": "https://www.npr.org/2026/08/23/nx-s1-5938809/climate-change-is-unearthing-new-archeological-discoveries-while-also-threating-them",
-      "pubDate": "Sun, 23 Aug 2026 17:23:05 -0400"
     }
   ]
 }
