@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T20:30:02.360701+00:00",
+  "fetched_at": "2026-08-24T21:15:01.396659+00:00",
   "items": [
+    {
+      "title": "Supreme Court pauses lower court ruling on Trump's mail voting order as hurdles loom",
+      "link": "https://www.npr.org/2026/08/24/nx-s1-5909592/trump-mail-voting-order-supreme-court",
+      "pubDate": "Mon, 24 Aug 2026 16:53:45 -0400"
+    },
     {
       "title": "Treasury Secretary Scott Bessent unveils new U.S. economic sanctions to isolate Iran",
       "link": "https://www.npr.org/2026/08/24/g-s1-139743/treasury-secretary-scott-bessent-to-unveil-new-economic-sanctions-on-iran",
@@ -37,11 +42,6 @@
       "title": "High-intensity sprints can trigger molecular changes in the bloodstream",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5939943/high-intensity-hiit-heart-health-exercise",
       "pubDate": "Mon, 24 Aug 2026 04:45:44 -0400"
-    },
-    {
-      "title": "Thousands forced to evacuate parts of Reno, Nevada, as new wildfire rages",
-      "link": "https://www.npr.org/2026/08/23/g-s1-139729/thousands-forced-to-evacuate-parts-of-reno-nevada-as-new-wildfire-rages",
-      "pubDate": "Sun, 23 Aug 2026 23:47:04 -0400"
     }
   ]
 }
