@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T02:45:01.559077+00:00",
+  "fetched_at": "2026-08-24T04:00:02.412282+00:00",
   "items": [
+    {
+      "title": "Thousands forced to evacuate parts of Reno, Nevada, as new wildfire rages",
+      "link": "https://www.npr.org/2026/08/23/g-s1-139729/thousands-forced-to-evacuate-parts-of-reno-nevada-as-new-wildfire-rages",
+      "pubDate": "Sun, 23 Aug 2026 23:47:04 -0400"
+    },
     {
       "title": "Learning to live in a post-American world",
       "link": "https://www.npr.org/2026/08/23/nx-s1-5939846/learning-to-live-in-a-post-american-world",
@@ -37,11 +42,6 @@
       "title": "Trump administration's 75-country visa ban was illegal, judge rules",
       "link": "https://www.npr.org/2026/08/22/nx-s1-5941765/trump-immigration-visa-ban-75-countries",
       "pubDate": "Sat, 22 Aug 2026 16:53:19 -0400"
-    },
-    {
-      "title": "Opinion: Mr. Rogers keeps finding a new neighborhood",
-      "link": "https://www.npr.org/2026/08/22/nx-s1-5932426/opinion-mr-rogers-keeps-finding-a-new-neighborhood",
-      "pubDate": "Sat, 22 Aug 2026 08:00:00 -0400"
     }
   ]
 }
