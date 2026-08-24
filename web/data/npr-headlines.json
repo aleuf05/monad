@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T12:45:02.172528+00:00",
+  "fetched_at": "2026-08-24T14:30:02.267600+00:00",
   "items": [
     {
       "title": "Treasury Secretary Scott Bessent to unveil new economic sanctions on Iran",
@@ -39,9 +39,9 @@
       "pubDate": "Sun, 23 Aug 2026 23:47:04 -0400"
     },
     {
-      "title": "Learning to live in a post-American world",
-      "link": "https://www.npr.org/2026/08/23/nx-s1-5939846/learning-to-live-in-a-post-american-world",
-      "pubDate": "Sun, 23 Aug 2026 17:21:23 -0400"
+      "title": "Climate change is unearthing archaeological discoveries, while also threatening them",
+      "link": "https://www.npr.org/2026/08/23/nx-s1-5938809/climate-change-is-unearthing-new-archeological-discoveries-while-also-threating-them",
+      "pubDate": "Sun, 23 Aug 2026 17:23:05 -0400"
     }
   ]
 }
