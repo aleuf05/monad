@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-08-24T21:15:01.396659+00:00",
+  "fetched_at": "2026-08-24T22:15:01.391832+00:00",
   "items": [
     {
       "title": "Supreme Court pauses lower court ruling on Trump's mail voting order as hurdles loom",
@@ -39,9 +39,9 @@
       "pubDate": "Mon, 24 Aug 2026 04:46:05 -0400"
     },
     {
-      "title": "High-intensity sprints can trigger molecular changes in the bloodstream",
-      "link": "https://www.npr.org/2026/08/23/nx-s1-5939943/high-intensity-hiit-heart-health-exercise",
-      "pubDate": "Mon, 24 Aug 2026 04:45:44 -0400"
+      "title": "U.S. businesses are getting tariff refunds. Will customers get any money back?",
+      "link": "https://www.npr.org/2026/08/24/nx-s1-5939518/u-s-businesses-are-getting-tariff-refunds-will-customers-get-any-money-back",
+      "pubDate": "Mon, 24 Aug 2026 04:45:49 -0400"
     }
   ]
 }
