@@ -113,6 +113,20 @@
   .cardmaker-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
   .cardmaker-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
 
+  .moonbase-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 22px 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #16243A, #111A2B 55%, #252414); border: 1px solid #F6C76D; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .moonbase-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #F6C76D33; }
+  .moonbase-berth::after { content: "NEW · LUNAR SIMULATOR"; position: absolute; right: 18px; top: 16px; color: #0B1220; background: #F6C76D; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .moonbase-berth .project-kicker { color: #F6C76D; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .moonbase-berth .project-title { margin: 5px 0 5px; font-family: 'Oswald', sans-serif; color: #F6C76D; font-size: 23px; letter-spacing: .04em; }
+  .moonbase-berth .project-desc { max-width: 650px; color: #9AACBF; font-size: 11.5px; line-height: 1.55; }
+
+  .centaur-berth { display: block; position: relative; overflow: hidden; margin: 10px 0 8px; padding: 24px; color: inherit; text-decoration: none; background: linear-gradient(120deg, #281F38, #111A2B 55%, #17313A); border: 1px solid #C78BFF; border-radius: 9px; transition: transform 150ms ease, box-shadow 150ms ease; }
+  .centaur-berth:hover { transform: translateY(-2px); box-shadow: 0 0 28px #C78BFF22; }
+  .centaur-berth::after { content: "NEW · ALL HANDS"; position: absolute; right: 18px; top: 16px; color: #150B20; background: #C78BFF; border-radius: 20px; padding: 3px 9px; font-family: 'Oswald', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+  .centaur-berth .project-kicker { color: #C78BFF; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; }
+  .centaur-berth .project-title { margin: 5px 100px 5px 0; font-family: 'Oswald', sans-serif; color: #E6C8FF; font-size: 23px; letter-spacing: .04em; }
+  .centaur-berth .project-desc { max-width: 680px; color: #B7A8C8; font-size: 11.5px; line-height: 1.55; }
+
   .categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-top: 30px; }
   .cat-card { display: block; text-decoration: none; color: inherit; background: #111A2B; border: 1px solid #1E2C42; border-radius: 8px; padding: 22px 22px; transition: border-color 150ms ease, transform 150ms ease; }
   .cat-card:hover { border-color: #4FD1C5; transform: translateY(-2px); }
@@ -358,6 +372,18 @@
       </div>
     </section>
 
+    <a class="moonbase-berth" href="math/">
+      <div class="project-kicker">MONAD EDUCATION 001 &middot; PLAY MOONBASE ARCHITECT &rarr;</div>
+      <div class="project-title">MOONBASE ARCHITECT v0.1 &mdash; 4TH GRADE MATH WORLD</div>
+      <div class="project-desc">Explore area, perimeter, multiplication, factor pairs, and optimization directly by manipulating a real lunar habitat. No worksheets — manipulate the mathematical world in real time.</div>
+    </a>
+
+    <a class="centaur-berth" href="toys/centaur-math/">
+      <div class="project-kicker">CENTaur MATH &middot; SHARED PUZZLE DECK &rarr;</div>
+      <div class="project-title">CENTAUR MATH: ALL HANDS</div>
+      <div class="project-desc">Explore IBM’s Loeschian arithmetic-progression puzzle together. Try x² + xy + y², inspect exact witnesses, save candidates for Cameron, Mike, or Captain, and see the shared deck grow live.</div>
+    </a>
+
     <a class="cardmaker-berth" href="toys/cardmaker/">
       <div class="project-kicker">FEATURED WORK &middot; MONAD CARDMAKER v0.1</div>
       <div class="project-title">MONAD CARDMAKER &mdash; GREETING CARD GENERATOR</div>
@@ -489,6 +515,11 @@
         <div class="cat-name">Monad CardMaker</div>
         <div class="cat-desc">Personalized Greeting Card Generator — Create, preview, edit, and print tailored bi-fold greeting cards in under 3 minutes.</div>
       </a>
+      <a class="cat-card" href="math/" style="border-color:#F6C76D">
+        <div class="cat-eyebrow" style="color:#F6C76D">NEW &middot; EDUCATION 001</div>
+        <div class="cat-name">Moonbase Architect</div>
+        <div class="cat-desc">Fourth Grade Common Core Math Laboratory — explore area, perimeter, factor pairs, and optimization by manipulating the lunar habitat directly.</div>
+      </a>
       <a class="cat-card" href="story.html">
         <div class="cat-eyebrow">Remember</div>
         <div class="cat-name">Story &amp; Records</div>
@@ -509,6 +540,7 @@
     <div class="quick">
       <div class="quick-label">Frequently used</div>
       <div class="quick-links">
+        <a href="math/">Moonbase Architect<span class="mn-new">NEW</span></a>
         <a href="/captain/">Captain Phone Terminal<span class="mn-new">NEW</span></a>
         <a href="toys/cardmaker/">Monad CardMaker<span class="mn-new">NEW</span></a>
         <a href="toys/bridge-station-3.0/">Bridge Station 3.0 — the live console</a>
