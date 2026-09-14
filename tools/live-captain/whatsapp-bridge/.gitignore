@@ -3,3 +3,5 @@ auth-state/
 auth-state-fresh/
 reference-auth-state/
 *.log
+memory-state.json
+memory-state.json.tmp-*

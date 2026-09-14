@@ -3,6 +3,7 @@ import process from "node:process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexViaVerifiedAdapter } from "./bridge.js";
+import { DEFAULT_MEMORY_PATH } from "./memory.js";
 
 const args = new Set(process.argv.slice(2));
 const pair = args.has("--pair");
@@ -30,7 +31,7 @@ try { client = await createPairedClient({
     const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
     console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
-      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0),
+      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
@@ -40,6 +41,7 @@ try { client = await createPairedClient({
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),
       text });
     if (result.action === "ignored") console.error(`WhatsApp self-chat gate: ${result.reason}`);
+    if (result.action === "remembered") console.log(JSON.stringify({ type: "memory_ack", text: result.text }));
     if (result.action === "proposed") console.log(JSON.stringify({ type: "dry_run_proposal", text: result.text }));
     if (result.action === "sent") console.error("One designated self-chat reply sent; send limit reached.");
     if (result.action === "failed") console.error(`Bridge failed without retry/send: ${result.reason}`);

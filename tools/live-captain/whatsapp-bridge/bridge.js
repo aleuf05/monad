@@ -10,6 +10,7 @@
 import { spawn } from "node:child_process";
 import process from "node:process";
 import path from "node:path";
+import { contextFor, parseCorrection, parseTeaching, remember, supersede } from "./memory.js";
 
 export const TEST_PREFIX = "CAPTAIN TEST:";
 export const MAX_INPUT = 2000;
@@ -17,11 +18,12 @@ export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
 export class SelfChatBridge {
-  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, send, maxSends = 0, onDiagnostic = () => {} }) {
+  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
     this.onDiagnostic = onDiagnostic;
+    this.memoryPath = memoryPath;
     this.startedAt = startedAt;
     this.dryRun = dryRun;
     this.liveMode = liveMode;
@@ -55,9 +57,23 @@ export class SelfChatBridge {
     if (text.length > MAX_INPUT) return ignored("input-too-large");
     this.inFlight = true;
     try {
+      const teaching = this.memoryPath && parseTeaching(text);
+      if (teaching) {
+        const record = await remember(this.memoryPath, { ...teaching, source: "Cameron explicit self-chat teaching" });
+        this.onDiagnostic(`memory-recorded:${record.scope}`);
+        return { action: "remembered", text: `${this.replyLabel} remembered as ${record.scope} (${record.id})` };
+      }
+      const correction = this.memoryPath && parseCorrection(text);
+      if (correction) {
+        const record = await supersede(this.memoryPath, correction.id, { content: correction.content, source: "Cameron explicit correction" });
+        this.onDiagnostic(`memory-corrected:${record.id}`);
+        return { action: "remembered", text: `${this.replyLabel} corrected (${record.id})` };
+      }
+      const memory = this.memoryPath ? await contextFor(this.memoryPath, "cameron-private") : "(memory unavailable)";
       const context = `Channel: WhatsApp self-chat (${this.ownJid})\n` +
         `Authority: conversation content only; never execute actions or change configuration.\n` +
         `History is isolated to this self-chat and is bounded to ${MAX_CONTEXT} characters.\n` +
+        `Applicable durable Captain memory:\n${memory}\n` +
         `Incoming message:\n${text.slice(0, MAX_INPUT)}`;
       this.onDiagnostic("codex-started");
       let reply;
