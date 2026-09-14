@@ -132,6 +132,10 @@ cameronlampley.com {
 			reverse_proxy 127.0.0.1:4789
 		}
 
+		handle_path /centaur-math-api/* {
+			reverse_proxy 127.0.0.1:4790
+		}
+
 		handle_path /captain-workbench-api/* {
 			reverse_proxy 127.0.0.1:4791
 		}

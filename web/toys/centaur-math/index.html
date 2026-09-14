@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Centaur Math: All Hands</title>
+  <link rel="stylesheet" href="../../assets/css/styles.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="cm-wrap">
+    <header class="cm-hero">
+      <p class="cm-kicker">CENTaur MATH · ALL HANDS</p>
+      <h1>Find a Loeschian progression together.</h1>
+      <p class="cm-intro">I’ll handle the machinery. You two bring the curiosity.</p>
+      <p class="cm-source">A shared exploration of IBM Research’s <a href="https://research.ibm.com/blog/ponder-this-september-2026" target="_blank" rel="noreferrer">September 2026 Ponder This puzzle</a>.</p>
+      <div class="cm-note">Cameron’s condition: Mike joins in using the live webtoys.</div>
+      <p class="cm-note-sub">Mike’s agreement is unconfirmed until he actually responds.</p>
+    </header>
+
+    <section class="cm-panel cm-explorer" aria-labelledby="explorer-title">
+      <div class="cm-panel-head">
+        <div>
+          <p class="cm-eyebrow">THE MACHINERY</p>
+          <h2 id="explorer-title">Numbers of the form x² + xy + y²</h2>
+        </div>
+        <span id="computeStatus" class="cm-status">exact arithmetic · bounded</span>
+      </div>
+      <p class="cm-copy">Choose a progression. Every term is checked exactly, and representable terms get an integer witness pair.</p>
+      <form id="progressionForm" class="cm-controls">
+        <label>Starting value<input id="startValue" type="number" min="0" max="1000000" value="1" inputmode="numeric"></label>
+        <label>Positive step<input id="stepValue" type="number" min="1" max="1000000" value="6" inputmode="numeric"></label>
+        <label>Length<input id="lengthValue" type="number" min="1" max="35" value="4" inputmode="numeric"></label>
+        <button class="cm-button" type="submit">Check progression</button>
+        <button class="cm-button cm-button-secondary" type="button" id="challengeButton">35-term challenge</button>
+      </form>
+      <p id="validationMessage" class="cm-validation" role="status"></p>
+      <div class="cm-summary" id="progressionSummary"></div>
+      <div class="cm-table-wrap">
+        <table>
+          <thead><tr><th>Term</th><th>Result</th><th>Witness</th></tr></thead>
+          <tbody id="termRows"></tbody>
+        </table>
+      </div>
+      <p id="supportNote" class="cm-support-note">Supported endpoint bound: 1,000,000. A value beyond it is reported as beyond the toy’s supported computation, not as a mathematical failure.</p>
+    </section>
+
+    <section class="cm-grid">
+      <article class="cm-panel">
+        <p class="cm-eyebrow">LEAVE A TRACE</p>
+        <h2>Save a candidate or observation</h2>
+        <p class="cm-copy">Your note is shared with the other visitors through the live server. Attribution is a contribution label, not a claim that anyone has solved the puzzle.</p>
+        <form id="contributionForm" class="cm-save-form">
+          <label>Attribution<select id="attribution"><option>Cameron</option><option>Mike</option><option>Captain</option></select></label>
+          <label>What kind?<select id="kind"><option value="candidate">Candidate progression</option><option value="observation">Observation / question</option></select></label>
+          <label class="cm-wide">Note<textarea id="note" rows="4" maxlength="800" placeholder="What did you notice? What remains unresolved?"></textarea></label>
+          <button class="cm-button" type="submit">Save to the shared deck</button>
+        </form>
+        <p id="saveMessage" class="cm-validation" role="status"></p>
+      </article>
+
+      <article class="cm-panel cm-explain">
+        <p class="cm-eyebrow">OPTIONAL COMPANY</p>
+        <h2>Why does this work?</h2>
+        <p>These are Loesch numbers: integers that can be written as <strong>x² + xy + y²</strong>. The toy checks the exact form, rather than guessing from a short list.</p>
+        <details><summary>Hint 1 · start small</summary><p>The introductory run is <strong>1, 7, 13, 19</strong>. Try changing one control at a time and look for a witness that stays pleasantly small.</p></details>
+        <details><summary>Hint 2 · inspect the endpoint</summary><p>For 35 terms, the endpoint is <strong>start + 34 × step</strong>. A low endpoint is interesting, but it is not evidence that it is the smallest possible endpoint.</p></details>
+        <details><summary>Plain-language explanation</summary><p>The expression is a three-cornered number machine. For each term, we ask whether some integer pair lands exactly on it. A witness is that pair; a verified failure means the exact arithmetic test rules the term out.</p></details>
+      </article>
+    </section>
+
+    <section class="cm-panel cm-contributions" aria-labelledby="contrib-title">
+      <div class="cm-panel-head">
+        <div><p class="cm-eyebrow">LIVE DECK</p><h2 id="contrib-title">All hands’ saved work</h2></div>
+        <span id="syncStatus" class="cm-status">connecting to shared state…</span>
+      </div>
+      <div id="contributionList" class="cm-contribution-list"><p class="cm-muted">Loading shared contributions…</p></div>
+      <div class="cm-session-row"><button class="cm-button cm-button-secondary" id="copySummary" type="button">Copy Captain session summary</button><span id="copyStatus" class="cm-muted"></span></div>
+      <p class="cm-api-note">Shared query: <code>/centaur-math-api/api/contributions</code>. This deck is server-backed, not browser-local storage.</p>
+    </section>
+
+    <footer class="cm-footer"><a href="../../">← Return to Fleet Monad</a><span>Explore together · do not call a candidate solved or optimal without evidence.</span></footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
