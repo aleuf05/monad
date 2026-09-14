@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T22:45:01.751018+00:00",
+  "fetched_at": "2026-09-14T23:45:01.573593+00:00",
   "items": [
     {
       "title": "Mitch McConnell returns to Senate after fall that led to an extended medical absence",
@@ -12,6 +12,11 @@
       "title": "Federal agents may have broken state laws in voter fraud hunt, whistleblower claims",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968892/dhs-whistleblower-voter-fraud",
       "pubDate": "Mon, 14 Sep 2026 18:05:06 -0400"
+    },
+    {
+      "title": "Trump's EPA repeals pollution limits on fossil fuel power plants",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968785/epa-repeals-pollution-limits-on-power-plants",
+      "pubDate": "Mon, 14 Sep 2026 16:34:28 -0400"
     },
     {
       "title": "Israel is 'dismantling Palestinian life' says Israeli human rights group",
@@ -37,11 +42,6 @@
       "title": "Key leaders sound the alarm on AI. And, Iran-Gulf diplomacy hits a setback",
       "link": "https://www.npr.org/2026/09/14/g-s1-143148/up-first-newsletter-ai-anthropic-openai-midterms-trump-oman-iran-talks",
       "pubDate": "Mon, 14 Sep 2026 07:39:06 -0400"
-    },
-    {
-      "title": "This city led the way on reparations for Black people. Trump is trying to stop it",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5869793/evanston-illinois-reparations-trump-administration",
-      "pubDate": "Mon, 14 Sep 2026 07:00:00 -0400"
     }
   ]
 }
