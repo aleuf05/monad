@@ -18,7 +18,7 @@ function bridge(overrides = {}) {
 
 test("designated self-chat input produces one dry-run proposal", async () => {
   const { bridge: b, calls } = bridge();
-  assert.deepEqual(await b.handleMessage(msg()), { action: "proposed", text: "proposed Captain reply" });
+  assert.deepEqual(await b.handleMessage(msg()), { action: "proposed", text: "⚓ Captain: proposed Captain reply" });
   assert.equal(calls.length, 1);
 });
 

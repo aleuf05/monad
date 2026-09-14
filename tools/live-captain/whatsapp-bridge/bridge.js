@@ -17,13 +17,15 @@ export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
 export class SelfChatBridge {
-  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, invokeCodex, send, maxSends = 0, onDiagnostic = () => {} }) {
+  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, send, maxSends = 0, onDiagnostic = () => {} }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
     this.onDiagnostic = onDiagnostic;
     this.startedAt = startedAt;
     this.dryRun = dryRun;
+    this.liveMode = liveMode;
+    this.replyLabel = replyLabel;
     this.invokeCodex = invokeCodex;
     this.send = send;
     this.maxSends = maxSends;
@@ -35,7 +37,12 @@ export class SelfChatBridge {
 
   stop() { this.stopped = true; }
 
-  async handleMessage(message) {
+  handleMessage(message) {
+    this.queue = (this.queue || Promise.resolve()).then(() => this._handleMessage(message));
+    return this.queue;
+  }
+
+  async _handleMessage(message) {
     const ignored = reason => { this.onDiagnostic(`gate-rejected:${reason}`); return { action: "ignored", reason }; };
     if (this.stopped || !message || this.seen.has(message.id)) return ignored("stopped-or-duplicate");
     this.seen.add(message.id);
@@ -43,8 +50,8 @@ export class SelfChatBridge {
     if (!message.fromMe) return ignored("not-from-me");
     if (Number(message.timestamp || 0) * 1000 < this.startedAt) return ignored("historical-replay");
     const text = String(message.text || "").trim();
-    if (!text.startsWith(TEST_PREFIX)) return ignored("not-designated-test-input");
-    if (this.inFlight) return ignored("busy");
+    if (text.startsWith(this.replyLabel)) return ignored("captain-echo");
+    if (!this.liveMode && !text.startsWith(TEST_PREFIX)) return ignored("not-designated-test-input");
     if (text.length > MAX_INPUT) return ignored("input-too-large");
     this.inFlight = true;
     try {
@@ -58,11 +65,12 @@ export class SelfChatBridge {
       catch (error) { this.onDiagnostic("codex-failed"); throw error; }
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
-      const result = { action: this.dryRun ? "proposed" : "sent", text: bounded };
+      const replyText = `${this.replyLabel} ${bounded}`.slice(0, MAX_REPLY);
+      const result = { action: this.dryRun ? "proposed" : "sent", text: replyText };
       if (!this.dryRun) {
         if (!this.send || this.sent >= this.maxSends) return { action: "failed", reason: "send-limit-or-sender-disabled" };
         this.sent += 1;
-        await this.send({ remoteJid: this.ownJid, text: bounded });
+        await this.send({ remoteJid: this.ownJid, text: replyText });
       }
       return result;
     } catch (error) {
@@ -74,7 +82,6 @@ export class SelfChatBridge {
 }
 
 export async function createPairedClient({ authDir, phoneNumber, onMessage, printPairingMaterial = true }) {
-  if (!process.stdout.isTTY || !process.stdin.isTTY) throw new Error("pairing requires an attended TTY");
   if (phoneNumber) throw new Error("phone-code pairing is disabled: Baileys 7 exposes no public pre-auth WebSocket-ready event");
   const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = await import("@whiskeysockets/baileys");
   const { default: qrcode } = await import("qrcode-terminal");

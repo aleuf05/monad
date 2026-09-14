@@ -7,8 +7,10 @@ import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexV
 const args = new Set(process.argv.slice(2));
 const pair = args.has("--pair");
 const sendOnce = args.has("--send-once");
+const liveMode = args.has("--live");
 const fresh = args.has("--fresh");
-if (!pair && !sendOnce) { console.error("Refusing to start: choose --pair or --send-once explicitly."); process.exit(2); }
+if (!pair && !sendOnce && !liveMode) { console.error("Refusing to start: choose --pair, --send-once, or --live explicitly."); process.exit(2); }
+if (pair && (!process.stdout.isTTY || !process.stdin.isTTY)) { console.error("--pair requires an attended TTY."); process.exit(2); }
 if (fresh && !pair) { console.error("--fresh requires --pair and never deletes an existing auth directory."); process.exit(2); }
 if (process.env.WHATSAPP_PAIR_PHONE) { console.error("Phone-code pairing is disabled for this Baileys version; use fresh QR pairing with --fresh --pair."); process.exit(2); }
 const defaultAuth = path.resolve(path.dirname(fileURLToPath(import.meta.url)), fresh ? "auth-state-fresh" : "auth-state");
@@ -28,7 +30,7 @@ try { client = await createPairedClient({
     const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
     console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
-      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, dryRun: !sendOnce, maxSends: sendOnce ? 1 : 0,
+      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0),
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
