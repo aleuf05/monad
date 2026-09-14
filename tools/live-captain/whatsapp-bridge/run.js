@@ -37,6 +37,7 @@ try { client = await createPairedClient({
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),
       text });
+    if (result.action === "ignored") console.error(`WhatsApp self-chat gate: ${result.reason}`);
     if (result.action === "proposed") console.log(JSON.stringify({ type: "dry_run_proposal", text: result.text }));
     if (result.action === "sent") console.error("One designated self-chat reply sent; send limit reached.");
     if (result.action === "failed") console.error(`Bridge failed without retry/send: ${result.reason}`);

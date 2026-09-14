@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-14T10:51:11Z",
+  "generated": "2026-09-14T10:56:56Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -15,7 +15,7 @@
   },
   "tree": {
     "uncommitted": 4,
-    "head": "1f21e064"
+    "head": "1d3d7c4f"
   },
   "captain": "running",
   "captain_detail": {
@@ -27,9 +27,9 @@
   },
   "voice": {
     "day": "2026-09-14",
-    "seconds_used": 25.08,
+    "seconds_used": 28.96,
     "seconds_limit": null,
-    "usd_used": 0.012539999999999999,
+    "usd_used": 0.01448,
     "usd_limit": null,
     "enforced": false
   },
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.2G",
-      "memory_available_percent": 79.1,
-      "load_1m": 0.34
+      "memory_available_percent": 78.6,
+      "load_1m": 0.38
     }
   },
   "sound": true,
@@ -116,7 +116,7 @@
     },
     {
       "priority": 1,
-      "text": "Voice ungated. 25.1 seconds generated today; usage remains accounted."
+      "text": "Voice ungated. 29.0 seconds generated today; usage remains accounted."
     },
     {
       "priority": 3,

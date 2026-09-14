@@ -36,15 +36,16 @@ export class SelfChatBridge {
   stop() { this.stopped = true; }
 
   async handleMessage(message) {
-    if (this.stopped || !message || this.seen.has(message.id)) return { action: "ignored", reason: "stopped-or-duplicate" };
+    const ignored = reason => { this.onDiagnostic(`gate-rejected:${reason}`); return { action: "ignored", reason }; };
+    if (this.stopped || !message || this.seen.has(message.id)) return ignored("stopped-or-duplicate");
     this.seen.add(message.id);
-    if (!this.ownJids.has(message.remoteJid)) return { action: "ignored", reason: "not-self-chat" };
-    if (!message.fromMe) return { action: "ignored", reason: "not-from-me" };
-    if (Number(message.timestamp || 0) * 1000 < this.startedAt) return { action: "ignored", reason: "historical-replay" };
+    if (!this.ownJids.has(message.remoteJid)) return ignored("not-self-chat");
+    if (!message.fromMe) return ignored("not-from-me");
+    if (Number(message.timestamp || 0) * 1000 < this.startedAt) return ignored("historical-replay");
     const text = String(message.text || "").trim();
-    if (!text.startsWith(TEST_PREFIX)) return { action: "ignored", reason: "not-designated-test-input" };
-    if (this.inFlight) return { action: "ignored", reason: "busy" };
-    if (text.length > MAX_INPUT) return { action: "ignored", reason: "input-too-large" };
+    if (!text.startsWith(TEST_PREFIX)) return ignored("not-designated-test-input");
+    if (this.inFlight) return ignored("busy");
+    if (text.length > MAX_INPUT) return ignored("input-too-large");
     this.inFlight = true;
     try {
       const context = `Channel: WhatsApp self-chat (${this.ownJid})\n` +
@@ -126,7 +127,10 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   });
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify") return;
-    for (const message of messages) await onMessage(message, sock);
+    for (const message of messages) {
+      try { await onMessage(message, sock); }
+      catch (error) { console.error(`WhatsApp handler error: ${sanitizePairingError(error)}`); }
+    }
   });
   return { sock, stop: async () => {
     sock.ev.removeAllListeners("messages.upsert");
