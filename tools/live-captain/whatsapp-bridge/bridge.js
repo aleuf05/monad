@@ -14,6 +14,7 @@ import { contextFor, parseCorrection, parseTeaching, remember, supersede } from 
 
 export const TEST_PREFIX = "CAPTAIN TEST:";
 export const NOTEBOOK_PREFIX = "Notebook:";
+export const OPERATOR_PREFIX = "Operator:";
 export const MAX_INPUT = 2000;
 export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
@@ -21,7 +22,9 @@ export const MAX_REPLY = 2000;
 export function explicitNotebookGitAction(request) {
   const text = String(request || "").toLowerCase();
   if (/\b(?:do not|don't|never)\b[\s\S]{0,60}\b(?:commit|push)\b/.test(text)) return null;
-  if (/\bfork\b[\s\S]{0,120}\b(?:pull request|pr)\b/.test(text) || /\b(?:pull request|pr)\b[\s\S]{0,120}\bfork\b/.test(text)) return "publish-readme-fork-pr";
+  if (/\bfork\b[\s\S]{0,120}\b(?:pull request|pr)\b/.test(text) || /\b(?:pull request|pr)\b[\s\S]{0,120}\bfork\b/.test(text)) {
+    return /\b(?:minimal|baseline|upstream)\b/.test(text) ? "publish-minimal-fork-pr" : "publish-readme-fork-pr";
+  }
   if (/\bcommit\s*(?:and|,)\s*push\b/.test(text)) return "commit-readme-push";
   if (/\bauthorized\b[\s\S]{0,100}\b(?:commit|push)\b/.test(text) && /\b(?:commit|push)\b/.test(text)) return "commit-readme-push";
   return null;
@@ -81,7 +84,8 @@ export class SelfChatBridge {
         return { action: "remembered", text: `${this.replyLabel} corrected (${record.id})` };
       }
       const notebookRequest = this.liveMode
-        ? (text.startsWith(NOTEBOOK_PREFIX) ? text.slice(NOTEBOOK_PREFIX.length).trim() : "")
+        ? (text.startsWith(NOTEBOOK_PREFIX) ? text.slice(NOTEBOOK_PREFIX.length).trim()
+          : text.startsWith(OPERATOR_PREFIX) ? text.slice(OPERATOR_PREFIX.length).trim() : "")
         : (text.startsWith(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`)
           ? text.slice(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`.length).trim() : "");
       const isNotebook = Boolean(notebookRequest && this.invokeNotebook);

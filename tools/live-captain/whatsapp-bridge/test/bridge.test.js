@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, explicitNotebookGitAction, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, OPERATOR_PREFIX, explicitNotebookGitAction, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -76,6 +76,19 @@ test("Git publication requires an explicit positive commit-and-push request", ()
   assert.equal(explicitNotebookGitAction("Please commit and push the README to origin main"), "commit-readme-push");
   assert.equal(explicitNotebookGitAction("Do not commit or push"), null);
   assert.equal(explicitNotebookGitAction("Inspect the README only"), null);
+  assert.equal(explicitNotebookGitAction("Publish the minimal upstream baseline to the fork and open a pull request"), "publish-minimal-fork-pr");
+});
+
+test("operator prefix uses the authenticated self-chat worker boundary", async () => {
+  const calls = [];
+  const { bridge: b } = bridge({
+    liveMode: true,
+    invokeCodex: async () => { throw new Error("ordinary worker must not run"); },
+    invokeNotebook: async request => { calls.push(request); return "operator probe complete"; },
+  });
+  assert.deepEqual(await b.handleMessage(msg({ id: "operator-1", text: `${OPERATOR_PREFIX} run a harmless probe` })),
+    { action: "proposed", text: "⚓ Captain: operator probe complete" });
+  assert.deepEqual(calls, ["run a harmless probe"]);
 });
 
 test("explicit send mode permits one fresh reply and never retries", async () => {

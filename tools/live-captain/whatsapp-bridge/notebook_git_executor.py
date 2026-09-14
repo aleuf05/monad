@@ -4,6 +4,7 @@ from pathlib import Path
 import json
 import subprocess
 import sys
+import tempfile
 
 ROOT = Path("/home/cgl/dev/rocketry").resolve()
 EXPECTED_ORIGIN = "https://github.com/mds2/rocketry.git"
@@ -14,17 +15,87 @@ def git(*args, timeout=120):
                           capture_output=True, timeout=timeout, check=False)
 
 
+def git_at(cwd, *args, timeout=120):
+    return subprocess.run(["git", "-C", str(cwd), *args], text=True,
+                          capture_output=True, timeout=timeout, check=False)
+
+
 def fail(message):
     print(json.dumps({"ok": False, "error": message}))
     raise SystemExit(1)
 
 
-if len(sys.argv) != 2 or sys.argv[1] not in {"commit-readme-push", "publish-readme-fork-pr"}:
+if len(sys.argv) != 2 or sys.argv[1] not in {"commit-readme-push", "publish-readme-fork-pr", "publish-minimal-fork-pr"}:
     fail("unsupported Git action")
 if not ROOT.is_dir() or not (ROOT / ".git").is_dir():
     fail("verified Rocket Notebook repository is unavailable")
 if (ROOT / ".git" / "index.lock").exists():
     fail("Git index lock already exists; no lock was removed")
+
+if sys.argv[1] == "publish-minimal-fork-pr":
+    BRANCH = "captain/readme-connection"
+    EXPECTED_FORK = "git@github.com:aleuf05/rocketry.git"
+    MINIMAL_README = "## Captain connection\n\nAuthorized Rocket Notebook work is available through Cameron's configured authenticated WhatsApp self-chat bridge.\n"
+    fetched = git("fetch", "origin", "main")
+    if fetched.returncode != 0:
+        fail("could not fetch origin main")
+    fork = git("remote", "get-url", "fork")
+    if fork.returncode != 0 or fork.stdout.strip() != EXPECTED_FORK:
+        fail("refusing publication to an unverified fork")
+    remote_branch = git("ls-remote", "--exit-code", "fork", f"refs/heads/{BRANCH}")
+    if remote_branch.returncode == 0:
+        fail("publication branch already exists on fork; no force push performed")
+    collision = subprocess.run([
+        "gh", "pr", "list", "--repo", "mds2/rocketry", "--head", "aleuf05:" + BRANCH,
+        "--state", "all", "--json", "number,url,state",
+    ], text=True, capture_output=True, timeout=120, check=False)
+    if collision.returncode != 0:
+        fail("could not inspect existing pull requests")
+    if json.loads(collision.stdout or "[]"):
+        fail("pull request collision exists for publication branch")
+    temp = Path(tempfile.mkdtemp(prefix="rocketry-readme-") )
+    published = False
+    try:
+        added = git("worktree", "add", "--detach", str(temp), "origin/main")
+        if added.returncode != 0:
+            fail("could not create isolated upstream worktree")
+        readme = temp / "README.md"
+        readme.write_text(MINIMAL_README, encoding="utf-8")
+        if readme.read_text(encoding="utf-8") != MINIMAL_README:
+            fail("isolated README content did not match the authorized section")
+        names = git_at(temp, "status", "--porcelain")
+        if names.returncode != 0 or [line for line in names.stdout.splitlines() if line] != ["?? README.md"]:
+            fail("isolated worktree contains changes outside README.md")
+        check = git_at(temp, "diff", "--check")
+        if check.returncode != 0:
+            fail("isolated README diff has whitespace errors")
+        staged = git_at(temp, "add", "--", "README.md")
+        committed = git_at(temp, "commit", "-m", "Add Captain connection note")
+        if staged.returncode != 0 or committed.returncode != 0:
+            fail("isolated README commit failed")
+        commit_id = git_at(temp, "rev-parse", "HEAD").stdout.strip()
+        final_names = git_at(temp, "diff", "--name-only", "origin/main...HEAD")
+        if [line for line in final_names.stdout.splitlines() if line] != ["README.md"]:
+            fail("complete upstream-to-branch diff is broader than README.md")
+        pushed = git_at(temp, "push", "fork", f"HEAD:refs/heads/{BRANCH}")
+        if pushed.returncode != 0:
+            fail("fork branch push failed; no retry or force push performed")
+        pr = subprocess.run([
+            "gh", "pr", "create", "--repo", "mds2/rocketry", "--base", "main",
+            "--head", "aleuf05:" + BRANCH,
+            "--title", "Add Captain connection note to Rocket Notebook README",
+            "--body", "Authorized minimal README baseline for the configured Captain bridge.",
+        ], text=True, capture_output=True, timeout=120, check=False)
+        if pr.returncode != 0:
+            fail("fork branch pushed but PR creation failed: " + (pr.stderr or pr.stdout).strip()[:400])
+        print(json.dumps({"ok": True, "mode": "minimal-fork-pr", "commit": commit_id,
+                          "branch": BRANCH, "files": ["README.md"], "pr": pr.stdout.strip()}))
+        published = True
+    finally:
+        removed = git("worktree", "remove", "--force", str(temp))
+        if removed.returncode != 0 and published:
+            print(json.dumps({"ok": False, "error": "published but isolated worktree cleanup failed"}))
+    raise SystemExit(0)
 
 if sys.argv[1] == "publish-readme-fork-pr":
     BRANCH = "captain/readme-8f594f1"
