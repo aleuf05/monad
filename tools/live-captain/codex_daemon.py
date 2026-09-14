@@ -175,7 +175,7 @@ class CodexDaemon:
 
     def send_and_wait(
         self, compiled_text: str, sandbox: str = EXECUTION_SANDBOX, timeout: int = TURN_TIMEOUT_SECONDS,
-        source: str = "admiral",
+        source: str = "admiral", tools_enabled: bool = True,
     ) -> dict:
         """Start one ephemeral turn with compiled_text as its entire input,
         wait for the completed agentMessage, and return the reply plus
@@ -194,12 +194,20 @@ class CodexDaemon:
                 self._active_source = source
                 started = self._request(
                     "thread/start",
-                    {
-                        "cwd": str(self.cwd),
-                        "sandbox": sandbox,
-                        "approvalPolicy": APPROVAL_POLICY,
-                        "ephemeral": True,
+                {
+                    "cwd": str(self.cwd),
+                    "sandbox": sandbox,
+                    "approvalPolicy": APPROVAL_POLICY,
+                    "ephemeral": True,
+                    # This is a real app-server control, not a prompt promise.
+                    # Keep the existing default for Captain callers; the
+                    # WhatsApp worker opts out explicitly.
+                    "config": {
+                        "default_tools_enabled": bool(tools_enabled),
+                        "open_world_enabled": bool(tools_enabled),
+                        "destructive_enabled": bool(tools_enabled),
                     },
+                },
                 )
                 self.last_thread_start_result = started
                 thread_id = started["thread"]["id"]

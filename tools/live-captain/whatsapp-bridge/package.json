@@ -1,0 +1,12 @@
+{
+  "name": "monad-live-captain-whatsapp-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/bridge.test.js",
+    "dry-run": "node bridge.js --dry-run"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "7.0.0-rc14"
+  }
+}
