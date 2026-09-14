@@ -18,7 +18,7 @@ let bridge, client, stopped = false;
 const stop = async () => { if (stopped) return; stopped = true; await client?.stop(); process.exit(0); };
 process.once("SIGINT", stop); process.once("SIGTERM", stop);
 
-client = await createPairedClient({
+try { client = await createPairedClient({
   authDir,
   phoneNumber: undefined,
   onMessage: async (message, sock) => {
@@ -37,4 +37,8 @@ client = await createPairedClient({
     if (result.action === "sent") console.error("One designated self-chat reply sent; send limit reached.");
     if (result.action === "failed") console.error(`Bridge failed without retry/send: ${result.reason}`);
   }
-});
+  });
+} catch (error) {
+  console.error(`WhatsApp startup blocked: ${String(error.message || error).replace(/\b\d{8,}\b/g, "<redacted>")}`);
+  process.exit(1);
+}

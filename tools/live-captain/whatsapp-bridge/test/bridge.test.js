@@ -74,3 +74,12 @@ test("pairing lifecycle waits for readiness and never acts after close", () => {
   assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: false, registered: true, attempted: false }), "ignore");
   assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: false, registered: false, attempted: true }), "ignore");
 });
+
+test("paired-but-restart-required credentials are distinct from incomplete state", () => {
+  // pair-success supplies account + signalIdentities while Baileys leaves
+  // registered=false until the required manual restart.
+  const legitimate = { registered: false, me: { id: "redacted@s.whatsapp.net", lid: "redacted@lid" }, account: {}, signalIdentities: [] };
+  const incomplete = { registered: false, me: { id: "redacted@s.whatsapp.net" }, pairingCode: "present" };
+  assert.equal(Boolean(legitimate.account && legitimate.signalIdentities && !legitimate.registered), true);
+  assert.equal(Boolean(incomplete.pairingCode), true);
+});

@@ -80,16 +80,26 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   for (const entry of await fs.readdir(authDir, { withFileTypes: true })) {
     if (entry.isFile()) await fs.chmod(path.join(authDir, entry.name), 0o600);
   }
-  if (!state.creds.registered && (state.creds.me || state.creds.pairingCode)) {
+  if (!state.creds.registered && (state.creds.pairingCode || (state.creds.me && !state.creds.account && !state.creds.signalIdentities))) {
     throw new Error("incomplete unregistered auth state; use --fresh with a separate auth directory");
   }
   const sock = makeWASocket({ auth: state, logger: pino({ level: "silent" }), browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
   let pairingAttempted = false;
   let closed = false;
-  sock.ev.on("creds.update", saveCreds);
-  sock.ev.on("connection.update", async ({ connection, lastDisconnect, qr }) => {
+  const pendingCredentialWrites = new Set();
+  const persistCreds = update => {
+    const write = Promise.resolve(saveCreds(update));
+    pendingCredentialWrites.add(write);
+    void write.finally(() => pendingCredentialWrites.delete(write));
+  };
+  sock.ev.on("creds.update", persistCreds);
+  sock.ev.on("connection.update", async ({ connection, lastDisconnect, qr, isNewLogin }) => {
     if (qr && printPairingMaterial) qrcode.generate(qr, { small: true });
     if (connection === "open") console.error("WhatsApp connected; self-chat gate is active.");
+    if (isNewLogin) {
+      await Promise.allSettled([...pendingCredentialWrites]);
+      console.error("WhatsApp pairing credentials persisted; Baileys requires a manual restart.");
+    }
     if (connection === "close") {
       closed = true;
       const code = lastDisconnect?.error?.output?.statusCode;
@@ -108,7 +118,12 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
     if (type !== "notify") return;
     for (const message of messages) await onMessage(message, sock);
   });
-  return { sock, stop: async () => { sock.ev.removeAllListeners("messages.upsert"); sock.end(undefined); } };
+  return { sock, stop: async () => {
+    sock.ev.removeAllListeners("messages.upsert");
+    await Promise.allSettled([...pendingCredentialWrites]);
+    sock.end(undefined);
+    await Promise.allSettled([...pendingCredentialWrites]);
+  } };
 }
 
 export function sanitizeDisconnect(code) {
