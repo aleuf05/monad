@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T10:30:01.926006+00:00",
+  "fetched_at": "2026-09-14T10:45:01.600079+00:00",
   "items": [
+    {
+      "title": "The powerful millionaires hiding in plain sight",
+      "link": "https://www.npr.org/sections/planet-money/2026/09/14/g-s1-143041/the-powerful-millionaires-hiding-in-plain-sight",
+      "pubDate": "Mon, 14 Sep 2026 06:30:00 -0400"
+    },
     {
       "title": "Beijing hits back at Anthropic CEO's call to curb China's AI development",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968456/china-hits-back-ai-development",
@@ -37,11 +42,6 @@
       "title": "Pennsylvania says an unvaccinated woman has died from measles-related complications",
       "link": "https://www.npr.org/2026/09/13/nx-s1-5968093/pennsylvania-says-an-unvaccinated-woman-has-died-from-measles-related-complications",
       "pubDate": "Sun, 13 Sep 2026 19:23:00 -0400"
-    },
-    {
-      "title": "Trump downplays calls for AI slowdown",
-      "link": "https://www.npr.org/2026/09/13/nx-s1-5968078/trump-mike-johnson-ai-slowdown",
-      "pubDate": "Sun, 13 Sep 2026 18:32:39 -0400"
     }
   ]
 }

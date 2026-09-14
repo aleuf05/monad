@@ -2,7 +2,7 @@
 import process from "node:process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { SelfChatBridge, createPairedClient, authenticatedSelfJid, invokeCodexViaVerifiedAdapter } from "./bridge.js";
+import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexViaVerifiedAdapter } from "./bridge.js";
 
 const args = new Set(process.argv.slice(2));
 const pair = args.has("--pair");
@@ -22,17 +22,21 @@ try { client = await createPairedClient({
   authDir,
   phoneNumber: undefined,
   onMessage: async (message, sock) => {
-    const ownJid = authenticatedSelfJid(sock);
+    const ownJids = authenticatedSelfJids(sock);
+    const ownJid = ownJids[0];
     if (!ownJid) return;
+    const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
+    console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
-      bridge = new SelfChatBridge({ ownJid, startedAt, dryRun: !sendOnce, maxSends: sendOnce ? 1 : 0,
+      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, dryRun: !sendOnce, maxSends: sendOnce ? 1 : 0,
+        onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
       console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
     }
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),
-      text: message.message?.conversation || message.message?.extendedTextMessage?.text || "" });
+      text });
     if (result.action === "proposed") console.log(JSON.stringify({ type: "dry_run_proposal", text: result.text }));
     if (result.action === "sent") console.error("One designated self-chat reply sent; send limit reached.");
     if (result.action === "failed") console.error(`Bridge failed without retry/send: ${result.reason}`);

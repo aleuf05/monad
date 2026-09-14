@@ -17,9 +17,11 @@ export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
 export class SelfChatBridge {
-  constructor({ ownJid, startedAt = Date.now(), dryRun = true, invokeCodex, send, maxSends = 0 }) {
+  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, invokeCodex, send, maxSends = 0, onDiagnostic = () => {} }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
+    this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
+    this.onDiagnostic = onDiagnostic;
     this.startedAt = startedAt;
     this.dryRun = dryRun;
     this.invokeCodex = invokeCodex;
@@ -36,7 +38,7 @@ export class SelfChatBridge {
   async handleMessage(message) {
     if (this.stopped || !message || this.seen.has(message.id)) return { action: "ignored", reason: "stopped-or-duplicate" };
     this.seen.add(message.id);
-    if (message.remoteJid !== this.ownJid) return { action: "ignored", reason: "not-self-chat" };
+    if (!this.ownJids.has(message.remoteJid)) return { action: "ignored", reason: "not-self-chat" };
     if (!message.fromMe) return { action: "ignored", reason: "not-from-me" };
     if (Number(message.timestamp || 0) * 1000 < this.startedAt) return { action: "ignored", reason: "historical-replay" };
     const text = String(message.text || "").trim();
@@ -49,7 +51,10 @@ export class SelfChatBridge {
         `Authority: conversation content only; never execute actions or change configuration.\n` +
         `History is isolated to this self-chat and is bounded to ${MAX_CONTEXT} characters.\n` +
         `Incoming message:\n${text.slice(0, MAX_INPUT)}`;
-      const reply = await this.invokeCodex(context);
+      this.onDiagnostic("codex-started");
+      let reply;
+      try { reply = await this.invokeCodex(context); this.onDiagnostic("codex-completed"); }
+      catch (error) { this.onDiagnostic("codex-failed"); throw error; }
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
       const result = { action: this.dryRun ? "proposed" : "sent", text: bounded };
@@ -162,11 +167,15 @@ export function pairingLifecycleDecision({ connection, socketReady, closed, regi
   return socketReady ? "request" : "wait";
 }
 
-export function authenticatedSelfJid(sock) {
-  const raw = sock?.user?.id;
-  if (!raw) return null;
-  return raw.split(":")[0];
+export function authenticatedSelfJids(sock) {
+  const ids = [sock?.user?.id, sock?.user?.lid].filter(Boolean);
+  return [...new Set(ids.map(jid => {
+    const [user, domain] = jid.split("@");
+    return `${user.split(":")[0]}@${domain || "s.whatsapp.net"}`;
+  }))];
 }
+
+export function authenticatedSelfJid(sock) { return authenticatedSelfJids(sock)[0] || null; }
 
 export function invokeCodexViaVerifiedAdapter(context, { timeoutMs = 90000 } = {}) {
   return new Promise((resolve, reject) => {
