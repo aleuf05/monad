@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T12:00:02.142646+00:00",
+  "fetched_at": "2026-09-14T13:15:01.513067+00:00",
   "items": [
     {
       "title": "Key leaders sound the alarm on AI. And, Iran-Gulf diplomacy hits a setback",
@@ -29,7 +29,7 @@
       "pubDate": "Mon, 14 Sep 2026 05:44:44 -0400"
     },
     {
-      "title": "ChatGPT has a feature to help those in crisis. But where can you find it?",
+      "title": "NPR looked for ChatGPT's new crisis feature. It's hard to find",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5943118/chatgpt-has-a-feature-to-help-those-in-crisis-but-where-can-you-find-it",
       "pubDate": "Mon, 14 Sep 2026 05:00:00 -0400"
     },
