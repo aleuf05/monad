@@ -18,6 +18,14 @@ export const MAX_INPUT = 2000;
 export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
+export function explicitNotebookGitAction(request) {
+  const text = String(request || "").toLowerCase();
+  if (/\b(?:do not|don't|never)\b[\s\S]{0,60}\b(?:commit|push)\b/.test(text)) return null;
+  if (/\bcommit\s*(?:and|,)\s*push\b/.test(text)) return "commit-readme-push";
+  if (/\bauthorized\b[\s\S]{0,100}\b(?:commit|push)\b/.test(text) && /\b(?:commit|push)\b/.test(text)) return "commit-readme-push";
+  return null;
+}
+
 export class SelfChatBridge {
   constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
     if (!ownJid) throw new Error("ownJid is required");
@@ -88,7 +96,9 @@ export class SelfChatBridge {
       this.onDiagnostic(isNotebook ? "notebook-started" : "codex-started");
       let reply;
       try {
-        reply = isNotebook ? await this.invokeNotebook(notebookRequest, memory) : await this.invokeCodex(context);
+        reply = isNotebook
+          ? await this.invokeNotebook(notebookRequest, memory, explicitNotebookGitAction(notebookRequest))
+          : await this.invokeCodex(context);
         this.onDiagnostic(isNotebook ? "notebook-completed" : "codex-completed");
       }
       catch (error) { this.onDiagnostic(isNotebook ? "notebook-failed" : "codex-failed"); throw error; }
@@ -247,7 +257,7 @@ export function invokeCodexViaVerifiedAdapter(context, { timeoutMs = 90000 } = {
   });
 }
 
-export function invokeNotebookViaVerifiedAdapter(request, sharedMemory, { timeoutMs = 180000 } = {}) {
+export function invokeNotebookViaVerifiedAdapter(request, sharedMemory, { timeoutMs = 180000, gitAction = null } = {}) {
   return new Promise((resolve, reject) => {
     const worker = spawn("python3", ["notebook_codex_worker.py"], {
       cwd: new URL(".", import.meta.url).pathname,
@@ -265,7 +275,7 @@ export function invokeNotebookViaVerifiedAdapter(request, sharedMemory, { timeou
       try { finish(resolve, JSON.parse(out).text); }
       catch { finish(reject, new Error("Notebook worker returned invalid output")); }
     });
-    worker.stdin.end(JSON.stringify({ request, shared_memory: sharedMemory }));
+    worker.stdin.end(JSON.stringify({ request, shared_memory: sharedMemory, git_action: gitAction }));
   });
 }
 

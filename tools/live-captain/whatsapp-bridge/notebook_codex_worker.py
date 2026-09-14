@@ -3,6 +3,7 @@
 from pathlib import Path
 import json
 import os
+import subprocess
 import sys
 
 ROOT = Path("/home/cgl/dev/rocketry").resolve()
@@ -14,6 +15,7 @@ from codex_daemon import CodexDaemon, CodexError
 data = json.load(sys.stdin)
 request = str(data.get("request", "")).strip()[:4000]
 shared_memory = str(data.get("shared_memory", ""))[:4000]
+git_action = data.get("git_action")
 if not request:
     raise SystemExit("empty notebook request")
 prompt = f"""You are the Rocket Notebook execution Captain.
@@ -36,8 +38,24 @@ try:
     result = daemon.send_and_wait(prompt, sandbox="workspace-write", timeout=180,
                                   source="whatsapp-notebook", tools_enabled=True,
                                   workspace_roots=[str(ROOT)], network_access=True)
-    print(json.dumps({"text": result["text"], "provider": result["thread_start_result"].get("modelProvider"),
-                      "repo": str(ROOT), "tools_enabled": True, "sandbox": "workspace-write"}))
+    report = result["text"]
+    publication_failed = False
+    if git_action:
+        publication = subprocess.run(
+            [sys.executable, "notebook_git_executor.py", git_action],
+            cwd=Path(__file__).resolve().parent, text=True, capture_output=True,
+            timeout=150, check=False,
+        )
+        if publication.stdout.strip():
+            report += "\n\nGit publication result:\n" + publication.stdout.strip()
+        if publication.returncode != 0:
+            if publication.stderr.strip(): report += "\n" + publication.stderr.strip()[:400]
+            publication_failed = True
+    print(json.dumps({"text": report, "provider": result["thread_start_result"].get("modelProvider"),
+                      "repo": str(ROOT), "tools_enabled": True, "sandbox": "workspace-write",
+                      "git_action": git_action}))
+    if publication_failed:
+        raise SystemExit(1)
 except (CodexError, KeyError) as exc:
     print(str(exc), file=sys.stderr)
     raise SystemExit(1)

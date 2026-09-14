@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, explicitNotebookGitAction, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -70,6 +70,12 @@ test("dry-run notebook requests require the designated test prefix", async () =>
   assert.equal((await b.handleMessage(msg({ id: "notebook-2", text: `${NOTEBOOK_PREFIX} inspect` }))).reason, "not-designated-test-input");
   assert.equal((await b.handleMessage(msg({ id: "notebook-3", text: `${TEST_PREFIX} ${NOTEBOOK_PREFIX} inspect` }))).action, "proposed");
   assert.deepEqual(calls, ["inspect"]);
+});
+
+test("Git publication requires an explicit positive commit-and-push request", () => {
+  assert.equal(explicitNotebookGitAction("Please commit and push the README to origin main"), "commit-readme-push");
+  assert.equal(explicitNotebookGitAction("Do not commit or push"), null);
+  assert.equal(explicitNotebookGitAction("Inspect the README only"), null);
 });
 
 test("explicit send mode permits one fresh reply and never retries", async () => {

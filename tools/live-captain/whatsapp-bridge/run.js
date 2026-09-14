@@ -34,7 +34,7 @@ try { client = await createPairedClient({
       bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
-        invokeNotebook: (request, sharedMemory) => invokeNotebookViaVerifiedAdapter(request, sharedMemory),
+        invokeNotebook: (request, sharedMemory, gitAction) => invokeNotebookViaVerifiedAdapter(request, sharedMemory, { gitAction }),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
       console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
     }
