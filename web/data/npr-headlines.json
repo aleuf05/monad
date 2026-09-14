@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T22:15:02.403922+00:00",
+  "fetched_at": "2026-09-14T22:45:01.751018+00:00",
   "items": [
+    {
+      "title": "Mitch McConnell returns to Senate after fall that led to an extended medical absence",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968909/mitch-mcconnell-senate-return",
+      "pubDate": "Mon, 14 Sep 2026 18:36:33 -0400"
+    },
     {
       "title": "Federal agents may have broken state laws in voter fraud hunt, whistleblower claims",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968892/dhs-whistleblower-voter-fraud",
@@ -37,11 +42,6 @@
       "title": "This city led the way on reparations for Black people. Trump is trying to stop it",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5869793/evanston-illinois-reparations-trump-administration",
       "pubDate": "Mon, 14 Sep 2026 07:00:00 -0400"
-    },
-    {
-      "title": "The powerful millionaires hiding in plain sight",
-      "link": "https://www.npr.org/sections/planet-money/2026/09/14/g-s1-143041/the-powerful-millionaires-hiding-in-plain-sight",
-      "pubDate": "Mon, 14 Sep 2026 06:30:00 -0400"
     }
   ]
 }
