@@ -1,8 +1,8 @@
 {
   "schema_version": "monad.fleetStatus.v1",
-  "status": "amber",
-  "summary": "qdrant unreachable; living-fleet-memory endpoint unreachable; living-fleet stale",
-  "checked_at": "2026-09-14T09:37:58.207018Z",
+  "status": "green",
+  "summary": "All systems nominal.",
+  "checked_at": "2026-09-14T09:43:12.584008Z",
   "hostname": "granite",
-  "git_commit": "961b94a1d4d1bbd58781c0f066bd9d478e4d75a6"
+  "git_commit": "41fcc3c8269931990183f7f2e877e637417e4cb9"
 }
