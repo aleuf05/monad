@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T18:30:02.104353+00:00",
+  "fetched_at": "2026-09-14T19:00:01.765427+00:00",
   "items": [
+    {
+      "title": "10 years after taking a knee, Colin Kaepernick is still waging a 'Perilous Fight'",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5965828/colin-kaepernick-football-the-perilous-fight",
+      "pubDate": "Mon, 14 Sep 2026 14:45:21 -0400"
+    },
     {
       "title": "Kennedy Center says it's on the brink of bankruptcy, might close as early as Tuesday",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968690/kennedy-center-financial-physical-state",
@@ -37,11 +42,6 @@
       "title": "New Carlo Rovelli book challenges science's understanding of reality and the universe",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968442/on-the-equality-of-all-things-physics-carlo-rovelli",
       "pubDate": "Mon, 14 Sep 2026 05:44:44 -0400"
-    },
-    {
-      "title": "NPR looked for ChatGPT's new crisis feature. It's hard to find",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5943118/chatgpt-has-a-feature-to-help-those-in-crisis-but-where-can-you-find-it",
-      "pubDate": "Mon, 14 Sep 2026 05:00:00 -0400"
     }
   ]
 }
