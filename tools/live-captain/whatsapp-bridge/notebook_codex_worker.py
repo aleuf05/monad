@@ -48,8 +48,10 @@ try:
         if publication.returncode != 0:
             if publication.stderr.strip(): report += "\n" + publication.stderr.strip()[:400]
             publication_failed = True
-    print(json.dumps({"text": report, "provider": result["thread_start_result"].get("modelProvider"),
-                      "tools_enabled": True, "sandbox": "danger-full-access",
+    started = result["thread_start_result"]
+    print(json.dumps({"text": report, "provider": started.get("modelProvider"),
+                      "tools_enabled": True, "sandbox": started.get("sandbox", "danger-full-access"),
+                      "approval_policy": started.get("approvalPolicy"), "cwd": started.get("cwd", "/home/cgl"),
                       "git_action": git_action}))
     if publication_failed:
         raise SystemExit(1)

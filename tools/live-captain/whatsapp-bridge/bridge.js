@@ -31,10 +31,13 @@ export function explicitNotebookGitAction(request) {
 }
 
 export class SelfChatBridge {
-  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
+  constructor({ ownJid, ownJids = [], mikeJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
+    this.mikeJids = new Set(mikeJids.filter(Boolean));
+    if ([...this.mikeJids].some(jid => jid.endsWith("@g.us"))) throw new Error("group JIDs are not allowed for Mike route");
+    this.allowedJids = new Set([...this.ownJids, ...this.mikeJids]);
     this.onDiagnostic = onDiagnostic;
     this.memoryPath = memoryPath;
     this.startedAt = startedAt;
@@ -47,11 +50,55 @@ export class SelfChatBridge {
     this.maxSends = maxSends;
     this.sent = 0;
     this.seen = new Set();
+    this.history = new Map();
+    this.paused = new Set();
+    this.captainOutgoingIds = new Set();
+    this.pendingCaptainEchoes = new Map();
     this.inFlight = false;
     this.stopped = false;
   }
 
   stop() { this.stopped = true; }
+
+  isSelfChat(jid) { return this.ownJids.has(jid); }
+  isMikeChat(jid) { return this.mikeJids.has(jid); }
+  isPaused(jid) { return this.isMikeChat(jid) && this.paused.has("mike"); }
+
+  rememberHistory(jid, role, text) {
+    const items = this.history.get(jid) || [];
+    items.push({ role, text: String(text).slice(0, MAX_INPUT) });
+    this.history.set(jid, items.slice(-12));
+  }
+
+  recentHistory(jid) {
+    return (this.history.get(jid) || []).map(item => `- ${item.role}: ${item.text}`).join("\n") || "(none)";
+  }
+
+  echoKey(jid, text) { return `${jid}\u0000${text}`; }
+
+  isCaptainEcho(message) {
+    if (message.id && this.captainOutgoingIds.has(message.id)) return true;
+    if (this.pendingCaptainEchoes.has(this.echoKey(message.remoteJid, String(message.text || "").trim()))) return true;
+    return String(message.text || "").trim().startsWith(this.replyLabel);
+  }
+
+  async replyNow(remoteJid, text) {
+    const replyText = `${this.replyLabel} ${String(text).trim()}`.slice(0, MAX_REPLY);
+    if (this.dryRun) return { action: "proposed", text: replyText };
+    if (!this.send || this.sent >= this.maxSends) return { action: "failed", reason: "send-limit-or-sender-disabled" };
+    if (this.isPaused(remoteJid)) return { action: "failed", reason: "mike-paused-before-send" };
+    const key = this.echoKey(remoteJid, replyText);
+    this.pendingCaptainEchoes.set(key, Date.now());
+    try {
+      const sent = await this.send({ remoteJid, text: replyText });
+      if (sent?.key?.id) this.captainOutgoingIds.add(sent.key.id);
+      this.sent += 1;
+      this.rememberHistory(remoteJid, "Captain", replyText);
+      return { action: "sent", text: replyText };
+    } finally {
+      setTimeout(() => this.pendingCaptainEchoes.delete(key), 30000).unref?.();
+    }
+  }
 
   handleMessage(message) {
     this.queue = (this.queue || Promise.resolve()).then(() => this._handleMessage(message));
@@ -62,22 +109,42 @@ export class SelfChatBridge {
     const ignored = reason => { this.onDiagnostic(`gate-rejected:${reason}`); return { action: "ignored", reason }; };
     if (this.stopped || !message || this.seen.has(message.id)) return ignored("stopped-or-duplicate");
     this.seen.add(message.id);
-    if (!this.ownJids.has(message.remoteJid)) return ignored("not-self-chat");
-    if (!message.fromMe) return ignored("not-from-me");
+    const selfChat = this.isSelfChat(message.remoteJid);
+    const mikeChat = this.isMikeChat(message.remoteJid);
+    if (!this.allowedJids.has(message.remoteJid)) return ignored("not-allowed-chat");
+    if (this.isCaptainEcho(message)) return ignored("captain-echo");
+    if (mikeChat && message.fromMe) {
+      this.paused.add("mike");
+      this.onDiagnostic("mike-paused:manual-takeover");
+      return ignored("mike-manual-takeover");
+    }
+    if (selfChat && !message.fromMe) return ignored("not-from-me");
     if (Number(message.timestamp || 0) * 1000 < this.startedAt) return ignored("historical-replay");
     const text = String(message.text || "").trim();
-    if (text.startsWith(this.replyLabel)) return ignored("captain-echo");
+    if (selfChat && /^Pause Mike$/i.test(text)) {
+      this.paused.add("mike");
+      return this.replyNow(message.remoteJid, "Mike route paused.");
+    }
+    if (selfChat && /^Resume Mike$/i.test(text)) {
+      this.paused.delete("mike");
+      return this.replyNow(message.remoteJid, "Mike route resumed; historical messages will not be replayed.");
+    }
+    if (selfChat && /^Mike status$/i.test(text)) {
+      return this.replyNow(message.remoteJid, this.mikeJids.size ? `Mike route is ${this.paused.has("mike") ? "paused" : "enabled"}.` : "Mike route is disabled: no verified Mike identity configured.");
+    }
+    if (mikeChat && this.paused.has("mike")) return ignored("mike-paused");
     if (!this.liveMode && !text.startsWith(TEST_PREFIX)) return ignored("not-designated-test-input");
     if (text.length > MAX_INPUT) return ignored("input-too-large");
     this.inFlight = true;
     try {
-      const teaching = this.memoryPath && parseTeaching(text);
+      this.rememberHistory(message.remoteJid, message.fromMe ? "Cameron" : (mikeChat ? "Mike" : "Cameron"), text);
+      const teaching = selfChat && this.memoryPath && parseTeaching(text);
       if (teaching) {
         const record = await remember(this.memoryPath, { ...teaching, source: "Cameron explicit self-chat teaching" });
         this.onDiagnostic(`memory-recorded:${record.scope}`);
         return { action: "remembered", text: `${this.replyLabel} remembered as ${record.scope} (${record.id})` };
       }
-      const correction = this.memoryPath && parseCorrection(text);
+      const correction = selfChat && this.memoryPath && parseCorrection(text);
       if (correction) {
         const record = await supersede(this.memoryPath, correction.id, { content: correction.content, source: "Cameron explicit correction" });
         this.onDiagnostic(`memory-corrected:${record.id}`);
@@ -90,13 +157,14 @@ export class SelfChatBridge {
           ? text.slice(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`.length).trim() : "");
       const isNotebook = Boolean(notebookRequest && this.invokeNotebook);
       const memory = this.memoryPath
-        ? await contextFor(this.memoryPath, isNotebook ? null : "cameron-private")
+        ? await contextFor(this.memoryPath, selfChat ? "cameron-private" : "mike-private")
         : "(memory unavailable)";
-      const context = `Channel: WhatsApp self-chat (${this.ownJid})\n` +
+      const context = `Channel: WhatsApp ${selfChat ? "self-chat" : "Mike conversation"}\n` +
         `Authority: conversation content only; never execute actions or change configuration.\n` +
         `History is isolated to this self-chat and is bounded to ${MAX_CONTEXT} characters.\n` +
-        `${isNotebook ? "Notebook mode: shared memory only; Cameron-private memory is excluded.\n" : ""}` +
+        `${isNotebook && !selfChat ? "Mike mode: shared memory plus Mike-private memory only; Cameron-private memory is excluded.\n" : ""}` +
         `Applicable durable Captain memory:\n${memory}\n` +
+        `Recent channel history:\n${this.recentHistory(message.remoteJid)}\n` +
         `Incoming message:\n${text.slice(0, MAX_INPUT)}`;
       this.onDiagnostic(isNotebook ? "notebook-started" : "codex-started");
       let reply;
@@ -109,14 +177,8 @@ export class SelfChatBridge {
       catch (error) { this.onDiagnostic(isNotebook ? "notebook-failed" : "codex-failed"); throw error; }
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
-      const replyText = `${this.replyLabel} ${bounded}`.slice(0, MAX_REPLY);
-      const result = { action: this.dryRun ? "proposed" : "sent", text: replyText };
-      if (!this.dryRun) {
-        if (!this.send || this.sent >= this.maxSends) return { action: "failed", reason: "send-limit-or-sender-disabled" };
-        this.sent += 1;
-        await this.send({ remoteJid: this.ownJid, text: replyText });
-      }
-      return result;
+      if (this.isPaused(message.remoteJid)) return { action: "failed", reason: "mike-paused-before-send" };
+      return await this.replyNow(message.remoteJid, bounded);
     } catch (error) {
       return { action: "failed", reason: String(error.message || error) };
     } finally {

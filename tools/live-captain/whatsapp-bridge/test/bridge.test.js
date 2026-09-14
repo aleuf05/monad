@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import os from "node:os";
+import path from "node:path";
+import fs from "node:fs/promises";
 import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, OPERATOR_PREFIX, explicitNotebookGitAction, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
+import { remember } from "../memory.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -89,6 +93,47 @@ test("operator prefix uses the authenticated self-chat worker boundary", async (
   assert.deepEqual(await b.handleMessage(msg({ id: "operator-1", text: `${OPERATOR_PREFIX} run a harmless probe` })),
     { action: "proposed", text: "⚓ Captain: operator probe complete" });
   assert.deepEqual(calls, ["run a harmless probe"]);
+});
+
+test("Mike route uses shared plus Mike-private context and excludes Cameron-private context", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "captain-mike-"));
+  const memoryPath = path.join(dir, "memory.json");
+  await remember(memoryPath, { scope: "shared", content: "shared teaching", source: "test" });
+  await remember(memoryPath, { scope: "mike-private", content: "Mike context", source: "test" });
+  await remember(memoryPath, { scope: "cameron-private", content: "Cameron secret", source: "test" });
+  const contexts = [];
+  const mike = "15550000001@s.whatsapp.net";
+  const b = new SelfChatBridge({ ownJid: msg().remoteJid, mikeJids: [mike], startedAt: now, liveMode: true,
+    memoryPath, invokeCodex: async context => { contexts.push(context); return "Mike reply"; } });
+  const result = await b.handleMessage({ id: "mike-1", remoteJid: mike, fromMe: false, timestamp: now / 1000, text: "hello Captain" });
+  assert.equal(result.action, "proposed");
+  assert.match(contexts[0], /shared teaching/);
+  assert.match(contexts[0], /Mike context/);
+  assert.doesNotMatch(contexts[0], /Cameron secret/);
+  assert.equal((await b.handleMessage({ id: "other-1", remoteJid: "15550000002@s.whatsapp.net", fromMe: false, timestamp: now / 1000, text: "hello" })).reason, "not-allowed-chat");
+});
+
+test("Mike operator request has parity without Cameron-private context", async () => {
+  const calls = [];
+  const mike = "15550000003@s.whatsapp.net";
+  const b = new SelfChatBridge({ ownJid: msg().remoteJid, mikeJids: [mike], startedAt: now, liveMode: true,
+    invokeCodex: async () => { throw new Error("ordinary worker must not run"); },
+    invokeNotebook: async request => { calls.push(request); return "operator result"; } });
+  assert.equal((await b.handleMessage({ id: "mike-op", remoteJid: mike, fromMe: false, timestamp: now / 1000, text: `${OPERATOR_PREFIX} inspect status` })).action, "proposed");
+  assert.deepEqual(calls, ["inspect status"]);
+});
+
+test("Mike manual takeover pauses, resume does not replay backlog, and Captain echoes are ignored", async () => {
+  const mike = "15550000004@s.whatsapp.net";
+  const calls = [];
+  const b = new SelfChatBridge({ ownJid: msg().remoteJid, mikeJids: [mike], startedAt: now, liveMode: true,
+    invokeCodex: async () => { calls.push(true); return "reply"; } });
+  assert.equal((await b.handleMessage({ id: "takeover", remoteJid: mike, fromMe: true, timestamp: now / 1000, text: "Cameron manual message" })).reason, "mike-manual-takeover");
+  assert.equal((await b.handleMessage({ id: "paused", remoteJid: mike, fromMe: false, timestamp: now / 1000, text: "backlog" })).reason, "mike-paused");
+  assert.equal((await b.handleMessage({ id: "resume", remoteJid: msg().remoteJid, fromMe: true, timestamp: now / 1000, text: "Resume Mike" })).action, "proposed");
+  assert.equal((await b.handleMessage({ id: "fresh", remoteJid: mike, fromMe: false, timestamp: now / 1000, text: "fresh" })).action, "proposed");
+  assert.equal((await b.handleMessage({ id: "echo", remoteJid: mike, fromMe: true, timestamp: now / 1000, text: "⚓ Captain: reply" })).reason, "captain-echo");
+  assert.equal(calls.length, 1);
 });
 
 test("explicit send mode permits one fresh reply and never retries", async () => {

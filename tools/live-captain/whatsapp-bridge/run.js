@@ -16,6 +16,11 @@ if (fresh && !pair) { console.error("--fresh requires --pair and never deletes a
 if (process.env.WHATSAPP_PAIR_PHONE) { console.error("Phone-code pairing is disabled for this Baileys version; use fresh QR pairing with --fresh --pair."); process.exit(2); }
 const defaultAuth = path.resolve(path.dirname(fileURLToPath(import.meta.url)), fresh ? "auth-state-fresh" : "auth-state");
 const authDir = process.env.WHATSAPP_AUTH_DIR || defaultAuth;
+const mikeJids = String(process.env.WHATSAPP_MIKE_JIDS || "").split(",").map(value => value.trim()).filter(Boolean);
+if (mikeJids.some(jid => !/^(?:\d+@s\.whatsapp\.net|\d+@lid)$/.test(jid))) {
+  console.error("WHATSAPP_MIKE_JIDS must contain verified phone JIDs (@s.whatsapp.net) or LIDs (@lid); groups are rejected.");
+  process.exit(2);
+}
 const startedAt = Date.now();
 let bridge, client, stopped = false;
 const stop = async () => { if (stopped) return; stopped = true; await client?.stop(); process.exit(0); };
@@ -29,14 +34,15 @@ try { client = await createPairedClient({
     const ownJid = ownJids[0];
     if (!ownJid) return;
     const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
-    console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
+    console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} mikeChat=${mikeJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
-      bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
+      bridge = new SelfChatBridge({ ownJid, ownJids, mikeJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         invokeNotebook: (request, sharedMemory, gitAction) => invokeNotebookViaVerifiedAdapter(request, sharedMemory, { gitAction }),
-        send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
+        send: async payload => await sock.sendMessage(payload.remoteJid, { text: payload.text }) });
       console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
+      console.error(mikeJids.length ? "Mike route configured with verified identities (identifiers withheld)." : "Mike route disabled: no verified identity configured.");
     }
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),
