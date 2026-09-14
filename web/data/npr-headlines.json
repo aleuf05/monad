@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T14:15:01.872138+00:00",
+  "fetched_at": "2026-09-14T14:45:02.343019+00:00",
   "items": [
     {
       "title": "The producer of Fleabag and Baby Reindeer's tip for finding a hit? Don't look for one",
@@ -39,9 +39,9 @@
       "pubDate": "Mon, 14 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Indonesia searches for 129 people missing after ferry capsizes in the Java Sea",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968417/indonesia-search-missing-ferry",
-      "pubDate": "Mon, 14 Sep 2026 02:20:28 -0400"
+      "title": "Lawmakers home in on midterm messages as Congress returns to session",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5966873/lawmakers-hone-in-on-midterm-messages-as-congress-returns-to-session",
+      "pubDate": "Mon, 14 Sep 2026 04:43:06 -0400"
     }
   ]
 }
