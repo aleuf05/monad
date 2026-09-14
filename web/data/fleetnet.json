@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-14T11:03:11Z",
+  "generated": "2026-09-14T11:08:56Z",
   "units": {
     "installed": 25,
     "active": 20,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 7,
-    "head": "212ab70f"
+    "uncommitted": 2,
+    "head": "318b5b3e"
   },
   "captain": "running",
   "captain_detail": {
@@ -27,9 +27,9 @@
   },
   "voice": {
     "day": "2026-09-14",
-    "seconds_used": 33.16,
+    "seconds_used": 37.0,
     "seconds_limit": null,
-    "usd_used": 0.01658,
+    "usd_used": 0.0185,
     "usd_limit": null,
     "enforced": false
   },
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 19,
       "disk_available": "172.2G",
-      "memory_available_percent": 79.8,
-      "load_1m": 0.33
+      "memory_available_percent": 79.1,
+      "load_1m": 0.69
     }
   },
   "sound": true,
@@ -112,11 +112,11 @@
     },
     {
       "priority": 3,
-      "text": "7 files uncommitted."
+      "text": "2 files uncommitted."
     },
     {
       "priority": 1,
-      "text": "Voice ungated. 33.2 seconds generated today; usage remains accounted."
+      "text": "Voice ungated. 37.0 seconds generated today; usage remains accounted."
     },
     {
       "priority": 3,
