@@ -56,6 +56,7 @@ export class SelfChatBridge {
     this.pendingCaptainEchoes = new Map();
     this.inFlight = false;
     this.stopped = false;
+    this.queue = Promise.resolve();
   }
 
   stop() { this.stopped = true; }
@@ -101,7 +102,13 @@ export class SelfChatBridge {
   }
 
   handleMessage(message) {
-    this.queue = (this.queue || Promise.resolve()).then(() => this._handleMessage(message));
+    // A failed task must not poison the serialized queue for later eligible
+    // messages. _handleMessage currently catches backend failures; keeping
+    // this recovery boundary protects the queue if a future gate changes.
+    this.queue = this.queue.catch(error => {
+      this.onDiagnostic(`queue-recovered:${sanitizeBridgeError(error)}`);
+      return { action: "failed", reason: sanitizeBridgeError(error) };
+    }).then(() => this._handleMessage(message));
     return this.queue;
   }
 
@@ -180,7 +187,7 @@ export class SelfChatBridge {
       if (this.isPaused(message.remoteJid)) return { action: "failed", reason: "mike-paused-before-send" };
       return await this.replyNow(message.remoteJid, bounded);
     } catch (error) {
-      return { action: "failed", reason: String(error.message || error) };
+      return { action: "failed", reason: sanitizeBridgeError(error) };
     } finally {
       this.inFlight = false;
     }
@@ -279,6 +286,14 @@ export function sanitizePairingError(error) {
   return `${sanitizeDisconnect(code)}; no retry performed`;
 }
 
+export function sanitizeBridgeError(error) {
+  return String(error?.message || error || "unknown bridge error")
+    .replace(/sk-[A-Za-z0-9_-]+/g, "<redacted-key>")
+    .replace(/Bearer\s+\S+/gi, "Bearer <redacted>")
+    .replace(/\/home\/[^\s:]+/g, "<local-path>")
+    .slice(0, 300);
+}
+
 export async function requestPairingCodeOnce(sock, phoneNumber, timeoutMs = 15000) {
   const normalized = String(phoneNumber || "").replace(/[^0-9]/g, "");
   if (!normalized) throw new Error("--phone must include country code digits");
@@ -311,14 +326,24 @@ export function invokeCodexViaVerifiedAdapter(context, { timeoutMs = 90000 } = {
       stdio: ["pipe", "pipe", "pipe"],
       env: { ...process.env, PYTHONPATH: ".." },
     });
-    let out = "", err = "";
-    const timer = setTimeout(() => { worker.kill("SIGTERM"); reject(new Error("Codex timeout")); }, timeoutMs);
+    let out = "", err = "", settled = false;
+    const finish = (fn, value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      fn(value);
+    };
+    const timer = setTimeout(() => {
+      worker.kill("SIGTERM");
+      finish(reject, new Error("Codex timeout"));
+    }, timeoutMs);
     worker.stdout.on("data", chunk => { out += chunk; });
     worker.stderr.on("data", chunk => { err += chunk; });
+    worker.on("error", error => finish(reject, new Error(sanitizeBridgeError(error))));
     worker.on("close", code => {
-      clearTimeout(timer);
-      if (code !== 0) return reject(new Error(err.trim() || `Codex worker exited ${code}`));
-      try { resolve(JSON.parse(out).text); } catch { reject(new Error("Codex worker returned invalid output")); }
+      if (code !== 0) return finish(reject, new Error(sanitizeBridgeError(err.trim() || `Codex worker exited ${code}`)));
+      try { finish(resolve, JSON.parse(out).text); }
+      catch { finish(reject, new Error("Codex worker returned invalid output")); }
     });
     worker.stdin.end(JSON.stringify({ context }));
   });

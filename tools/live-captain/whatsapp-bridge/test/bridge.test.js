@@ -49,6 +49,19 @@ test("backend errors do not retry or send", async () => {
   assert.equal(sends, 0);
 });
 
+test("a failed worker releases the serialized queue for the next fresh input", async () => {
+  let attempts = 0;
+  const { bridge: b } = bridge({ invokeCodex: async () => {
+    attempts += 1;
+    if (attempts === 1) throw new Error("Codex timeout");
+    return "second request completed";
+  } });
+  assert.deepEqual(await b.handleMessage(msg({ id: "failed-then-recover-1" })), { action: "failed", reason: "Codex timeout" });
+  assert.deepEqual(await b.handleMessage(msg({ id: "failed-then-recover-2", text: `${TEST_PREFIX} second request` })),
+    { action: "proposed", text: "⚓ Captain: second request completed" });
+  assert.equal(attempts, 2);
+});
+
 test("stop control blocks later inputs and sending is disabled by default", async () => {
   const { bridge: b, calls } = bridge({ send: async () => assert.fail("send must not run") });
   b.stop();
