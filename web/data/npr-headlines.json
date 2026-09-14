@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T21:15:01.760703+00:00",
+  "fetched_at": "2026-09-14T22:15:02.403922+00:00",
   "items": [
+    {
+      "title": "Federal agents may have broken state laws in voter fraud hunt, whistleblower claims",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968892/dhs-whistleblower-voter-fraud",
+      "pubDate": "Mon, 14 Sep 2026 18:05:06 -0400"
+    },
     {
       "title": "Israel is 'dismantling Palestinian life' says Israeli human rights group",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5964897/israel-is-systematically-dismantling-palestinian-life-says-human-rights-group",
@@ -37,11 +42,6 @@
       "title": "The powerful millionaires hiding in plain sight",
       "link": "https://www.npr.org/sections/planet-money/2026/09/14/g-s1-143041/the-powerful-millionaires-hiding-in-plain-sight",
       "pubDate": "Mon, 14 Sep 2026 06:30:00 -0400"
-    },
-    {
-      "title": "Beijing hits back at Anthropic CEO's call to curb China's AI development",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968456/china-hits-back-ai-development",
-      "pubDate": "Mon, 14 Sep 2026 06:09:08 -0400"
     }
   ]
 }
