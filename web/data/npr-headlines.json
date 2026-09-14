@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T13:15:01.513067+00:00",
+  "fetched_at": "2026-09-14T14:15:01.872138+00:00",
   "items": [
+    {
+      "title": "The producer of Fleabag and Baby Reindeer's tip for finding a hit? Don't look for one",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968566/francesca-moody-fleabag-producer-hits-edinburgh",
+      "pubDate": "Mon, 14 Sep 2026 10:03:14 -0400"
+    },
     {
       "title": "Key leaders sound the alarm on AI. And, Iran-Gulf diplomacy hits a setback",
       "link": "https://www.npr.org/2026/09/14/g-s1-143148/up-first-newsletter-ai-anthropic-openai-midterms-trump-oman-iran-talks",
@@ -37,11 +42,6 @@
       "title": "Indonesia searches for 129 people missing after ferry capsizes in the Java Sea",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968417/indonesia-search-missing-ferry",
       "pubDate": "Mon, 14 Sep 2026 02:20:28 -0400"
-    },
-    {
-      "title": "Russian drone hits train near Ukraine-Poland border soon after dignitaries passed through",
-      "link": "https://www.npr.org/2026/09/14/g-s1-143140/russian-drone-ukrainian-train",
-      "pubDate": "Mon, 14 Sep 2026 01:46:26 -0400"
     }
   ]
 }
