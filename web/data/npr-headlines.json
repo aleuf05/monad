@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T10:00:01.633016+00:00",
+  "fetched_at": "2026-09-14T10:30:01.926006+00:00",
   "items": [
+    {
+      "title": "Beijing hits back at Anthropic CEO's call to curb China's AI development",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968456/china-hits-back-ai-development",
+      "pubDate": "Mon, 14 Sep 2026 06:09:08 -0400"
+    },
     {
       "title": "New Carlo Rovelli book challenges science's understanding of reality and the universe",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968442/on-the-equality-of-all-things-physics-carlo-rovelli",
@@ -37,11 +42,6 @@
       "title": "Trump downplays calls for AI slowdown",
       "link": "https://www.npr.org/2026/09/13/nx-s1-5968078/trump-mike-johnson-ai-slowdown",
       "pubDate": "Sun, 13 Sep 2026 18:32:39 -0400"
-    },
-    {
-      "title": "Can Gulf states and Iran negotiate the Strait of Hormuz without the U.S.?",
-      "link": "https://www.npr.org/2026/09/13/nx-s1-5966920/what-to-expect-from-talks-between-iran-and-gulf-states-in-oman",
-      "pubDate": "Sun, 13 Sep 2026 17:03:12 -0400"
     }
   ]
 }

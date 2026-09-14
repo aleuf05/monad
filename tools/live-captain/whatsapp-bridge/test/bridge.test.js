@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -80,6 +80,7 @@ test("paired-but-restart-required credentials are distinct from incomplete state
   // registered=false until the required manual restart.
   const legitimate = { registered: false, me: { id: "redacted@s.whatsapp.net", lid: "redacted@lid" }, account: {}, signalIdentities: [] };
   const incomplete = { registered: false, me: { id: "redacted@s.whatsapp.net" }, pairingCode: "present" };
-  assert.equal(Boolean(legitimate.account && legitimate.signalIdentities && !legitimate.registered), true);
-  assert.equal(Boolean(incomplete.pairingCode), true);
+  assert.equal(classifyAuthState(legitimate), "paired-restart-required");
+  assert.equal(classifyAuthState(incomplete), "incomplete");
+  assert.equal(classifyAuthState({ registered: true, me: {} }), "registered");
 });

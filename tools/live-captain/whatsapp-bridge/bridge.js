@@ -80,7 +80,8 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   for (const entry of await fs.readdir(authDir, { withFileTypes: true })) {
     if (entry.isFile()) await fs.chmod(path.join(authDir, entry.name), 0o600);
   }
-  if (!state.creds.registered && (state.creds.pairingCode || (state.creds.me && !state.creds.account && !state.creds.signalIdentities))) {
+  const authStatus = classifyAuthState(state.creds);
+  if (authStatus === "incomplete") {
     throw new Error("incomplete unregistered auth state; use --fresh with a separate auth directory");
   }
   const sock = makeWASocket({ auth: state, logger: pino({ level: "silent" }), browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
@@ -111,7 +112,9 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
     // attempt; a close never causes a retry.
     if (connection === "connecting" && !state.creds.registered && !pairingAttempted && !closed) {
       pairingAttempted = true;
-      console.error("WhatsApp QR mode: Baileys will emit QR only after its internal WebSocket-ready check.");
+      console.error(authStatus === "paired-restart-required"
+        ? "WhatsApp paired state loaded; continuing the required post-pairing restart."
+        : "WhatsApp QR mode: Baileys will emit QR only after its internal WebSocket-ready check.");
     }
   });
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
@@ -124,6 +127,13 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
     sock.end(undefined);
     await Promise.allSettled([...pendingCredentialWrites]);
   } };
+}
+
+export function classifyAuthState(creds) {
+  if (creds?.registered) return "registered";
+  if (creds?.me && creds?.account && creds?.signalIdentities && !creds?.pairingCode) return "paired-restart-required";
+  if (creds?.pairingCode || creds?.me) return "incomplete";
+  return "new";
 }
 
 export function sanitizeDisconnect(code) {

@@ -28,7 +28,7 @@ try { client = await createPairedClient({
       bridge = new SelfChatBridge({ ownJid, startedAt, dryRun: !sendOnce, maxSends: sendOnce ? 1 : 0,
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
-      console.error(`Authenticated self-chat identity: ${ownJid}`);
+      console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
     }
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),

@@ -1,3 +1,5 @@
 node_modules/
 auth-state/
+auth-state-fresh/
+reference-auth-state/
 *.log
