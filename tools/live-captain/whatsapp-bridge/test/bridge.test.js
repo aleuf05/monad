@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -59,4 +59,10 @@ test("explicit send mode permits one fresh reply and never retries", async () =>
   assert.equal(sends, 1);
   assert.equal((await b.handleMessage(msg({ id: "send-2" }))).reason, "send-limit-or-sender-disabled");
   assert.equal(sends, 1);
+});
+
+test("pairing request is bounded and errors are sanitized", async () => {
+  const fake = { requestPairingCode: async () => { throw Object.assign(new Error("secret transport detail"), { output: { statusCode: 428 } }); } };
+  await assert.rejects(() => requestPairingCodeOnce(fake, "+15551234567", 20));
+  assert.equal(sanitizePairingError(Object.assign(new Error("hidden"), { output: { statusCode: 428 } })), "status 428; no retry performed");
 });

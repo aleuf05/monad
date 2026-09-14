@@ -9,6 +9,7 @@
  */
 import { spawn } from "node:child_process";
 import process from "node:process";
+import path from "node:path";
 
 export const TEST_PREFIX = "CAPTAIN TEST:";
 export const MAX_INPUT = 2000;
@@ -74,27 +75,58 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   await fs.mkdir(authDir, { recursive: true, mode: 0o700 });
   await fs.chmod(authDir, 0o700);
   const { state, saveCreds } = await useMultiFileAuthState(authDir);
+  for (const entry of await fs.readdir(authDir, { withFileTypes: true })) {
+    if (entry.isFile()) await fs.chmod(path.join(authDir, entry.name), 0o600);
+  }
   const sock = makeWASocket({ auth: state, browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
+  let pairingAttempted = false;
+  let closed = false;
   sock.ev.on("creds.update", saveCreds);
-  sock.ev.on("connection.update", ({ connection, lastDisconnect, qr }) => {
+  sock.ev.on("connection.update", async ({ connection, lastDisconnect, qr }) => {
     if (qr && printPairingMaterial) qrcode.generate(qr, { small: true });
     if (connection === "open") console.error("WhatsApp connected; self-chat gate is active.");
     if (connection === "close") {
+      closed = true;
       const code = lastDisconnect?.error?.output?.statusCode;
-      if (code !== DisconnectReason.loggedOut) console.error("WhatsApp disconnected; automatic reconnect is disabled.");
+      console.error(`WhatsApp disconnected (${sanitizeDisconnect(code)}); automatic reconnect is disabled.`);
+    }
+    // Baileys 7 emits `connecting` from the socket lifecycle. Calling the
+    // pairing request immediately after makeWASocket can race the WebSocket
+    // opening and yields status 428. This is one bounded, event-triggered
+    // attempt; a close never causes a retry.
+    if (connection === "connecting" && phoneNumber && !state.creds.registered && !pairingAttempted && !closed) {
+      pairingAttempted = true;
+      try {
+        const pairingCode = await requestPairingCodeOnce(sock, phoneNumber, 15000);
+        if (printPairingMaterial) console.error(`WhatsApp pairing code (attended terminal only): ${pairingCode}`);
+      } catch (error) {
+        console.error(`WhatsApp pairing request failed: ${sanitizePairingError(error)}`);
+      }
     }
   });
-  if (phoneNumber && !state.creds.registered) {
-    const normalized = phoneNumber.replace(/[^0-9]/g, "");
-    if (!normalized) throw new Error("--phone must include country code digits");
-    const pairingCode = await sock.requestPairingCode(normalized);
-    if (printPairingMaterial) console.error(`WhatsApp pairing code (attended terminal only): ${pairingCode}`);
-  }
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
     if (type !== "notify") return;
     for (const message of messages) await onMessage(message, sock);
   });
   return { sock, stop: async () => { sock.ev.removeAllListeners("messages.upsert"); sock.end(undefined); } };
+}
+
+export function sanitizeDisconnect(code) {
+  return Number.isInteger(code) ? `status ${code}` : "unknown status";
+}
+
+export function sanitizePairingError(error) {
+  const code = error?.output?.statusCode;
+  return `${sanitizeDisconnect(code)}; no retry performed`;
+}
+
+export async function requestPairingCodeOnce(sock, phoneNumber, timeoutMs = 15000) {
+  const normalized = String(phoneNumber || "").replace(/[^0-9]/g, "");
+  if (!normalized) throw new Error("--phone must include country code digits");
+  return await Promise.race([
+    sock.requestPairingCode(normalized),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("pairing readiness timeout")), timeoutMs)),
+  ]);
 }
 
 export function authenticatedSelfJid(sock) {
