@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T10:45:01.600079+00:00",
+  "fetched_at": "2026-09-14T11:15:02.058822+00:00",
   "items": [
+    {
+      "title": "This city led the way on reparations for Black people. Trump is trying to stop it",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5869793/evanston-illinois-reparations-trump-administration",
+      "pubDate": "Mon, 14 Sep 2026 07:00:00 -0400"
+    },
     {
       "title": "The powerful millionaires hiding in plain sight",
       "link": "https://www.npr.org/sections/planet-money/2026/09/14/g-s1-143041/the-powerful-millionaires-hiding-in-plain-sight",
@@ -37,11 +42,6 @@
       "title": "Amazon suspends use of 21 Air, cargo carrier whose plane careened off Miami runway",
       "link": "https://www.npr.org/2026/09/14/g-s1-143138/amazon-suspends-21-air-cargo-carrier",
       "pubDate": "Mon, 14 Sep 2026 01:26:01 -0400"
-    },
-    {
-      "title": "Pennsylvania says an unvaccinated woman has died from measles-related complications",
-      "link": "https://www.npr.org/2026/09/13/nx-s1-5968093/pennsylvania-says-an-unvaccinated-woman-has-died-from-measles-related-complications",
-      "pubDate": "Sun, 13 Sep 2026 19:23:00 -0400"
     }
   ]
 }
