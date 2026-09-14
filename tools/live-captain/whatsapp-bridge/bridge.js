@@ -21,6 +21,7 @@ export const MAX_REPLY = 2000;
 export function explicitNotebookGitAction(request) {
   const text = String(request || "").toLowerCase();
   if (/\b(?:do not|don't|never)\b[\s\S]{0,60}\b(?:commit|push)\b/.test(text)) return null;
+  if (/\bfork\b[\s\S]{0,120}\b(?:pull request|pr)\b/.test(text) || /\b(?:pull request|pr)\b[\s\S]{0,120}\bfork\b/.test(text)) return "publish-readme-fork-pr";
   if (/\bcommit\s*(?:and|,)\s*push\b/.test(text)) return "commit-readme-push";
   if (/\bauthorized\b[\s\S]{0,100}\b(?:commit|push)\b/.test(text) && /\b(?:commit|push)\b/.test(text)) return "commit-readme-push";
   return null;
