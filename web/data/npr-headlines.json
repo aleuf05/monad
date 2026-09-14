@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T09:45:01.754263+00:00",
+  "fetched_at": "2026-09-14T10:00:01.633016+00:00",
   "items": [
+    {
+      "title": "New Carlo Rovelli book challenges science's understanding of reality and the universe",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5968442/on-the-equality-of-all-things-physics-carlo-rovelli",
+      "pubDate": "Mon, 14 Sep 2026 05:44:44 -0400"
+    },
     {
       "title": "ChatGPT has a feature to help those in crisis. But where can you find it?",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5943118/chatgpt-has-a-feature-to-help-those-in-crisis-but-where-can-you-find-it",
@@ -37,11 +42,6 @@
       "title": "Can Gulf states and Iran negotiate the Strait of Hormuz without the U.S.?",
       "link": "https://www.npr.org/2026/09/13/nx-s1-5966920/what-to-expect-from-talks-between-iran-and-gulf-states-in-oman",
       "pubDate": "Sun, 13 Sep 2026 17:03:12 -0400"
-    },
-    {
-      "title": "Wisconsin congressman survives emergency plane landing, swims to safety",
-      "link": "https://www.npr.org/2026/09/13/nx-s1-5968081/wisconsin-congressman-survives-emergency-plane-landing-swims-to-safety",
-      "pubDate": "Sun, 13 Sep 2026 13:45:33 -0400"
     }
   ]
 }

@@ -51,3 +51,12 @@ test("stop control blocks later inputs and sending is disabled by default", asyn
   assert.equal((await b.handleMessage(msg({ id: "m5" }))).action, "ignored");
   assert.equal(calls.length, 0);
 });
+
+test("explicit send mode permits one fresh reply and never retries", async () => {
+  let sends = 0;
+  const { bridge: b } = bridge({ dryRun: false, maxSends: 1, send: async () => { sends++; } });
+  assert.equal((await b.handleMessage(msg({ id: "send-1" }))).action, "sent");
+  assert.equal(sends, 1);
+  assert.equal((await b.handleMessage(msg({ id: "send-2" }))).reason, "send-limit-or-sender-disabled");
+  assert.equal(sends, 1);
+});

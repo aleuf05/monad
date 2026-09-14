@@ -8,6 +8,7 @@
  * Codex boundary are fully testable without a WhatsApp account.
  */
 import { spawn } from "node:child_process";
+import process from "node:process";
 
 export const TEST_PREFIX = "CAPTAIN TEST:";
 export const MAX_INPUT = 2000;
@@ -15,13 +16,15 @@ export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
 export class SelfChatBridge {
-  constructor({ ownJid, startedAt = Date.now(), dryRun = true, invokeCodex, send }) {
+  constructor({ ownJid, startedAt = Date.now(), dryRun = true, invokeCodex, send, maxSends = 0 }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.startedAt = startedAt;
     this.dryRun = dryRun;
     this.invokeCodex = invokeCodex;
     this.send = send;
+    this.maxSends = maxSends;
+    this.sent = 0;
     this.seen = new Set();
     this.inFlight = false;
     this.stopped = false;
@@ -48,8 +51,12 @@ export class SelfChatBridge {
       const reply = await this.invokeCodex(context);
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
-      const result = { action: this.dryRun ? "proposed" : "sent-disabled", text: bounded };
-      if (!this.dryRun && this.send) await this.send({ remoteJid: this.ownJid, text: bounded });
+      const result = { action: this.dryRun ? "proposed" : "sent", text: bounded };
+      if (!this.dryRun) {
+        if (!this.send || this.sent >= this.maxSends) return { action: "failed", reason: "send-limit-or-sender-disabled" };
+        this.sent += 1;
+        await this.send({ remoteJid: this.ownJid, text: bounded });
+      }
       return result;
     } catch (error) {
       return { action: "failed", reason: String(error.message || error) };
@@ -57,6 +64,43 @@ export class SelfChatBridge {
       this.inFlight = false;
     }
   }
+}
+
+export async function createPairedClient({ authDir, phoneNumber, onMessage, printPairingMaterial = true }) {
+  if (!process.stdout.isTTY || !process.stdin.isTTY) throw new Error("pairing requires an attended TTY");
+  const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = await import("@whiskeysockets/baileys");
+  const { default: qrcode } = await import("qrcode-terminal");
+  const fs = await import("node:fs/promises");
+  await fs.mkdir(authDir, { recursive: true, mode: 0o700 });
+  await fs.chmod(authDir, 0o700);
+  const { state, saveCreds } = await useMultiFileAuthState(authDir);
+  const sock = makeWASocket({ auth: state, browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
+  sock.ev.on("creds.update", saveCreds);
+  sock.ev.on("connection.update", ({ connection, lastDisconnect, qr }) => {
+    if (qr && printPairingMaterial) qrcode.generate(qr, { small: true });
+    if (connection === "open") console.error("WhatsApp connected; self-chat gate is active.");
+    if (connection === "close") {
+      const code = lastDisconnect?.error?.output?.statusCode;
+      if (code !== DisconnectReason.loggedOut) console.error("WhatsApp disconnected; automatic reconnect is disabled.");
+    }
+  });
+  if (phoneNumber && !state.creds.registered) {
+    const normalized = phoneNumber.replace(/[^0-9]/g, "");
+    if (!normalized) throw new Error("--phone must include country code digits");
+    const pairingCode = await sock.requestPairingCode(normalized);
+    if (printPairingMaterial) console.error(`WhatsApp pairing code (attended terminal only): ${pairingCode}`);
+  }
+  sock.ev.on("messages.upsert", async ({ messages, type }) => {
+    if (type !== "notify") return;
+    for (const message of messages) await onMessage(message, sock);
+  });
+  return { sock, stop: async () => { sock.ev.removeAllListeners("messages.upsert"); sock.end(undefined); } };
+}
+
+export function authenticatedSelfJid(sock) {
+  const raw = sock?.user?.id;
+  if (!raw) return null;
+  return raw.split(":")[0];
 }
 
 export function invokeCodexViaVerifiedAdapter(context, { timeoutMs = 90000 } = {}) {
