@@ -176,7 +176,12 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
     // cannot enter the bridge log; do not alter or delete auth state.
     const originalInfo = console.info;
     console.info = () => {};
-    try { sock.end(undefined); } finally { console.info = originalInfo; }
+    try {
+      sock.end(undefined);
+      // libsignal closes sessions from an asynchronous callback. Keep the
+      // sanitizer in place for that bounded drain before restoring logging.
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } finally { console.info = originalInfo; }
     await Promise.allSettled([...pendingCredentialWrites]);
   } };
 }

@@ -35,7 +35,7 @@ daemon = CodexDaemon(ROOT)
 try:
     result = daemon.send_and_wait(prompt, sandbox="workspace-write", timeout=180,
                                   source="whatsapp-notebook", tools_enabled=True,
-                                  workspace_roots=[str(ROOT)])
+                                  workspace_roots=[str(ROOT)], network_access=True)
     print(json.dumps({"text": result["text"], "provider": result["thread_start_result"].get("modelProvider"),
                       "repo": str(ROOT), "tools_enabled": True, "sandbox": "workspace-write"}))
 except (CodexError, KeyError) as exc:

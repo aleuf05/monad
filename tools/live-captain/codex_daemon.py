@@ -180,6 +180,7 @@ class CodexDaemon:
     def send_and_wait(
         self, compiled_text: str, sandbox: str = EXECUTION_SANDBOX, timeout: int = TURN_TIMEOUT_SECONDS,
         source: str = "admiral", tools_enabled: bool = True, workspace_roots: list[str] | None = None,
+        network_access: bool = False,
     ) -> dict:
         """Start one ephemeral turn with compiled_text as its entire input,
         wait for the completed agentMessage, and return the reply plus
@@ -211,6 +212,10 @@ class CodexDaemon:
                         "default_tools_enabled": bool(tools_enabled),
                         "open_world_enabled": bool(tools_enabled),
                         "destructive_enabled": bool(tools_enabled),
+                        "sandbox_workspace_write": {
+                            "network_access": bool(network_access),
+                            "writable_roots": workspace_roots or [],
+                        },
                     },
                 },
                 )
