@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T19:00:01.765427+00:00",
+  "fetched_at": "2026-09-14T21:15:01.760703+00:00",
   "items": [
+    {
+      "title": "Israel is 'dismantling Palestinian life' says Israeli human rights group",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5964897/israel-is-systematically-dismantling-palestinian-life-says-human-rights-group",
+      "pubDate": "Mon, 14 Sep 2026 16:34:20 -0400"
+    },
     {
       "title": "10 years after taking a knee, Colin Kaepernick is still waging a 'Perilous Fight'",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5965828/colin-kaepernick-football-the-perilous-fight",
@@ -37,11 +42,6 @@
       "title": "Beijing hits back at Anthropic CEO's call to curb China's AI development",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968456/china-hits-back-ai-development",
       "pubDate": "Mon, 14 Sep 2026 06:09:08 -0400"
-    },
-    {
-      "title": "New Carlo Rovelli book challenges science's understanding of reality and the universe",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968442/on-the-equality-of-all-things-physics-carlo-rovelli",
-      "pubDate": "Mon, 14 Sep 2026 05:44:44 -0400"
     }
   ]
 }
