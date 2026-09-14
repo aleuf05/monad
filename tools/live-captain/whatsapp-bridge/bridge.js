@@ -70,7 +70,7 @@ export class SelfChatBridge {
 export async function createPairedClient({ authDir, phoneNumber, onMessage, printPairingMaterial = true }) {
   if (!process.stdout.isTTY || !process.stdin.isTTY) throw new Error("pairing requires an attended TTY");
   if (phoneNumber) throw new Error("phone-code pairing is disabled: Baileys 7 exposes no public pre-auth WebSocket-ready event");
-  const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = await import("@whiskeysockets/baileys");
+  const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = await import("@whiskeysockets/baileys");
   const { default: qrcode } = await import("qrcode-terminal");
   const { default: pino } = await import("pino");
   const fs = await import("node:fs/promises");
@@ -84,7 +84,9 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   if (authStatus === "incomplete") {
     throw new Error("incomplete unregistered auth state; use --fresh with a separate auth directory");
   }
-  const sock = makeWASocket({ auth: state, logger: pino({ level: "silent" }), browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
+  // Match the successful reference client: installed Baileys defaults for
+  // browser identity, protocol version, presence, and history behavior.
+  const sock = makeWASocket({ auth: state, logger: pino({ level: "silent" }), printQRInTerminal: false });
   let pairingAttempted = false;
   let closed = false;
   const pendingCredentialWrites = new Set();
