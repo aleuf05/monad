@@ -2,7 +2,7 @@
 import process from "node:process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexViaVerifiedAdapter } from "./bridge.js";
+import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexViaVerifiedAdapter, invokeNotebookViaVerifiedAdapter } from "./bridge.js";
 import { DEFAULT_MEMORY_PATH } from "./memory.js";
 
 const args = new Set(process.argv.slice(2));
@@ -34,6 +34,7 @@ try { client = await createPairedClient({
       bridge = new SelfChatBridge({ ownJid, ownJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
+        invokeNotebook: (request, sharedMemory) => invokeNotebookViaVerifiedAdapter(request, sharedMemory),
         send: async payload => sock.sendMessage(payload.remoteJid, { text: payload.text }) });
       console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
     }

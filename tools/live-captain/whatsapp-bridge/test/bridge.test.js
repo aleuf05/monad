@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, NOTEBOOK_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision, classifyAuthState } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -50,6 +50,26 @@ test("stop control blocks later inputs and sending is disabled by default", asyn
   b.stop();
   assert.equal((await b.handleMessage(msg({ id: "m5" }))).action, "ignored");
   assert.equal(calls.length, 0);
+});
+
+test("explicit notebook request uses repo worker and excludes Cameron-private memory", async () => {
+  const calls = [];
+  const { bridge: b } = bridge({
+    liveMode: true,
+    invokeCodex: async () => { throw new Error("ordinary worker must not run"); },
+    invokeNotebook: async (request, memory) => { calls.push({ request, memory }); return "repo work proposed"; },
+  });
+  const result = await b.handleMessage(msg({ id: "notebook-1", text: `${NOTEBOOK_PREFIX} inspect the notebook tests` }));
+  assert.deepEqual(result, { action: "proposed", text: "⚓ Captain: repo work proposed" });
+  assert.deepEqual(calls, [{ request: "inspect the notebook tests", memory: "(memory unavailable)" }]);
+});
+
+test("dry-run notebook requests require the designated test prefix", async () => {
+  const calls = [];
+  const { bridge: b } = bridge({ invokeNotebook: async request => { calls.push(request); return "ok"; } });
+  assert.equal((await b.handleMessage(msg({ id: "notebook-2", text: `${NOTEBOOK_PREFIX} inspect` }))).reason, "not-designated-test-input");
+  assert.equal((await b.handleMessage(msg({ id: "notebook-3", text: `${TEST_PREFIX} ${NOTEBOOK_PREFIX} inspect` }))).action, "proposed");
+  assert.deepEqual(calls, ["inspect"]);
 });
 
 test("explicit send mode permits one fresh reply and never retries", async () => {

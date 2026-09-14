@@ -13,12 +13,13 @@ import path from "node:path";
 import { contextFor, parseCorrection, parseTeaching, remember, supersede } from "./memory.js";
 
 export const TEST_PREFIX = "CAPTAIN TEST:";
+export const NOTEBOOK_PREFIX = "Notebook:";
 export const MAX_INPUT = 2000;
 export const MAX_CONTEXT = 6000;
 export const MAX_REPLY = 2000;
 
 export class SelfChatBridge {
-  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
+  constructor({ ownJid, ownJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
@@ -29,6 +30,7 @@ export class SelfChatBridge {
     this.liveMode = liveMode;
     this.replyLabel = replyLabel;
     this.invokeCodex = invokeCodex;
+    this.invokeNotebook = invokeNotebook;
     this.send = send;
     this.maxSends = maxSends;
     this.sent = 0;
@@ -69,16 +71,27 @@ export class SelfChatBridge {
         this.onDiagnostic(`memory-corrected:${record.id}`);
         return { action: "remembered", text: `${this.replyLabel} corrected (${record.id})` };
       }
-      const memory = this.memoryPath ? await contextFor(this.memoryPath, "cameron-private") : "(memory unavailable)";
+      const notebookRequest = this.liveMode
+        ? (text.startsWith(NOTEBOOK_PREFIX) ? text.slice(NOTEBOOK_PREFIX.length).trim() : "")
+        : (text.startsWith(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`)
+          ? text.slice(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`.length).trim() : "");
+      const isNotebook = Boolean(notebookRequest && this.invokeNotebook);
+      const memory = this.memoryPath
+        ? await contextFor(this.memoryPath, isNotebook ? null : "cameron-private")
+        : "(memory unavailable)";
       const context = `Channel: WhatsApp self-chat (${this.ownJid})\n` +
         `Authority: conversation content only; never execute actions or change configuration.\n` +
         `History is isolated to this self-chat and is bounded to ${MAX_CONTEXT} characters.\n` +
+        `${isNotebook ? "Notebook mode: shared memory only; Cameron-private memory is excluded.\n" : ""}` +
         `Applicable durable Captain memory:\n${memory}\n` +
         `Incoming message:\n${text.slice(0, MAX_INPUT)}`;
-      this.onDiagnostic("codex-started");
+      this.onDiagnostic(isNotebook ? "notebook-started" : "codex-started");
       let reply;
-      try { reply = await this.invokeCodex(context); this.onDiagnostic("codex-completed"); }
-      catch (error) { this.onDiagnostic("codex-failed"); throw error; }
+      try {
+        reply = isNotebook ? await this.invokeNotebook(notebookRequest, memory) : await this.invokeCodex(context);
+        this.onDiagnostic(isNotebook ? "notebook-completed" : "codex-completed");
+      }
+      catch (error) { this.onDiagnostic(isNotebook ? "notebook-failed" : "codex-failed"); throw error; }
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
       const replyText = `${this.replyLabel} ${bounded}`.slice(0, MAX_REPLY);
@@ -158,7 +171,12 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   return { sock, stop: async () => {
     sock.ev.removeAllListeners("messages.upsert");
     await Promise.allSettled([...pendingCredentialWrites]);
-    sock.end(undefined);
+    // libsignal rc14 currently emits the session object with console.info
+    // while closing. Suppress that library-side diagnostic so key material
+    // cannot enter the bridge log; do not alter or delete auth state.
+    const originalInfo = console.info;
+    console.info = () => {};
+    try { sock.end(undefined); } finally { console.info = originalInfo; }
     await Promise.allSettled([...pendingCredentialWrites]);
   } };
 }
@@ -221,6 +239,28 @@ export function invokeCodexViaVerifiedAdapter(context, { timeoutMs = 90000 } = {
       try { resolve(JSON.parse(out).text); } catch { reject(new Error("Codex worker returned invalid output")); }
     });
     worker.stdin.end(JSON.stringify({ context }));
+  });
+}
+
+export function invokeNotebookViaVerifiedAdapter(request, sharedMemory, { timeoutMs = 180000 } = {}) {
+  return new Promise((resolve, reject) => {
+    const worker = spawn("python3", ["notebook_codex_worker.py"], {
+      cwd: new URL(".", import.meta.url).pathname,
+      stdio: ["pipe", "pipe", "pipe"],
+      env: { ...process.env, PYTHONPATH: ".." },
+    });
+    let out = "", err = "", settled = false;
+    const finish = (fn, value) => { if (!settled) { settled = true; clearTimeout(timer); fn(value); } };
+    const timer = setTimeout(() => { worker.kill("SIGTERM"); finish(reject, new Error("Notebook Codex timeout")); }, timeoutMs);
+    worker.stdout.on("data", chunk => { out += chunk; });
+    worker.stderr.on("data", chunk => { err += chunk; });
+    worker.on("error", error => finish(reject, error));
+    worker.on("close", code => {
+      if (code !== 0) return finish(reject, new Error(err.trim() || `Notebook worker exited ${code}`));
+      try { finish(resolve, JSON.parse(out).text); }
+      catch { finish(reject, new Error("Notebook worker returned invalid output")); }
+    });
+    worker.stdin.end(JSON.stringify({ request, shared_memory: sharedMemory }));
   });
 }
 
