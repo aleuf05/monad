@@ -7,8 +7,12 @@ import { SelfChatBridge, createPairedClient, authenticatedSelfJid, invokeCodexVi
 const args = new Set(process.argv.slice(2));
 const pair = args.has("--pair");
 const sendOnce = args.has("--send-once");
+const fresh = args.has("--fresh");
 if (!pair && !sendOnce) { console.error("Refusing to start: choose --pair or --send-once explicitly."); process.exit(2); }
-const authDir = process.env.WHATSAPP_AUTH_DIR || path.resolve(path.dirname(fileURLToPath(import.meta.url)), "auth-state");
+if (fresh && !pair) { console.error("--fresh requires --pair and never deletes an existing auth directory."); process.exit(2); }
+if (process.env.WHATSAPP_PAIR_PHONE) { console.error("Phone-code pairing is disabled for this Baileys version; use fresh QR pairing with --fresh --pair."); process.exit(2); }
+const defaultAuth = path.resolve(path.dirname(fileURLToPath(import.meta.url)), fresh ? "auth-state-fresh" : "auth-state");
+const authDir = process.env.WHATSAPP_AUTH_DIR || defaultAuth;
 const startedAt = Date.now();
 let bridge, client, stopped = false;
 const stop = async () => { if (stopped) return; stopped = true; await client?.stop(); process.exit(0); };
@@ -16,7 +20,7 @@ process.once("SIGINT", stop); process.once("SIGTERM", stop);
 
 client = await createPairedClient({
   authDir,
-  phoneNumber: process.env.WHATSAPP_PAIR_PHONE,
+  phoneNumber: undefined,
   onMessage: async (message, sock) => {
     const ownJid = authenticatedSelfJid(sock);
     if (!ownJid) return;

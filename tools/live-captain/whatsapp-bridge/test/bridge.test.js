@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError } from "../bridge.js";
+import { SelfChatBridge, TEST_PREFIX, requestPairingCodeOnce, sanitizePairingError, pairingLifecycleDecision } from "../bridge.js";
 
 const now = 2_000_000;
 const msg = (overrides = {}) => ({
@@ -65,4 +65,12 @@ test("pairing request is bounded and errors are sanitized", async () => {
   const fake = { requestPairingCode: async () => { throw Object.assign(new Error("secret transport detail"), { output: { statusCode: 428 } }); } };
   await assert.rejects(() => requestPairingCodeOnce(fake, "+15551234567", 20));
   assert.equal(sanitizePairingError(Object.assign(new Error("hidden"), { output: { statusCode: 428 } })), "status 428; no retry performed");
+});
+
+test("pairing lifecycle waits for readiness and never acts after close", () => {
+  assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: false, closed: false, registered: false, attempted: false }), "wait");
+  assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: false, registered: false, attempted: false }), "request");
+  assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: true, registered: false, attempted: false }), "ignore");
+  assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: false, registered: true, attempted: false }), "ignore");
+  assert.equal(pairingLifecycleDecision({ connection: "connecting", socketReady: true, closed: false, registered: false, attempted: true }), "ignore");
 });

@@ -69,8 +69,10 @@ export class SelfChatBridge {
 
 export async function createPairedClient({ authDir, phoneNumber, onMessage, printPairingMaterial = true }) {
   if (!process.stdout.isTTY || !process.stdin.isTTY) throw new Error("pairing requires an attended TTY");
+  if (phoneNumber) throw new Error("phone-code pairing is disabled: Baileys 7 exposes no public pre-auth WebSocket-ready event");
   const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = await import("@whiskeysockets/baileys");
   const { default: qrcode } = await import("qrcode-terminal");
+  const { default: pino } = await import("pino");
   const fs = await import("node:fs/promises");
   await fs.mkdir(authDir, { recursive: true, mode: 0o700 });
   await fs.chmod(authDir, 0o700);
@@ -78,7 +80,10 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
   for (const entry of await fs.readdir(authDir, { withFileTypes: true })) {
     if (entry.isFile()) await fs.chmod(path.join(authDir, entry.name), 0o600);
   }
-  const sock = makeWASocket({ auth: state, browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
+  if (!state.creds.registered && (state.creds.me || state.creds.pairingCode)) {
+    throw new Error("incomplete unregistered auth state; use --fresh with a separate auth directory");
+  }
+  const sock = makeWASocket({ auth: state, logger: pino({ level: "silent" }), browser: Browsers.ubuntu("Monad Live Captain"), printQRInTerminal: false, markOnlineOnConnect: false, syncFullHistory: false });
   let pairingAttempted = false;
   let closed = false;
   sock.ev.on("creds.update", saveCreds);
@@ -94,14 +99,9 @@ export async function createPairedClient({ authDir, phoneNumber, onMessage, prin
     // pairing request immediately after makeWASocket can race the WebSocket
     // opening and yields status 428. This is one bounded, event-triggered
     // attempt; a close never causes a retry.
-    if (connection === "connecting" && phoneNumber && !state.creds.registered && !pairingAttempted && !closed) {
+    if (connection === "connecting" && !state.creds.registered && !pairingAttempted && !closed) {
       pairingAttempted = true;
-      try {
-        const pairingCode = await requestPairingCodeOnce(sock, phoneNumber, 15000);
-        if (printPairingMaterial) console.error(`WhatsApp pairing code (attended terminal only): ${pairingCode}`);
-      } catch (error) {
-        console.error(`WhatsApp pairing request failed: ${sanitizePairingError(error)}`);
-      }
+      console.error("WhatsApp QR mode: Baileys will emit QR only after its internal WebSocket-ready check.");
     }
   });
   sock.ev.on("messages.upsert", async ({ messages, type }) => {
@@ -127,6 +127,12 @@ export async function requestPairingCodeOnce(sock, phoneNumber, timeoutMs = 1500
     sock.requestPairingCode(normalized),
     new Promise((_, reject) => setTimeout(() => reject(new Error("pairing readiness timeout")), timeoutMs)),
   ]);
+}
+
+export function pairingLifecycleDecision({ connection, socketReady, closed, registered, attempted }) {
+  if (closed || registered || attempted) return "ignore";
+  if (connection !== "connecting") return "wait";
+  return socketReady ? "request" : "wait";
 }
 
 export function authenticatedSelfJid(sock) {
