@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T16:15:02.219381+00:00",
+  "fetched_at": "2026-09-15T16:30:01.914332+00:00",
   "items": [
     {
       "title": "Geopolitics and grain don't mix, say these Montana farmers",
@@ -24,8 +24,8 @@
       "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
     },
     {
-      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
+      "title": "Get ready for yet another cost when buying a home: Junk fees",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +39,8 @@
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Get ready for yet another cost when buying a home: Junk fees",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
+      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
