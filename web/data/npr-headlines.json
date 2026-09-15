@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T18:45:02.120958+00:00",
+  "fetched_at": "2026-09-15T19:15:01.431019+00:00",
   "items": [
+    {
+      "title": "State of U.S. democracy reaches new low, report finds",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5969741/state-of-u-s-democracy-reaches-new-low-report-finds",
+      "pubDate": "Tue, 15 Sep 2026 14:57:42 -0400"
+    },
     {
       "title": "Family income rose and poverty fell in 2025 \u2014 but safety net cuts could erase gains",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968648/census-poverty-income-health-insurance-report",
@@ -37,11 +42,6 @@
       "title": "SCOTUS rejects Trump's mail voting limits. And, the Kennedy Center financial crisis",
       "link": "https://www.npr.org/2026/09/15/g-s1-143294/up-first-newsletter-bernie-sanders-steve-bannon-ai-mail-in-ballots-kennedy-center-emmys",
       "pubDate": "Tue, 15 Sep 2026 07:35:49 -0400"
-    },
-    {
-      "title": "Air pollution spiked after the Trump administration stopped embassy monitoring",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5966503/air-pollution-spiked-after-the-trump-administration-stopped-embassy-monitoring",
-      "pubDate": "Tue, 15 Sep 2026 06:26:08 -0400"
     }
   ]
 }
