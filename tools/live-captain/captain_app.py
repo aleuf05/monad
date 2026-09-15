@@ -51,7 +51,10 @@ class CaptainApplicationService:
 
     def __init__(self, store: Optional[HabitatStore] = None):
         self.store = store or HabitatStore(HABITAT_DB_PATH)
-        self.api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        # Only Gemini credentials authorize the Gemini HTTP path.  Other
+        # providers are selected through their adapters, never by reusing an
+        # unrelated vendor's environment variable.
+        self.api_key = os.environ.get("GEMINI_API_KEY")
 
     def compile_context(self) -> str:
         """Assembles canonical posture, bearing, ledger, and Heart lessons into prompt."""

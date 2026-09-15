@@ -195,7 +195,11 @@ class LLMEngine:
     """Streams response tokens and manages live tool execution loops."""
 
     def __init__(self):
-        self.api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+        # This path speaks Gemini's REST protocol; an OpenAI key is not a
+        # valid credential for it.  Keep provider selection explicit so a
+        # missing Gemini key uses the deterministic/provider-neutral fallback
+        # instead of misrouting an OpenAI credential to Google.
+        self.api_key = os.environ.get("GEMINI_API_KEY")
 
     def run_turn_stream(
         self,
