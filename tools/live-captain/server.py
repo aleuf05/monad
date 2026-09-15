@@ -18,6 +18,7 @@ import os
 import queue
 import sys
 import time
+import uuid
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -73,6 +74,19 @@ DB_PATH = REPO_ROOT / "data" / "live-captain" / "live-captain.db"
 DIAGNOSTIC_LOG_PATH = REPO_ROOT / "data" / "live-captain" / "instruction-sources.log"
 RECENT_MESSAGE_LIMIT = 12
 STATUS_LABEL = "Live Captain — commissioning baseline"
+
+
+def _turn_response(execution: dict, status: int = 200) -> tuple[dict, int]:
+    """Shape a durable execution for both the original request and retries."""
+    payload = {
+        "execution": execution,
+        "text": execution.get("result_text", ""),
+        "thread_id": execution.get("thread_id"),
+        "speech_artifact": execution.get("metadata", {}).get("speech_artifact"),
+    }
+    if execution.get("status") == "failed":
+        payload["error"] = (execution.get("error") or {}).get("message", "turn failed")
+    return payload, status
 
 
 def _captain_channel() -> dict:
@@ -225,6 +239,19 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                 self.send_error(401)
                 return
             self._handle_stream()
+        elif route == "/api/history":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                query = self.path.split("?", 1)[1] if "?" in self.path else ""
+                params = dict(part.split("=", 1) for part in query.split("&") if "=" in part)
+                limit = int(params.get("limit", "200"))
+            except (TypeError, ValueError):
+                limit = 200
+            messages, omitted, executions = self.store.load_history(limit)
+            self._send_json({"messages": messages, "omitted": omitted,
+                             "executions": executions})
         elif route == "/api/status":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
@@ -254,6 +281,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     "omitted_older_messages": omitted,
                     "objective": self.objectives.latest() if hasattr(self, "objectives") else None,
                     "turn_arbiter": self.arbiter.status() if hasattr(self, "arbiter") else None,
+                    "executions": self.store.load_executions(20),
                 }
             )
         elif route == "/api/objective":
@@ -404,6 +432,28 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         if interaction_mode not in {"bridge", "command_draft"}:
             self._send_json({"error": "unsupported interaction mode"}, status=400)
             return
+        request_id = payload.get("request_id") or ("request-" + uuid.uuid4().hex)
+        if not isinstance(request_id, str) or not request_id.strip():
+            self._send_json({"error": "request_id must be a non-empty string"}, status=400)
+            return
+
+        # A browser retry may arrive after the original request has completed
+        # or while it is still running. Resolve it before admission so it can
+        # never start a second model turn.
+        existing = self.store.get_execution_by_request_id(request_id.strip())
+        if existing is not None:
+            if existing["input_text"] != text.strip():
+                self._send_json({"error": "request_id was already used for different message text"}, status=409)
+                return
+            if existing["status"] == "running":
+                response, status = _turn_response(existing, 202)
+                response["replayed"] = True
+                self._send_json(response, status=status)
+                return
+            response, status = _turn_response(existing, 200 if existing["status"] == "completed" else 502)
+            response["replayed"] = True
+            self._send_json(response, status=status)
+            return
 
         # Refuse *new* turns while paused. Nothing is recorded, no context is
         # compiled, no model is called — continuity is left exactly as it was.
@@ -454,22 +504,46 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         context_assembly_ms = round((time.monotonic() - turn_started) * 1000, 3)
 
         try:
-            self.store.record_message(
-                "admiral",
-                text,
-                sources["kernel_digest"],
-                sources["bearing_digest"],
-                sources["ledger_digest"],
+            execution, created = self.store.begin_execution(
+                request_id.strip(), text, "admiral", interaction_mode,
+                sources["kernel_digest"], sources["bearing_digest"], sources["ledger_digest"],
             )
+            if not created:
+                response, status = _turn_response(execution, 202 if execution["status"] == "running" else 200)
+                response["replayed"] = True
+                self._send_json(response, status=status)
+                return
         except PersistenceError as exc:
             self._send_json({"error": f"persistence failure: {exc}"}, status=500)
             return
 
+        execution_id = execution["id"]
+        self.store.record_execution_event(
+            execution_id, "turn_started",
+            {"request_id": request_id, "admiral_seq": execution["admiral_seq"],
+             "text": text, "source": "admiral", "interaction_mode": interaction_mode},
+        )
+        if hasattr(self.daemon, "broadcast"):
+            self.daemon.broadcast({"type": "turn_started", "execution_id": execution_id,
+                                   "request_id": request_id, "admiral_seq": execution["admiral_seq"],
+                                   "text": text, "source": "admiral", "ts": time.time()})
+
         inference_started = time.monotonic()
         try:
-            result = self.daemon.send_and_wait(compiled)
+            result = self.daemon.send_and_wait(
+                compiled, execution_id=execution_id,
+                event_callback=lambda event: self.store.record_execution_event(
+                    execution_id, "codex_event", event
+                ),
+            )
         except (CodexError, ValueError) as exc:
             failed_inference_ms = round((time.monotonic() - inference_started) * 1000, 3)
+            self.store.record_execution_event(execution_id, "failed", {"message": str(exc)})
+            self.store.update_execution(
+                execution_id, status="failed", error={"message": str(exc)},
+                metadata={"context_metrics": context_metrics, "inference_ms": failed_inference_ms},
+                completed=True,
+            )
             log_diagnostic(
                 {
                     "ts": time.time(),
@@ -490,7 +564,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         inference_ms = round((time.monotonic() - inference_started) * 1000, 3)
 
         try:
-            self.store.record_message(
+            captain_seq = self.store.record_message(
                 "captain",
                 result["text"],
                 sources["kernel_digest"],
@@ -500,6 +574,11 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
         except PersistenceError as exc:
             # The Codex reply already happened; a persistence failure here
             # must be reported, not hidden behind a fabricated success.
+            self.store.record_execution_event(execution_id, "persistence_error", {"message": str(exc)})
+            self.store.update_execution(
+                execution_id, status="failed", error={"message": f"reply persistence failure: {exc}"},
+                metadata={"thread_id": result.get("thread_id")}, completed=True,
+            )
             self._send_json(
                 {
                     "text": result["text"],
@@ -550,6 +629,27 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                                            "error": str(exc), "ts": time.time()})
         speech_ms = round((time.monotonic() - speech_started) * 1000, 3) if renderer else 0
 
+        metadata = {
+            "context_metrics": context_metrics,
+            "inference_ms": inference_ms,
+            "speech_ms": speech_ms,
+            "speech_error": speech_error,
+            "sandbox": result.get("sandbox"),
+            "approval_policy": result.get("approval_policy"),
+            "tool_event_count": len(result.get("tool_events", [])),
+            "speech_artifact": speech_artifact,
+        }
+        self.store.record_execution_event(execution_id, "completed", {
+            "thread_id": result["thread_id"],
+            "tool_event_count": len(result.get("tool_events", [])),
+            "speech_error": speech_error,
+        })
+        self.store.update_execution(
+            execution_id, status="completed", captain_seq=captain_seq,
+            thread_id=result["thread_id"], result_text=result["text"],
+            metadata=metadata, completed=True,
+        )
+
         log_diagnostic(
             {
                 "ts": time.time(),
@@ -572,8 +672,8 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                 "speech_error": speech_error,
             }
         )
-        self._send_json({"text": result["text"], "thread_id": result["thread_id"],
-                         "speech_artifact": speech_artifact})
+        completed = self.store.get_execution(execution_id)
+        self._send_json(_turn_response(completed)[0])
 
 
 def create_daemon(backend: str | None = None, cwd: Path = REPO_ROOT) -> AgyDaemon | ClaudeDaemon | CodexDaemon:

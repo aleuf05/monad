@@ -70,6 +70,7 @@ class CodexDaemon:
         self._turn_lock = threading.Lock()
         self._active_thread_id: str | None = None
         self._active_source = "system"
+        self._active_execution_id: str | None = None
         self._started_at = time.time()
         self._closing = False
         self.last_thread_start_result: dict = {}
@@ -160,6 +161,7 @@ class CodexDaemon:
                         "method": message["method"],
                         "params": message.get("params", {}),
                         "source": self._active_source,
+                        "execution_id": self._active_execution_id,
                         "ts": time.time(),
                     }
                 )
@@ -180,7 +182,8 @@ class CodexDaemon:
     def send_and_wait(
         self, compiled_text: str, sandbox: str = EXECUTION_SANDBOX, timeout: int = TURN_TIMEOUT_SECONDS,
         source: str = "admiral", tools_enabled: bool = True, workspace_roots: list[str] | None = None,
-        network_access: bool = False,
+        network_access: bool = False, execution_id: str | None = None,
+        event_callback=None,
     ) -> dict:
         """Start one ephemeral turn with compiled_text as its entire input,
         wait for the completed agentMessage, and return the reply plus
@@ -197,6 +200,7 @@ class CodexDaemon:
                 # before starting the Codex thread so every subsequent delta
                 # can be routed to the right Captain surface.
                 self._active_source = source
+                self._active_execution_id = execution_id
                 started = self._request(
                     "thread/start",
                 {
@@ -228,6 +232,7 @@ class CodexDaemon:
                         "thread_id": thread_id,
                         "text": compiled_text,
                         "source": source,
+                        "execution_id": execution_id,
                         "ts": time.time(),
                     }
                 )
@@ -256,6 +261,14 @@ class CodexDaemon:
                     params = event.get("params", {})
                     if params.get("threadId") not in {None, thread_id}:
                         continue
+                    if event_callback is not None:
+                        try:
+                            event_callback(event)
+                        except Exception:
+                            # Event persistence is diagnostic state; a broken
+                            # recorder must not turn a completed model turn
+                            # into a second execution on retry.
+                            pass
                     if method == "item/completed":
                         item = params.get("item", {})
                         if item.get("type") == "agentMessage":
@@ -269,6 +282,7 @@ class CodexDaemon:
                         break
         finally:
             self.unsubscribe(listener)
+            self._active_execution_id = None
         if not final_text or not final_text.strip():
             raise CodexError("Codex returned no reply")
         return {

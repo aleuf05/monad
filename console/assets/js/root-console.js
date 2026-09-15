@@ -30,6 +30,8 @@ const loginError = document.getElementById("login-error");
 
 const terminalEl = document.getElementById("terminal");
 const promptRowEl = document.getElementById("prompt-row");
+const historyStatusEl = document.getElementById("history-status");
+const retryLastButton = document.getElementById("retry-last");
 const connEl = document.getElementById("conn");
 const connTextEl = document.getElementById("conn-text");
 const input = document.getElementById("input");
@@ -606,13 +608,17 @@ function identiconSvg(seed, size) {
   return `<svg class="glyph" width="${size}" height="${size}" viewBox="0 0 ${cell * 5} ${cell * rows}" style="border-radius:2px;background:rgba(255,255,255,0.06);flex:none;">${rects}</svg>`;
 }
 
-function addRow(cssClass, src, body) {
+const renderedMessageSeqs = new Set();
+const historyExecutionStates = new Map();
+let retryableRequest = null;
+
+function addRow(cssClass, src, body, options = {}) {
   if (["agent", "injected"].includes(cssClass)) document.body.classList.add("has-captain-dialogue");
   const row = document.createElement("div");
   row.className = `row ${cssClass}`;
   const ts = document.createElement("span");
   ts.className = "ts";
-  ts.textContent = timestamp();
+  ts.textContent = options.timestamp ? formatEpoch(options.timestamp) : timestamp();
   const srcEl = document.createElement("span");
   srcEl.className = "src";
   if (src === "captain") srcEl.innerHTML = identiconSvg(body || cssClass + ts.textContent, 13);
@@ -621,9 +627,56 @@ function addRow(cssClass, src, body) {
   bodyEl.className = "body";
   bodyEl.textContent = body;
   row.append(ts, srcEl, bodyEl);
+  if (options.executionId) row.dataset.executionId = options.executionId;
+  if (options.seq != null) row.dataset.messageSeq = String(options.seq);
   terminalEl.insertBefore(row, promptRowEl);
   followTerminalBottom();
   return bodyEl;
+}
+
+function setHistoryStatus(text, kind = "") {
+  historyStatusEl.className = kind;
+  const label = document.createTextNode(text);
+  historyStatusEl.replaceChildren(label, retryLastButton);
+}
+
+function restoreHistory() {
+  return fetch(`${LIVE_CAPTAIN_API_BASE}/history?limit=200`, { cache: "no-store" })
+    .then(async (response) => {
+      if (!response.ok) throw new Error(`history HTTP ${response.status}`);
+      return response.json();
+    })
+    .then((body) => {
+      for (const execution of body.executions || []) {
+        historyExecutionStates.set(execution.id, execution.status);
+      }
+      for (const message of body.messages || []) {
+        if (renderedMessageSeqs.has(message.seq)) continue;
+        renderedMessageSeqs.add(message.seq);
+        addRow(
+          message.role === "captain" ? "agent" : "injected",
+          message.role === "captain" ? "captain" : "you",
+          message.text,
+          { timestamp: message.ts, seq: message.seq,
+            executionId: message.execution?.id },
+        );
+      }
+      const active = (body.executions || []).filter((item) => item.status === "running");
+      for (const execution of active) {
+        if (document.querySelector(`[data-execution-state="${execution.id}"]`)) continue;
+        const row = addRow("tool", "execution",
+          `saved execution still ${execution.status} · request ${execution.request_id.slice(0, 10)}`,
+          { executionId: execution.id });
+        row.closest(".row").dataset.executionState = execution.id;
+      }
+      const suffix = body.omitted ? ` · ${body.omitted} older messages omitted` : "";
+      setHistoryStatus(`History restored · ${body.messages?.length || 0} saved messages${suffix}`, "ok");
+      return body;
+    })
+    .catch((error) => {
+      setHistoryStatus(`History unavailable · ${error.message}`, "fault");
+      throw error;
+    });
 }
 
 function openImageStage(url, label) {
@@ -1218,8 +1271,14 @@ function handleCodexEvent(event) {
     const item = params.item || {};
     if (item.type === "agentMessage") {
       stopThinking();
+      if (params.execution_id && historyExecutionStates.get(params.execution_id) === "completed") {
+        // Reconnect restoration already painted the durable Captain reply.
+        // The live event is acknowledgement, not a second message.
+        return;
+      }
       let bodyEl = streamingRows.get(item.id);
       if (!bodyEl) bodyEl = addRow("agent", "captain", "");
+      if (params.execution_id) bodyEl.closest(".row").dataset.executionId = params.execution_id;
       bodyEl.textContent = item.text || "";
       streamingRows.delete(item.id);
       for (const [url, label] of imageArtifactsFrom(item, { scanFreeText: true })) addImageArtifact(url, label);
@@ -1264,6 +1323,7 @@ function handleCodexEvent(event) {
     stopImageGenIndicator();
     const turn = params.turn || {};
     const status = turn.status || "completed";
+    if (params.execution_id) historyExecutionStates.set(params.execution_id, status === "failed" ? "failed" : "completed");
     recordActivity("thread", "turn", `completed (${status})`);
     window.dispatchEvent(new CustomEvent("captain-turn-completed", { detail: { status } }));
     if (status === "failed") {
@@ -1486,7 +1546,12 @@ function handleEvent(event) {
     return;
   }
   if (event.type === "turn_started") {
-    if (event.source !== "captain-watch") addRow("injected", "you", event.text);
+    if (event.source !== "captain-watch") {
+      if (event.admiral_seq != null && renderedMessageSeqs.has(event.admiral_seq)) return;
+      if (event.admiral_seq != null) renderedMessageSeqs.add(event.admiral_seq);
+      addRow("injected", "you", event.text, { seq: event.admiral_seq, executionId: event.execution_id });
+      if (event.execution_id) historyExecutionStates.set(event.execution_id, "running");
+    }
     else addRow("tool", "watch", "Captain autonomous move started");
     return;
   }
@@ -1737,7 +1802,9 @@ function connect() {
     // about work still being done.
     stopThinking();
     stopImageGenIndicator();
-    setCaptainPresence("ready", "Captain connected · awaiting command.");
+    restoreHistory()
+      .then(() => setCaptainPresence("ready", "Captain connected · history restored."))
+      .catch(() => setCaptainPresence("fault", "Captain connected · history could not be restored."));
   };
   streamSource.onerror = () => {
     window.captainBridgeReady = false;
@@ -1755,12 +1822,19 @@ function connect() {
   };
 }
 
-async function submitDirective() {
+async function submitDirective(retryRequest = null) {
   unlockCaptainVoice();
   const sourceInput = activeCommandInput();
-  const text = sourceInput.value.trim();
+  const text = retryRequest?.text || sourceInput.value.trim();
   if (!text) return;
-  sourceInput.value = "";
+  if (!retryRequest) sourceInput.value = "";
+  const request = retryRequest || {
+    text,
+    interaction_mode: commandDraftMode ? "command_draft" : "bridge",
+    request_id: (crypto.randomUUID ? crypto.randomUUID() : `request-${Date.now()}-${Math.random()}`),
+  };
+  retryableRequest = null;
+  retryLastButton.hidden = true;
   startThinking();
   setCaptainPresence("thinking", "Interpreting Admiral intent…");
   setActivePairMove("Interpreting signal and updating the shared course…");
@@ -1768,12 +1842,16 @@ async function submitDirective() {
     const response = await fetch(`${LIVE_CAPTAIN_API_BASE}/turn`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, interaction_mode: commandDraftMode ? "command_draft" : "bridge" }),
+      body: JSON.stringify(request),
     });
     if (!response.ok) {
       stopThinking();
       const body = await response.json().catch(() => ({}));
       addRow("error", "error", body.error || `HTTP ${response.status}`);
+      if (response.status >= 500 || response.status === 0) {
+        retryableRequest = request;
+        retryLastButton.hidden = false;
+      }
       setCaptainPresence("fault", body.error || `Turn refused · HTTP ${response.status}`);
       window.dispatchEvent(new Event("captain-turn-submit-failed"));
     } else {
@@ -1781,6 +1859,8 @@ async function submitDirective() {
       // entire inference + render. playCentralCaptainSpeech deduplicates this
       // against the normal captain_speech event.
       const body = await response.json().catch(() => ({}));
+      if (body.execution?.id) historyExecutionStates.set(body.execution.id, body.execution.status);
+      if (body.replayed) restoreHistory().catch(() => {});
       if (body.speech_artifact) {
         playCentralCaptainSpeech({
           phase: "ready",
@@ -1793,11 +1873,17 @@ async function submitDirective() {
   } catch (err) {
     stopThinking();
     addRow("error", "error", String(err));
+    retryableRequest = request;
+    retryLastButton.hidden = false;
     setCaptainPresence("fault", String(err));
     window.dispatchEvent(new Event("captain-turn-submit-failed"));
   }
   activeCommandInput().focus();
 }
+
+retryLastButton.addEventListener("click", () => {
+  if (retryableRequest) submitDirective(retryableRequest);
+});
 
 input.addEventListener("keydown", (keyEvent) => {
   if (keyEvent.key === "Enter") {

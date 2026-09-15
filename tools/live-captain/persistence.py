@@ -36,6 +36,39 @@ CREATE TABLE IF NOT EXISTS restarts (
     ts REAL NOT NULL
 );
 
+-- One durable record per browser submission. request_id is supplied by the
+-- browser and makes reconnect/retry idempotent: the same request can only
+-- acquire one execution slot and one Admiral message.
+CREATE TABLE IF NOT EXISTS executions (
+    id TEXT PRIMARY KEY,
+    request_id TEXT NOT NULL UNIQUE,
+    session_id TEXT NOT NULL,
+    source TEXT NOT NULL,
+    interaction_mode TEXT NOT NULL,
+    input_text TEXT NOT NULL,
+    admiral_seq INTEGER,
+    captain_seq INTEGER,
+    status TEXT NOT NULL CHECK (status IN ('running', 'completed', 'failed')),
+    thread_id TEXT,
+    started_at REAL NOT NULL,
+    completed_at REAL,
+    result_text TEXT NOT NULL DEFAULT '',
+    error_json TEXT NOT NULL DEFAULT '',
+    metadata_json TEXT NOT NULL DEFAULT '{}'
+);
+CREATE INDEX IF NOT EXISTS idx_executions_started ON executions(started_at);
+CREATE TABLE IF NOT EXISTS execution_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    execution_id TEXT NOT NULL REFERENCES executions(id),
+    ordinal INTEGER NOT NULL,
+    event_type TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    created_at REAL NOT NULL,
+    UNIQUE(execution_id, ordinal)
+);
+CREATE INDEX IF NOT EXISTS idx_execution_events_execution
+    ON execution_events(execution_id, ordinal);
+
 CREATE TABLE IF NOT EXISTS concept_rooms (
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -211,6 +244,218 @@ class LiveCaptainStore:
         except sqlite3.DatabaseError as exc:
             raise PersistenceError(f"failed to record message: {exc}") from exc
         return seq
+
+    @staticmethod
+    def _execution_dict(row) -> dict:
+        if row is None:
+            return None
+        (
+            execution_id, request_id, session_id, source, interaction_mode,
+            input_text, admiral_seq, captain_seq, status, thread_id,
+            started_at, completed_at, result_text, error_json, metadata_json,
+        ) = row
+        try:
+            error = json.loads(error_json) if error_json else None
+        except json.JSONDecodeError:
+            error = {"message": error_json}
+        try:
+            metadata = json.loads(metadata_json or "{}")
+        except json.JSONDecodeError:
+            metadata = {}
+        return {
+            "id": execution_id, "request_id": request_id, "session_id": session_id,
+            "source": source, "interaction_mode": interaction_mode,
+            "input_text": input_text, "admiral_seq": admiral_seq,
+            "captain_seq": captain_seq, "status": status, "thread_id": thread_id,
+            "started_at": started_at, "completed_at": completed_at,
+            "result_text": result_text, "error": error, "metadata": metadata,
+        }
+
+    def begin_execution(
+        self, request_id: str, text: str, source: str, interaction_mode: str,
+        kernel_digest: str = "", bearing_digest: str = "", ledger_digest: str = "",
+    ) -> tuple[dict, bool]:
+        """Atomically reserve a request and persist its Admiral message.
+
+        Returns (execution, created). A repeated request_id returns the
+        original execution without recording or running anything again.
+        """
+        request_id = (request_id or "").strip()
+        if not request_id or not text.strip():
+            raise PersistenceError("request_id and message are required")
+        with self._lock:
+            existing = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+            if existing is not None:
+                execution = self._execution_dict(existing)
+                if execution["input_text"] != text.strip():
+                    raise PersistenceError("request_id was already used for different message text")
+                return execution, False
+
+            seq = self._seq
+            self._seq += 1
+            execution_id = "execution-" + uuid.uuid4().hex[:16]
+            now = time.time()
+            self._conn.execute(
+                "INSERT INTO messages(session_id,seq,role,text,ts,kernel_digest,bearing_digest,ledger_digest) "
+                "VALUES(?,?,?,?,?,?,?,?)",
+                (self.session_id, seq, "admiral", text.strip(), now,
+                 kernel_digest, bearing_digest, ledger_digest),
+            )
+            self._conn.execute(
+                "INSERT INTO executions(id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,status,started_at) VALUES(?,?,?,?,?,?,?,?,?)",
+                (execution_id, request_id, self.session_id, source, interaction_mode,
+                 text.strip(), seq, "running", now),
+            )
+            self._conn.commit()
+            row = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions WHERE id=?",
+                (execution_id,),
+            ).fetchone()
+        return self._execution_dict(row), True
+
+    def load_executions(self, limit: int = 20) -> list[dict]:
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions ORDER BY started_at DESC LIMIT ?",
+                (max(1, min(int(limit), 200)),),
+            ).fetchall()
+        return [self._execution_dict(row) for row in rows]
+
+    def update_execution(
+        self, execution_id: str, *, status: str | None = None,
+        captain_seq: int | None = None, thread_id: str | None = None,
+        result_text: str | None = None, error: dict | None = None,
+        metadata: dict | None = None, completed: bool = False,
+    ) -> dict:
+        assignments, values = [], []
+        if status is not None:
+            assignments.append("status=?"); values.append(status)
+        if captain_seq is not None:
+            assignments.append("captain_seq=?"); values.append(captain_seq)
+        if thread_id is not None:
+            assignments.append("thread_id=?"); values.append(thread_id)
+        if result_text is not None:
+            assignments.append("result_text=?"); values.append(result_text)
+        if error is not None:
+            assignments.append("error_json=?"); values.append(json.dumps(error, sort_keys=True))
+        if metadata is not None:
+            assignments.append("metadata_json=?"); values.append(json.dumps(metadata, sort_keys=True))
+        if completed:
+            assignments.append("completed_at=?"); values.append(time.time())
+        if not assignments:
+            raise PersistenceError("no execution update supplied")
+        values.append(execution_id)
+        with self._lock:
+            self._conn.execute(f"UPDATE executions SET {', '.join(assignments)} WHERE id=?", values)
+            self._conn.commit()
+            row = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions WHERE id=?",
+                (execution_id,),
+            ).fetchone()
+        if row is None:
+            raise PersistenceError(f"execution does not exist: {execution_id}")
+        return self._execution_dict(row)
+
+    def record_execution_event(self, execution_id: str, event_type: str, payload: dict) -> dict:
+        with self._lock:
+            ordinal = self._conn.execute(
+                "SELECT COALESCE(MAX(ordinal), 0) + 1 FROM execution_events WHERE execution_id=?",
+                (execution_id,),
+            ).fetchone()[0]
+            now = time.time()
+            self._conn.execute(
+                "INSERT INTO execution_events(execution_id,ordinal,event_type,payload_json,created_at) "
+                "VALUES(?,?,?,?,?)",
+                (execution_id, ordinal, event_type, json.dumps(payload, sort_keys=True, default=str), now),
+            )
+            self._conn.commit()
+        return {"execution_id": execution_id, "ordinal": ordinal,
+                "event_type": event_type, "payload": payload, "created_at": now}
+
+    def get_execution(self, execution_id: str) -> dict | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions WHERE id=?",
+                (execution_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            events = self._conn.execute(
+                "SELECT ordinal,event_type,payload_json,created_at FROM execution_events "
+                "WHERE execution_id=? ORDER BY ordinal", (execution_id,)
+            ).fetchall()
+        execution = self._execution_dict(row)
+        execution["events"] = [
+            {"ordinal": e[0], "event_type": e[1], "payload": json.loads(e[2]), "created_at": e[3]}
+            for e in events
+        ]
+        return execution
+
+    def get_execution_by_request_id(self, request_id: str) -> dict | None:
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions WHERE request_id=?",
+                (request_id,),
+            ).fetchone()
+        return self._execution_dict(row) if row is not None else None
+
+    def load_history(self, limit: int = 200) -> tuple[list[dict], int, list[dict]]:
+        """Load durable messages and their execution records for UI restore."""
+        limit = max(1, min(int(limit), 1000))
+        with self._lock:
+            total = self._conn.execute("SELECT COUNT(*) FROM messages").fetchone()[0]
+            rows = self._conn.execute(
+                "SELECT seq,role,text,ts FROM messages ORDER BY seq DESC LIMIT ?", (limit,)
+            ).fetchall()
+            rows.reverse()
+            executions = self._conn.execute(
+                "SELECT id,request_id,session_id,source,interaction_mode,input_text,"
+                "admiral_seq,captain_seq,status,thread_id,started_at,completed_at,"
+                "result_text,error_json,metadata_json FROM executions ORDER BY started_at DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+            execution_ids = [row[0] for row in executions]
+            event_rows = []
+            if execution_ids:
+                placeholders = ",".join("?" for _ in execution_ids)
+                event_rows = self._conn.execute(
+                    f"SELECT execution_id,ordinal,event_type,payload_json,created_at FROM execution_events "
+                    f"WHERE execution_id IN ({placeholders}) ORDER BY execution_id,ordinal", execution_ids
+                ).fetchall()
+        by_seq = {}
+        for execution in executions:
+            item = self._execution_dict(execution)
+            item["events"] = []
+            by_seq[item["admiral_seq"]] = item
+            if item["captain_seq"]:
+                by_seq[item["captain_seq"]] = item
+        by_id = {item["id"]: item for item in by_seq.values()}
+        for execution_id, ordinal, event_type, payload_json, created_at in event_rows:
+            item = by_id.get(execution_id)
+            if item is not None:
+                item["events"].append({"ordinal": ordinal, "event_type": event_type,
+                                       "payload": json.loads(payload_json), "created_at": created_at})
+        messages = []
+        for seq, role, text, ts in rows:
+            messages.append({"seq": seq, "role": role, "text": text, "ts": ts,
+                             "execution": by_seq.get(seq)})
+        return messages, max(0, total - len(messages)), list(by_id.values())
 
     def load_recent_messages(self, limit: int = 30) -> tuple[list[dict], int]:
         """Return (messages, omitted_count). messages is chronological
