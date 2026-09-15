@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T17:45:01.445808+00:00",
+  "fetched_at": "2026-09-15T18:00:02.125042+00:00",
   "items": [
+    {
+      "title": "Judge blocks plan to return Trump's name to the Kennedy Center",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5969905/kennedy-center-trump-name",
+      "pubDate": "Tue, 15 Sep 2026 13:49:07 -0400"
+    },
     {
       "title": "Prosecutors won't seek the death penalty for Nick Reiner",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5969890/nick-reiner-rob-reiner-murder-charges-death-penalty",
@@ -37,11 +42,6 @@
       "title": "NATO jets shoot down a drone in Lithuanian airspace",
       "link": "https://www.npr.org/2026/09/15/g-s1-143284/nato-jets-down-drone-in-lithuanian-airspace",
       "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
-    },
-    {
-      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
-      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
 }
