@@ -1,8 +1,38 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T07:15:01.488919+00:00",
+  "fetched_at": "2026-09-15T09:15:01.529942+00:00",
   "items": [
+    {
+      "title": "NATO jets down drone in Lithuanian airspace",
+      "link": "https://www.npr.org/2026/09/15/g-s1-143284/nato-jets-down-drone-in-lithuanian-airspace",
+      "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
+    },
+    {
+      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "NASA rushed engineers out of their labs. They say it risks future space missions",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5964919/nasa-employee-relocations-equipment-impacts-missions",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Get ready for yet another cost when buying a home: Junk fees",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Bernie Sanders and Steve Bannon to share a stage to promote curbs on AI",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968678/bernie-sanders-and-steve-bannon-to-share-a-stage-to-promote-curbs-on-ai",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Ex-CIA chief issued subpoena in Trump 'grand conspiracy' investigation, lawyer says",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5969390/ex-cia-director-subpoenaed",
@@ -12,36 +42,6 @@
       "title": "Emmys 2026: Here's the list of winners",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5957565/emmys-2026-winners",
       "pubDate": "Mon, 14 Sep 2026 19:55:49 -0400"
-    },
-    {
-      "title": "The Supreme Court rejects Trump's mail voting restrictions for this year's midterms",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5962190/supreme-court-mail-in-voting-trump",
-      "pubDate": "Mon, 14 Sep 2026 19:38:40 -0400"
-    },
-    {
-      "title": "Mitch McConnell returns to Senate after fall that led to an extended medical absence",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968909/mitch-mcconnell-senate-return",
-      "pubDate": "Mon, 14 Sep 2026 18:36:33 -0400"
-    },
-    {
-      "title": "Federal agents may have broken state laws in voter fraud hunt, whistleblower claims",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968892/dhs-whistleblower-voter-fraud",
-      "pubDate": "Mon, 14 Sep 2026 18:05:06 -0400"
-    },
-    {
-      "title": "Trump's EPA repeals pollution limits on fossil fuel power plants",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968785/epa-repeals-pollution-limits-on-power-plants",
-      "pubDate": "Mon, 14 Sep 2026 16:34:28 -0400"
-    },
-    {
-      "title": "Israel is 'dismantling Palestinian life' says Israeli human rights group",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5964897/israel-is-systematically-dismantling-palestinian-life-says-human-rights-group",
-      "pubDate": "Mon, 14 Sep 2026 16:34:20 -0400"
-    },
-    {
-      "title": "10 years after taking a knee, Colin Kaepernick is still waging a 'Perilous Fight'",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5965828/colin-kaepernick-football-the-perilous-fight",
-      "pubDate": "Mon, 14 Sep 2026 14:45:21 -0400"
     }
   ]
 }
