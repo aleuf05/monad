@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T03:15:02.316071+00:00",
+  "fetched_at": "2026-09-15T07:15:01.488919+00:00",
   "items": [
+    {
+      "title": "Ex-CIA chief issued subpoena in Trump 'grand conspiracy' investigation, lawyer says",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5969390/ex-cia-director-subpoenaed",
+      "pubDate": "Tue, 15 Sep 2026 02:58:02 -0400"
+    },
     {
       "title": "Emmys 2026: Here's the list of winners",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5957565/emmys-2026-winners",
@@ -37,11 +42,6 @@
       "title": "10 years after taking a knee, Colin Kaepernick is still waging a 'Perilous Fight'",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5965828/colin-kaepernick-football-the-perilous-fight",
       "pubDate": "Mon, 14 Sep 2026 14:45:21 -0400"
-    },
-    {
-      "title": "Kennedy Center says it's on the brink of bankruptcy, might close as early as Tuesday",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968690/kennedy-center-financial-physical-state",
-      "pubDate": "Mon, 14 Sep 2026 14:25:04 -0400"
     }
   ]
 }
