@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T16:00:01.542616+00:00",
+  "fetched_at": "2026-09-15T16:15:02.219381+00:00",
   "items": [
     {
       "title": "Geopolitics and grain don't mix, say these Montana farmers",
@@ -24,8 +24,8 @@
       "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
     },
     {
-      "title": "Get ready for yet another cost when buying a home: Junk fees",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
+      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
@@ -34,13 +34,13 @@
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Bernie Sanders and Steve Bannon to share a stage to promote curbs on AI",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968678/bernie-sanders-and-steve-bannon-to-share-a-stage-to-promote-curbs-on-ai",
+      "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
+      "title": "Get ready for yet another cost when buying a home: Junk fees",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
