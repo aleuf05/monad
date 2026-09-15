@@ -20,6 +20,7 @@ import time
 import urllib.request
 import urllib.error
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from http.cookies import SimpleCookie
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -43,6 +44,7 @@ from comms import (
     Urgency,
     WebChannelAdapter,
 )
+from auth import COOKIE_NAME, AuthConfig
 from captain_app import CAPTAIN_APP
 from job_engine import GLOBAL_JOB_RUNNER
 from proactive import NOTIFIER
@@ -327,6 +329,8 @@ LLM = LLMEngine()
 class HabitatRequestHandler(BaseHTTPRequestHandler):
     """HTTP Handler for Captain Habitat API."""
 
+    auth: Optional[AuthConfig] = None
+
     def log_message(self, format: str, *args: tuple) -> None:
         pass
 
@@ -356,6 +360,29 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
             "action": action,
             "reason": "This legacy endpoint has no authenticated authority context.",
         })
+
+    def _authenticated(self) -> bool:
+        cookie = SimpleCookie(self.headers.get("Cookie", ""))
+        morsel = cookie.get(COOKIE_NAME)
+        return bool(self.auth and morsel and self.auth.verify_session(morsel.value))
+
+    def _authenticated_tool(self, tool_name: str, args: Dict[str, Any]) -> bool:
+        """Route a proven operator session through the canonical tool gate."""
+        if not self._authenticated():
+            self._deny_unverified_effect(tool_name)
+            return False
+        result = CAPTAIN_APP.execute_tool(
+            tool_name,
+            args,
+            actor="admiral",
+            source="habitat_http_session",
+            authority_level=AuthorityLevel.AUTHORIZED,
+        )
+        if result.startswith("Authority denied:"):
+            self._send_json(403, {"error": result, "action": tool_name})
+            return False
+        self._send_json(200, {"action": tool_name, "result": result})
+        return True
 
     def do_OPTIONS(self) -> None:
         self.send_response(200)
@@ -431,11 +458,21 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0].rstrip("/")
 
         if path in ("/jobs", "/captain-api/jobs"):
-            self._deny_unverified_effect("delegate_job")
+            if not self._authenticated():
+                self._deny_unverified_effect("delegate_job")
+                return
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+            data = json.loads(body.decode("utf-8")) if body else {}
+            self._authenticated_tool("delegate_job", {
+                "worker": data.get("worker", "agy"),
+                "request": data.get("request", ""),
+                "conversation_id": data.get("conversation_id"),
+            })
             return
 
         if (path.startswith("/captain-api/jobs/") or path.startswith("/jobs/")) and path.endswith("/cancel"):
-            self._deny_unverified_effect("cancel_job")
+            self._authenticated_tool("cancel_job", {"job_id": path.split("/")[-2]})
             return
 
         if path in ("/notify", "/captain-api/notify"):
@@ -451,7 +488,16 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
             return
 
         if path in ("/heart", "/captain-api/heart"):
-            self._deny_unverified_effect("save_heart_lesson")
+            if not self._authenticated():
+                self._deny_unverified_effect("save_heart_lesson")
+                return
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
+            data = json.loads(body.decode("utf-8")) if body else {}
+            self._authenticated_tool("save_heart_lesson", {
+                "lesson": data.get("lesson", ""),
+                "source": data.get("source", "Operator"),
+            })
             return
 
         if path in ("/stop", "/captain-api/stop"):
@@ -569,8 +615,13 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
         self.send_error(404, "Not Found")
 
 
-def run_server(host: str = "127.0.0.1", port: int = 4777) -> None:
+def run_server(
+    host: str = "127.0.0.1",
+    port: int = 4777,
+    auth: Optional[AuthConfig] = None,
+) -> None:
     ThreadingHTTPServer.allow_reuse_address = True
+    HabitatRequestHandler.auth = auth
     server = ThreadingHTTPServer((host, port), HabitatRequestHandler)
     print(f"⚓ CAPTAIN HABITAT SERVER running at http://{host}:{port}/")
     try:
@@ -586,4 +637,4 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int, default=4777, help="Port to bind")
     args = parser.parse_args()
 
-    run_server(host=args.host, port=args.port)
+    run_server(host=args.host, port=args.port, auth=AuthConfig.from_environment())

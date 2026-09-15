@@ -160,9 +160,9 @@ class CaptainApplicationService:
 
         elif tool_name == "save_heart_lesson":
             lesson = args.get("lesson", "")
-            source = args.get("source", "Operator")
+            lesson_source = args.get("source", "Operator")
             if lesson:
-                res = self.store.add_heart_lesson(lesson, source)
+                res = self.store.add_heart_lesson(lesson, lesson_source)
                 return audited(f"Saved Heart lesson: {res['id']}")
             return audited("Error: Empty lesson")
 
