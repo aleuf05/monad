@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T11:30:01.972606+00:00",
+  "fetched_at": "2026-09-15T11:45:01.581954+00:00",
   "items": [
+    {
+      "title": "SCOTUS rejects Trump's mail voting limits. And, the Kennedy Center financial crisis",
+      "link": "https://www.npr.org/2026/09/15/g-s1-143294/up-first-newsletter-bernie-sanders-steve-bannon-ai-mail-in-ballots-kennedy-center-emmys",
+      "pubDate": "Tue, 15 Sep 2026 07:35:49 -0400"
+    },
     {
       "title": "Air pollution spiked after the Trump administration stopped embassy monitoring",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5966503/air-pollution-spiked-after-the-trump-administration-stopped-embassy-monitoring",
@@ -14,8 +19,8 @@
       "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
     },
     {
-      "title": "Get ready for yet another cost when buying a home: Junk fees",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
+      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
@@ -24,24 +29,19 @@
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Bernie Sanders and Steve Bannon to share a stage to promote curbs on AI",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968678/bernie-sanders-and-steve-bannon-to-share-a-stage-to-promote-curbs-on-ai",
-      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
+      "title": "Get ready for yet another cost when buying a home: Junk fees",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968763/housing-home-buying-junk-fees",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Supreme Court refuses to allow Trump's mail voting restrictions for the midterms",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968937/scotus-rejects-trumps-restrictions-on-mail-in-ballots",
-      "pubDate": "Tue, 15 Sep 2026 04:44:26 -0400"
+      "title": "Bernie Sanders and Steve Bannon to share a stage to promote curbs on AI",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968678/bernie-sanders-and-steve-bannon-to-share-a-stage-to-promote-curbs-on-ai",
+      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
 }
