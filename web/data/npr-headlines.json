@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-14T23:45:01.573593+00:00",
+  "fetched_at": "2026-09-15T00:00:02.335540+00:00",
   "items": [
+    {
+      "title": "The Supreme Court rejects Trump's mail voting restrictions for this year's midterms",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5962190/supreme-court-mail-in-voting-trump",
+      "pubDate": "Mon, 14 Sep 2026 19:38:40 -0400"
+    },
     {
       "title": "Mitch McConnell returns to Senate after fall that led to an extended medical absence",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968909/mitch-mcconnell-senate-return",
@@ -37,11 +42,6 @@
       "title": "The producer of Fleabag and Baby Reindeer's tip for finding a hit? Don't look for one",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968566/francesca-moody-fleabag-producer-hits-edinburgh",
       "pubDate": "Mon, 14 Sep 2026 10:03:14 -0400"
-    },
-    {
-      "title": "Key leaders sound the alarm on AI. And, Iran-Gulf diplomacy hits a setback",
-      "link": "https://www.npr.org/2026/09/14/g-s1-143148/up-first-newsletter-ai-anthropic-openai-midterms-trump-oman-iran-talks",
-      "pubDate": "Mon, 14 Sep 2026 07:39:06 -0400"
     }
   ]
 }
