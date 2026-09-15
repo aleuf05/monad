@@ -1,8 +1,8 @@
 {
   "schema_version": "monad.fleetStatus.v1",
-  "status": "green",
-  "summary": "All systems nominal.",
-  "checked_at": "2026-09-15T06:33:12.583995Z",
+  "status": "amber",
+  "summary": "living-fleet-memory endpoint unreachable",
+  "checked_at": "2026-09-15T06:39:24.907138Z",
   "hostname": "granite",
-  "git_commit": "1e54d243c559d31b17b1906c289951d8c629951b"
+  "git_commit": "fd61ce19461772a45b3638c3d51d2d74e6130c7c"
 }
