@@ -44,6 +44,20 @@ CREATE TABLE IF NOT EXISTS heart_lessons (
     created_at REAL NOT NULL,
     applied_count INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS authority_events (
+    id TEXT PRIMARY KEY,
+    tool_name TEXT NOT NULL,
+    effect TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    source TEXT NOT NULL,
+    authority_level TEXT NOT NULL,
+    permitted INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    created_at REAL NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_authority_events_created ON authority_events(created_at DESC);
 """
 
 
@@ -227,3 +241,43 @@ class HabitatStore:
         with self._lock, self._get_connection() as conn:
             rows = conn.execute("SELECT * FROM heart_lessons ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
         return [dict(r) for r in rows]
+
+    # --- CAPTAIN AUTHORITY AUDIT ---
+
+    def record_authority_event(
+        self,
+        *,
+        tool_name: str,
+        effect: str,
+        actor: str,
+        source: str,
+        authority_level: str,
+        permitted: bool,
+        reason: str,
+        outcome: str,
+    ) -> Dict[str, Any]:
+        event_id = f"authority-{uuid.uuid4().hex[:12]}"
+        now = time.time()
+        with self._lock, self._get_connection() as conn:
+            conn.execute(
+                """
+                INSERT INTO authority_events
+                (id, tool_name, effect, actor, source, authority_level, permitted, reason, outcome, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (event_id, tool_name, effect, actor, source, authority_level,
+                 int(permitted), reason, outcome, now),
+            )
+        return {
+            "id": event_id, "tool_name": tool_name, "effect": effect,
+            "actor": actor, "source": source, "authority_level": authority_level,
+            "permitted": permitted, "reason": reason, "outcome": outcome,
+            "created_at": now,
+        }
+
+    def list_authority_events(self, limit: int = 30) -> List[Dict[str, Any]]:
+        with self._lock, self._get_connection() as conn:
+            rows = conn.execute(
+                "SELECT * FROM authority_events ORDER BY created_at DESC LIMIT ?", (limit,)
+            ).fetchall()
+        return [dict(row) for row in rows]

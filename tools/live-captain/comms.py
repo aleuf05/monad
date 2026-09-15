@@ -112,11 +112,22 @@ class OutboundMessage:
 
 
 class AuthorityBoundary:
-    """Classifies Admiral intent and enforces operation safety gates."""
+    """Classifies intent and decides whether a Captain tool may take effect.
+
+    This is deliberately a small, provider-neutral seam.  Models and
+    transports may propose tools, but only this boundary decides whether an
+    effectful tool can run.
+    """
 
     PRIVILEGED_COMMANDS = {
         "systemctl restart", "systemctl stop", "systemctl start",
         "reboot", "shutdown", "rm -rf /", "mkfs", "iptables", "caddy reload"
+    }
+
+    READ_ONLY_TOOLS = {"consult_operator_manual", "read_manual", "list_jobs"}
+    EFFECTFUL_TOOLS = {
+        "sound_ship", "delegate_job", "dispatch_agent", "run_job",
+        "cancel_job", "save_heart_lesson",
     }
 
     @classmethod
@@ -137,6 +148,60 @@ class AuthorityBoundary:
 
         # Standard non-privileged execution
         return AuthorityLevel.AUTHORIZED
+
+    @classmethod
+    def decide_tool(
+        cls,
+        tool_name: str,
+        *,
+        actor: str,
+        source: str,
+        authority_level: AuthorityLevel,
+    ) -> Dict[str, str | bool]:
+        """Return the complete decision before a tool can cause an effect."""
+        if tool_name in cls.READ_ONLY_TOOLS:
+            return {
+                "permitted": True,
+                "effect": "read",
+                "reason": "read-only tool",
+                "actor": actor,
+                "source": source,
+            }
+
+        if tool_name not in cls.EFFECTFUL_TOOLS:
+            return {
+                "permitted": False,
+                "effect": "unknown",
+                "reason": "tool is not registered with Captain authority",
+                "actor": actor,
+                "source": source,
+            }
+
+        if actor != "admiral":
+            return {
+                "permitted": False,
+                "effect": "persistent_or_external",
+                "reason": "effectful tools require Admiral authority",
+                "actor": actor,
+                "source": source,
+            }
+
+        if authority_level is not AuthorityLevel.AUTHORIZED:
+            return {
+                "permitted": False,
+                "effect": "persistent_or_external",
+                "reason": f"authority level {authority_level.value} does not permit execution",
+                "actor": actor,
+                "source": source,
+            }
+
+        return {
+            "permitted": True,
+            "effect": "persistent_or_external",
+            "reason": "Admiral-authorized registered tool",
+            "actor": actor,
+            "source": source,
+        }
 
 
 class ChannelAdapter:

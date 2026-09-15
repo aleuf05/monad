@@ -6,6 +6,7 @@ import json
 import socket
 import sys
 import unittest
+import urllib.error
 import urllib.request
 from pathlib import Path
 from threading import Thread
@@ -99,6 +100,17 @@ class TestHabitatServer(unittest.TestCase):
             stream_body = resp.read().decode("utf-8")
             self.assertIn("event: delta", stream_body)
             self.assertIn("event: done", stream_body)
+
+    def test_legacy_effect_endpoints_fail_closed_without_authority_context(self):
+        for endpoint in ("heart", "notify", "stop", "jobs"):
+            request = urllib.request.Request(
+                f"http://127.0.0.1:{self.port}/captain-api/{endpoint}",
+                data=b"{}",
+                headers={"Content-Type": "application/json"},
+            )
+            with self.assertRaises(urllib.error.HTTPError) as raised:
+                urllib.request.urlopen(request)
+            self.assertEqual(raised.exception.code, 403)
 
 
 if __name__ == "__main__":

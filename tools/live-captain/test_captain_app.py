@@ -12,7 +12,7 @@ REPO_ROOT = ROOT_DIR.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from captain_app import CaptainApplicationService
-from comms import InboundMessage, MediaItem, OutboundMessage, Urgency
+from comms import AuthorityLevel, InboundMessage, MediaItem, OutboundMessage, Urgency
 from habitat_store import HabitatStore
 
 
@@ -65,6 +65,18 @@ class TestCaptainApplicationService(unittest.TestCase):
         summary = self.app.execute_tool("consult_operator_manual", {"query": "phone messaging terminal"})
         self.assertIn("Section", summary)
         self.assertIn("Phone", summary)
+
+    def test_effectful_tool_requires_admiral_authority_and_is_audited(self):
+        result = self.app.execute_tool(
+            "delegate_job", {"worker": "agy", "request": "do not run"},
+            actor="external", source="telegram", authority_level=AuthorityLevel.AUTHORIZED,
+        )
+        self.assertIn("Authority denied", result)
+        event = self.store.list_authority_events(limit=1)[0]
+        self.assertEqual(event["tool_name"], "delegate_job")
+        self.assertEqual(event["actor"], "external")
+        self.assertEqual(event["permitted"], 0)
+        self.assertEqual(event["outcome"], "blocked before execution")
 
     def test_inbound_button_explanation(self):
         msg = InboundMessage(

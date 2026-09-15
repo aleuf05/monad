@@ -339,6 +339,24 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _deny_unverified_effect(self, action: str) -> None:
+        """Fail closed when a legacy HTTP route has no proven caller identity."""
+        STORE.record_authority_event(
+            tool_name=action,
+            effect="persistent_or_external",
+            actor="unverified_http",
+            source="habitat_http",
+            authority_level=AuthorityLevel.CONVERSATIONAL.value,
+            permitted=False,
+            reason="legacy HTTP route has no authenticated authority context",
+            outcome="blocked before execution",
+        )
+        self._send_json(403, {
+            "error": "Captain authority denied",
+            "action": action,
+            "reason": "This legacy endpoint has no authenticated authority context.",
+        })
+
     def do_OPTIONS(self) -> None:
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -413,41 +431,15 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0].rstrip("/")
 
         if path in ("/jobs", "/captain-api/jobs"):
-            content_len = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
-            data = json.loads(body.decode("utf-8")) if body else {}
-            worker = data.get("worker", "agy")
-            request = data.get("request", "")
-            conversation_id = data.get("conversation_id")
-            if not request:
-                self._send_json(400, {"error": "Empty request"})
-                return
-            job = GLOBAL_JOB_RUNNER.submit(worker=worker, request=request, conversation_id=conversation_id)
-            self._send_json(200, job)
+            self._deny_unverified_effect("delegate_job")
             return
 
         if (path.startswith("/captain-api/jobs/") or path.startswith("/jobs/")) and path.endswith("/cancel"):
-            job_id = path.split("/")[-2]
-            ok = GLOBAL_JOB_RUNNER.cancel(job_id)
-            self._send_json(200, {"status": "cancelled" if ok else "failed", "job_id": job_id})
+            self._deny_unverified_effect("cancel_job")
             return
 
         if path in ("/notify", "/captain-api/notify"):
-            content_len = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
-            data = json.loads(body.decode("utf-8")) if body else {}
-            text = data.get("text", "")
-            if not text:
-                self._send_json(400, {"error": "Empty notification text"})
-                return
-            res = NOTIFIER.notify(
-                text=text,
-                semantic_role=data.get("role", "captain"),
-                urgency=data.get("urgency", "normal"),
-                thread_id=data.get("thread_id"),
-                actions=data.get("actions"),
-            )
-            self._send_json(200, res)
+            self._deny_unverified_effect("notify")
             return
 
         if path in ("/threads", "/captain-api/threads"):
@@ -459,28 +451,11 @@ class HabitatRequestHandler(BaseHTTPRequestHandler):
             return
 
         if path in ("/heart", "/captain-api/heart"):
-            content_len = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(content_len)
-            data = json.loads(body.decode("utf-8")) if body else {}
-            lesson = data.get("lesson", "")
-            source = data.get("source", "Operator")
-            if lesson:
-                res = STORE.add_heart_lesson(lesson, source)
-                self._send_json(200, res)
-            else:
-                self._send_json(400, {"error": "Empty lesson"})
+            self._deny_unverified_effect("save_heart_lesson")
             return
 
         if path in ("/stop", "/captain-api/stop"):
-            content_len = int(self.headers.get("Content-Length", 0))
-            body = self.rfile.read(content_len) if content_len > 0 else b"{}"
-            data = json.loads(body.decode("utf-8")) if body else {}
-            thread_id = data.get("thread_id")
-            if thread_id and thread_id in ACTIVE_CANCEL_EVENTS:
-                ACTIVE_CANCEL_EVENTS[thread_id].set()
-                self._send_json(200, {"status": "stopped", "thread_id": thread_id})
-            else:
-                self._send_json(200, {"status": "not_running", "thread_id": thread_id})
+            self._deny_unverified_effect("cancel_job")
             return
 
         if path in ("/upload", "/captain-api/upload"):

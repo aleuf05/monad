@@ -80,17 +80,48 @@ class CaptainApplicationService:
             f"When tools or agent jobs are requested, execute or delegate them directly."
         )
 
-    def execute_tool(self, tool_name: str, args: Dict[str, Any]) -> str:
-        """Executes authorized non-privileged operational tools."""
+    def execute_tool(
+        self,
+        tool_name: str,
+        args: Dict[str, Any],
+        *,
+        actor: str = "system",
+        source: str = "internal",
+        authority_level: AuthorityLevel = AuthorityLevel.CONVERSATIONAL,
+    ) -> str:
+        """Run a registered tool only after the Captain authority decision."""
+        decision = AuthorityBoundary.decide_tool(
+            tool_name,
+            actor=actor,
+            source=source,
+            authority_level=authority_level,
+        )
+        if not decision["permitted"]:
+            outcome = "blocked before execution"
+            self.store.record_authority_event(
+                tool_name=tool_name, effect=str(decision["effect"]), actor=actor,
+                source=source, authority_level=authority_level.value, permitted=False,
+                reason=str(decision["reason"]), outcome=outcome,
+            )
+            return f"Authority denied: {decision['reason']}"
+
+        def audited(outcome: str) -> str:
+            self.store.record_authority_event(
+                tool_name=tool_name, effect=str(decision["effect"]), actor=actor,
+                source=source, authority_level=authority_level.value, permitted=True,
+                reason=str(decision["reason"]), outcome=outcome[:500],
+            )
+            return outcome
+
         if tool_name == "sound_ship":
             try:
                 res = subprocess.run(
                     "bash scripts/sound-the-ship.sh", shell=True, cwd=REPO_ROOT,
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30, text=True
                 )
-                return res.stdout.strip()
+                return audited(res.stdout.strip() or "sound ship completed")
             except Exception as e:
-                return f"Error sounding ship: {e}"
+                return audited(f"Error sounding ship: {e}")
 
         elif tool_name in ("delegate_job", "dispatch_agent", "run_job"):
             worker = args.get("worker", "agy")
@@ -108,34 +139,35 @@ class CaptainApplicationService:
                     thread_id=j.get("conversation_id"),
                 ),
             )
-            return f"Dispatched.\nJob: `{job['id']}`\nWorker: `{job['worker']}`\nState: `{job['state']}`"
+            return audited(f"Dispatched.\nJob: `{job['id']}`\nWorker: `{job['worker']}`\nState: `{job['state']}")
 
         elif tool_name == "list_jobs":
             jobs = GLOBAL_JOB_RUNNER.store.list_jobs(limit=10)
             if not jobs:
-                return "No jobs registered."
+                return audited("No jobs registered.")
             lines = [f"- `{j['id']}` [{j['worker']}] ({j['state']}): {j['request'][:60]}" for j in jobs]
-            return "\n".join(lines)
+            return audited("\n".join(lines))
 
         elif tool_name == "cancel_job":
             job_id = args.get("job_id", "").strip()
             ok = GLOBAL_JOB_RUNNER.cancel(job_id)
-            return f"Job `{job_id}` cancellation request sent: {'success' if ok else 'failed'}"
+            return audited(f"Job `{job_id}` cancellation request sent: {'success' if ok else 'failed'}")
 
         elif tool_name in ("consult_operator_manual", "read_manual"):
             query = args.get("query") or args.get("question") or ""
             res = MANUAL_READER.query(query)
-            return res.get("summary", "")
+            return audited(res.get("summary", ""))
 
         elif tool_name == "save_heart_lesson":
             lesson = args.get("lesson", "")
             source = args.get("source", "Operator")
             if lesson:
                 res = self.store.add_heart_lesson(lesson, source)
-                return f"Saved Heart lesson: {res['id']}"
-            return "Error: Empty lesson"
+                return audited(f"Saved Heart lesson: {res['id']}")
+            return audited("Error: Empty lesson")
 
-        return f"Unknown tool: {tool_name}"
+        # Kept for defensive completeness; unknown tools are denied above.
+        return "Authority denied: tool is not registered with Captain authority"
 
     def get_status(self) -> Dict[str, Any]:
         """Provides a comprehensive, truthful snapshot of the station."""
@@ -179,7 +211,10 @@ class CaptainApplicationService:
             elif "codex" in lower_msg:
                 worker = "codex"
             task_req = re.sub(r'^(.*?)(have|dispatch)\s+(agy|claude|codex)\s+(to\s+)?', '', text, flags=re.IGNORECASE).strip(" ,:") or text
-            res = self.execute_tool("delegate_job", {"worker": worker, "request": task_req, "conversation_id": thread_id})
+            res = self.execute_tool(
+                "delegate_job", {"worker": worker, "request": task_req, "conversation_id": thread_id},
+                actor=msg.sender, source=msg.channel, authority_level=auth_level,
+            )
             resp_text = f"### Agent Job Dispatched\n\n{res}\n\nTask: *\"{task_req}\"*\n\nUpdates will stream automatically upon completion."
             return OutboundMessage(
                 destination=msg.channel,
