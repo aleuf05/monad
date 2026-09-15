@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T00:00:02.335540+00:00",
+  "fetched_at": "2026-09-15T00:15:02.084466+00:00",
   "items": [
+    {
+      "title": "See who's won an Emmy Award so far",
+      "link": "https://www.npr.org/2026/09/14/nx-s1-5957565/emmys-2026-winners",
+      "pubDate": "Mon, 14 Sep 2026 19:55:49 -0400"
+    },
     {
       "title": "The Supreme Court rejects Trump's mail voting restrictions for this year's midterms",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5962190/supreme-court-mail-in-voting-trump",
@@ -37,11 +42,6 @@
       "title": "Kennedy Center says it's on the brink of bankruptcy, might close as early as Tuesday",
       "link": "https://www.npr.org/2026/09/14/nx-s1-5968690/kennedy-center-financial-physical-state",
       "pubDate": "Mon, 14 Sep 2026 14:25:04 -0400"
-    },
-    {
-      "title": "The producer of Fleabag and Baby Reindeer's tip for finding a hit? Don't look for one",
-      "link": "https://www.npr.org/2026/09/14/nx-s1-5968566/francesca-moody-fleabag-producer-hits-edinburgh",
-      "pubDate": "Mon, 14 Sep 2026 10:03:14 -0400"
     }
   ]
 }
