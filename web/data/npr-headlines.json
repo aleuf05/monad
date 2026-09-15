@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T18:00:02.125042+00:00",
+  "fetched_at": "2026-09-15T18:45:02.120958+00:00",
   "items": [
+    {
+      "title": "Family income rose and poverty fell in 2025 \u2014 but safety net cuts could erase gains",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5968648/census-poverty-income-health-insurance-report",
+      "pubDate": "Tue, 15 Sep 2026 14:29:49 -0400"
+    },
     {
       "title": "Judge blocks plan to return Trump's name to the Kennedy Center",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5969905/kennedy-center-trump-name",
@@ -37,11 +42,6 @@
       "title": "Air pollution spiked after the Trump administration stopped embassy monitoring",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5966503/air-pollution-spiked-after-the-trump-administration-stopped-embassy-monitoring",
       "pubDate": "Tue, 15 Sep 2026 06:26:08 -0400"
-    },
-    {
-      "title": "NATO jets shoot down a drone in Lithuanian airspace",
-      "link": "https://www.npr.org/2026/09/15/g-s1-143284/nato-jets-down-drone-in-lithuanian-airspace",
-      "pubDate": "Tue, 15 Sep 2026 05:06:30 -0400"
     }
   ]
 }
