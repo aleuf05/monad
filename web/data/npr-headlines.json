@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T17:30:01.835554+00:00",
+  "fetched_at": "2026-09-15T17:45:01.445808+00:00",
   "items": [
+    {
+      "title": "Prosecutors won't seek the death penalty for Nick Reiner",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5969890/nick-reiner-rob-reiner-murder-charges-death-penalty",
+      "pubDate": "Tue, 15 Sep 2026 13:36:49 -0400"
+    },
+    {
+      "title": "Republican Rep. Massie moves to impeach Defense Secretary Hegseth over Iran war",
+      "link": "https://www.npr.org/2026/09/15/g-s1-143407/massie-impeach-hegseth-iran",
+      "pubDate": "Tue, 15 Sep 2026 13:35:14 -0400"
+    },
     {
       "title": "Tiny krill are turning up in deep-sea hydrothermal vents. Scientists want to know why",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968643/antarctic-krill-hydrothermal-vent-south-pole",
@@ -31,16 +41,6 @@
     {
       "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
-      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "NASA rushed engineers out of their labs. They say it risks future space missions",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5964919/nasa-employee-relocations-equipment-impacts-missions",
-      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
