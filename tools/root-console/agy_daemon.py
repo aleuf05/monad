@@ -49,6 +49,7 @@ class AgyDaemon:
         self._turn_lock = threading.Lock()
         self._active_thread_id: str | None = None
         self._active_source: str = "admiral"
+        self._active_execution_id: str | None = None
         self._active_process: subprocess.Popen | None = None
         self._started_at = time.time()
         self._closing = False
@@ -89,6 +90,7 @@ class AgyDaemon:
             "method": method,
             "params": params,
             "source": source,
+            "execution_id": self._active_execution_id,
             "ts": time.time(),
         })
 
@@ -321,6 +323,9 @@ class AgyDaemon:
         sandbox: str | None = None,
         timeout: int = 180,
         source: str = "admiral",
+        execution_id: str | None = None,
+        event_callback=None,
+        **_ignored,
     ) -> dict:
         """Start one turn synchronously, wait for completion, and return results."""
         compiled_text = compiled_text.strip()
@@ -333,7 +338,9 @@ class AgyDaemon:
                 thread_id = str(uuid.uuid4())
                 self._active_thread_id = thread_id
                 self._active_source = source
-                self._broadcast({"type": "turn_started", "thread_id": thread_id, "text": compiled_text, "source": source, "ts": time.time()})
+                self._active_execution_id = execution_id
+                self._broadcast({"type": "turn_started", "thread_id": thread_id, "text": compiled_text,
+                                 "source": source, "execution_id": execution_id, "ts": time.time()})
                 self._codex_event("turn/started", {"threadId": thread_id}, source=source)
 
                 worker = threading.Thread(
@@ -363,6 +370,11 @@ class AgyDaemon:
 
                     if event.get("type") != "codex_event":
                         continue
+                    if event_callback is not None:
+                        try:
+                            event_callback(event)
+                        except Exception:
+                            pass
                     method = event.get("method", "")
                     params = event.get("params", {})
                     if method == "item/completed":
@@ -379,6 +391,7 @@ class AgyDaemon:
                         break
             finally:
                 self.unsubscribe(listener)
+                self._active_execution_id = None
 
         if not final_text or not final_text.strip():
             raise AgyError("AGY returned no reply")

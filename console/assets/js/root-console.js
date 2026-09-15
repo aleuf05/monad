@@ -610,7 +610,14 @@ function identiconSvg(seed, size) {
 
 const renderedMessageSeqs = new Set();
 const historyExecutionStates = new Map();
+const startedExecutionIds = new Set();
+const restoredEventKeys = new Set();
 let retryableRequest = null;
+
+function formatEpoch(epoch) {
+  const date = new Date(Number(epoch) * 1000);
+  return Number.isFinite(date.getTime()) ? date.toISOString().replace("T", " ").replace(/\.\d+Z$/, "Z") : timestamp();
+}
 
 function addRow(cssClass, src, body, options = {}) {
   if (["agent", "injected"].includes(cssClass)) document.body.classList.add("has-captain-dialogue");
@@ -661,8 +668,24 @@ function restoreHistory() {
             executionId: message.execution?.id },
         );
       }
-      const active = (body.executions || []).filter((item) => item.status === "running");
-      for (const execution of active) {
+      for (const execution of (body.executions || []).slice(0, 20)) {
+        for (const event of execution.events || []) {
+          if (event.event_type !== "codex_event") continue;
+          const item = event.payload?.params?.item;
+          if (!item || item.type === "agentMessage") continue;
+          const eventKey = `${execution.id}:${event.ordinal}`;
+          if (restoredEventKeys.has(eventKey)) continue;
+          restoredEventKeys.add(eventKey);
+          addRow("tool", "saved execution", summarizeItem(item), { executionId: execution.id });
+        }
+        if (execution.status === "failed") {
+          if (document.querySelector(`[data-execution-state="${execution.id}"]`)) continue;
+          const message = execution.error?.message || "saved execution failed";
+          const row = addRow("error", "saved execution", message, { executionId: execution.id });
+          row.closest(".row").dataset.executionState = execution.id;
+          continue;
+        }
+        if (execution.status !== "running") continue;
         if (document.querySelector(`[data-execution-state="${execution.id}"]`)) continue;
         const row = addRow("tool", "execution",
           `saved execution still ${execution.status} · request ${execution.request_id.slice(0, 10)}`,
@@ -1547,6 +1570,8 @@ function handleEvent(event) {
   }
   if (event.type === "turn_started") {
     if (event.source !== "captain-watch") {
+      if (event.execution_id && startedExecutionIds.has(event.execution_id)) return;
+      if (event.execution_id) startedExecutionIds.add(event.execution_id);
       if (event.admiral_seq != null && renderedMessageSeqs.has(event.admiral_seq)) return;
       if (event.admiral_seq != null) renderedMessageSeqs.add(event.admiral_seq);
       addRow("injected", "you", event.text, { seq: event.admiral_seq, executionId: event.execution_id });

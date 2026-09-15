@@ -889,13 +889,18 @@ class EndToEndHttpBootTests(unittest.TestCase):
             self.compiled = []
             self.broadcasts = []
 
-        def send_and_wait(self, compiled_text, sandbox=None, timeout=180):
+        def send_and_wait(self, compiled_text, sandbox=None, timeout=180, **kwargs):
             self.compiled.append(compiled_text)
+            callback = kwargs.get("event_callback")
+            if callback:
+                callback({"type": "codex_event", "method": "item/completed",
+                          "params": {"item": {"type": "commandExecution", "text": "fake tool result"}}})
             return {
                 "text": "fake reply",
                 "thread_id": "test-thread-id",
                 "sandbox": "workspace-write",
                 "approval_policy": "never",
+                "tool_events": [{"type": "commandExecution", "text": "fake tool result"}],
                 "thread_start_result": {},
             }
 
@@ -1002,6 +1007,53 @@ class EndToEndHttpBootTests(unittest.TestCase):
 
         messages, _ = self.store.load_recent_messages(10)
         self.assertTrue(any(m["text"] == "end-to-end boot test message" for m in messages))
+
+    def test_two_browser_sessions_read_the_same_saved_history(self):
+        import urllib.request
+
+        first_cookie = self.auth.issue_session()
+        payload = json.dumps({"text": "shared browser marker", "request_id": "browser-shared"}).encode()
+        request = urllib.request.Request(
+            self._url("/api/turn"), data=payload, method="POST",
+            headers={"Cookie": f"{COOKIE_NAME}={first_cookie}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(request, timeout=5) as response:
+            self.assertEqual(response.status, 200)
+
+        second_cookie = self.auth.issue_session()
+        history_request = urllib.request.Request(
+            self._url("/api/history?limit=200"),
+            headers={"Cookie": f"{COOKIE_NAME}={second_cookie}"},
+        )
+        with urllib.request.urlopen(history_request, timeout=5) as response:
+            body = json.loads(response.read())
+        self.assertIn("shared browser marker", [item["text"] for item in body["messages"]])
+        execution = next(item for item in body["executions"] if item["request_id"] == "browser-shared")
+        self.assertEqual(execution["status"], "completed")
+        self.assertTrue(execution["events"])
+
+    def test_duplicate_http_request_id_replays_without_second_execution(self):
+        import urllib.request
+
+        cookie = self.auth.issue_session()
+        payload = json.dumps({"text": "execute exactly once", "request_id": "request-once"}).encode()
+
+        def send():
+            request = urllib.request.Request(
+                self._url("/api/turn"), data=payload, method="POST",
+                headers={"Cookie": f"{COOKIE_NAME}={cookie}", "Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(request, timeout=5) as response:
+                return json.loads(response.read())
+
+        first = send()
+        second = send()
+        self.assertFalse(first.get("replayed", False))
+        self.assertTrue(second["replayed"])
+        self.assertEqual(first["execution"]["id"], second["execution"]["id"])
+        self.assertEqual(len(self.daemon.compiled), 1)
+        messages, _, _ = self.store.load_history()
+        self.assertEqual(sum(item["text"] == "execute exactly once" for item in messages), 1)
 
     def test_concurrent_turn_context_is_compiled_after_prior_reply(self):
         import threading

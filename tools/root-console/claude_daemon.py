@@ -65,6 +65,8 @@ class ClaudeDaemon:
         self._subscribers_lock = threading.Lock()
         self._turn_lock = threading.Lock()
         self._active_thread_id: str | None = None
+        self._active_source: str = "admiral"
+        self._active_execution_id: str | None = None
         self._pending_tools: dict[str, dict] = {}
         self._started_at = time.time()
         self._closing = False
@@ -101,7 +103,9 @@ class ClaudeDaemon:
                 self._subscribers.remove(listener)
 
     def _codex_event(self, method: str, params: dict) -> None:
-        self._broadcast({"type": "codex_event", "method": method, "params": params, "ts": time.time()})
+        self._broadcast({"type": "codex_event", "method": method, "params": params,
+                         "source": self._active_source,
+                         "execution_id": self._active_execution_id, "ts": time.time()})
 
     def _item_completed(self, item: dict) -> None:
         self._codex_event("item/completed", {"item": item})
@@ -113,7 +117,9 @@ class ClaudeDaemon:
             raise CodexError("Claude process is not running")
         thread_id = self._active_thread_id or str(uuid.uuid4())
         self._active_thread_id = thread_id
-        self._broadcast({"type": "turn_started", "thread_id": thread_id, "text": text, "ts": time.time()})
+        self._broadcast({"type": "turn_started", "thread_id": thread_id, "text": text,
+                         "source": self._active_source,
+                         "execution_id": self._active_execution_id, "ts": time.time()})
         self._codex_event("turn/started", {"threadId": thread_id})
         line = json.dumps(
             {"type": "user", "message": {"role": "user", "content": [{"type": "text", "text": text}]}}
@@ -133,7 +139,11 @@ class ClaudeDaemon:
         with self._turn_lock:
             return self._write_turn(text)
 
-    def send_and_wait(self, compiled_text: str, sandbox: str | None = None, timeout: int = 180) -> dict:
+    def send_and_wait(
+        self, compiled_text: str, sandbox: str | None = None, timeout: int = 180,
+        source: str = "admiral", execution_id: str | None = None,
+        event_callback=None, **_ignored,
+    ) -> dict:
         """Start one turn and block until it completes, returning the reply
         text plus tool_events. Matches tools/live-captain/codex_daemon.py's
         CodexDaemon.send_and_wait (live-captain's synchronous caller)."""
@@ -152,6 +162,8 @@ class ClaudeDaemon:
         try:
             with self._turn_lock:
                 listener = self.subscribe()
+                self._active_source = source
+                self._active_execution_id = execution_id
                 thread_id = self._write_turn(compiled_text)
                 final_text: str | None = None
                 tool_events: list[dict] = []
@@ -166,6 +178,11 @@ class ClaudeDaemon:
                         raise CodexError("Claude turn timed out") from None
                     if event.get("type") != "codex_event":
                         continue
+                    if event_callback is not None:
+                        try:
+                            event_callback(event)
+                        except Exception:
+                            pass
                     method = event.get("method", "")
                     params = event.get("params", {})
                     if method == "item/completed":
@@ -182,6 +199,7 @@ class ClaudeDaemon:
                         break
         finally:
             self.unsubscribe(listener)
+            self._active_execution_id = None
         if not final_text or not final_text.strip():
             raise CodexError("Claude returned no reply")
         return {
@@ -189,6 +207,7 @@ class ClaudeDaemon:
             "thread_id": thread_id,
             "sandbox": sandbox or "bypassPermissions",
             "approval_policy": "never",
+            "source": source,
             "tool_events": tool_events,
             "thread_start_result": {},
         }

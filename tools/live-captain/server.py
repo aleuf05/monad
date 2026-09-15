@@ -53,7 +53,7 @@ ROOT_CONSOLE_DIR = Path(__file__).resolve().parent.parent / "root-console"
 if str(ROOT_CONSOLE_DIR) not in sys.path:
     sys.path.append(str(ROOT_CONSOLE_DIR))
 from generated_images import map_generated_images  # noqa: E402
-from claude_daemon import ClaudeDaemon  # noqa: E402
+from claude_daemon import ClaudeDaemon, CodexError as ClaudeError  # noqa: E402
 from agy_daemon import AgyDaemon, AgyError  # noqa: E402
 import docs_corpus  # noqa: E402
 
@@ -536,7 +536,7 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
                     execution_id, "codex_event", event
                 ),
             )
-        except (CodexError, ValueError) as exc:
+        except (CodexError, ClaudeError, AgyError, ValueError) as exc:
             failed_inference_ms = round((time.monotonic() - inference_started) * 1000, 3)
             self.store.record_execution_event(execution_id, "failed", {"message": str(exc)})
             self.store.update_execution(
