@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-15T05:03:21Z",
+  "generated": "2026-09-15T05:08:56Z",
   "units": {
     "installed": 26,
     "active": 21,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 4,
-    "head": "86043c18"
+    "uncommitted": 2,
+    "head": "e87c4458"
   },
   "captain": "running",
   "captain_detail": {
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "4 files uncommitted."
+      "text": "2 files uncommitted."
     },
     {
       "priority": 1,
