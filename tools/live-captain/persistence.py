@@ -178,6 +178,7 @@ class LiveCaptainStore:
             raise PersistenceError(f"live-captain persistence unavailable: {exc}") from exc
         self.session_id = uuid.uuid4().hex
         self._seq = self._next_seq()
+        self._recover_interrupted_executions()
         self._record_restart()
 
     def _migrate_schema(self) -> None:
@@ -207,6 +208,35 @@ class LiveCaptainStore:
                 "INSERT INTO restarts (session_id, ts) VALUES (?, ?)",
                 (self.session_id, time.time()),
             )
+            self._conn.commit()
+
+    def _recover_interrupted_executions(self) -> None:
+        """Turn stale `running` rows into truthful restart failures.
+
+        The inference process cannot survive this store being reconstructed,
+        so retaining `running` after service startup would create permanent,
+        misleading progress in every browser.
+        """
+        now = time.time()
+        error = {"message": "service restarted before this execution completed"}
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT id FROM executions WHERE status='running'"
+            ).fetchall()
+            for (execution_id,) in rows:
+                ordinal = self._conn.execute(
+                    "SELECT COALESCE(MAX(ordinal), 0) + 1 FROM execution_events WHERE execution_id=?",
+                    (execution_id,),
+                ).fetchone()[0]
+                self._conn.execute(
+                    "UPDATE executions SET status='failed',completed_at=?,error_json=? WHERE id=?",
+                    (now, json.dumps(error, sort_keys=True), execution_id),
+                )
+                self._conn.execute(
+                    "INSERT INTO execution_events(execution_id,ordinal,event_type,payload_json,created_at) "
+                    "VALUES(?,?,?,?,?)",
+                    (execution_id, ordinal, "interrupted", json.dumps(error, sort_keys=True), now),
+                )
             self._conn.commit()
 
     def record_message(

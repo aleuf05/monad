@@ -246,9 +246,9 @@ class LiveCaptainHandler(BaseHTTPRequestHandler):
             try:
                 query = self.path.split("?", 1)[1] if "?" in self.path else ""
                 params = dict(part.split("=", 1) for part in query.split("&") if "=" in part)
-                limit = int(params.get("limit", "200"))
+                limit = int(params.get("limit", "1000"))
             except (TypeError, ValueError):
-                limit = 200
+                limit = 1000
             messages, omitted, executions = self.store.load_history(limit)
             self._send_json({"messages": messages, "omitted": omitted,
                              "executions": executions})

@@ -91,6 +91,17 @@ class ContinuityRepairTests(unittest.TestCase):
         self.assertEqual(replay["error"], failed["error"])
         self.assertEqual(self.store.load_history()[2][0]["events"][0]["event_type"], "failed")
 
+    def test_restart_marks_abandoned_running_execution_as_interrupted(self):
+        execution, _ = self.store.begin_execution(
+            "request-interrupted", "restart isolation", "admiral", "bridge",
+        )
+        self.store.close()
+        self.store = LiveCaptainStore(self.db)
+        recovered = self.store.get_execution(execution["id"])
+        self.assertEqual(recovered["status"], "failed")
+        self.assertIn("restarted", recovered["error"]["message"])
+        self.assertEqual(recovered["events"][-1]["event_type"], "interrupted")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

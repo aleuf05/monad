@@ -648,7 +648,7 @@ function setHistoryStatus(text, kind = "") {
 }
 
 function restoreHistory() {
-  return fetch(`${LIVE_CAPTAIN_API_BASE}/history?limit=200`, { cache: "no-store" })
+  return fetch(`${LIVE_CAPTAIN_API_BASE}/history?limit=1000`, { cache: "no-store" })
     .then(async (response) => {
       if (!response.ok) throw new Error(`history HTTP ${response.status}`);
       return response.json();
@@ -660,6 +660,16 @@ function restoreHistory() {
       for (const message of body.messages || []) {
         if (renderedMessageSeqs.has(message.seq)) continue;
         renderedMessageSeqs.add(message.seq);
+        const executionId = message.execution?.id;
+        if (executionId) {
+          const selector = message.role === "captain" ? ".row.agent" : ".row.injected";
+          const existing = document.querySelector(`${selector}[data-execution-id="${executionId}"]`);
+          if (existing) {
+            existing.dataset.messageSeq = String(message.seq);
+            existing.querySelector(".body").textContent = message.text;
+            continue;
+          }
+        }
         addRow(
           message.role === "captain" ? "agent" : "injected",
           message.role === "captain" ? "captain" : "you",
@@ -1347,6 +1357,7 @@ function handleCodexEvent(event) {
     const turn = params.turn || {};
     const status = turn.status || "completed";
     if (params.execution_id) historyExecutionStates.set(params.execution_id, status === "failed" ? "failed" : "completed");
+    if (params.execution_id) document.querySelector(`[data-execution-state="${params.execution_id}"]`)?.remove();
     recordActivity("thread", "turn", `completed (${status})`);
     window.dispatchEvent(new CustomEvent("captain-turn-completed", { detail: { status } }));
     if (status === "failed") {
@@ -1363,6 +1374,7 @@ function handleCodexEvent(event) {
       setCaptainPresence("ready", "Turn complete · maintaining the shared watch.");
       refreshBridgeCourse();
     }
+    window.setTimeout(() => restoreHistory().catch(() => {}), 250);
     return;
   }
   if (method === "thread/status/changed") {
@@ -1829,7 +1841,7 @@ function connect() {
     stopImageGenIndicator();
     restoreHistory()
       .then(() => setCaptainPresence("ready", "Captain connected · history restored."))
-      .catch(() => setCaptainPresence("fault", "Captain connected · history could not be restored."));
+      .catch(() => setCaptainPresence("ready", "Captain connected · saved-history activation pending."));
   };
   streamSource.onerror = () => {
     window.captainBridgeReady = false;
