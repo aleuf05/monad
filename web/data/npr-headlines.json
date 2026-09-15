@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T12:15:02.013542+00:00",
+  "fetched_at": "2026-09-15T12:45:01.381575+00:00",
   "items": [
+    {
+      "title": "Geopolitics and grain don't mix, say these Montana farmers",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5964930/canada-tariffs-hurting-montana-farmers",
+      "pubDate": "Tue, 15 Sep 2026 08:33:19 -0400"
+    },
     {
       "title": "SCOTUS rejects Trump's mail voting limits. And, the Kennedy Center financial crisis",
       "link": "https://www.npr.org/2026/09/15/g-s1-143294/up-first-newsletter-bernie-sanders-steve-bannon-ai-mail-in-ballots-kennedy-center-emmys",
@@ -36,11 +41,6 @@
     {
       "title": "This  bill could reshape crypto in America -- and it's sparking a major battle",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968711/clarity-act-crypto-senate-vote",
-      "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "For thousands of Haitians in the U.S., end of protected status brings fear, grief and defiance",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5961154/for-thousands-of-haitians-in-the-u-s-end-of-protected-status-brings-fear-grief-and-defiance",
       "pubDate": "Tue, 15 Sep 2026 05:00:00 -0400"
     }
   ]
