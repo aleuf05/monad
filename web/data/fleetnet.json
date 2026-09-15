@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-15T21:14:01Z",
+  "generated": "2026-09-15T21:19:46Z",
   "units": {
     "installed": 26,
     "active": 21,
@@ -14,8 +14,8 @@
     "total": 6
   },
   "tree": {
-    "uncommitted": 4,
-    "head": "c9125adb"
+    "uncommitted": 2,
+    "head": "7c300c45"
   },
   "captain": "running",
   "captain_detail": {
@@ -88,8 +88,8 @@
     "resources": {
       "disk_used_percent": 21,
       "disk_available": "168.8G",
-      "memory_available_percent": 78.2,
-      "load_1m": 0.26
+      "memory_available_percent": 77.9,
+      "load_1m": 0.36
     }
   },
   "sound": true,
@@ -112,7 +112,7 @@
     },
     {
       "priority": 3,
-      "text": "4 files uncommitted."
+      "text": "2 files uncommitted."
     },
     {
       "priority": 1,
