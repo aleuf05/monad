@@ -4,6 +4,11 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## ANDROID-PIPELINE-RECOVERY-01: Request direct-phone APK delivery details
+
+Status: active — information request prepared for the Old Captain; no Gantry
+assumption may be carried into Pondkeeper delivery.
+
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
