@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T20:30:02.314734+00:00",
+  "fetched_at": "2026-09-16T21:15:01.359121+00:00",
   "items": [
+    {
+      "title": "Trump administration plans ideological warning signs for Smithsonian",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5971420/trump-administration-smithsonian-warning-signs",
+      "pubDate": "Wed, 16 Sep 2026 16:55:54 -0400"
+    },
     {
       "title": "EU rolls out red carpet to Canada to become its first 'associate member'",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971043/eu-canada-carney-tariffs-trump",
@@ -37,11 +42,6 @@
       "title": "How are rising prices affecting you? NPR wants to know",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5969965/cost-of-living-expenses-prices-midterms",
       "pubDate": "Wed, 16 Sep 2026 09:40:12 -0400"
-    },
-    {
-      "title": "Russia seizes Ukrainian POWs, then it demands favors from their relatives",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5904423/russia-seizes-ukrainian-pows-then-it-demands-favors-from-their-relatives",
-      "pubDate": "Wed, 16 Sep 2026 09:33:53 -0400"
     }
   ]
 }
