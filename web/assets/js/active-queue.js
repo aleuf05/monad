@@ -48,6 +48,19 @@
   }
   function saveQueue(q) { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }
 
+  // Retire a demoted instrument from every browser's local active queue.
+  // It remains reachable from Observe's archive, but should not claim a
+  // current-work slot or appear in the add-to-queue picker again.
+  function retireDemotedItems() {
+    var q = loadQueue();
+    var before = q.items.length;
+    q.items = q.items.filter(function (item) { return item.url !== "toys/living-captain/"; });
+    if (q.items.length !== before) {
+      renumber(q);
+      saveQueue(q);
+    }
+  }
+
   function sortedItems(q) {
     return q.items.slice().sort(function (a, b) { return a.queue_position - b.queue_position; });
   }
@@ -401,6 +414,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    retireDemotedItems();
     initHomepageQueue();
     initCardButtons();
     initArchiveSearch();

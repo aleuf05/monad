@@ -318,6 +318,9 @@
   .captain-center .cc-kicker { color: #5ED6BE; font-size: 10px; letter-spacing: .16em; font-weight: 800; }
   .captain-center h2 { margin: 8px 0; color: #EAF5FF; font-size: clamp(28px,5vw,54px); line-height: .95; }
   .captain-center p { color: #9FB3CC; max-width: 650px; line-height: 1.6; }
+  .reserved-berth { background: radial-gradient(circle at 12% 10%,rgba(232,163,61,.12),transparent 45%),#0A111D; }
+  .reserved-berth .cc-kicker { color: #E8A33D; }
+  .reserved-berth h2 { max-width: 720px; }
   .cc-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
   .cc-actions a, .cc-actions button { border: 1px solid #5ED6BE; border-radius: 6px; padding: 10px 14px;
     background: #0F2A2C; color: #5ED6BE; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
@@ -356,27 +359,16 @@
       <span>DOCTRINE: <span class="val">NARRATIVE FOLLOWS REALITY</span></span>
     </div>
 
-    <section class="captain-center" aria-labelledby="livingCaptainTitle">
+    <section class="captain-center reserved-berth" aria-labelledby="reservedBerthTitle">
       <div>
-        <div class="cc-kicker">CENTRAL FOCUS · CAPTAIN ON THE BRIDGE</div>
-        <h2 id="livingCaptainTitle">LIVING CAPTAIN</h2>
-        <p>Monad's coherent operational presence: conversation, continuity, live events, voice, tools, evidence, and command—coming together through one Captain instead of scattering across instruments.</p>
-        <div class="cc-actions">
-          <a id="captainEnter" href="/root/">Root Console (Desktop)</a>
-          <a id="captainPhoneEnter" href="/captain/" style="background:#4FD1C5; color:#0B1220; font-weight:700; border:none; padding:8px 14px; border-radius:6px; text-decoration:none; display:inline-block; font-size:12px; letter-spacing:0.04em;">⚓ Phone Terminal</a>
-          <button type="button" id="masterLiveSound">♪ Engage Live Sound</button>
-          <button type="button" id="masterCaptainVoice">⚓ Hear Live Captain</button>
-          <button type="button" id="masterFleetVoice">📻 Hear FleetNet</button>
-          <a href="#activeQueue">Current Course</a>
-        </div>
+        <div class="cc-kicker">PRIME BERTH · RESERVED</div>
+        <h2 id="reservedBerthTitle">SOMETHING NEW IS TAKING SHAPE</h2>
+        <p>This space is held for the next serious piece of Monad. We will name it when it has earned a name.</p>
       </div>
       <div class="cc-state">
-        <span>HELM <strong>CODEX</strong></span>
-        <span>EVENT WIRE <strong>LIVE SSE</strong></span>
-        <span>VOICE <strong>UNGATED</strong></span>
-        <span>VIEW <strong id="masterViewState">DETECTING AUTHORITY…</strong></span>
-        <span>OPERATOR WATCH <strong id="masterOpsState">READING…</strong></span>
-        <div id="masterOpsAlerts"></div>
+        <span>STATUS <strong>HELD OPEN</strong></span>
+        <span>COURSE <strong>INFORMATIONAL</strong></span>
+        <span>LAUNCH <strong>WHEN READY</strong></span>
       </div>
     </section>
 
@@ -1917,8 +1909,8 @@
             if (!response.ok) throw new Error("root unavailable");
             rootSwitch.classList.add("ready");
             rootSwitch.textContent = "ROOT · READY";
-            viewState.textContent = "ROOT AUTHENTICATED";
-            captainEnter.textContent = "Enter Root Living Captain";
+            if (viewState) viewState.textContent = "ROOT AUTHENTICATED";
+            if (captainEnter) captainEnter.textContent = "Enter Root Living Captain";
             document.body.dataset.masterAuthority = "root";
           })
           .catch(function () {
