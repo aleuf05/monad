@@ -1,8 +1,38 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T09:00:01.553003+00:00",
+  "fetched_at": "2026-09-16T09:15:02.290374+00:00",
   "items": [
+    {
+      "title": "Saudi Arabia calls an attempted Mecca attack a 'red line' as Houthis deny they did it",
+      "link": "https://www.npr.org/2026/09/16/g-s1-143554/saudi-arabia-attempted-mecca-attack",
+      "pubDate": "Wed, 16 Sep 2026 05:04:27 -0400"
+    },
+    {
+      "title": "A Kansas girl ran off to join the circus and changed the tattoo world",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5955615/a-kansas-girl-ran-off-to-join-the-circus-and-changed-the-tattoo-world",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As campaign season gears up, AI-generated ads are everywhere",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The Fed is expected to raise interest rates for the first time in 3 years",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The 500 colleges where former students aren't repaying their loans, and why",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5946419/student-loans-repayment-for-profit-college",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "21 million women live in U.S. counties with limited birth control access",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5956869/birth-control-contraception-access-clinic",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5966383/morning-news-brief",
@@ -12,36 +42,6 @@
       "title": "U.S. acknowledges for the first time that it has deployed weapons in space",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5970937/us-weapons-space",
       "pubDate": "Wed, 16 Sep 2026 03:26:28 -0400"
-    },
-    {
-      "title": "Ed Sheeran's tour in trouble after opening acts drop out in solidarity with rapper Macklemore",
-      "link": "https://www.npr.org/2026/09/16/g-s1-143549/ed-sheeran-tour-trouble",
-      "pubDate": "Wed, 16 Sep 2026 02:41:48 -0400"
-    },
-    {
-      "title": "3 people killed when news helicopter crashes while covering LA bus accident",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5970477/helicopter-crash-los-angeles",
-      "pubDate": "Wed, 16 Sep 2026 00:06:00 -0400"
-    },
-    {
-      "title": "Judge blocks DHS from acting against a man over a harsh email to an ICE official",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5970459/ice-dhs-david-streever-free-speech",
-      "pubDate": "Tue, 15 Sep 2026 23:03:47 -0400"
-    },
-    {
-      "title": "Turkish habit of stashing gold \"under the pillow' hurts economy, government says",
-      "link": "https://www.npr.org/2026/09/15/g-s1-143414/turkey-gold-economy",
-      "pubDate": "Tue, 15 Sep 2026 20:55:41 -0400"
-    },
-    {
-      "title": "Turks often keep gold as a hedge against inflation. It may be hurting Turkey's future",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5949212/turks-often-keep-gold-as-a-hedge-against-inflation-it-may-be-hurting-turkeys-future",
-      "pubDate": "Tue, 15 Sep 2026 18:26:14 -0400"
-    },
-    {
-      "title": "State of U.S. democracy reaches new low, report finds",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5969741/state-of-u-s-democracy-reaches-new-low-report-finds",
-      "pubDate": "Tue, 15 Sep 2026 14:57:42 -0400"
     }
   ]
 }
