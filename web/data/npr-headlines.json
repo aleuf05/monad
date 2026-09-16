@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T10:30:02.125151+00:00",
+  "fetched_at": "2026-09-16T11:00:01.415592+00:00",
   "items": [
+    {
+      "title": "EU's Ursula von der Leyen says she wants Canada to become an associate member",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5970985/canada-become-eu-associate-member",
+      "pubDate": "Wed, 16 Sep 2026 06:48:22 -0400"
+    },
     {
       "title": "Senators question Trump's picks for top health positions, including surgeon general",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5968780/trump-rfk-jr-health-nomination-surgeon-general",
@@ -31,11 +36,6 @@
     {
       "title": "As campaign season gears up, AI-generated ads are everywhere",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
-      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "The Fed is expected to raise interest rates for the first time in 3 years",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
