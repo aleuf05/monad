@@ -1,15 +1,20 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T07:00:01.928358+00:00",
+  "fetched_at": "2026-09-16T07:45:02.350391+00:00",
   "items": [
+    {
+      "title": "U.S. acknowledges for the first time that it has deployed weapons in space",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5970937/us-weapons-space",
+      "pubDate": "Wed, 16 Sep 2026 03:26:28 -0400"
+    },
     {
       "title": "Ed Sheeran's tour in trouble after opening acts drop out in solidarity with rapper Macklemore",
       "link": "https://www.npr.org/2026/09/16/g-s1-143549/ed-sheeran-tour-trouble",
       "pubDate": "Wed, 16 Sep 2026 02:41:48 -0400"
     },
     {
-      "title": "NBC news helicopter crashes and kills at least 3 in LA neighborhood",
+      "title": "3 people killed when news helicopter crashes while covering LA bus accident",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5970477/helicopter-crash-los-angeles",
       "pubDate": "Wed, 16 Sep 2026 00:06:00 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "Family income rose and poverty fell in 2025 \u2014 but safety net cuts could erase gains",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968648/census-poverty-income-health-insurance-report",
       "pubDate": "Tue, 15 Sep 2026 14:29:49 -0400"
-    },
-    {
-      "title": "Kennedy Center board votes to close it, as judge again keeps Trump's name off",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5969905/kennedy-center-closing-trump-name",
-      "pubDate": "Tue, 15 Sep 2026 13:49:07 -0400"
     }
   ]
 }
