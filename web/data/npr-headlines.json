@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T09:30:02.096990+00:00",
+  "fetched_at": "2026-09-16T09:45:01.871229+00:00",
   "items": [
     {
       "title": "Saudi Arabia calls an attempted Mecca attack a 'red line' as Houthis deny they did it",
@@ -9,8 +9,13 @@
       "pubDate": "Wed, 16 Sep 2026 05:04:27 -0400"
     },
     {
-      "title": "The Fed is expected to raise interest rates for the first time in 3 years",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
+      "title": "As campaign season gears up, AI-generated ads are everywhere",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "21 million women live in U.S. counties with limited birth control access",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5956869/birth-control-contraception-access-clinic",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
@@ -24,13 +29,8 @@
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "21 million women live in U.S. counties with limited birth control access",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5956869/birth-control-contraception-access-clinic",
-      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As campaign season gears up, AI-generated ads are everywhere",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
+      "title": "The Fed is expected to raise interest rates for the first time in 3 years",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
