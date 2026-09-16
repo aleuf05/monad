@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-16T07:30:46Z",
+  "generated": "2026-09-16T07:37:06Z",
   "units": {
     "installed": 26,
     "active": 21,
@@ -9,13 +9,13 @@
   },
   "ports": 20,
   "suites": {
-    "passed": 6,
-    "failed": 0,
+    "passed": 5,
+    "failed": 1,
     "total": 6
   },
   "tree": {
-    "uncommitted": 5,
-    "head": "5861595d"
+    "uncommitted": 3,
+    "head": "e00ad5d5"
   },
   "captain": "running",
   "captain_detail": {
@@ -27,17 +27,25 @@
   },
   "voice": {
     "day": "2026-09-16",
-    "seconds_used": 56.4,
+    "seconds_used": 79.32000000000001,
     "seconds_limit": null,
-    "usd_used": 0.0282,
+    "usd_used": 0.03966,
     "usd_limit": null,
     "enforced": false
   },
   "operations": {
-    "status": "clear",
-    "alerts": [],
-    "alert_count": 0,
-    "next_action": "Maintain watch; no operator action required.",
+    "status": "action-required",
+    "alerts": [
+      {
+        "id": "tests:monitored",
+        "severity": "warning",
+        "title": "1 monitored suites failing",
+        "evidence": "5/6 passed",
+        "action": "Run the failing monitored suite and repair the regression."
+      }
+    ],
+    "alert_count": 1,
+    "next_action": "Run the failing monitored suite and repair the regression.",
     "probes": [
       {
         "name": "root-console",
@@ -88,15 +96,15 @@
     "resources": {
       "disk_used_percent": 21,
       "disk_available": "168.7G",
-      "memory_available_percent": 78.4,
-      "load_1m": 0.62
+      "memory_available_percent": 78.1,
+      "load_1m": 0.23
     }
   },
-  "sound": true,
+  "sound": false,
   "lines": [
     {
-      "priority": 2,
-      "text": "Operator watch clear. No action required."
+      "priority": 7,
+      "text": "Operator alert. 1 monitored suites failing. Run the failing monitored suite and repair the regression."
     },
     {
       "priority": 3,
@@ -107,16 +115,16 @@
       "text": "21 of 26 units running on 20 ports."
     },
     {
-      "priority": 2,
-      "text": "All 6 test suites green."
+      "priority": 8,
+      "text": "Warning. 1 test suites failing."
     },
     {
       "priority": 3,
-      "text": "5 files uncommitted."
+      "text": "3 files uncommitted."
     },
     {
       "priority": 1,
-      "text": "Voice ungated. 56.4 seconds generated today; usage remains accounted."
+      "text": "Voice ungated. 79.3 seconds generated today; usage remains accounted."
     },
     {
       "priority": 3,
