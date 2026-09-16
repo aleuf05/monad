@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duck Pond — Fleet Monad</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <a href="../../build.html">← Build &amp; Research</a>
+      <p class="eyebrow">Living system · browser-native</p>
+      <h1>Duck Pond</h1>
+      <p class="lede">Six ducks, one pond, enough memory for small politics. Feed them, change the weather, and see what they make of one another.</p>
+    </header>
+    <section class="layout">
+      <div class="pond-wrap"><canvas id="pond" width="900" height="600" aria-label="Animated duck pond"></canvas></div>
+      <aside>
+        <section class="controls">
+          <h2>Intervene</h2>
+          <button id="feed">Throw breadcrumbs</button>
+          <button id="rain">Make it rain</button>
+          <button id="lily">Add lily pad</button>
+          <button id="reset" class="quiet">Reset pond</button>
+          <p class="hint">Click water to toss food exactly where you want it.</p>
+        </section>
+        <section class="readout">
+          <h2>Pond readout</h2>
+          <dl><div><dt>Temperament</dt><dd id="mood">Settling in</dd></div><div><dt>Friendships</dt><dd id="friends">—</dd></div><div><dt>Territory</dt><dd id="territory">—</dd></div></dl>
+        </section>
+        <section class="duck-card" id="duckCard"><h2>Meet the ducks</h2><p>Hover a duck to see what is on its mind.</p></section>
+        <section class="events"><h2>Pond gossip</h2><ol id="events"></ol></section>
+      </aside>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script src="../../assets/js/monad-nav.js" data-root="../../" data-section="build" data-page="Duck Pond"></script>
+</body>
+</html>

@@ -4,11 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## DUCK-POND-01: Build Duck Pond as the new homepage marquee experience
-
-Status: active — browser-native living pond with autonomous ducks, memory,
-weather and food interventions, visible causal event feed, and marquee link.
-
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
