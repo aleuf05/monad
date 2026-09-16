@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T16:30:01.677718+00:00",
+  "fetched_at": "2026-09-16T17:15:01.755105+00:00",
   "items": [
+    {
+      "title": "A tumultuous congressional primary season closes with record departures and defeats",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5971264/congress-retirement-2026-house-senate-primary-defeat",
+      "pubDate": "Wed, 16 Sep 2026 13:05:41 -0400"
+    },
     {
       "title": "How Jared Kushner is mixing U.S. diplomacy with his billion-dollar business",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971125/how-jared-kushner-is-mixing-u-s-diplomacy-with-his-billion-dollar-business",
@@ -37,11 +42,6 @@
       "title": "Senators question Trump's picks for top health positions, including surgeon general",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5968780/trump-rfk-jr-health-nomination-surgeon-general",
       "pubDate": "Wed, 16 Sep 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Kosovo's ex-President Thaci convicted of war crimes, sentenced to 25 years in prison",
-      "link": "https://www.npr.org/2026/09/16/g-s1-143560/kosovo-former-president-war-crimes",
-      "pubDate": "Wed, 16 Sep 2026 05:57:03 -0400"
     }
   ]
 }
