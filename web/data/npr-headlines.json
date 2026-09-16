@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T11:30:01.951697+00:00",
+  "fetched_at": "2026-09-16T12:30:02.058220+00:00",
   "items": [
     {
       "title": "Fed expected to raise interest rates. And, board votes to close Kennedy Center",
@@ -34,13 +34,13 @@
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "The 500 colleges where former students aren't repaying their loans, and why",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5946419/student-loans-repayment-for-profit-college",
+      "title": "As campaign season gears up, AI-generated ads are everywhere",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "As campaign season gears up, AI-generated ads are everywhere",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
+      "title": "The Fed is expected to raise interest rates for the first time in 3 years",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     }
   ]
