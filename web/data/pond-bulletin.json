@@ -1,0 +1,14 @@
+{
+  "schema_version": "monad.pond-bulletin.v0.1",
+  "published_at": "2026-09-16T09:10:00Z",
+  "mood": "unreasonably peaceful",
+  "bulletin": "The pond wakes. Everyone is pretending not to look at everyone else.",
+  "ducks": [
+    {"name": "Mabel", "temperament": "unreasonably peaceful", "story": "has been watching the reeds"},
+    {"name": "Rupert", "temperament": "confident near crumbs", "story": "believes the pond owes him answers"},
+    {"name": "Pearl", "temperament": "keeping a mental list", "story": "is making introductions"},
+    {"name": "Gus", "temperament": "friendly, until lunch", "story": "found a route worth defending"},
+    {"name": "Clover", "temperament": "quietly ambitious", "story": "has plans for the lily pads"},
+    {"name": "Biscuit", "temperament": "alert to injustices", "story": "remembers every slight"}
+  ]
+}

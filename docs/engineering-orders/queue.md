@@ -4,6 +4,15 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## POND-BULLETIN-01: Canonical phone-readable pond bulletin
+
+Status: **claimed — Live Captain**
+
+Publish a small, static, cacheable Duck Pond bulletin under `web/data/` so
+Pond Companion can refresh a truthful canonical mood and duck dossiers without
+pretending the browser simulation has a server-side event stream. Verify the
+deployed JSON before removing this claim.
+
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
