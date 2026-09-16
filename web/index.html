@@ -1915,12 +1915,12 @@
           })
           .catch(function () {
             rootSwitch.textContent = "ROOT · SIGN IN";
-            viewState.textContent = "PUBLIC";
+            if (viewState) viewState.textContent = "PUBLIC";
             document.body.dataset.masterAuthority = "public";
           });
 
         var liveSound = document.getElementById("masterLiveSound");
-        liveSound.addEventListener("click", function () {
+        if (liveSound) liveSound.addEventListener("click", function () {
           var soundControl = document.getElementById("rigSound");
           if (soundControl) soundControl.click();
           var on = soundControl && soundControl.classList.contains("on");

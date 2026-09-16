@@ -4,11 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## WEB-IA-RESERVE-MARQUEE-01: Demote Living Captain and reserve homepage berth
-
-Status: active — remove Living Captain from the marquee and active queue;
-hold the prime homepage berth for the next build.
-
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
