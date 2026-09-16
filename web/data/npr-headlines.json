@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T01:00:01.421530+00:00",
+  "fetched_at": "2026-09-16T03:15:01.581920+00:00",
   "items": [
+    {
+      "title": "Judge blocks DHS from acting against a man over a harsh email to an ICE official",
+      "link": "https://www.npr.org/2026/09/15/nx-s1-5970459/ice-dhs-david-streever-free-speech",
+      "pubDate": "Tue, 15 Sep 2026 23:03:47 -0400"
+    },
     {
       "title": "Turkish habit of stashing gold \"under the pillow' hurts economy, government says",
       "link": "https://www.npr.org/2026/09/15/g-s1-143414/turkey-gold-economy",
@@ -37,11 +42,6 @@
       "title": "Republican Rep. Massie moves to impeach Defense Secretary Hegseth over Iran war",
       "link": "https://www.npr.org/2026/09/15/g-s1-143407/massie-impeach-hegseth-iran",
       "pubDate": "Tue, 15 Sep 2026 13:35:14 -0400"
-    },
-    {
-      "title": "Tiny krill are turning up in deep-sea hydrothermal vents. Scientists want to know why",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5968643/antarctic-krill-hydrothermal-vent-south-pole",
-      "pubDate": "Tue, 15 Sep 2026 12:53:39 -0400"
     }
   ]
 }
