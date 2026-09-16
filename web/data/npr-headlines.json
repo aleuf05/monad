@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T14:30:01.855333+00:00",
+  "fetched_at": "2026-09-16T15:00:02.351489+00:00",
   "items": [
     {
       "title": "How are rising prices affecting you? NPR wants to know",
@@ -39,8 +39,8 @@
       "pubDate": "Wed, 16 Sep 2026 05:04:27 -0400"
     },
     {
-      "title": "A Kansas girl ran off to join the circus and changed the tattoo world",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5955615/a-kansas-girl-ran-off-to-join-the-circus-and-changed-the-tattoo-world",
+      "title": "As campaign season gears up, AI-generated ads are everywhere",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     }
   ]
