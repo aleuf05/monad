@@ -4,11 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## WEB-IA-PRIMARY-NAV-01: Simplify public homepage and section navigation
-
-Status: active — Live Captain reducing the primary surface to Command,
-Observe, and Build; secondary material moves behind explicit “More” routes.
-
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
@@ -64,4 +59,3 @@ and is on the Captain's `never` list (doctrine 017).
 
 ## ~~WEB-IA-RESPONSIVE-01~~ — VERIFIED 2026-08-14
 Verified mobile-width layout on `web/index.html`, `command.html`, `observe.html`, `build.html`, `story.html`, and `staff.html`. The `.grid` single-column fallback (`minmax(240px, 1fr)` at 327px–366px container widths) and top header 56px clearance for fixed `monad-nav.js` are structurally sound.
-
