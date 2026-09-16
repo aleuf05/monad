@@ -1,6 +1,7 @@
 /**
  * Shared orientation strip for the Monad site: fixed top-left breadcrumb +
- * a one-click switcher between the five top-level sections. Purely additive
+ * a one-click switcher for primary sections. Secondary material is grouped
+ * under “More from Monad” so the working surface stays focused. Purely additive
  * (fixed-position overlay) so it can be dropped into any existing page
  * without touching that page's own layout or CSS.
  *
@@ -29,7 +30,8 @@
     story: { label: "Story & Records", href: "story.html" },
     crew: { label: "Crew", href: "staff.html" },
   };
-  var ORDER = ["command", "observe", "build", "story", "crew"];
+  var PRIMARY_ORDER = ["command", "observe", "build"];
+  var SECONDARY_ORDER = ["story", "crew"];
 
   var style = document.createElement("style");
   style.textContent =
@@ -49,6 +51,7 @@
     "background:#111A2B;border:1px solid #1E2C42;border-radius:6px;padding:4px;min-width:150px;" +
     "flex-direction:column;}" +
     ".monad-nav .mn-menu.open{display:flex;}" +
+    ".monad-nav .mn-menu-label{padding:5px 8px 3px;color:#6B7C93;font-size:9px;letter-spacing:.08em;text-transform:uppercase;}" +
     ".monad-nav .mn-menu a{padding:5px 8px;border-radius:4px;white-space:nowrap;}" +
     ".monad-nav .mn-menu a:hover{background:#0D1626;}" +
     ".monad-nav .mn-menu a.mn-active{color:#E8A33D;}" +
@@ -64,11 +67,14 @@
 
   if (section && SECTIONS[section]) {
     crumbs.push('<span class="mn-sep">›</span>');
-    var menuLinks = ORDER.map(function (key) {
+    function menuLink(key) {
       var s = SECTIONS[key];
       var active = key === section ? " mn-active" : "";
       return '<a class="' + active.trim() + '" href="' + root + s.href + '">' + s.label + "</a>";
-    }).join("");
+    }
+    var menuLinks = PRIMARY_ORDER.map(menuLink).join("") +
+      '<span class="mn-menu-label">More from Monad</span>' +
+      SECONDARY_ORDER.map(menuLink).join("");
     var switcherHtml =
       '<span class="mn-switch">' +
       '<button type="button" class="mn-switch-btn" data-mn-toggle>' +
