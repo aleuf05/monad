@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T21:30:02.160885+00:00",
+  "fetched_at": "2026-09-16T21:45:01.855208+00:00",
   "items": [
     {
       "title": "You'd expect homeowners to save their stuff. Federal policy pays them to leave it",
@@ -17,6 +17,11 @@
       "title": "Trump administration plans ideological warning signs for Smithsonian",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971420/trump-administration-smithsonian-warning-signs",
       "pubDate": "Wed, 16 Sep 2026 16:55:54 -0400"
+    },
+    {
+      "title": "The 'burnerverse' exploiting young women in college",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5971222/the-burnerverse-exploiting-young-women-in-college",
+      "pubDate": "Wed, 16 Sep 2026 16:50:17 -0400"
     },
     {
       "title": "EU rolls out red carpet to Canada to become its first 'associate member'",
@@ -37,11 +42,6 @@
       "title": "A tumultuous congressional primary season closes with record departures and defeats",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971264/congress-retirement-2026-house-senate-primary-defeat",
       "pubDate": "Wed, 16 Sep 2026 13:05:41 -0400"
-    },
-    {
-      "title": "How Jared Kushner is mixing U.S. diplomacy with his billion-dollar business",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5971125/how-jared-kushner-is-mixing-u-s-diplomacy-with-his-billion-dollar-business",
-      "pubDate": "Wed, 16 Sep 2026 12:14:19 -0400"
     }
   ]
 }
