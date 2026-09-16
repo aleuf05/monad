@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T15:00:02.351489+00:00",
+  "fetched_at": "2026-09-16T15:15:02.003657+00:00",
   "items": [
+    {
+      "title": "Mice with human brain cells offer a tool to study disease. Ethicists ask: What's next?",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5968873/lab-mouse-human-brain-cells-organoid-disease-ethics",
+      "pubDate": "Wed, 16 Sep 2026 11:00:16 -0400"
+    },
     {
       "title": "How are rising prices affecting you? NPR wants to know",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5969965/cost-of-living-expenses-prices-midterms",
@@ -37,11 +42,6 @@
       "title": "Saudi Arabia calls an attempted Mecca attack a 'red line' as Houthis deny they did it",
       "link": "https://www.npr.org/2026/09/16/g-s1-143554/saudi-arabia-attempted-mecca-attack",
       "pubDate": "Wed, 16 Sep 2026 05:04:27 -0400"
-    },
-    {
-      "title": "As campaign season gears up, AI-generated ads are everywhere",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
-      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     }
   ]
 }
