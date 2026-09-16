@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-15T22:45:02.057589+00:00",
+  "fetched_at": "2026-09-16T01:00:01.421530+00:00",
   "items": [
+    {
+      "title": "Turkish habit of stashing gold \"under the pillow' hurts economy, government says",
+      "link": "https://www.npr.org/2026/09/15/g-s1-143414/turkey-gold-economy",
+      "pubDate": "Tue, 15 Sep 2026 20:55:41 -0400"
+    },
     {
       "title": "Turks often keep gold as a hedge against inflation. It may be hurting Turkey's future",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5949212/turks-often-keep-gold-as-a-hedge-against-inflation-it-may-be-hurting-turkeys-future",
@@ -37,11 +42,6 @@
       "title": "Tiny krill are turning up in deep-sea hydrothermal vents. Scientists want to know why",
       "link": "https://www.npr.org/2026/09/15/nx-s1-5968643/antarctic-krill-hydrothermal-vent-south-pole",
       "pubDate": "Tue, 15 Sep 2026 12:53:39 -0400"
-    },
-    {
-      "title": "Geopolitics and grain don't mix, say these Montana farmers",
-      "link": "https://www.npr.org/2026/09/15/nx-s1-5964930/canada-tariffs-hurting-montana-farmers",
-      "pubDate": "Tue, 15 Sep 2026 08:33:19 -0400"
     }
   ]
 }
