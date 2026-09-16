@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T17:45:01.568183+00:00",
+  "fetched_at": "2026-09-16T20:30:02.314734+00:00",
   "items": [
+    {
+      "title": "EU rolls out red carpet to Canada to become its first 'associate member'",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5971043/eu-canada-carney-tariffs-trump",
+      "pubDate": "Wed, 16 Sep 2026 16:08:27 -0400"
+    },
     {
       "title": "Congress is under pressure to act on AI \u2014 here's what that could look like",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5969933/congress-ai-regulation",
@@ -37,11 +42,6 @@
       "title": "Russia seizes Ukrainian POWs, then it demands favors from their relatives",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5904423/russia-seizes-ukrainian-pows-then-it-demands-favors-from-their-relatives",
       "pubDate": "Wed, 16 Sep 2026 09:33:53 -0400"
-    },
-    {
-      "title": "Fed expected to raise interest rates. And, board votes to close Kennedy Center",
-      "link": "https://www.npr.org/2026/09/16/g-s1-143569/up-first-newsletter-fed-reserve-interest-rates-iran-war-kennedy-center-contraception",
-      "pubDate": "Wed, 16 Sep 2026 07:19:46 -0400"
     }
   ]
 }
