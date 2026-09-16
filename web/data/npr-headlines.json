@@ -1,12 +1,27 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-16T10:00:01.849725+00:00",
+  "fetched_at": "2026-09-16T10:15:01.472185+00:00",
   "items": [
+    {
+      "title": "Senators question Trump's picks for top health positions, including surgeon general",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5968780/trump-rfk-jr-health-nomination-surgeon-general",
+      "pubDate": "Wed, 16 Sep 2026 06:00:00 -0400"
+    },
+    {
+      "title": "Kosovo's ex-President Thaci convicted of war crimes, sentenced to 25 years in prison",
+      "link": "https://www.npr.org/2026/09/16/g-s1-143560/kosovo-former-president-war-crimes",
+      "pubDate": "Wed, 16 Sep 2026 05:57:03 -0400"
+    },
     {
       "title": "Saudi Arabia calls an attempted Mecca attack a 'red line' as Houthis deny they did it",
       "link": "https://www.npr.org/2026/09/16/g-s1-143554/saudi-arabia-attempted-mecca-attack",
       "pubDate": "Wed, 16 Sep 2026 05:04:27 -0400"
+    },
+    {
+      "title": "As campaign season gears up, AI-generated ads are everywhere",
+      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
+      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "A Kansas girl ran off to join the circus and changed the tattoo world",
@@ -19,11 +34,6 @@
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "As campaign season gears up, AI-generated ads are everywhere",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5953990/ai-political-ads-2026-midterms",
-      "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "21 million women live in U.S. counties with limited birth control access",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5956869/birth-control-contraception-access-clinic",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
@@ -32,16 +42,6 @@
       "title": "The Fed is expected to raise interest rates for the first time in 3 years",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5968724/federal-reserve-interest-rates-inflation-economy",
       "pubDate": "Wed, 16 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5966383/morning-news-brief",
-      "pubDate": "Wed, 16 Sep 2026 04:44:50 -0400"
-    },
-    {
-      "title": "U.S. acknowledges for the first time that it has deployed weapons in space",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5970937/us-weapons-space",
-      "pubDate": "Wed, 16 Sep 2026 03:26:28 -0400"
     }
   ]
 }
