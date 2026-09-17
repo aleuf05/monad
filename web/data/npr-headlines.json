@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T14:00:01.911096+00:00",
+  "fetched_at": "2026-09-17T14:15:01.712063+00:00",
   "items": [
+    {
+      "title": "Greetings from Beijing, where baozi are worth the wait in line",
+      "link": "https://www.npr.org/2026/09/17/g-s1-142416/china-beijing-buns-baozi",
+      "pubDate": "Thu, 17 Sep 2026 09:59:17 -0400"
+    },
     {
       "title": "U.N.-backed experts cite possible U.S. war crimes in Iran, including a school attack",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5972934/us-iran-war-un-report-alleged-war-crimes",
@@ -29,18 +34,13 @@
       "pubDate": "Thu, 17 Sep 2026 05:01:00 -0400"
     },
     {
-      "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
-      "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "Pediatricians raise the alarm on the effect of Trump's immigration crackdown on kids",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5953989/immigration-crackdown-children-medical-care",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "People's houses are collapsing into the ocean. FEMA gives them no other option",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5844642/fema-homes-collapse-ocean-climate-north-carolina-maine",
+      "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     }
   ]
