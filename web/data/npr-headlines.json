@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T19:45:02.299991+00:00",
+  "fetched_at": "2026-09-17T20:30:02.419094+00:00",
   "items": [
+    {
+      "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting",
+      "pubDate": "Thu, 17 Sep 2026 16:23:34 -0400"
+    },
     {
       "title": "Can an AI chatbot save lives by answering texts about pregnancy?",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5962840/artificial-intelligence-ai-chatbot-pregnancy-maternal-health",
@@ -37,11 +42,6 @@
       "title": "Pressure on global chokepoints drives Asia's increased use of Arctic Trade Routes",
       "link": "https://www.npr.org/2026/09/17/g-s1-143712/pressure-on-global-chokepoints-drives-asias-increased-use-of-arctic-trade-routes",
       "pubDate": "Thu, 17 Sep 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Why reshaping memories may hold the key to raising self-esteem",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971141/boost-self-worth-self-esteem",
-      "pubDate": "Thu, 17 Sep 2026 05:02:00 -0400"
     }
   ]
 }
