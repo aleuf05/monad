@@ -4,15 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## CLI-CAPTAIN-WATCH-01: Clean change-of-watch card
-
-Status: **claimed — CLI Captain**
-
-Create and exercise a compact, separate handoff card for the supervised CLI
-Captain experiment. It must not use or modify Live Captain state. At a clean
-change of watch, a fresh Codex receives a short order, reads the card, then
-recovers the current course, limits, and next bearing with live checks.
-
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
