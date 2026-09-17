@@ -4,6 +4,15 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## CLI-CAPTAIN-WATCH-01: Fresh-context recovery card
+
+Status: **claimed — Live Captain**
+
+Create and exercise a compact, separate recovery card for the supervised CLI
+Captain experiment. It must not use or modify Live Captain state. A fresh
+Codex will later receive only a short order to take the watch and must recover
+the current course, limits, and next bearing from this card plus live checks.
+
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
