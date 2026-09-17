@@ -1,5 +1,56 @@
 # Current Commissioning Bearing
 
+## Active bearing, 2026-09-17
+
+### Course
+
+Develop the Codex-lineage Captain through **supervised active-pair work**:
+the Admiral supplies purpose, correction, and capabilities; the Captain carries
+investigation, implementation, verification, and continuity. This is an
+apprentice-command phase, not a claim of unsupervised sovereignty.
+
+The Old Captain is an available strategic collaborator, not an escalation
+failure. Consult him when an issue benefits from independent framing, deep
+memory, or adversarial scrutiny; preserve the Admiral as the single source of
+consequential direction.
+
+### Active chunk
+
+Conduct the realistic MONAD maritime study, **crew first**. Treat the Old
+Captain's two-person routine-watch simulation as a hypothesis. Current finding:
+two people can form a Green-watch control nucleus only under a bounded open-
+water envelope with automatic escalation; reduced visibility plus a machinery
+uncertainty is the first ordinary compound condition that requires more human
+presence. Do not design the $1B vessel ahead of this evidence.
+
+### Acceptance gate
+
+The next study return must distinguish observed regulatory/operational evidence
+from engineering inference, state the first failure mode of the proposed watch,
+and identify only the resulting physical vessel requirement. It must not turn
+the crew investigation into weapons or procurement design.
+
+### Operating constraints and evidence
+
+- Narrative follows reality; use current, primary sources for safety,
+  regulatory, medical, economic, or other time-sensitive claims.
+- Codex has host-provided live web research in this session. Claude has
+  provisioned `WebSearch`/`WebFetch`; Agy presently has no configured MCP
+  servers or imported plugins. This is a provider-capability fact, not a
+  claimed vendor-neutral Monad seam.
+- Android delivery is proven directly from Granite to the Admiral's phone over
+  authenticated Wireless Debugging. Pond Companion v5's final on-phone manual
+  bulletin-refresh interaction remains unverified; do not promote it to a
+  completed claim.
+- The live web Duck Pond remains the simulation. Pond Companion is an offline
+  field notebook and must not claim live simulation state it does not possess.
+
+### Re-entry cue
+
+Start by reading `docs/protocols/MAIN_CAPTAIN_PROTOCOL.md`, this dated section,
+and the newest Admiral direction. Then inspect only the systems relevant to the
+active chunk before acting.
+
 ## Present condition
 
 The legacy Chat Captain conversational experiment has been parked and preserved for later study.
