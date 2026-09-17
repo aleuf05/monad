@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T13:00:01.877954+00:00",
+  "fetched_at": "2026-09-17T13:15:01.452638+00:00",
   "items": [
     {
       "title": "U.N.-backed experts cite possible U.S. war crimes in Iran, including a school attack",
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Big questions - and key logistical details - loom ahead of China-U.S. summit",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971293/trump-xi-summit-china",
+      "title": "People's houses are collapsing into the ocean. FEMA gives them no other option",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5844642/fema-homes-collapse-ocean-climate-north-carolina-maine",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     }
   ]
