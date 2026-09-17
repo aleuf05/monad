@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Captain's Eye</title>
+<style>
+  :root { color-scheme:dark; --bg:#11161d; --panel:#18212b; --line:#385064; --text:#edf4fb; --dim:#aab9c8; --green:#59dfb0; --red:#ff8193; }
+  * { box-sizing:border-box; } body { margin:0; min-height:100vh; display:grid; place-items:center; background:radial-gradient(circle at top,#173844,#11161d 60%); color:var(--text); font:16px system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { width:min(620px,calc(100% - 32px)); } h1 { margin:0 0 8px; font-size:28px; } p { color:var(--dim); line-height:1.5; }
+  #drop { margin:24px 0 12px; min-height:260px; display:grid; place-items:center; text-align:center; border:2px dashed var(--line); border-radius:18px; background:color-mix(in srgb,var(--panel) 86%,transparent); padding:28px; cursor:pointer; outline:none; }
+  #drop:focus, #drop.drag { border-color:var(--green); box-shadow:0 0 0 4px #59dfb022; } #drop strong { display:block; font-size:22px; color:var(--green); margin-bottom:8px; } #drop small { color:var(--dim); }
+  #status { min-height:28px; color:var(--dim); } #status.ok { color:var(--green); } #status.error { color:var(--red); }
+  button { border:1px solid var(--line); background:var(--panel); color:var(--text); border-radius:8px; padding:10px 13px; font:inherit; cursor:pointer; } button:hover { border-color:var(--green); } button[hidden] { display:none; }
+  #file { display:none; } .quiet { font-size:13px; margin-top:22px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Captain’s Eye</h1>
+  <p>Send one screenshot to the CLI Captain. Nothing watches your screen; only the image you paste or choose is delivered.</p>
+  <section id="drop" tabindex="0" role="button" aria-label="Paste or choose a screenshot">
+    <div><strong>Paste a snip here</strong><span>Press <b>Win + Shift + S</b>, select what matters, then press <b>Ctrl + V</b>.<br><small>Or click here to choose an image file.</small></span></div>
+  </section>
+  <input id="file" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+  <div id="status" aria-live="polite">Ready for a screenshot.</div>
+  <button id="copy" hidden>Copy: Captain, inspect latest Winstation screenshot.</button>
+  <p class="quiet">After green confirmation, paste the copied sentence into the Captain chat. Your image is kept privately as the current capture plus a dated record.</p>
+</main>
+<script>
+  const drop = document.querySelector('#drop'); const file = document.querySelector('#file'); const status = document.querySelector('#status'); const copy = document.querySelector('#copy');
+  function tell(message, kind = '') { status.className = kind; status.textContent = message; }
+  async function send(image) {
+    if (!image || !image.type.startsWith('image/')) return tell('Please use a PNG, JPEG, WebP, or GIF image.', 'error');
+    if (image.size > 12 * 1024 * 1024) return tell('That image is over the 12 MB limit.', 'error');
+    tell('Delivering screenshot…'); copy.hidden = true;
+    const form = new FormData(); form.append('file', image, image.name || 'winstation-screenshot.png');
+    try {
+      const response = await fetch('/root-console-api/api/captains-eye', { method:'POST', body:form });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(body.error || `Upload failed (${response.status})`);
+      tell(`Delivered at ${new Date().toLocaleTimeString()}. Captain can inspect it now.`, 'ok'); copy.hidden = false;
+    } catch (error) { tell(`Not delivered: ${error.message}`, 'error'); }
+  }
+  drop.addEventListener('click', () => file.click()); drop.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') file.click(); });
+  file.addEventListener('change', () => send(file.files[0]));
+  ['dragenter','dragover'].forEach(type => drop.addEventListener(type, event => { event.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(type => drop.addEventListener(type, event => { event.preventDefault(); drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', event => send(event.dataTransfer.files[0]));
+  window.addEventListener('paste', event => { const item = [...event.clipboardData.items].find(item => item.type.startsWith('image/')); if (item) { event.preventDefault(); send(item.getAsFile()); } });
+  copy.addEventListener('click', async () => { await navigator.clipboard.writeText('Captain, inspect latest Winstation screenshot.'); tell('Sentence copied. Paste it into the Captain chat.', 'ok'); });
+</script>
+</body>
+</html>

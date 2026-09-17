@@ -4,6 +4,13 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## CAPTAINS-EYE-01: Windows screenshot handoff
+
+Status: **claimed by CLI Captain** — turn the authenticated Root Console image
+intake into a tiny installable Windows-facing capture app. One snip, one paste,
+clear delivered/failed state, and a stable latest-image pointer for the CLI
+Captain to inspect. No new upload service or continuous screen access.
+
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 

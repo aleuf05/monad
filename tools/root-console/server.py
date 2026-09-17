@@ -66,8 +66,8 @@ CONTEXT_IMAGE_TYPES = {
 }
 
 
-def save_context_image(handler: BaseHTTPRequestHandler) -> dict:
-    """Save one authenticated operator image into the private incoming pool."""
+def read_image_upload(handler: BaseHTTPRequestHandler) -> tuple[str, str, bytes]:
+    """Read one bounded, supported image from an authenticated operator."""
     length = int(handler.headers.get("Content-Length", "0"))
     if length <= 0 or length > CONTEXT_IMAGE_MAX_BYTES + 1024 * 1024:
         raise ValueError("image upload is empty or exceeds the 12 MB limit")
@@ -88,13 +88,44 @@ def save_context_image(handler: BaseHTTPRequestHandler) -> dict:
     data = item.file.read(CONTEXT_IMAGE_MAX_BYTES + 1)
     if len(data) > CONTEXT_IMAGE_MAX_BYTES:
         raise ValueError("image upload exceeds the 12 MB limit")
-    original = Path(item.filename).name
+    return Path(item.filename).name, mime, data
+
+
+def save_context_image(handler: BaseHTTPRequestHandler) -> dict:
+    """Save one authenticated operator image into the private incoming pool."""
+    original, mime, data = read_image_upload(handler)
     stem = re.sub(r"[^A-Za-z0-9._-]+", "-", Path(original).stem).strip(".-")[:80] or "context-image"
+    suffix = CONTEXT_IMAGE_TYPES[mime]
     target_dir = REPO_ROOT / "docs" / "incoming" / "context-images"
     target_dir.mkdir(parents=True, exist_ok=True)
     target = target_dir / f"{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}-{stem}{suffix}"
     target.write_bytes(data)
     return {"ok": True, "path": str(target.relative_to(REPO_ROOT)), "bytes": len(data), "content_type": mime}
+
+
+def save_captains_eye_image(handler: BaseHTTPRequestHandler) -> dict:
+    """Receive a Winstation capture with a stable, Captain-readable latest pointer."""
+    original, mime, data = read_image_upload(handler)
+    suffix = CONTEXT_IMAGE_TYPES[mime]
+    root = REPO_ROOT / "data" / "root-console" / "captains-eye"
+    history = root / "history"
+    history.mkdir(parents=True, exist_ok=True)
+    stamp = time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())
+    stem = re.sub(r"[^A-Za-z0-9._-]+", "-", Path(original).stem).strip(".-")[:80] or "winstation"
+    captured = history / f"{stamp}-{stem}{suffix}"
+    captured.write_bytes(data)
+    latest = root / f"latest{suffix}"
+    latest.write_bytes(data)
+    metadata = {
+        "captured_at": stamp,
+        "original_name": original,
+        "content_type": mime,
+        "bytes": len(data),
+        "latest": str(latest.relative_to(REPO_ROOT)),
+        "history": str(captured.relative_to(REPO_ROOT)),
+    }
+    (root / "latest.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    return {"ok": True, **metadata}
 
 def commissioning_status(daemon: CodexDaemon) -> dict:
     """Truthful, inspectable state for the Live Captain commission."""
@@ -355,6 +386,15 @@ class RootConsoleHandler(BaseHTTPRequestHandler):
             self.send_error(404)
 
     def do_POST(self) -> None:  # noqa: N802
+        if self.path == "/api/captains-eye":
+            if not self._authenticated():
+                self._send_json({"error": "authentication required"}, status=401)
+                return
+            try:
+                self._send_json(save_captains_eye_image(self))
+            except (ValueError, OSError) as exc:
+                self._send_json({"error": str(exc)}, status=400)
+            return
         if self.path == "/api/context-image":
             if not self._authenticated():
                 self._send_json({"error": "authentication required"}, status=401)
