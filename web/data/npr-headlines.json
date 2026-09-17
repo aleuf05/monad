@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T20:30:02.419094+00:00",
+  "fetched_at": "2026-09-17T21:30:02.085083+00:00",
   "items": [
+    {
+      "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice",
+      "pubDate": "Thu, 17 Sep 2026 17:17:39 -0400"
+    },
     {
       "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting",
@@ -37,11 +42,6 @@
       "title": "The Fed raises interest rates. And, EU proposes Canada become an 'associate member'",
       "link": "https://www.npr.org/2026/09/17/g-s1-143783/up-first-newsletter-federal-reserve-interest-rates-gas-prices-war-canada-european-union",
       "pubDate": "Thu, 17 Sep 2026 06:54:18 -0400"
-    },
-    {
-      "title": "Pressure on global chokepoints drives Asia's increased use of Arctic Trade Routes",
-      "link": "https://www.npr.org/2026/09/17/g-s1-143712/pressure-on-global-chokepoints-drives-asias-increased-use-of-arctic-trade-routes",
-      "pubDate": "Thu, 17 Sep 2026 06:00:00 -0400"
     }
   ]
 }
