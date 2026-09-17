@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T12:15:01.733326+00:00",
+  "fetched_at": "2026-09-17T12:45:02.053623+00:00",
   "items": [
+    {
+      "title": "U.N.-backed experts cite possible U.S. war crimes in Iran, including a school attack",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5972934/us-iran-war-un-report-alleged-war-crimes",
+      "pubDate": "Thu, 17 Sep 2026 08:33:36 -0400"
+    },
     {
       "title": "The Fed raises interest rates. And, EU proposes Canada become an 'associate member'",
       "link": "https://www.npr.org/2026/09/17/g-s1-143783/up-first-newsletter-federal-reserve-interest-rates-gas-prices-war-canada-european-union",
@@ -36,11 +41,6 @@
     {
       "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
-      "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Big questions - and key logistical details - loom ahead of China-U.S. summit",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971293/trump-xi-summit-china",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     }
   ]
