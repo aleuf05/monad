@@ -4,6 +4,7 @@ import json
 import tempfile
 import unittest
 from unittest.mock import patch
+from email.message import Message
 
 import server
 
@@ -38,13 +39,10 @@ class ContextImageGatewayTests(unittest.TestCase):
             'Content-Disposition: form-data; name="file"; filename="winstation.png"\r\n'
             "Content-Type: image/png\r\n\r\n"
         ).encode() + image + f"\r\n--{boundary}--\r\n".encode()
-        handler = type("Upload", (), {
-            "headers": {
-                "Content-Length": str(len(body)),
-                "Content-Type": f"multipart/form-data; boundary={boundary}",
-            },
-            "rfile": io.BytesIO(body),
-        })()
+        headers = Message()
+        headers["Content-Length"] = str(len(body))
+        headers["Content-Type"] = f"multipart/form-data; boundary={boundary}"
+        handler = type("Upload", (), {"headers": headers, "rfile": io.BytesIO(body)})()
         with tempfile.TemporaryDirectory() as directory, patch.object(server, "REPO_ROOT", Path(directory)):
             result = server.save_captains_eye_image(handler)
             latest = Path(directory, result["latest"])
