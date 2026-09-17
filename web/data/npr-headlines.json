@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T14:45:02.041712+00:00",
+  "fetched_at": "2026-09-17T16:15:02.195184+00:00",
   "items": [
+    {
+      "title": "'American Scoundrel' traces Roy Cohn's playbook from McCarthyism to Trump",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5965831/american-scoundrel-traces-roy-cohns-playbook-from-mccarthyism-to-trump",
+      "pubDate": "Thu, 17 Sep 2026 12:14:06 -0400"
+    },
     {
       "title": "Greetings from Beijing, where baozi are worth the wait in line",
       "link": "https://www.npr.org/2026/09/17/g-s1-142416/china-beijing-buns-baozi",
@@ -36,11 +41,6 @@
     {
       "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
-      "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "People's houses are collapsing into the ocean. FEMA gives them no other option",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5844642/fema-homes-collapse-ocean-climate-north-carolina-maine",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     }
   ]
