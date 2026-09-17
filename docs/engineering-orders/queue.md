@@ -4,15 +4,6 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
-## CAPTAIN-BEARING-09-17: Refresh the supervised-Captain course
-
-Status: **claimed — Live Captain**
-
-Add a small, dated current-bearing section that records the present supervised
-Captain-development phase, active research thread, evidence boundary, and the
-Admiral/Old Captain relationship. Preserve historical commissioning context;
-do not create new doctrine.
-
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 
