@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T07:00:01.572659+00:00",
+  "fetched_at": "2026-09-17T09:00:01.897124+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5966387/morning-news-brief",
+      "pubDate": "Thu, 17 Sep 2026 04:45:53 -0400"
+    },
     {
       "title": "OpenAI flags new concerning AI behavior, to track model misalignment regularly",
       "link": "https://www.npr.org/2026/09/17/g-s1-143774/openai-concerning-ai-behavior",
@@ -37,11 +42,6 @@
       "title": "The 'burnerverse' exploiting young women in college",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971222/the-burnerverse-exploiting-young-women-in-college",
       "pubDate": "Wed, 16 Sep 2026 16:50:17 -0400"
-    },
-    {
-      "title": "EU offers Canada 'associate member' role; Trump calls it 'laughable'",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5971043/eu-canada-carney-tariffs-trump",
-      "pubDate": "Wed, 16 Sep 2026 16:08:27 -0400"
     }
   ]
 }
