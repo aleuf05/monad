@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T11:00:02.124413+00:00",
+  "fetched_at": "2026-09-17T11:45:02.337558+00:00",
   "items": [
     {
       "title": "The Fed raises interest rates. And, EU proposes Canada become an 'associate member'",
@@ -29,13 +29,13 @@
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Pediatricians raise the alarm on the effect of Trump's immigration crackdown on kids",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5953989/immigration-crackdown-children-medical-care",
+      "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
+      "title": "Pediatricians raise the alarm on the effect of Trump's immigration crackdown on kids",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5953989/immigration-crackdown-children-medical-care",
       "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     },
     {
