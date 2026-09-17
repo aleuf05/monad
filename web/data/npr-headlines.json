@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T16:15:02.195184+00:00",
+  "fetched_at": "2026-09-17T17:00:02.134926+00:00",
   "items": [
+    {
+      "title": "A year ago, President Trump pledged to lower Medicaid drug prices. Has that happened?",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5971066/trump-rx-medicaid-generous-drug-prices-pfizer-favored-nation",
+      "pubDate": "Thu, 17 Sep 2026 12:45:58 -0400"
+    },
     {
       "title": "'American Scoundrel' traces Roy Cohn's playbook from McCarthyism to Trump",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5965831/american-scoundrel-traces-roy-cohns-playbook-from-mccarthyism-to-trump",
@@ -37,11 +42,6 @@
       "title": "D.C. airspace is complicated. Experts say Trump's arch would add one more risk",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5950462/trump-arch-dca-planes-safety-concerns-faa",
       "pubDate": "Thu, 17 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "A Sikh truck driver is stabbed amid a rise in anti-South Asian rhetoric",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971866/truck-driver-attack-wyoming-sikh-south-asian",
-      "pubDate": "Thu, 17 Sep 2026 05:00:00 -0400"
     }
   ]
 }
