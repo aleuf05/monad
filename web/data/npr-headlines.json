@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T17:00:02.134926+00:00",
+  "fetched_at": "2026-09-17T19:45:02.299991+00:00",
   "items": [
+    {
+      "title": "Can an AI chatbot save lives by answering texts about pregnancy?",
+      "link": "https://www.npr.org/2026/09/17/nx-s1-5962840/artificial-intelligence-ai-chatbot-pregnancy-maternal-health",
+      "pubDate": "Thu, 17 Sep 2026 15:33:30 -0400"
+    },
     {
       "title": "A year ago, President Trump pledged to lower Medicaid drug prices. Has that happened?",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5971066/trump-rx-medicaid-generous-drug-prices-pfizer-favored-nation",
@@ -37,11 +42,6 @@
       "title": "Why reshaping memories may hold the key to raising self-esteem",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5971141/boost-self-worth-self-esteem",
       "pubDate": "Thu, 17 Sep 2026 05:02:00 -0400"
-    },
-    {
-      "title": "D.C. airspace is complicated. Experts say Trump's arch would add one more risk",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5950462/trump-arch-dca-planes-safety-concerns-faa",
-      "pubDate": "Thu, 17 Sep 2026 05:01:00 -0400"
     }
   ]
 }
