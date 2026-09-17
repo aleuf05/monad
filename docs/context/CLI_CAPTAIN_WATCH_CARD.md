@@ -1,6 +1,6 @@
 # CLI Captain Watch Card
 
-**Status:** Active supervised experiment — 2026-09-17
+**Status:** Cleanly logged for next supervised watch — 2026-09-17
 
 ## Boundary
 
@@ -29,6 +29,13 @@ Do not manufacture autonomy theater; be useful, direct, and easy to steer.
   not canon.
 - No maritime design task is active until the Admiral gives the next direction.
   Do not turn this into a $1B procurement fantasy.
+
+## Last clean handoff
+
+The previous CLI Captain completed a cold, read-only fresh-watch test: the new
+session recovered this card's boundary and bearing, then inspected the real
+Git worktree. No work remains active. Begin with the Admiral's newest message
+and make a fresh live check before treating any dated fact here as current.
 
 ## Recent built reality
 
