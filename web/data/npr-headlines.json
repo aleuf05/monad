@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-17T01:45:01.797216+00:00",
+  "fetched_at": "2026-09-17T07:00:01.572659+00:00",
   "items": [
+    {
+      "title": "OpenAI flags new concerning AI behavior, to track model misalignment regularly",
+      "link": "https://www.npr.org/2026/09/17/g-s1-143774/openai-concerning-ai-behavior",
+      "pubDate": "Thu, 17 Sep 2026 02:44:49 -0400"
+    },
     {
       "title": "Here's why an Arizona medical examiner is working to track heat-related deaths",
       "link": "https://www.npr.org/2024/05/30/nx-s1-4854224/death-heat-arizona-climate-change-medical-examiner",
@@ -37,11 +42,6 @@
       "title": "EU offers Canada 'associate member' role; Trump calls it 'laughable'",
       "link": "https://www.npr.org/2026/09/16/nx-s1-5971043/eu-canada-carney-tariffs-trump",
       "pubDate": "Wed, 16 Sep 2026 16:08:27 -0400"
-    },
-    {
-      "title": "Congress is under pressure to act on AI \u2014 here's what that could look like",
-      "link": "https://www.npr.org/2026/09/16/nx-s1-5969933/congress-ai-regulation",
-      "pubDate": "Wed, 16 Sep 2026 13:32:44 -0400"
     }
   ]
 }
