@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T14:15:02.055543+00:00",
+  "fetched_at": "2026-09-18T16:15:01.909259+00:00",
   "items": [
+    {
+      "title": "Will even one of the U.N.'s 17 'sustainable development goals' be met by 2030?",
+      "link": "https://www.npr.org/2026/09/18/g-s1-143738/united-nations-sustainable-development-goals-hunger-climate-gender",
+      "pubDate": "Fri, 18 Sep 2026 12:07:51 -0400"
+    },
     {
       "title": "Judge says Trump can't demolish Kennedy Center. And, lawsuits target voter intimidation",
       "link": "https://www.npr.org/2026/09/18/g-s1-143913/up-first-newsletter-kennedy-center-trump-voter-intimidation-lawsuit-poland-russia-ukraine",
@@ -36,11 +41,6 @@
     {
       "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
-      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "A DHS email raises new questions about the Trump administration's election plans",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5973278/dhs-noncitizen-voting-english-language",
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     }
   ]
