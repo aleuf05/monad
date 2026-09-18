@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T11:30:01.832346+00:00",
+  "fetched_at": "2026-09-18T14:15:02.055543+00:00",
   "items": [
     {
       "title": "Judge says Trump can't demolish Kennedy Center. And, lawsuits target voter intimidation",
@@ -34,13 +34,13 @@
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Google is helping write AI chatbot safety laws \u2014 while pushing for loopholes",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5968878/ai-chatbots-safety-regulation-google",
+      "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
+      "title": "A DHS email raises new questions about the Trump administration's election plans",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5973278/dhs-noncitizen-voting-english-language",
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     }
   ]
