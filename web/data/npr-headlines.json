@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T10:45:01.681655+00:00",
+  "fetched_at": "2026-09-18T11:00:01.516882+00:00",
   "items": [
+    {
+      "title": "Warren Buffett steps down as Berkshire Hathaway chairman",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5973852/warren-buffett-steps-down",
+      "pubDate": "Fri, 18 Sep 2026 06:58:49 -0400"
+    },
     {
       "title": "South Africa 'feels like a prison' for women amid spate of femicides",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973822/south-africa-feels-like-a-prison-for-women-amid-spate-of-femicides",
@@ -12,16 +17,6 @@
       "title": "True or false: Trump's name is now on the Kennedy Center. The quiz has the answer",
       "link": "https://www.npr.org/2026/09/18/g-s1-143768/celine-dion-trump-kennedy-center-emmys-news-quiz",
       "pubDate": "Fri, 18 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
-      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Google is helping write AI chatbot safety laws \u2014 while pushing for loopholes",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5968878/ai-chatbots-safety-regulation-google",
-      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "A DHS email raises new questions about the Trump administration's election plans",
@@ -34,14 +29,19 @@
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
     },
     {
+      "title": "Google is helping write AI chatbot safety laws \u2014 while pushing for loopholes",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5968878/ai-chatbots-safety-regulation-google",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
+    {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5966388/morning-news-brief",
       "pubDate": "Fri, 18 Sep 2026 04:46:02 -0400"
-    },
-    {
-      "title": "Couple shares how chance encounter brought them together after meeting online",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5971450/couple-shares-how-chance-encounter-brought-them-together-after-meeting-online",
-      "pubDate": "Fri, 18 Sep 2026 04:44:14 -0400"
     }
   ]
 }
