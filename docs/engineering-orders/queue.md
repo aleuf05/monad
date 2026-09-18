@@ -4,6 +4,11 @@ Protocol: see [`AGENTS.md`](../../AGENTS.md) at the repo root. Non-privileged,
 git-only tasks only — nothing requiring `sudo` (that stays in `cmd.sh` /
 `commissioning-handoff.md`).
 
+## COGNITIVE-WATCH-01: Qdrant retrieval pilot
+
+Status: **claimed** — build a curated, provenance-first, read-only retrieval
+watch and evaluate it against real Monad questions. No canonical-memory role.
+
 ## ~~CANON-TRACK-01~~ — DONE
 Ten "Status: Canon" doctrine files (`023`–`031`, `041`) were added to git and are tracked. Verified zero untracked doctrine files.
 

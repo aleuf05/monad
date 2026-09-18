@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T08:15:01.912571+00:00",
+  "fetched_at": "2026-09-18T09:00:01.833007+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5966388/morning-news-brief",
+      "pubDate": "Fri, 18 Sep 2026 04:46:02 -0400"
+    },
     {
       "title": "What to know after a week of Houthi attacks that threaten Saudi oil",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973810/houthi-attacks-saudi-oil-world-markets",
@@ -37,11 +42,6 @@
       "title": "To prevent deaths in childbirth, Kenyan moms turn to an AI powered chatbot",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5962840/artificial-intelligence-ai-chatbot-pregnancy-maternal-health",
       "pubDate": "Thu, 17 Sep 2026 15:33:30 -0400"
-    },
-    {
-      "title": "A year ago, President Trump pledged to lower Medicaid drug prices. Has that happened?",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5971066/trump-rx-medicaid-generous-drug-prices-pfizer-favored-nation",
-      "pubDate": "Thu, 17 Sep 2026 12:45:58 -0400"
     }
   ]
 }
