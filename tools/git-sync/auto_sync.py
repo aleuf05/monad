@@ -18,6 +18,7 @@ import os
 import sys
 import subprocess
 import re
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Tuple, Dict, Optional
@@ -25,6 +26,7 @@ from typing import List, Tuple, Dict, Optional
 # Root directory of the repository
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 LOG_FILE = REPO_ROOT / "logs" / "git-sync.log"
+LEASE_FILE = Path.home() / ".monad" / "captain-work-lease.json"
 
 # Sensitive file patterns that must never be auto-committed
 FORBIDDEN_PATTERNS = [
@@ -100,6 +102,61 @@ def get_status_summary(repo_path: Path = REPO_ROOT) -> Dict[str, List[str]]:
         "total": len(lines)
     }
 
+def load_active_lease(lease_file: Path = LEASE_FILE) -> Optional[Dict[str, object]]:
+    """Return a valid, unexpired Captain edit lease, or None.
+
+    The lease lives outside the repository so an in-progress edit cannot be
+    accidentally staged just by creating its protection marker.
+    """
+    try:
+        raw = json.loads(lease_file.read_text(encoding="utf-8"))
+        expires_at = datetime.fromisoformat(str(raw["expires_at"]).replace("Z", "+00:00"))
+        paths = raw["paths"]
+        if expires_at <= datetime.now(timezone.utc) or not isinstance(paths, list) or not paths:
+            return None
+        return {"expires_at": expires_at, "paths": [str(path).strip("/") for path in paths]}
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return None
+
+def path_is_leased(file_path: str, lease: Dict[str, object]) -> bool:
+    candidate = file_path.strip("/")
+    for raw_scope in lease["paths"]:
+        scope = str(raw_scope).strip("/")
+        if scope in ("", ".") or candidate == scope or candidate.startswith(scope + "/"):
+            return True
+    return False
+
+def filter_leased_status(status: Dict[str, List[str]], lease: Optional[Dict[str, object]]) -> Tuple[Dict[str, List[str]], List[str]]:
+    """Split porcelain status into files eligible for sync and leased files."""
+    if not lease:
+        return status, []
+    eligible = {"modified": [], "untracked": [], "deleted": [], "total": 0}
+    held = []
+    for kind in ("modified", "untracked", "deleted"):
+        for file_path in status[kind]:
+            if path_is_leased(file_path, lease):
+                held.append(file_path)
+            else:
+                eligible[kind].append(file_path)
+    eligible["total"] = sum(len(eligible[kind]) for kind in ("modified", "untracked", "deleted"))
+    return eligible, held
+
+def push_ahead_commits(repo_path: Path, dry_run: bool) -> bool:
+    branch = get_current_branch(repo_path)
+    try:
+        res = run_git(["rev-list", f"origin/{branch}..HEAD"], cwd=repo_path, check=False)
+        ahead_commits = [commit for commit in res.stdout.splitlines() if commit.strip()]
+        if ahead_commits and not dry_run:
+            log(f"Local branch is ahead by {len(ahead_commits)} commit(s). Pushing to origin/{branch}...")
+            run_git(["push", "origin", branch], cwd=repo_path)
+            log(f"Successfully pushed ahead commits to origin/{branch}.")
+        else:
+            log("Remote is up-to-date with local HEAD. Nothing to do.")
+        return True
+    except Exception as e:
+        log(f"Remote check warning: {e}", level="WARN")
+        return True
+
 def scan_for_secrets(files: List[str], repo_path: Path = REPO_ROOT) -> List[str]:
     violations = []
     for f in files:
@@ -170,23 +227,14 @@ def sync(repo_path: Path = REPO_ROOT, dry_run: bool = False, custom_message: Opt
     
     # 1. Check working tree
     status = get_status_summary(repo_path)
+    lease = load_active_lease()
+    status, held_files = filter_leased_status(status, lease)
+    if held_files:
+        expiry = lease["expires_at"].strftime("%H:%M UTC")
+        log(f"Captain work lease holds {len(held_files)} path(s) until {expiry}: {', '.join(held_files[:4])}")
     if status["total"] == 0:
-        log("Working tree is completely clean. Checking remote sync status...")
-        branch = get_current_branch(repo_path)
-        try:
-            # Check if local is ahead of remote
-            res = run_git(["rev-list", f"origin/{branch}..HEAD"], cwd=repo_path, check=False)
-            ahead_commits = [c for c in res.stdout.splitlines() if c.strip()]
-            if ahead_commits and not dry_run:
-                log(f"Local branch is ahead by {len(ahead_commits)} commit(s). Pushing to origin/{branch}...")
-                run_git(["push", "origin", branch], cwd=repo_path)
-                log(f"Successfully pushed ahead commits to origin/{branch}.")
-            else:
-                log("Remote is up-to-date with local HEAD. Nothing to do.")
-            return True
-        except Exception as e:
-            log(f"Remote check warning: {e}", level="WARN")
-            return True
+        log("No eligible changes. Checking remote sync status...")
+        return push_ahead_commits(repo_path, dry_run)
 
     log(f"Detected {status['total']} uncommitted changes: "
         f"{len(status['modified'])} modified, {len(status['untracked'])} untracked, {len(status['deleted'])} deleted.")
@@ -206,7 +254,8 @@ def sync(repo_path: Path = REPO_ROOT, dry_run: bool = False, custom_message: Opt
 
     # 3. Stage changes safely
     log("Staging changes...")
-    run_git(["add", "-A"], cwd=repo_path)
+    staged_paths = status["modified"] + status["untracked"] + status["deleted"]
+    run_git(["add", "-A", "--", *staged_paths], cwd=repo_path)
 
     # 4. Generate commit message and commit
     branch = get_current_branch(repo_path)

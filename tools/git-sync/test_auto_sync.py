@@ -9,6 +9,7 @@ import shutil
 import tempfile
 import unittest
 import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # Add current directory to sys.path to import auto_sync
@@ -17,6 +18,9 @@ from auto_sync import (
     get_status_summary,
     scan_for_secrets,
     generate_commit_message,
+    filter_leased_status,
+    load_active_lease,
+    path_is_leased,
     sync,
     run_git
 )
@@ -98,6 +102,26 @@ class TestAutoSync(unittest.TestCase):
         # File should remain untracked in dry run
         status = get_status_summary(self.repo_path)
         self.assertEqual(status["total"], 1)
+
+    def test_lease_holds_only_its_scoped_paths(self):
+        status = {
+            "modified": ["console/captains-eye.html", "web/data/fleet-status.json"],
+            "untracked": ["tools/root-console/new.py"],
+            "deleted": ["console/old.html"],
+            "total": 4,
+        }
+        lease = {"paths": ["console", "tools/root-console"], "expires_at": datetime.now(timezone.utc) + timedelta(minutes=1)}
+        eligible, held = filter_leased_status(status, lease)
+        self.assertEqual(eligible["modified"], ["web/data/fleet-status.json"])
+        self.assertEqual(eligible["total"], 1)
+        self.assertEqual(set(held), {"console/captains-eye.html", "console/old.html", "tools/root-console/new.py"})
+        self.assertTrue(path_is_leased("console/a.html", lease))
+        self.assertFalse(path_is_leased("console-tools/a.html", lease))
+
+    def test_expired_lease_is_ignored(self):
+        lease_file = Path(self.test_dir) / "lease.json"
+        lease_file.write_text('{"paths": ["web"], "expires_at": "2000-01-01T00:00:00Z"}', encoding="utf-8")
+        self.assertIsNone(load_active_lease(lease_file))
 
 if __name__ == "__main__":
     unittest.main()
