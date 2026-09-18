@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T05:30:01.862263+00:00",
+  "fetched_at": "2026-09-18T07:45:02.330337+00:00",
   "items": [
+    {
+      "title": "It's illegal for armed federal officers to be at polls. Lawsuits seek to ensure that",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5965823/ice-polling-places-concerns-lawsuits",
+      "pubDate": "Fri, 18 Sep 2026 03:37:09 -0400"
+    },
     {
       "title": "The driver who slammed into an LA bus before helicopter crash is charged with murder",
       "link": "https://www.npr.org/2026/09/18/g-s1-143900/helicopter-crash-los-angeles",
@@ -37,11 +42,6 @@
       "title": "'American Scoundrel' traces Roy Cohn's playbook from McCarthyism to Trump",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5965831/american-scoundrel-traces-roy-cohns-playbook-from-mccarthyism-to-trump",
       "pubDate": "Thu, 17 Sep 2026 12:14:06 -0400"
-    },
-    {
-      "title": "Greetings from Beijing, where baozi are worth the wait in line",
-      "link": "https://www.npr.org/2026/09/17/g-s1-142416/china-beijing-buns-baozi",
-      "pubDate": "Thu, 17 Sep 2026 09:59:17 -0400"
     }
   ]
 }
