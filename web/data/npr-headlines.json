@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T19:30:01.927450+00:00",
+  "fetched_at": "2026-09-18T20:30:01.718962+00:00",
   "items": [
+    {
+      "title": "Trump says he is banning CNN, MS NOW and Politico from the White House",
+      "link": "https://www.npr.org/2026/09/18/g-s1-144112/trump-ban-cnn-msnow-politico-white-house-media",
+      "pubDate": "Fri, 18 Sep 2026 16:15:53 -0400"
+    },
     {
       "title": "When Trump and Xi meet they will discuss AI. 'Track Two' talks are already buzzing",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5971481/trump-xi-meeting-ai-track-two-talks",
@@ -37,11 +42,6 @@
       "title": "Warren Buffett steps down as Berkshire Hathaway chairman",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973852/warren-buffett-steps-down",
       "pubDate": "Fri, 18 Sep 2026 06:58:49 -0400"
-    },
-    {
-      "title": "South Africa 'feels like a prison' for women amid spate of femicides",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5973822/south-africa-feels-like-a-prison-for-women-amid-spate-of-femicides",
-      "pubDate": "Fri, 18 Sep 2026 06:39:14 -0400"
     }
   ]
 }
