@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T11:00:01.516882+00:00",
+  "fetched_at": "2026-09-18T11:15:02.150073+00:00",
   "items": [
+    {
+      "title": "Ms. Rachel has entered her album era, and she is so happy about it",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5938847/ms-rachel-mr-aron-new-album-im-so-happy",
+      "pubDate": "Fri, 18 Sep 2026 07:00:00 -0400"
+    },
     {
       "title": "Warren Buffett steps down as Berkshire Hathaway chairman",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973852/warren-buffett-steps-down",
@@ -37,11 +42,6 @@
       "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
       "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5966388/morning-news-brief",
-      "pubDate": "Fri, 18 Sep 2026 04:46:02 -0400"
     }
   ]
 }
