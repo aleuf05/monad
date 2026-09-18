@@ -1,47 +1,47 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T09:00:01.833007+00:00",
+  "fetched_at": "2026-09-18T09:15:01.593407+00:00",
   "items": [
+    {
+      "title": "True or false: Trump's name is now on the Kennedy Center. The quiz has the answer",
+      "link": "https://www.npr.org/2026/09/18/g-s1-143768/celine-dion-trump-kennedy-center-emmys-news-quiz",
+      "pubDate": "Fri, 18 Sep 2026 05:01:00 -0400"
+    },
+    {
+      "title": "Republican 'cavalry' arrives with a Trump-backed $150 million ad blitz in key races",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5971202/trump-super-pac-midterm-spending-republicans-democrats",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Google is helping write AI chatbot safety laws \u2014 while pushing for loopholes",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5968878/ai-chatbots-safety-regulation-google",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "A DHS email raises new questions about the Trump administration's election plans",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5973278/dhs-noncitizen-voting-english-language",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Could trees developed with gene-editing technology protect Florida's citrus industry?",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5966501/trees-gene-editing-florida-citrus-industry",
+      "pubDate": "Fri, 18 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5966388/morning-news-brief",
       "pubDate": "Fri, 18 Sep 2026 04:46:02 -0400"
     },
     {
+      "title": "Poland's prime minister warns of Russian 'accidental' attacks on Ukraine's allies",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5973265/poland-nato-russia",
+      "pubDate": "Fri, 18 Sep 2026 04:44:08 -0400"
+    },
+    {
       "title": "What to know after a week of Houthi attacks that threaten Saudi oil",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973810/houthi-attacks-saudi-oil-world-markets",
       "pubDate": "Fri, 18 Sep 2026 04:02:41 -0400"
-    },
-    {
-      "title": "It's illegal for armed federal officers to be at polls. Lawsuits seek to ensure that",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5965823/ice-polling-places-concerns-lawsuits",
-      "pubDate": "Fri, 18 Sep 2026 03:37:09 -0400"
-    },
-    {
-      "title": "The driver who slammed into an LA bus before helicopter crash is charged with murder",
-      "link": "https://www.npr.org/2026/09/18/g-s1-143900/helicopter-crash-los-angeles",
-      "pubDate": "Fri, 18 Sep 2026 01:16:29 -0400"
-    },
-    {
-      "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice",
-      "pubDate": "Thu, 17 Sep 2026 17:17:39 -0400"
-    },
-    {
-      "title": "ICE agent appears in Minnesota court to face charges in the shooting of a Venezuelan immigrant",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5973127/ice-agent-court-extradition-minnesota-immigrant-shooting",
-      "pubDate": "Thu, 17 Sep 2026 16:23:34 -0400"
-    },
-    {
-      "title": "Retired Olympic superstar Jessie Diggins wins her first-ever 100 mile trail race",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5948171/retired-olympic-superstar-jessie-diggins-wins-her-first-ever-100-mile-trail-race",
-      "pubDate": "Thu, 17 Sep 2026 16:00:35 -0400"
-    },
-    {
-      "title": "To prevent deaths in childbirth, Kenyan moms turn to an AI powered chatbot",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5962840/artificial-intelligence-ai-chatbot-pregnancy-maternal-health",
-      "pubDate": "Thu, 17 Sep 2026 15:33:30 -0400"
     }
   ]
 }

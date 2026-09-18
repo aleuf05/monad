@@ -68,13 +68,14 @@ def records():
         source = ROOT / path
         text = source.read_text(encoding="utf-8")
         digest = hashlib.sha256(text.encode()).hexdigest()
+        commit = git_commit(path)
         for heading, ordinal, chunk in heading_chunks(text):
             if not chunk:
                 continue
             key = f"{path}:{digest}:{ordinal}"
             yield str(uuid.uuid5(NAMESPACE, key)), chunk, {
                 "projection": "cognitive-watch-v1", "source_path": path, "source_class": entry["class"],
-                "source_commit": git_commit(path), "source_sha256": digest, "heading": heading,
+                "source_commit": commit, "source_sha256": digest, "heading": heading,
                 "ordinal": ordinal, "title": source.stem, "excerpt": chunk[:600],
                 "indexed_at": datetime.now(timezone.utc).isoformat(), "authority": "retrieval-only"
             }
