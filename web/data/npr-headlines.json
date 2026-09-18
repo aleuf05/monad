@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T01:45:01.462770+00:00",
+  "fetched_at": "2026-09-18T05:30:01.862263+00:00",
   "items": [
+    {
+      "title": "The driver who slammed into an LA bus before helicopter crash is charged with murder",
+      "link": "https://www.npr.org/2026/09/18/g-s1-143900/helicopter-crash-los-angeles",
+      "pubDate": "Fri, 18 Sep 2026 01:16:29 -0400"
+    },
     {
       "title": "Trump withdraws Lance Schroyer, a former Oklahoma state trooper, as his nominee to lead ICE",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5973271/trump-withdraws-lance-schroyer-a-former-oklahoma-state-trooper-as-his-nominee-to-lead-ice",
@@ -37,11 +42,6 @@
       "title": "Greetings from Beijing, where baozi are worth the wait in line",
       "link": "https://www.npr.org/2026/09/17/g-s1-142416/china-beijing-buns-baozi",
       "pubDate": "Thu, 17 Sep 2026 09:59:17 -0400"
-    },
-    {
-      "title": "U.N.-backed experts cite possible U.S. war crimes in Iran, including a school attack",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5972934/us-iran-war-un-report-alleged-war-crimes",
-      "pubDate": "Thu, 17 Sep 2026 08:33:36 -0400"
     }
   ]
 }
