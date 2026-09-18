@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T07:45:02.330337+00:00",
+  "fetched_at": "2026-09-18T08:15:01.912571+00:00",
   "items": [
+    {
+      "title": "What to know after a week of Houthi attacks that threaten Saudi oil",
+      "link": "https://www.npr.org/2026/09/18/nx-s1-5973810/houthi-attacks-saudi-oil-world-markets",
+      "pubDate": "Fri, 18 Sep 2026 04:02:41 -0400"
+    },
     {
       "title": "It's illegal for armed federal officers to be at polls. Lawsuits seek to ensure that",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5965823/ice-polling-places-concerns-lawsuits",
@@ -37,11 +42,6 @@
       "title": "A year ago, President Trump pledged to lower Medicaid drug prices. Has that happened?",
       "link": "https://www.npr.org/2026/09/17/nx-s1-5971066/trump-rx-medicaid-generous-drug-prices-pfizer-favored-nation",
       "pubDate": "Thu, 17 Sep 2026 12:45:58 -0400"
-    },
-    {
-      "title": "'American Scoundrel' traces Roy Cohn's playbook from McCarthyism to Trump",
-      "link": "https://www.npr.org/2026/09/17/nx-s1-5965831/american-scoundrel-traces-roy-cohns-playbook-from-mccarthyism-to-trump",
-      "pubDate": "Thu, 17 Sep 2026 12:14:06 -0400"
     }
   ]
 }
