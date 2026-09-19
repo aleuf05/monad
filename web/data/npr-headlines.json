@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T05:30:02.267234+00:00",
+  "fetched_at": "2026-09-19T07:00:01.472321+00:00",
   "items": [
+    {
+      "title": "Russia holds parliamentary vote in areas it seized from Ukraine in the war",
+      "link": "https://www.npr.org/2026/09/19/g-s1-144169/russia-holds-parliamentary-vote-in-areas-it-seized-from-ukraine",
+      "pubDate": "Sat, 19 Sep 2026 02:39:57 -0400"
+    },
     {
       "title": "As Europe warms, Italy sees West Nile virus spread",
       "link": "https://www.npr.org/2026/09/19/g-s1-144162/as-europe-warms-italy-sees-west-nile-virus-spread",
@@ -37,11 +42,6 @@
       "title": "What expensive sulfur means for your dinner table",
       "link": "https://www.npr.org/sections/planet-money/2026/09/18/nx-s1-5974103/what-expensive-sulfur-means-for-your-dinner-table",
       "pubDate": "Fri, 18 Sep 2026 12:40:58 -0400"
-    },
-    {
-      "title": "Will even one of the U.N.'s 17 'sustainable development goals' be met by 2030?",
-      "link": "https://www.npr.org/2026/09/18/g-s1-143738/united-nations-sustainable-development-goals-hunger-climate-gender",
-      "pubDate": "Fri, 18 Sep 2026 12:07:51 -0400"
     }
   ]
 }
