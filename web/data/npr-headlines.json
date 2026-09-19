@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-18T21:30:01.685764+00:00",
+  "fetched_at": "2026-09-19T05:00:01.579733+00:00",
   "items": [
+    {
+      "title": "US and Denmark reach deal to build US military presence in Greenland",
+      "link": "https://www.npr.org/2026/09/19/g-s1-144158/us-and-denmark-reach-deal",
+      "pubDate": "Sat, 19 Sep 2026 00:44:46 -0400"
+    },
     {
       "title": "Alaska's salmon-feasting bears face off in biggest Fat Bear Week ever",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5973938/fat-bear-week-2026-bracket",
@@ -37,11 +42,6 @@
       "title": "Judge says Trump can't demolish Kennedy Center. And, lawsuits target voter intimidation",
       "link": "https://www.npr.org/2026/09/18/g-s1-143913/up-first-newsletter-kennedy-center-trump-voter-intimidation-lawsuit-poland-russia-ukraine",
       "pubDate": "Fri, 18 Sep 2026 07:09:24 -0400"
-    },
-    {
-      "title": "Ms. Rachel has entered her album era, and she is so happy about it",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5938847/ms-rachel-mr-aron-new-album-im-so-happy",
-      "pubDate": "Fri, 18 Sep 2026 07:00:00 -0400"
     }
   ]
 }
