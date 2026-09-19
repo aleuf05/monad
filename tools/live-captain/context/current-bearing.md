@@ -51,6 +51,17 @@ core needed on every turn:
 Source: Admiral's 2026-08-01 commissioning message containing *Live Captain
 Self-Guidance Packet — First Metacircular Address*, revision 0.1.
 
+## Current passive-memory posture
+
+Implemented 2026-09-19 from the Admiral/Captain conversation on passive
+learning. The Captain now treats ordinary conversation as a source of
+provisional memory candidates, not automatic canon. Candidates use the
+existing Pulse/Current Watch and memory surfaces and carry observation,
+provenance, scope, confidence, and proposed destination. Explicit memory
+requests may be recorded; repeated patterns are proposed for review; technical
+claims require evidence; corrections supersede earlier records. No new memory
+store, background writer, or parallel archive was added.
+
 ## Required first proof
 
 The Captain must demonstrate that he can:
