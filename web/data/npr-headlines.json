@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T14:45:01.729484+00:00",
+  "fetched_at": "2026-09-19T15:30:02.302379+00:00",
   "items": [
+    {
+      "title": "CNN, MS NOW, Politico reporters denied access to White House following Trump ban",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5974854/trump-cnn-msnow-politico-ban",
+      "pubDate": "Sat, 19 Sep 2026 11:26:31 -0400"
+    },
     {
       "title": "Opinion: Remembering Annie Dillard, nature writer",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5966624/opinion-remembering-annie-dillard-nature-writer",
@@ -37,11 +42,6 @@
       "title": "As Europe warms, Italy sees West Nile virus spread",
       "link": "https://www.npr.org/2026/09/19/g-s1-144162/as-europe-warms-italy-sees-west-nile-virus-spread",
       "pubDate": "Sat, 19 Sep 2026 01:13:18 -0400"
-    },
-    {
-      "title": "U.S. and Denmark reach deal to build U.S. military presence in Greenland",
-      "link": "https://www.npr.org/2026/09/19/g-s1-144158/us-and-denmark-reach-deal",
-      "pubDate": "Sat, 19 Sep 2026 00:44:46 -0400"
     }
   ]
 }
