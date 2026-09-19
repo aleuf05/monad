@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T14:15:02.227370+00:00",
+  "fetched_at": "2026-09-19T14:30:02.067846+00:00",
   "items": [
     {
       "title": "Opinion: Remembering Annie Dillard, nature writer",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5966624/opinion-remembering-annie-dillard-nature-writer",
       "pubDate": "Sat, 19 Sep 2026 08:00:00 -0400"
+    },
+    {
+      "title": "Life in Kabul 5 years after the Taliban's return",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5961263/life-in-kabul-5-years-after-the-talibans-return",
+      "pubDate": "Sat, 19 Sep 2026 07:40:40 -0400"
     },
     {
       "title": "Ancient teeth pose a mystery: What made those strange grooves?",
@@ -37,11 +42,6 @@
       "title": "U.S. and Denmark reach deal to build U.S. military presence in Greenland",
       "link": "https://www.npr.org/2026/09/19/g-s1-144158/us-and-denmark-reach-deal",
       "pubDate": "Sat, 19 Sep 2026 00:44:46 -0400"
-    },
-    {
-      "title": "Alaska's salmon-feasting bears face off in biggest Fat Bear Week ever",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5973938/fat-bear-week-2026-bracket",
-      "pubDate": "Fri, 18 Sep 2026 17:13:14 -0400"
     }
   ]
 }
