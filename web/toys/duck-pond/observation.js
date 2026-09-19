@@ -19,6 +19,12 @@ const freeze = (value, seen = new WeakSet()) => {
 
 const copyForObserver = (value) => freeze(clone(value));
 
+export function clampSampleHz(sampleHz) {
+  const numericSampleHz = Number(sampleHz);
+  if (!Number.isFinite(numericSampleHz)) return 1;
+  return Math.min(10, Math.max(0.1, numericSampleHz));
+}
+
 export function createObservationBus() {
   const subscribers = new Set();
   let sequence = 0;
@@ -35,6 +41,8 @@ export function createObservationBus() {
   }
 
   return {
+    // Delivery is synchronous: messages are state-isolated, but callbacks share
+    // the browser event loop and must return promptly.
     subscribe(subscriber) {
       if (typeof subscriber !== "function") throw new TypeError("subscriber must be a function");
       subscribers.add(subscriber);

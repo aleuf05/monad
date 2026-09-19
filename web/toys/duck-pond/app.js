@@ -1,4 +1,4 @@
-import { createObservationBus } from "./observation.js";
+import { clampSampleHz, createObservationBus } from "./observation.js";
 
 (() => {
   const canvas=document.querySelector('#pond'),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
@@ -11,7 +11,7 @@ import { createObservationBus } from "./observation.js";
   function targetSnapshot(target){if(!target)return null;const duck=ducks.find(d=>d===target);const kind=duck?'duck':food.includes(target)?'food':'point';return {kind,x:target.x,y:target.y,...(duck?{name:duck.name}:{})}}
   function snapshotState(){return {rain,food:food.map(({x,y})=>({x,y})),lilies:lilies.map(({x,y,r})=>({x,y,r})),events:events.map(({text,t})=>({text,t})),ducks:ducks.map(d=>({name:d.name,color:d.color,x:d.x,y:d.y,vx:d.vx,vy:d.vy,hunger:d.hunger,energy:d.energy,territory:d.territory,friends:{...d.friends},grudges:{...d.grudges},state:d.state,target:targetSnapshot(d.target)}))}}
   function publishSnapshot(){observation.publishSnapshot(ticks,snapshotState())}
-  function configureObservation({sampleHz=1}={}){if(observationTimer)clearInterval(observationTimer);if(Number.isFinite(sampleHz)&&sampleHz>0)observationTimer=setInterval(publishSnapshot,1000/sampleHz)}
+  function configureObservation({sampleHz=1}={}){if(observationTimer)clearInterval(observationTimer);observationTimer=setInterval(publishSnapshot,1000/clampSampleHz(sampleHz))}
   globalThis.DuckPondObservation=Object.freeze({subscribe:observation.subscribe,configure:configureObservation});
   function reset(){ticks=0;food=[];lilies=[{x:W*.28,y:H*.67,r:31},{x:W*.72,y:H*.27,r:25},{x:W*.63,y:H*.75,r:20}];rain=0;events=[];ducks=names.map((name,i)=>({name,color:colors[i],x:rand(100,W-100),y:rand(100,H-100),vx:0,vy:0,hunger:rand(.15,.55),energy:1,territory:rand(0,Math.PI*2),friends:{},grudges:{},state:'exploring',target:null})); log('The pond wakes. Everyone is pretending not to look at everyone else.','pond_started');publishSnapshot();}
   function affinity(a,b){return (a.friends[b.name]||0)-(a.grudges[b.name]||0)}

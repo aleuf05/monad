@@ -1,6 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createObservationBus } from "./observation.js";
+import { clampSampleHz, createObservationBus } from "./observation.js";
+
+test("snapshot sampling is clamped to the supported bounds", () => {
+  assert.equal(clampSampleHz(0), 0.1);
+  assert.equal(clampSampleHz(-4), 0.1);
+  assert.equal(clampSampleHz(50), 10);
+  assert.equal(clampSampleHz(1), 1);
+});
 
 test("observer messages are immutable copies and cannot mutate source state", () => {
   const bus = createObservationBus();
