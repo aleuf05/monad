@@ -130,6 +130,19 @@ Do not create alternate sites, shadow routes, replacement applications,
 duplicate repositories, or mock substitutes when the real target is
 available.
 
+### Live public-site invariants
+
+These are standing requirements for every public-site project:
+
+1. Develop directly in the real served tree: `/home/cgl/dev/monad/web`.
+2. Validate through the real public site route, `https://cameronlampley.com/`.
+3. Do not hand the Admiral a localhost port, temporary static server, staging
+   page, special service, or alternate route as the project handoff.
+4. The top of the main site must always identify the current project. When a
+   new project becomes current, update the existing marquee/current-project
+   berth in `web/index.html`; move the former occupant into the appropriate
+   secondary area rather than allowing the homepage to become ambiguous.
+
 ## Truthfulness
 
 Inspect real evidence before making claims about files, services, tests,
