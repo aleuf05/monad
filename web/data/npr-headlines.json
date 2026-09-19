@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T10:15:01.715031+00:00",
+  "fetched_at": "2026-09-19T11:30:01.965164+00:00",
   "items": [
+    {
+      "title": "Ancient teeth pose a mystery: What made those strange grooves?",
+      "link": "https://www.npr.org/2026/09/19/g-s1-144054/ancient-teeth-betel-nuts-mind-altering-drugs",
+      "pubDate": "Sat, 19 Sep 2026 07:21:56 -0400"
+    },
     {
       "title": "An Alaska storm scattered artifacts. Archaeologists are racing to save what's left",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5966568/ex-typhoon-halong-nunallaq-artifacts-archaeological-dig-site-alaska-quinhagak",
@@ -37,11 +42,6 @@
       "title": "Trump says he is banning CNN, MS NOW and Politico from the White House",
       "link": "https://www.npr.org/2026/09/18/g-s1-144112/trump-ban-cnn-msnow-politico-white-house-media",
       "pubDate": "Fri, 18 Sep 2026 16:15:53 -0400"
-    },
-    {
-      "title": "When Trump and Xi meet they will discuss AI. 'Track Two' talks are already buzzing",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5971481/trump-xi-meeting-ai-track-two-talks",
-      "pubDate": "Fri, 18 Sep 2026 15:14:15 -0400"
     }
   ]
 }
