@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T07:00:01.472321+00:00",
+  "fetched_at": "2026-09-19T09:15:01.779185+00:00",
   "items": [
+    {
+      "title": "An Alaska storm scattered artifacts. Archaeologists are racing to save what's left",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5966568/ex-typhoon-halong-nunallaq-artifacts-archaeological-dig-site-alaska-quinhagak",
+      "pubDate": "Sat, 19 Sep 2026 05:01:00 -0400"
+    },
+    {
+      "title": "Ever wonder how the Fed's interest rate actually works? We've got answers",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5969816/federal-reserve-interest-rate-inflation-economy",
+      "pubDate": "Sat, 19 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Russia holds parliamentary vote in areas it seized from Ukraine in the war",
       "link": "https://www.npr.org/2026/09/19/g-s1-144169/russia-holds-parliamentary-vote-in-areas-it-seized-from-ukraine",
@@ -32,16 +42,6 @@
       "title": "When Trump and Xi meet they will discuss AI. 'Track Two' talks are already buzzing",
       "link": "https://www.npr.org/2026/09/18/nx-s1-5971481/trump-xi-meeting-ai-track-two-talks",
       "pubDate": "Fri, 18 Sep 2026 15:14:15 -0400"
-    },
-    {
-      "title": "Syrian regime planned American journalist's kidnapping for weeks",
-      "link": "https://www.npr.org/2026/09/18/nx-s1-5974166/assad-austin-tice-kidnapping-bbc-embedded",
-      "pubDate": "Fri, 18 Sep 2026 15:13:52 -0400"
-    },
-    {
-      "title": "What expensive sulfur means for your dinner table",
-      "link": "https://www.npr.org/sections/planet-money/2026/09/18/nx-s1-5974103/what-expensive-sulfur-means-for-your-dinner-table",
-      "pubDate": "Fri, 18 Sep 2026 12:40:58 -0400"
     }
   ]
 }
