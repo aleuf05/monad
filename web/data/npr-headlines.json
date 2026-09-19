@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T15:30:02.302379+00:00",
+  "fetched_at": "2026-09-19T19:15:02.278866+00:00",
   "items": [
+    {
+      "title": "The new lines of southern Lebanon",
+      "link": "https://www.npr.org/sections/the-picture-show/2026/09/19/g-s1-139752/the-new-lines-of-southern-lebanon",
+      "pubDate": "Sat, 19 Sep 2026 15:00:24 -0400"
+    },
     {
       "title": "CNN, MS NOW, Politico reporters denied access to White House following Trump ban",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5974854/trump-cnn-msnow-politico-ban",
@@ -37,11 +42,6 @@
       "title": "Russia holds parliamentary vote in areas it seized from Ukraine in the war",
       "link": "https://www.npr.org/2026/09/19/g-s1-144169/russia-holds-parliamentary-vote-in-areas-it-seized-from-ukraine",
       "pubDate": "Sat, 19 Sep 2026 02:39:57 -0400"
-    },
-    {
-      "title": "As Europe warms, Italy sees West Nile virus spread",
-      "link": "https://www.npr.org/2026/09/19/g-s1-144162/as-europe-warms-italy-sees-west-nile-virus-spread",
-      "pubDate": "Sat, 19 Sep 2026 01:13:18 -0400"
     }
   ]
 }
