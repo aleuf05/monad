@@ -9,9 +9,11 @@ it, validates the complete successor, and records every causal step.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from hashlib import sha256
 import json
+from pathlib import Path
+import re
 from typing import Any, Generic, Literal, Mapping, TypeVar
 
 
@@ -29,6 +31,7 @@ class X:
 
     kind: str
     identifier: str
+    implementation_digest: str | None = None
 
 
 @dataclass(frozen=True)
@@ -79,8 +82,11 @@ class XOSEACInstance:
     c: C
 
     def to_dict(self) -> Json:
+        x = {"kind": self.x.kind, "identifier": self.x.identifier}
+        if self.x.implementation_digest is not None:
+            x["implementation_digest"] = self.x.implementation_digest
         return {
-            "x": {"kind": self.x.kind, "identifier": self.x.identifier},
+            "x": x,
             "o": {"labels": list(self.o.labels)},
             "s": {"states": list(self.s.states)},
             "e": {"edges": [list(edge) for edge in self.e.edges]},
@@ -140,6 +146,7 @@ class AddEdge:
 
 
 Mutation = AddState | AddEdge
+OPERATIVE_IDENTIFIER = "tools.xoseac_lift.lift"
 
 
 @dataclass(frozen=True)
@@ -186,7 +193,16 @@ def instance_from_dict(raw: Mapping[str, Any]) -> XOSEACInstance:
             raise XOSEACError(f"Inst(M).{key} must be a mapping")
 
     xraw, oraw, sraw, eraw, araw, craw = (raw[k] for k in ("x", "o", "s", "e", "a", "c"))
-    x = X(_require_string(xraw.get("kind"), "x.kind"), _require_string(xraw.get("identifier"), "x.identifier"))
+    implementation_digest = xraw.get("implementation_digest")
+    if implementation_digest is not None:
+        implementation_digest = _require_string(implementation_digest, "x.implementation_digest")
+        if len(implementation_digest) != 64 or any(char not in "0123456789abcdef" for char in implementation_digest):
+            raise XOSEACError("x.implementation_digest must be a lowercase SHA-256 hex digest")
+    x = X(
+        _require_string(xraw.get("kind"), "x.kind"),
+        _require_string(xraw.get("identifier"), "x.identifier"),
+        implementation_digest,
+    )
     o = O(_require_string_list(oraw.get("labels"), "o.labels"))
     states = _require_string_list(sraw.get("states"), "s.states")
     if not states:
@@ -233,6 +249,59 @@ def _canonical(instance: XOSEACInstance) -> str:
 
 def _digest(instance: XOSEACInstance) -> str:
     return sha256(_canonical(instance).encode("utf-8")).hexdigest()
+
+
+def operative_source_digest() -> str:
+    """Digest the actual module performing the lift, not a hand-authored spec."""
+
+    return sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+def operative_instance() -> XOSEACInstance:
+    """Generate Inst(M) from the live operative module and its trace machinery."""
+
+    source = Path(__file__).read_text(encoding="utf-8")
+    phases = tuple(dict.fromkeys(re.findall(r'_event\(events, "([^"]+)"', source)))
+    if not phases:
+        raise XOSEACError("operative module exposes no provenance phases")
+    edges = [[phases[index], phases[index + 1], "trace"] for index in range(len(phases) - 1)]
+    if "request" in phases and "rejection" in phases:
+        edges.append(["request", "rejection", "reject"])
+    terminal = [phases[-1]]
+    if "rejection" in phases and "rejection" not in terminal:
+        terminal.append("rejection")
+    return instance_from_dict({
+        "x": {
+            "kind": "operative-xoseac-lift",
+            "identifier": OPERATIVE_IDENTIFIER,
+            "implementation_digest": operative_source_digest(),
+        },
+        "o": {"labels": ["instance_from_dict", "validate_instance", "apply_lift"]},
+        "s": {"states": list(phases)},
+        "e": {"edges": edges},
+        "a": {"actions": ["AddState", "AddEdge"]},
+        "c": {"initial": phases[0], "terminal": terminal},
+    })
+
+
+def is_self_representation(instance: XOSEACInstance) -> bool:
+    """True only for the exact representation generated for this live M."""
+
+    try:
+        return instance.to_dict() == operative_instance().to_dict()
+    except (XOSEACError, OSError):
+        return False
+
+
+def _is_live_self_derived(instance: XOSEACInstance) -> bool:
+    """Allow a validated descendant of the current self target to execute."""
+
+    return (
+        instance.x.kind == "operative-xoseac-lift"
+        and instance.x.identifier == OPERATIVE_IDENTIFIER
+        and instance.x.implementation_digest == operative_source_digest()
+        and set(operative_instance().s.states) <= set(instance.s.states)
+    )
 
 
 def _event(events: list[ProvenanceEvent], phase: str, claim: str, **data: Any) -> None:
@@ -284,3 +353,52 @@ def apply_lift(instance: XOSEACInstance, mutation: Mutation) -> LiftResult:
     except XOSEACError as error:
         _event(events, "rejection", "WellFormedInst(M') rejected", reason=str(error))
         return LiftResult(False, instance, None, tuple(events), str(error))
+
+
+def _renumber(events: tuple[ProvenanceEvent, ...]) -> tuple[ProvenanceEvent, ...]:
+    return tuple(replace(event, sequence=index) for index, event in enumerate(events))
+
+
+def apply_self_application(target: XOSEACInstance, mutation: Mutation) -> LiftResult:
+    """Apply the operative lift to a mechanically verified representation of M."""
+
+    prefix = [ProvenanceEvent(0, "self-target", "target verified as the live operative M", {
+        "implementation_digest": target.x.implementation_digest,
+    })]
+    if not is_self_representation(target):
+        prefix.append(ProvenanceEvent(1, "rejection", "target is not the live operative M", {}))
+        return LiftResult(False, target, None, tuple(prefix), "target does not represent the live operative M")
+    result = apply_lift(target, mutation)
+    return replace(result, provenance=_renumber(tuple(prefix) + result.provenance))
+
+
+def execute_using_self_representation(
+    self_representation: XOSEACInstance,
+    instance: XOSEACInstance,
+    mutation: Mutation,
+) -> LiftResult:
+    """Run M while consulting a validated self-representation.
+
+    The marker is intentionally trivial: its presence adds one observable
+    runtime provenance event. This demonstrates consequence without claiming
+    that the operative code has improved or rewritten itself.
+    """
+
+    if not _is_live_self_derived(self_representation):
+        return LiftResult(
+            False,
+            instance,
+            None,
+            (ProvenanceEvent(0, "rejection", "self-representation is not live-derived", {}),),
+            "self-representation is not live-derived",
+        )
+    result = apply_lift(instance, mutation)
+    if not result.accepted or "self-audit-marker" not in self_representation.s.states:
+        return result
+    event = ProvenanceEvent(
+        len(result.provenance),
+        "runtime",
+        "self-audit-marker altered subsequent execution",
+        {"marker": "self-audit-marker"},
+    )
+    return replace(result, provenance=_renumber(result.provenance + (event,)))

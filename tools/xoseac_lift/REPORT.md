@@ -68,3 +68,22 @@ if successor construction produces an E endpoint absent from S, the result is
 rejected and no successor is emitted. The result preserves both the original
 instance and the successor when accepted, while rejection preserves the
 original instance and the rejection trace.
+
+## PSA-03A audit addition
+
+`operative_instance()` generates the target from the live `lift.py` source:
+the X component contains the module identifier and SHA-256 source digest; S
+is derived from the `_event` phases actually present in the implementation;
+and A is derived from the operative mutation classes. `is_self_representation`
+requires equality with that generated target, so the arbitrary valid example
+does not qualify.
+
+`apply_self_application` invokes the existing `apply_lift` on that verified
+target. The deliberately trivial `self-audit-marker` S mutation is consumed by
+`execute_using_self_representation`, which adds a runtime provenance event on
+the next execution. That is an observable consequence beyond JSON editing.
+
+This establishes self-application in the narrow operational sense in
+`PSA-03A-OPERATIONAL.md`. It does not rewrite the Python source, demonstrate
+improvement, or supply an external productivity criterion. The strongest claim
+is therefore **self-application**, not productive self-application.

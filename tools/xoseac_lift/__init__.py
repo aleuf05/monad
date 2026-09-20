@@ -8,7 +8,12 @@ from .lift import (
     XOSEACInstance,
     XUp,
     apply_lift,
+    apply_self_application,
+    execute_using_self_representation,
     instance_from_dict,
+    is_self_representation,
+    operative_instance,
+    operative_source_digest,
 )
 
 __all__ = [
@@ -19,5 +24,10 @@ __all__ = [
     "XOSEACInstance",
     "XUp",
     "apply_lift",
+    "apply_self_application",
+    "execute_using_self_representation",
     "instance_from_dict",
+    "is_self_representation",
+    "operative_instance",
+    "operative_source_digest",
 ]
