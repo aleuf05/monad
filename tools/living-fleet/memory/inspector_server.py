@@ -27,32 +27,60 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from memory import store  # noqa: E402
+from memory import identity  # noqa: E402
 from memory.seed_import import DEFAULT_CAPTAINS, DEFAULT_DB, _read_captains  # noqa: E402
 from memory.service import MemoryService  # noqa: E402
 
 HOST = "127.0.0.1"
 PORT = 4772
+REFRESH_POLL_SECONDS = 0.25
+MIN_REFRESH_INTERVAL_SECONDS = 5.0
+
+
+def _identity_summary(service: MemoryService, captain_id: str) -> dict:
+    """Return the identity-only slice without building retrieval context."""
+
+    traits_row = identity.get_traits(service.conn, captain_id)
+    seed = traits_row["seed_json"]
+    return {
+        "role": seed.get("role_summary"),
+        "values": seed.get("values_priorities"),
+        "communication_style": seed.get("communication_style"),
+        "current_tendencies": traits_row["traits_json"],
+    }
+
+
+def _one(conn, sql: str, params: tuple = ()) -> dict | None:
+    row = conn.execute(sql, params).fetchone()
+    return dict(row) if row is not None else None
 
 
 def _captain_summary(service: MemoryService, captain_id: str) -> dict:
-    context = service.request_context(captain_id, purpose="respond-to-lieutenant")
-    identity_summary = context["identity_summary"]
-    relationship = service.request_relationship_context(captain_id, "lieutenant.cgl")
-
-    reflections = sorted(
-        store.fetch_by(service.conn, "reflections", captain_id=captain_id),
-        key=lambda row: row["created_at"],
-        reverse=True,
+    identity_summary = _identity_summary(service, captain_id)
+    relationship = _one(
+        service.conn,
+        "SELECT trust, friction FROM relationships "
+        "WHERE captain_id = ? AND other_id = ? LIMIT 1",
+        (captain_id, "lieutenant.cgl"),
+    ) or {"trust": 0.5, "friction": 0.0}
+    latest_reflection = _one(
+        service.conn,
+        "SELECT summary, created_at, triggered_by FROM reflections "
+        "WHERE captain_id = ? ORDER BY created_at DESC LIMIT 1",
+        (captain_id,),
     )
-    beliefs = store.fetch_by(service.conn, "semantic_beliefs", captain_id=captain_id)
-    episodes = sorted(
-        store.fetch_by(service.conn, "episodic_memories", captain_id=captain_id),
-        key=lambda row: row["salience_score"],
-        reverse=True,
+    belief_counts = service.conn.execute(
+        "SELECT status, COUNT(*) AS count FROM semantic_beliefs "
+        "WHERE captain_id = ? GROUP BY status",
+        (captain_id,),
+    ).fetchall()
+    counts = {row["status"]: row["count"] for row in belief_counts}
+    top_episode = _one(
+        service.conn,
+        "SELECT what, salience_score FROM episodic_memories "
+        "WHERE captain_id = ? ORDER BY salience_score DESC LIMIT 1",
+        (captain_id,),
     )
-
-    latest_reflection = reflections[0] if reflections else None
-    top_episode = episodes[0] if episodes else None
     return {
         "captain_id": captain_id,
         "role": identity_summary.get("role"),
@@ -69,8 +97,8 @@ def _captain_summary(service: MemoryService, captain_id: str) -> dict:
             else None
         ),
         "belief_counts": {
-            "active": sum(1 for row in beliefs if row["status"] == "active"),
-            "superseded": sum(1 for row in beliefs if row["status"] == "superseded"),
+            "active": counts.get("active", 0),
+            "superseded": counts.get("superseded", 0),
         },
         "top_episode": (
             {"what": top_episode["what"], "salience_score": top_episode["salience_score"]} if top_episode else None
@@ -82,7 +110,11 @@ def _fleet_narrative(service: MemoryService) -> list[dict]:
     seen = set()
     result = []
     for captain_id in service.captains:
-        for row in store.fetch_by(service.conn, "narrative_memories", captain_id=captain_id):
+        rows = service.conn.execute(
+            "SELECT title, fact_summary, mythology FROM narrative_memories WHERE captain_id = ?",
+            (captain_id,),
+        ).fetchall()
+        for row in rows:
             key = (row["title"], row["fact_summary"])
             if key in seen:
                 continue
@@ -113,6 +145,7 @@ class SummaryCache:
         self.captains = captains
         self.payload = initial_payload
         self.stop_event = threading.Event()
+        self.last_refresh = time.monotonic()
         self.thread = threading.Thread(target=self._refresh_loop, name="memory-summary-refresh", daemon=True)
 
     def start(self) -> None:
@@ -126,13 +159,18 @@ class SummaryCache:
         service = MemoryService(self.db_path, self.captains)
         try:
             data_version = service.conn.execute("PRAGMA data_version").fetchone()[0]
-            while not self.stop_event.wait(0.25):
+            while not self.stop_event.wait(REFRESH_POLL_SECONDS):
                 try:
                     current_version = service.conn.execute("PRAGMA data_version").fetchone()[0]
-                    if current_version != data_version:
+                    now = time.monotonic()
+                    if (
+                        current_version != data_version
+                        and now - self.last_refresh >= MIN_REFRESH_INTERVAL_SECONDS
+                    ):
                         refreshed = _summary_payload(service)
                         self.payload = refreshed
                         data_version = current_version
+                        self.last_refresh = now
                 except Exception:
                     # The inspector is observational and fail-open: retain the
                     # last good payload if a concurrent write briefly wins.
