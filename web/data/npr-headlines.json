@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T12:00:01.671497+00:00",
+  "fetched_at": "2026-09-20T12:30:02.094401+00:00",
   "items": [
+    {
+      "title": "PHOTOS: The precarious life of fisherfolk",
+      "link": "https://www.npr.org/2026/09/20/g-s1-143447/photos-fishermen-sea-india",
+      "pubDate": "Sun, 20 Sep 2026 08:24:02 -0400"
+    },
     {
       "title": "In New Orleans, an empty building becomes a free store \u2014 and roller skating rink",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5940784/new-orleans-lower-ninth-ward-free-store",
@@ -37,11 +42,6 @@
       "title": "Thousands of planned launches, terms of deal, worry some near Louisiana SpaceX site",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5974180/spacex-musk-landry-louisiana-ndas",
       "pubDate": "Sun, 20 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Saudi Arabia says Houthis tried to attack its capital",
-      "link": "https://www.npr.org/2026/09/19/nx-s1-5974980/saudi-arabia-houthis-attempted-attack-capital",
-      "pubDate": "Sat, 19 Sep 2026 23:57:23 -0400"
     }
   ]
 }
