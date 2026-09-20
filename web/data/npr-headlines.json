@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T03:45:02.297587+00:00",
+  "fetched_at": "2026-09-20T04:15:01.995485+00:00",
   "items": [
+    {
+      "title": "Saudi Arabia says Houthis tried to attack its capital",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5974980/saudi-arabia-houthis-attempted-attack-capital",
+      "pubDate": "Sat, 19 Sep 2026 23:57:23 -0400"
+    },
     {
       "title": "Ed Sheeran says situation in Gaza is 'catastrophic and unjustifiable' as he opens solo concert",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5974977/ed-sheeran-gaza-catastrophic-unjustifiable-opens-solo-concert",
@@ -37,11 +42,6 @@
       "title": "Archaeologists are racing to save precious artifacts in Alaska after last year's storm",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5966568/ex-typhoon-halong-nunallaq-artifacts-archaeological-dig-site-alaska-quinhagak",
       "pubDate": "Sat, 19 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "Ever wonder how the Fed's interest rate actually works? We've got answers",
-      "link": "https://www.npr.org/2026/09/19/nx-s1-5969816/federal-reserve-interest-rate-inflation-economy",
-      "pubDate": "Sat, 19 Sep 2026 05:00:00 -0400"
     }
   ]
 }
