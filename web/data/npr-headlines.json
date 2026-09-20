@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-19T19:15:02.278866+00:00",
+  "fetched_at": "2026-09-20T03:45:02.297587+00:00",
   "items": [
+    {
+      "title": "Ed Sheeran says situation in Gaza is 'catastrophic and unjustifiable' as he opens solo concert",
+      "link": "https://www.npr.org/2026/09/19/nx-s1-5974977/ed-sheeran-gaza-catastrophic-unjustifiable-opens-solo-concert",
+      "pubDate": "Sat, 19 Sep 2026 23:34:12 -0400"
+    },
     {
       "title": "The new lines of southern Lebanon",
       "link": "https://www.npr.org/sections/the-picture-show/2026/09/19/g-s1-139752/the-new-lines-of-southern-lebanon",
@@ -37,11 +42,6 @@
       "title": "Ever wonder how the Fed's interest rate actually works? We've got answers",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5969816/federal-reserve-interest-rate-inflation-economy",
       "pubDate": "Sat, 19 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Russia holds parliamentary vote in areas it seized from Ukraine in the war",
-      "link": "https://www.npr.org/2026/09/19/g-s1-144169/russia-holds-parliamentary-vote-in-areas-it-seized-from-ukraine",
-      "pubDate": "Sat, 19 Sep 2026 02:39:57 -0400"
     }
   ]
 }
