@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T21:30:02.003474+00:00",
+  "fetched_at": "2026-09-20T22:00:01.516324+00:00",
   "items": [
+    {
+      "title": "Federal immigration agent shoots and injures man in Austin, Texas",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5975517/ice-shooting-austin-texas",
+      "pubDate": "Sun, 20 Sep 2026 17:53:00 -0400"
+    },
+    {
+      "title": "Poison suspected in deaths of ten lions in game reserve in Tanzania",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5975478/poison-suspected-in-deaths-of-ten-lions-in-game-reserve-in-tanzania",
+      "pubDate": "Sun, 20 Sep 2026 17:39:24 -0400"
+    },
     {
       "title": "Germany's Merz vows to press ahead with reforms after historic state election defeat",
       "link": "https://www.npr.org/2026/09/20/g-s1-144211/germanys-merz-vows-to-press-ahead-with-reforms-after-historic-state-election-defeat",
@@ -32,16 +42,6 @@
       "title": "U.S. childcare costs are astronomical. More families are turning to grandparents",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5963506/us-childcare-costs-astronomical-families-turning-to-grandparents",
       "pubDate": "Sun, 20 Sep 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Ukraine fires over 1,000 drones at Russia, including hundreds launched at Moscow",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5975372/ukraine-fires-drones-at-russia-moscow",
-      "pubDate": "Sun, 20 Sep 2026 05:16:42 -0400"
-    },
-    {
-      "title": "NPR's College Podcast Challenge is back for 2026",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5966588/nprs-college-podcast-challenge-is-back-for-2026",
-      "pubDate": "Sun, 20 Sep 2026 05:00:00 -0400"
     }
   ]
 }
