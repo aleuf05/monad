@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T10:00:02.052190+00:00",
+  "fetched_at": "2026-09-20T10:15:01.659526+00:00",
   "items": [
+    {
+      "title": "Judge orders Fox to hand over hundreds of documents in shareholders' case",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5974900/fox-shareholders-murdoch-lawsuit",
+      "pubDate": "Sun, 20 Sep 2026 06:01:00 -0400"
+    },
+    {
+      "title": "U.S. childcare costs are astronomical. More families are turning to grandparents",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5963506/us-childcare-costs-astronomical-families-turning-to-grandparents",
+      "pubDate": "Sun, 20 Sep 2026 06:00:00 -0400"
+    },
     {
       "title": "Ukraine fires over 1,000 drones at Russia, including hundreds launched at Moscow",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5975372/ukraine-fires-drones-at-russia-moscow",
@@ -32,16 +42,6 @@
       "title": "Ed Sheeran says situation in Gaza is 'catastrophic and unjustifiable' as he opens solo concert",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5974977/ed-sheeran-gaza-catastrophic-unjustifiable-opens-solo-concert",
       "pubDate": "Sat, 19 Sep 2026 23:34:12 -0400"
-    },
-    {
-      "title": "The new lines of southern Lebanon",
-      "link": "https://www.npr.org/sections/the-picture-show/2026/09/19/g-s1-139752/the-new-lines-of-southern-lebanon",
-      "pubDate": "Sat, 19 Sep 2026 15:00:24 -0400"
-    },
-    {
-      "title": "CNN, MS NOW, Politico reporters denied access to White House following Trump ban",
-      "link": "https://www.npr.org/2026/09/19/nx-s1-5974854/trump-cnn-msnow-politico-ban",
-      "pubDate": "Sat, 19 Sep 2026 11:26:31 -0400"
     }
   ]
 }
