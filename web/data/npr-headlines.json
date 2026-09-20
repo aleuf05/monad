@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T16:45:01.442903+00:00",
+  "fetched_at": "2026-09-20T17:00:02.190494+00:00",
   "items": [
     {
       "title": "Trump says his D.C. arch will serve as 'military complex' with snipers and drones",
@@ -34,13 +34,13 @@
       "pubDate": "Sun, 20 Sep 2026 05:16:42 -0400"
     },
     {
-      "title": "How the NPR College Podcast Challenge changed lives",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5945292/college-podcast-challenge-five-years",
+      "title": "NPR's College Podcast Challenge is back for 2026",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5966588/nprs-college-podcast-challenge-is-back-for-2026",
       "pubDate": "Sun, 20 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "NPR's College Podcast Challenge is back for 2026",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5966588/nprs-college-podcast-challenge-is-back-for-2026",
+      "title": "How the NPR College Podcast Challenge changed lives",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5945292/college-podcast-challenge-five-years",
       "pubDate": "Sun, 20 Sep 2026 05:00:00 -0400"
     }
   ]
