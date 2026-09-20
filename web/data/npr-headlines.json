@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T09:15:01.913227+00:00",
+  "fetched_at": "2026-09-20T09:30:01.733208+00:00",
   "items": [
+    {
+      "title": "Ukraine fires over 1,000 drones at Russia, including hundreds launched at Moscow",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5975372/ukraine-fires-drones-at-russia-moscow",
+      "pubDate": "Sun, 20 Sep 2026 05:16:42 -0400"
+    },
     {
       "title": "How the NPR College Podcast Challenge changed lives",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5945292/college-podcast-challenge-five-years",
@@ -37,11 +42,6 @@
       "title": "CNN, MS NOW, Politico reporters denied access to White House following Trump ban",
       "link": "https://www.npr.org/2026/09/19/nx-s1-5974854/trump-cnn-msnow-politico-ban",
       "pubDate": "Sat, 19 Sep 2026 11:26:31 -0400"
-    },
-    {
-      "title": "Opinion: Remembering Annie Dillard, nature writer",
-      "link": "https://www.npr.org/2026/09/19/nx-s1-5966624/opinion-remembering-annie-dillard-nature-writer",
-      "pubDate": "Sat, 19 Sep 2026 08:00:00 -0400"
     }
   ]
 }
