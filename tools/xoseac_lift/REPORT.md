@@ -48,3 +48,23 @@ full state is still available through `to_dict()`.
 4. “Complete provenance” was interpreted as ordered causal events plus full
 before/after canonical digests and reconstructable before/after states. No
    productivity, optimization, or self-application claim is made.
+
+## Audit findings
+
+The executable behavior is slightly narrower than the prose above in two
+places:
+
+1. Top-level component keys are exact, but nested component mappings are not
+   exact-key validated. For example, an extra key inside `s` is ignored. The
+   accepted boundary is therefore strict about the six components and their
+   required fields, not closed over every nested mapping key.
+2. `XUp` through `CUp` are Python generic aliases over `Lifted[T]`; they give
+   static type information but are not distinct runtime nominal classes.
+   Runtime mutation dispatch is closed by `isinstance` checks for `AddState`
+   and `AddEdge`, and unsupported mutation objects are rejected.
+
+The post-successor validator is executable and was adversarially exercised:
+if successor construction produces an E endpoint absent from S, the result is
+rejected and no successor is emitted. The result preserves both the original
+instance and the successor when accepted, while rejection preserves the
+original instance and the rejection trace.
