@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T16:15:02.172567+00:00",
+  "fetched_at": "2026-09-21T16:30:01.875299+00:00",
   "items": [
     {
       "title": "World leaders convene for UNGA. And, Trump says D.C. arch will be a 'military complex'",
@@ -39,9 +39,9 @@
       "pubDate": "Mon, 21 Sep 2026 04:41:50 -0400"
     },
     {
-      "title": "CNN, MS NOW and Politico sue Trump after being barred from White House",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5975451/reporters-say-they-were-blocked-from-entering-white-house-after-trump-banned-outlets",
-      "pubDate": "Mon, 21 Sep 2026 04:39:38 -0400"
+      "title": "How a national farm leader is dealing with record diesel prices",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5973073/diesel-prices-american-farmers-fuel-costs",
+      "pubDate": "Mon, 21 Sep 2026 04:40:54 -0400"
     }
   ]
 }
