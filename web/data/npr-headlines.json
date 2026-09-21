@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T18:45:01.354801+00:00",
+  "fetched_at": "2026-09-21T20:00:02.241126+00:00",
   "items": [
+    {
+      "title": "What the equinox 'henge' effect tells us about U.S. cities",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5973179/equinox-henge-sunrise-sunset",
+      "pubDate": "Mon, 21 Sep 2026 15:50:13 -0400"
+    },
     {
       "title": "Aviation regulators turn to AI to help manage the nation's airspace",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5976816/faa-ai-manage-airspace",
@@ -36,11 +41,6 @@
     {
       "title": "What to know as world leaders converge at the United Nations this week",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Germany's leader stands his ground after his party loses in state elections",
-      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     }
   ]
