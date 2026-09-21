@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T20:30:01.700073+00:00",
+  "fetched_at": "2026-09-21T21:30:01.387900+00:00",
   "items": [
     {
       "title": "What the equinox 'henge' effect tells us about U.S. cities",
@@ -34,13 +34,13 @@
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "The data center backlash is reshaping American politics \u2014 one community at a time",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5927288/data-center-election-voters-ai",
+      "title": "Germany's leader stands his ground after his party loses in state elections",
+      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Germany's leader stands his ground after his party loses in state elections",
-      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
+      "title": "What to know as world leaders converge at the United Nations this week",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     }
   ]
