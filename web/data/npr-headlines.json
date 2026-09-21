@@ -1,17 +1,12 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T12:00:02.415765+00:00",
+  "fetched_at": "2026-09-21T12:30:01.964032+00:00",
   "items": [
     {
       "title": "World leaders convene for UNGA. And, Trump says D.C. arch will be a 'military complex'",
       "link": "https://www.npr.org/2026/09/21/g-s1-144238/up-first-newsletter-united-nations-general-assembly-trump-arch-faa-ai-federal-agent-shooting",
       "pubDate": "Mon, 21 Sep 2026 07:24:27 -0400"
-    },
-    {
-      "title": "The data center backlash is reshaping American politics \u2014 one community at a time",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5927288/data-center-election-voters-ai",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "German chancellor stands his ground after his party loses in state elections",
@@ -34,14 +29,19 @@
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
+      "title": "The data center backlash is reshaping American politics \u2014 one community at a time",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5927288/data-center-election-voters-ai",
+      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
+    },
+    {
       "title": "18 suspects accused in the 2021 killing of Haiti's president being extradited to U.S.",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5976026/suspects-killing-haiti-president-extradited",
       "pubDate": "Mon, 21 Sep 2026 04:41:50 -0400"
     },
     {
-      "title": "Federal immigration agent shoots and injures man in Austin, Texas",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5975517/ice-shooting-austin-texas",
-      "pubDate": "Sun, 20 Sep 2026 17:53:00 -0400"
+      "title": "CNN, MS NOW and Politico will sue Trump after being barred from White House",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5975451/reporters-say-they-were-blocked-from-entering-white-house-after-trump-banned-outlets",
+      "pubDate": "Mon, 21 Sep 2026 04:39:38 -0400"
     }
   ]
 }
