@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T17:15:01.976432+00:00",
+  "fetched_at": "2026-09-21T17:45:01.486392+00:00",
   "items": [
+    {
+      "title": "Aviation regulators turn to AI to help manage the nation's airspace",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5976816/faa-ai-manage-airspace",
+      "pubDate": "Mon, 21 Sep 2026 13:37:56 -0400"
+    },
     {
       "title": "Paramount makes concessions to salvage $111 billion Warner Bros. Discovery deal",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5974909/paramount-warner-bros-lawsuit",
@@ -12,6 +17,11 @@
       "title": "World leaders convene for UNGA. And, Trump says D.C. arch will be a 'military complex'",
       "link": "https://www.npr.org/2026/09/21/g-s1-144238/up-first-newsletter-united-nations-general-assembly-trump-arch-faa-ai-federal-agent-shooting",
       "pubDate": "Mon, 21 Sep 2026 07:24:27 -0400"
+    },
+    {
+      "title": "What to know as world leaders converge at the United Nations this week",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
+      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "Many GOP candidates still echo Trump's 2020 claims. Lots of voters want to move on",
@@ -29,19 +39,9 @@
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "What to know as world leaders converge at the United Nations this week",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "Germany's leader stands his ground after his party loses in state elections",
       "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "18 suspects accused in the 2021 killing of Haiti's president being extradited to U.S.",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5976026/suspects-killing-haiti-president-extradited",
-      "pubDate": "Mon, 21 Sep 2026 04:41:50 -0400"
     }
   ]
 }
