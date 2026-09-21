@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T17:00:02.350229+00:00",
+  "fetched_at": "2026-09-21T17:15:01.976432+00:00",
   "items": [
     {
       "title": "Paramount makes concessions to salvage $111 billion Warner Bros. Discovery deal",
@@ -12,16 +12,6 @@
       "title": "World leaders convene for UNGA. And, Trump says D.C. arch will be a 'military complex'",
       "link": "https://www.npr.org/2026/09/21/g-s1-144238/up-first-newsletter-united-nations-general-assembly-trump-arch-faa-ai-federal-agent-shooting",
       "pubDate": "Mon, 21 Sep 2026 07:24:27 -0400"
-    },
-    {
-      "title": "What to know as world leaders converge at the United Nations this week",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "German chancellor stands his ground after his party loses in state elections",
-      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "Many GOP candidates still echo Trump's 2020 claims. Lots of voters want to move on",
@@ -36,6 +26,16 @@
     {
       "title": "The data center backlash is reshaping American politics \u2014 one community at a time",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5927288/data-center-election-voters-ai",
+      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "What to know as world leaders converge at the United Nations this week",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
+      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Germany's leader stands his ground after his party loses in state elections",
+      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     },
     {
