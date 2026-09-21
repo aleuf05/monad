@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-21T05:00:01.649713+00:00",
+  "fetched_at": "2026-09-21T08:45:01.441882+00:00",
   "items": [
+    {
+      "title": "18 suspects accused in the 2021 killing of Haiti's president being extradited to U.S.",
+      "link": "https://www.npr.org/2026/09/21/nx-s1-5976026/suspects-killing-haiti-president-extradited",
+      "pubDate": "Mon, 21 Sep 2026 04:41:50 -0400"
+    },
     {
       "title": "Federal immigration agent shoots and injures man in Austin, Texas",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5975517/ice-shooting-austin-texas",
@@ -37,11 +42,6 @@
       "title": "In New Orleans, an empty building becomes a free store \u2014 and roller skating rink",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5940784/new-orleans-lower-ninth-ward-free-store",
       "pubDate": "Sun, 20 Sep 2026 07:00:00 -0400"
-    },
-    {
-      "title": "Judge orders Fox to hand over hundreds of documents in shareholders' case",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5974900/fox-shareholders-murdoch-lawsuit",
-      "pubDate": "Sun, 20 Sep 2026 06:01:00 -0400"
     }
   ]
 }
