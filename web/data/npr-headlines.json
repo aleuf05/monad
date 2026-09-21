@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-20T22:00:01.516324+00:00",
+  "fetched_at": "2026-09-21T05:00:01.649713+00:00",
   "items": [
     {
       "title": "Federal immigration agent shoots and injures man in Austin, Texas",
@@ -29,6 +29,11 @@
       "pubDate": "Sun, 20 Sep 2026 08:24:02 -0400"
     },
     {
+      "title": "The capture of Western Yemen is making the country's humanitarian crisis worse",
+      "link": "https://www.npr.org/2026/09/20/nx-s1-5973884/the-capture-of-western-yemen-is-making-the-countrys-humanitarian-crisis-worse",
+      "pubDate": "Sun, 20 Sep 2026 08:05:42 -0400"
+    },
+    {
       "title": "In New Orleans, an empty building becomes a free store \u2014 and roller skating rink",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5940784/new-orleans-lower-ninth-ward-free-store",
       "pubDate": "Sun, 20 Sep 2026 07:00:00 -0400"
@@ -37,11 +42,6 @@
       "title": "Judge orders Fox to hand over hundreds of documents in shareholders' case",
       "link": "https://www.npr.org/2026/09/20/nx-s1-5974900/fox-shareholders-murdoch-lawsuit",
       "pubDate": "Sun, 20 Sep 2026 06:01:00 -0400"
-    },
-    {
-      "title": "U.S. childcare costs are astronomical. More families are turning to grandparents",
-      "link": "https://www.npr.org/2026/09/20/nx-s1-5963506/us-childcare-costs-astronomical-families-turning-to-grandparents",
-      "pubDate": "Sun, 20 Sep 2026 06:00:00 -0400"
     }
   ]
 }
