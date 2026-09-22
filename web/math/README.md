@@ -1,33 +1,35 @@
-# Monad Education 001 — Moonbase Architect v0.1
+# Monad Education 001 — Moonbase Architect / Cameron Lab v0.2
 
-**Audience**: Fourth grade  
-**Subject**: Common Core Mathematics  
-**Focus**: Area, perimeter, multiplication, factors, optimization
+**Audience**: Cameron (diagnostic, self-consumption)  
+**Subject**: Calculus and classical electromagnetism  
+**Focus**: derivatives, integrals, fields, potential, flux, and physical intuition
 
 ## Core Principle
 
-The child manipulates a mathematical world directly rather than answering worksheets.
-The mathematics is deterministic and implemented directly in code.
+The learner manipulates a mathematical world directly rather than answering worksheets.
+The laboratory starts with a small prompt, watches the reasoning, and increases the
+pressure when the answer is too easy. It is deliberately personal: a refresher that
+can expose a rusty derivative, a missing sign, or an unexamined physical assumption.
 
 ## User Experience
 
-- Instant lunar construction environment (no login, onboarding sequence, curriculum picker, or manual).
-- Interactive square grid representing the habitat.
-- Direct manipulation via mouse, touch, stepper buttons, and sliders.
-- Instant calculation updates on the Compact Engineering Instrument Panel:
-  - `WIDTH`
-  - `LENGTH`
-  - `FLOOR TILES / AREA` ($W \times L$)
-  - `OUTSIDE WALL / PERIMETER` ($2W + 2L$)
-  - `SHIELDING COST` ($P \times \$10,000$)
+- Instant lab environment (no login, onboarding sequence, or curriculum picker).
+- Direct manipulation via sliders and the plotted state.
+- Instant calculation updates on the Field Instrument Panel:
+  - `STATE`
+  - `FUNCTION / FIELD`
+  - `DERIVATIVE / POTENTIAL`
+  - `INVARIANT / CHECK`
 
-## Missions
+## Labs
 
-1. **Mission 1 — BUILD IT**: Build an area of exactly 48 floor tiles (accepts all factor pairs: $6 \times 8$, $4 \times 12$, $3 \times 16$, $2 \times 24$, $1 \times 48$, etc.).
-2. **Mission 2 — MAKE IT CHEAPER**: Keep 48 floor tiles while minimizing the exterior wall perimeter. Discovers the $6 \times 8$ minimum perimeter ($P = 28\text{m}$) engineering record.
-3. **Mission 3 — BEAT THE ENGINEERS**: Given a fixed exterior wall budget ($P \le 24\text{m}$), build the largest possible floor area (discovers the $6 \times 6 = 36$ square maximum area).
-4. **Sandbox — FREE BUILD**: Freeform manipulation up to $24 \times 24$.
+1. **Slope / derivative**: move along $f(x)=x^3-3x$ and recover the tangent slope, stationary points, and local behavior.
+2. **Accumulation / integral**: explore $g(t)=\sin(t)$ and compare instantaneous rate with accumulated signed area.
+3. **Electrostatics**: vary charge and radius for a point charge; connect $E(r)$, $V(r)$, force, and energy without losing the sign.
+4. **Maxwell check**: inspect a spherical Gaussian surface and see when flux, enclosed charge, and symmetry actually agree.
 
-## MARA (Moonbase Architecture & Research Assistant)
+## MARA (Mathematical & Reality Assistant)
 
-Deterministic, state-aware responses triggered by actual behavior to guide observation rather than revealing answers.
+Deterministic, state-aware responses triggered by actual behavior to guide observation
+rather than revealing answers. The point is not to pretend Cameron is a fourth grader;
+the point is to make the next useful question impossible to dodge.
