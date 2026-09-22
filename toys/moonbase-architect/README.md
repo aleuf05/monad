@@ -1,8 +1,9 @@
-# Monad Education 001 — Cameron Lab v0.2
+# Monad Education 001 — Cameron Lab v0.3
 
 **Audience**: Cameron (diagnostic, self-consumption)  
 **Subject**: Calculus and classical electromagnetism  
-**Focus**: derivatives, integrals, fields, potential, flux, and physical intuition
+**Focus**: derivatives, integrals, fields, potential, flux, and physical intuition;
+now extended with a first-principles electromagnetism bench lesson.
 
 ## Core Principle
 
@@ -28,6 +29,10 @@ can expose a rusty derivative, a missing sign, or an unexamined physical assumpt
 3. **Electrostatics**: vary charge and radius for a point charge; connect $E(r)$, $V(r)$, force, and energy without losing the sign.
 4. **Maxwell check**: inspect a spherical Gaussian surface and see when flux, enclosed charge, and symmetry actually agree.
 5. **Fourier**: decompose a live waveform into two rotating components and watch time become frequency.
+6. **Field → Coil**: move from E/B as vector fields through conventional current,
+   the tested 2N2222 switch and PWM, into the 300–500 turn coil, Faraday induction,
+   reciprocity, inductance, and the flyback diode. Each stage asks for a prediction
+   before revealing the explanation.
 
 ## MARA (Mathematical & Reality Assistant)
 

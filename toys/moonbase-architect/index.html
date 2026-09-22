@@ -16,6 +16,28 @@
   <section class="prompt-banner" aria-live="polite"><div class="pb-left"><div class="pb-title" id="promptTitle"></div><div class="pb-sub" id="promptSub"></div><div id="assessmentActions" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"></div></div><div id="promptBadge" class="badge-record" hidden>✓ INSIGHT LOCKED</div></section>
   <main class="main-stage"><section class="canvas-card"><div class="canvas-header"><span id="plotLabel">Live mathematical object</span><span>drag the state point · then predict again</span></div><div class="canvas-wrap"><canvas id="lunarCanvas"></canvas></div>
     <div class="dimension-toolbar"><div class="dim-control-group"><div class="dim-label-row"><span class="dim-title" id="primaryLabel">State x</span><span id="valWidth" class="dim-value">1</span></div><div class="stepper-row"><button id="btnWidthDec" class="stepper-btn">−</button><input id="sliderWidth" type="range" class="dim-slider" min="-30" max="30" step="0.1" value="1"><button id="btnWidthInc" class="stepper-btn">+</button></div></div><div class="dim-control-group"><div class="dim-label-row"><span class="dim-title" id="secondaryLabel">Probe q</span><span id="valLength" class="dim-value">1</span></div><div class="stepper-row"><button id="btnLengthDec" class="stepper-btn">−</button><input id="sliderLength" type="range" class="dim-slider" min="-10" max="10" step="0.1" value="1"><button id="btnLengthInc" class="stepper-btn">+</button></div></div></div>
+    <section id="emLesson" class="em-lesson" hidden aria-label="Electromagnetism lesson">
+      <div class="em-stage-head"><span class="em-kicker">CAMERON LAB · ELECTROMAGNETISM</span><span id="emStageCount"></span></div>
+      <h2 id="emStageTitle"></h2>
+      <div id="emStageBody" class="em-body"></div>
+      <pre id="emStageFormula" class="em-formula"></pre>
+      <div id="emStageNote" class="em-note"></div>
+      <div id="emBench" class="em-bench" hidden>
+        <div class="em-bench-title">Canonical schematic · low-side inductive load</div>
+        <svg viewBox="0 0 720 230" role="img" aria-label="Canonical low-side coil and flyback diode schematic">
+          <path d="M90 48H210M510 48H630M90 48V182H270M450 182H630V48M270 182H450" />
+          <path d="M210 48c0 35 42 35 42 0s42-35 42 0 42 35 42 0 42-35 42 0 42 35 42 0 42-35 42 0" />
+          <path d="M270 182V134M450 182V134M270 134h180" />
+          <path d="M325 134v-38M395 134v-38M325 96h70" />
+          <path d="M350 96l-14 12M350 96l14 12" />
+          <path d="M90 182h180M450 182h180" />
+          <text x="72" y="38">+V</text><text x="302" y="38">COIL</text><text x="292" y="218">NPN / BJT</text><text x="348" y="88">|&lt;|</text><text x="638" y="52">collector</text><text x="638" y="187">emitter → GND</text>
+        </svg>
+        <div class="em-bench-caption">Diode is reverse-biased while powered. When the transistor opens, the collapsing field forward-biases it and gives current a safe decay path.</div>
+      </div>
+      <div class="em-actions"><button id="emReveal" class="btn">Reveal explanation</button><button id="emPrev" class="btn secondary">← Previous</button><button id="emNext" class="btn secondary">Next →</button></div>
+      <div id="emRevealText" class="em-reveal" hidden></div>
+    </section>
   </section><aside class="sidebar"><div class="instrument-panel"><div class="ip-title">Field Instrument Panel</div><div class="readout-grid">
     <div class="readout-card"><div class="rc-head"><span class="rc-label" id="ipStateLabel">STATE</span><span class="rc-formula" id="ipStateFormula"></span></div><div class="rc-main" id="ipState"></div></div>
     <div class="readout-card highlight"><div class="rc-head"><span class="rc-label" id="ipFunctionLabel">FUNCTION</span><span class="rc-formula" id="ipFunctionFormula"></span></div><div class="rc-main" id="ipFunction"></div><div class="rc-sub" id="ipFunctionSub"></div></div>
