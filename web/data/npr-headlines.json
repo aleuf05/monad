@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T15:45:01.925078+00:00",
+  "fetched_at": "2026-09-22T16:00:01.727012+00:00",
   "items": [
     {
       "title": "Sri Lanka court convicts 15 over deadly 2019 Easter bombings",
@@ -29,11 +29,6 @@
       "pubDate": "Tue, 22 Sep 2026 05:01:00 -0400"
     },
     {
-      "title": "The House Freedom Caucus has to transform \u2014 it could preview the GOP's post-Trump era",
-      "link": "https://www.npr.org/2026/09/22/g-s1-144369/freedom-caucus-trump-republicans",
-      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "Abortion is on the ballot again as post-Roe policies continue to evolve",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5974318/election-voting-abortion-policies-roe",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
@@ -41,6 +36,11 @@
     {
       "title": "How unarmed 911 teams are reshaping public safety in nearly 100 cities",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5973302/unarmed-911-responders-police-reform",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The best and biggest games of September",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5971441/review-control-resonant-silent-hill-best-biggest-september-games",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
     }
   ]
