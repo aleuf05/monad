@@ -1,10 +1,15 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T21:45:02.204849+00:00",
+  "fetched_at": "2026-09-22T22:00:01.989721+00:00",
   "items": [
     {
-      "title": "Girl accuses Braden Peters, social media influencer known as 'Clavicular', of rape",
+      "title": "Questions remain after grand jury declines indictment in Nolan Wells' death",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5977673/questions-remain-after-grand-jury-declines-indictment-in-nolan-wells-death",
+      "pubDate": "Tue, 22 Sep 2026 17:47:51 -0400"
+    },
+    {
+      "title": "Girl accuses Braden Peters, social media influencer known as 'Clavicular,' of rape",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5978033/braden-peters-clavicular-looksmaxxing-rape-accusation",
       "pubDate": "Tue, 22 Sep 2026 17:37:28 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "CNN, MS NOW and Politico sue Trump. And, Paramount settles in massive merger lawsuit",
       "link": "https://www.npr.org/2026/09/22/g-s1-144512/up-first-newsletter-press-lawsuit-cnn-msnow-politico-unga-trump-speech-paramount-deal",
       "pubDate": "Tue, 22 Sep 2026 07:01:01 -0400"
-    },
-    {
-      "title": "Houthis try to push deeper into western Yemen, upending life, witnesses tell NPR",
-      "link": "https://www.npr.org/2026/09/22/g-s1-144261/yemen-houthis-saudi-iran-humanitarian-crisis",
-      "pubDate": "Tue, 22 Sep 2026 06:59:37 -0400"
     }
   ]
 }
