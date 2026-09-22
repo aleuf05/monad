@@ -1,9 +1,40 @@
 #!/usr/bin/env node
 import process from "node:process";
 import path from "node:path";
+import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { SelfChatBridge, createPairedClient, authenticatedSelfJids, invokeCodexViaVerifiedAdapter, invokeNotebookViaVerifiedAdapter } from "./bridge.js";
 import { DEFAULT_MEMORY_PATH } from "./memory.js";
+
+const identityFingerprint = value => value
+  ? crypto.createHash("sha256").update(String(value)).digest("hex").slice(0, 12)
+  : null;
+const identityForm = value => {
+  if (!value) return "missing";
+  if (String(value).endsWith("@lid")) return "@lid";
+  if (String(value).endsWith("@s.whatsapp.net")) return "@s.whatsapp.net";
+  if (String(value).endsWith("@g.us")) return "group";
+  return "other";
+};
+const identityDiagnostic = (message, mikeJids, ownJids) => {
+  const key = message?.key || {};
+  const fields = {
+    remoteJid: key.remoteJid,
+    remoteJidAlt: key.remoteJidAlt,
+    participant: key.participant,
+    participantAlt: key.participantAlt,
+    senderPn: key.senderPn,
+    senderLid: key.senderLid,
+  };
+  return Object.fromEntries(Object.entries(fields)
+    .filter(([, value]) => value)
+    .map(([name, value]) => [name, {
+      form: identityForm(value),
+      fingerprint: identityFingerprint(value),
+      self: ownJids.includes(value),
+      mike: mikeJids.includes(value),
+    }]));
+};
 
 const args = new Set(process.argv.slice(2));
 const pair = args.has("--pair");
@@ -34,6 +65,7 @@ try { client = await createPairedClient({
     const ownJid = ownJids[0];
     if (!ownJid) return;
     const text = message.message?.conversation || message.message?.extendedTextMessage?.text || "";
+    console.error(`WhatsApp identity diagnostic: ${JSON.stringify(identityDiagnostic(message, mikeJids, ownJids))}`);
     console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} mikeChat=${mikeJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
       bridge = new SelfChatBridge({ ownJid, ownJids, mikeJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
