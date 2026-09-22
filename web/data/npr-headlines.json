@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T19:30:02.234542+00:00",
+  "fetched_at": "2026-09-22T19:45:01.820311+00:00",
   "items": [
+    {
+      "title": "Trump's D.C. arch is now a military complex. Here's how that complicates things",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5977646/trump-dc-arch-military-complex-questions",
+      "pubDate": "Tue, 22 Sep 2026 15:25:05 -0400"
+    },
     {
       "title": "Inside a 'modern slavery situation' where cyber scammers are victims themselves",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5977731/inside-a-modern-slavery-situation-where-cyber-scammers-are-victims-themselves",
@@ -37,11 +42,6 @@
       "title": "New DNA analysis adds evidence Jefferson fathered children with Sally Hemings",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5791513/thomas-jefferson-sally-hemings-dna-hair-smithsonian",
       "pubDate": "Tue, 22 Sep 2026 06:00:00 -0400"
-    },
-    {
-      "title": "AI solved one of math's hardest problems. Humanity learned nothing (so far)",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5968588/openai-navier-stokes-problem-mathematicians-learn-little",
-      "pubDate": "Tue, 22 Sep 2026 05:01:00 -0400"
     }
   ]
 }
