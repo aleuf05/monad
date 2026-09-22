@@ -1,4 +1,4 @@
-# Monad Education 001 — Moonbase Architect / Cameron Lab v0.2
+# Monad Education 001 — Cameron Lab v0.2
 
 **Audience**: Cameron (diagnostic, self-consumption)  
 **Subject**: Calculus and classical electromagnetism  
@@ -32,5 +32,5 @@ can expose a rusty derivative, a missing sign, or an unexamined physical assumpt
 ## MARA (Mathematical & Reality Assistant)
 
 Deterministic, state-aware responses triggered by actual behavior to guide observation
-rather than revealing answers. The point is not to pretend Cameron is a fourth grader;
-the point is to make the next useful question impossible to dodge.
+rather than revealing answers. This is for Cameron specifically: advanced in some
+directions, rusty in others, and never flattened into a school-grade category.
