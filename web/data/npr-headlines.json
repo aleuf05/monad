@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T16:30:02.122066+00:00",
+  "fetched_at": "2026-09-22T16:45:01.785395+00:00",
   "items": [
+    {
+      "title": "Inside a 'modern slavery situation' where cyber scammers are victims themselves",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5977731/inside-a-modern-slavery-situation-where-cyber-scammers-are-victims-themselves",
+      "pubDate": "Tue, 22 Sep 2026 12:29:37 -0400"
+    },
     {
       "title": "This 'fire amoeba' pushes the limit of what's possible for complex life",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5977044/fire-amoeba-extremophile-eukaryote-life",
@@ -36,11 +41,6 @@
     {
       "title": "Abortion is on the ballot again as post-Roe policies continue to evolve",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5974318/election-voting-abortion-policies-roe",
-      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "How unarmed 911 teams are reshaping public safety in nearly 100 cities",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5973302/unarmed-911-responders-police-reform",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
     }
   ]
