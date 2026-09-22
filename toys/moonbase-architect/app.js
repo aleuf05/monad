@@ -1,7 +1,7 @@
-import { MoonbaseMathEngine, MISSIONS, EM_STAGES } from './engine.js';
-import { MoonbaseCanvasRenderer } from './renderer.js';
-import { MoonbaseAudio } from './sound.js';
-import { MoonbaseTelemetry } from './telemetry.js';
+import { MoonbaseMathEngine, MISSIONS, EM_STAGES } from './engine.js?v=em-20260922';
+import { MoonbaseCanvasRenderer } from './renderer.js?v=em-20260922';
+import { MoonbaseAudio } from './sound.js?v=em-20260922';
+import { MoonbaseTelemetry } from './telemetry.js?v=em-20260922';
 
 class MoonbaseApp {
   constructor() {
