@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T11:15:01.606169+00:00",
+  "fetched_at": "2026-09-22T11:45:02.024366+00:00",
   "items": [
     {
       "title": "CNN, MS NOW and Politico sue Trump. And, Paramount settles in massive merger lawsuit",
@@ -29,11 +29,6 @@
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Police, fire, EMT and mental health: How one city is leading the charge to reshape 911",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5973302/unarmed-911-responders-police-reform",
-      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "The best and biggest games of September",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5971441/review-control-resonant-silent-hill-best-biggest-september-games",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
@@ -41,6 +36,11 @@
     {
       "title": "Abortion is on the ballot again as post-Roe policies continue to evolve",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5974318/election-voting-abortion-policies-roe",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Trump heads to U.N. looking for wins after a rough week",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5976843/trump-heads-to-u-n-looking-for-wins-after-a-rough-week",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
     }
   ]
