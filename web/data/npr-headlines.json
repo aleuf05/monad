@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T08:15:02.297228+00:00",
+  "fetched_at": "2026-09-22T08:45:01.699553+00:00",
   "items": [
+    {
+      "title": "Grand jury finds no evidence of criminal conduct in the death of Nolan Wells",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5911804/nolan-wells-investigation-grand-jury",
+      "pubDate": "Tue, 22 Sep 2026 04:31:47 -0400"
+    },
     {
       "title": "New book by Princess Diana's brother prompts war of words with King Charles III",
       "link": "https://www.npr.org/2026/09/22/g-s1-144505/princess-diana-brother-book",
@@ -36,11 +41,6 @@
     {
       "title": "This farm raised thousands of pigs for slaughter. Now it's growing mushrooms instead",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5944503/iowa-hog-farm-growing-specialty-mushrooms",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Germany's leader stands his ground after his party loses in state elections",
-      "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     }
   ]
