@@ -1,8 +1,38 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T08:45:01.699553+00:00",
+  "fetched_at": "2026-09-22T09:15:02.112222+00:00",
   "items": [
+    {
+      "title": "AI solved one of math's hardest problems. Humanity learned nothing (so far)",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5968588/openai-navier-stokes-problem-mathematicians-learn-little",
+      "pubDate": "Tue, 22 Sep 2026 05:01:00 -0400"
+    },
+    {
+      "title": "Abortion is on the ballot again as post-Roe policies continue to evolve",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5974318/election-voting-abortion-policies-roe",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Police, fire, EMT and mental health: How one city is leading the charge to reshape 911",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5973302/unarmed-911-responders-police-reform",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The best and biggest games of September",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5971441/review-control-resonant-silent-hill-best-biggest-september-games",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The House Freedom Caucus has to transform \u2014 it could preview the GOP's post-Trump era",
+      "link": "https://www.npr.org/2026/09/22/g-s1-144369/freedom-caucus-trump-republicans",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Trump heads to U.N. looking for wins after a rough week",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5976843/trump-heads-to-u-n-looking-for-wins-after-a-rough-week",
+      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Grand jury finds no evidence of criminal conduct in the death of Nolan Wells",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5911804/nolan-wells-investigation-grand-jury",
@@ -12,36 +42,6 @@
       "title": "New book by Princess Diana's brother prompts war of words with King Charles III",
       "link": "https://www.npr.org/2026/09/22/g-s1-144505/princess-diana-brother-book",
       "pubDate": "Tue, 22 Sep 2026 04:03:27 -0400"
-    },
-    {
-      "title": "What the equinox 'henge' effect tells us about U.S. cities",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5973179/equinox-henge-sunrise-sunset",
-      "pubDate": "Mon, 21 Sep 2026 15:50:13 -0400"
-    },
-    {
-      "title": "Aviation regulators turn to AI to help manage the nation's airspace",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5976816/faa-ai-manage-airspace",
-      "pubDate": "Mon, 21 Sep 2026 13:37:56 -0400"
-    },
-    {
-      "title": "Paramount makes concessions to salvage $111 billion Warner Bros. Discovery deal",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5974909/paramount-warner-bros-lawsuit",
-      "pubDate": "Mon, 21 Sep 2026 12:40:28 -0400"
-    },
-    {
-      "title": "World leaders convene for UNGA. And, Trump says D.C. arch will be a 'military complex'",
-      "link": "https://www.npr.org/2026/09/21/g-s1-144238/up-first-newsletter-united-nations-general-assembly-trump-arch-faa-ai-federal-agent-shooting",
-      "pubDate": "Mon, 21 Sep 2026 07:24:27 -0400"
-    },
-    {
-      "title": "Many GOP candidates still echo Trump's 2020 claims. Lots of voters want to move on",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5974313/election-denial-trump-2026",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "This farm raised thousands of pigs for slaughter. Now it's growing mushrooms instead",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5944503/iowa-hog-farm-growing-specialty-mushrooms",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     }
   ]
 }
