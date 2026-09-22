@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T16:00:01.727012+00:00",
+  "fetched_at": "2026-09-22T16:30:02.122066+00:00",
   "items": [
+    {
+      "title": "This 'fire amoeba' pushes the limit of what's possible for complex life",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5977044/fire-amoeba-extremophile-eukaryote-life",
+      "pubDate": "Tue, 22 Sep 2026 12:17:37 -0400"
+    },
     {
       "title": "Sri Lanka court convicts 15 over deadly 2019 Easter bombings",
       "link": "https://www.npr.org/2026/09/22/g-s1-144514/sri-lanka-court-convicts-15-over-deadly-2019-easter-bombings",
@@ -36,11 +41,6 @@
     {
       "title": "How unarmed 911 teams are reshaping public safety in nearly 100 cities",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5973302/unarmed-911-responders-police-reform",
-      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "The best and biggest games of September",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5971441/review-control-resonant-silent-hill-best-biggest-september-games",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
     }
   ]
