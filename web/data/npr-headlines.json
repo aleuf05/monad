@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T11:00:01.867004+00:00",
+  "fetched_at": "2026-09-22T11:15:01.606169+00:00",
   "items": [
+    {
+      "title": "CNN, MS NOW and Politico sue Trump. And, Paramount settles in massive merger lawsuit",
+      "link": "https://www.npr.org/2026/09/22/g-s1-144512/up-first-newsletter-press-lawsuit-cnn-msnow-politico-unga-trump-speech-paramount-deal",
+      "pubDate": "Tue, 22 Sep 2026 07:01:01 -0400"
+    },
+    {
+      "title": "Houthis try to push deeper into western Yemen, upending life, witnesses tell NPR",
+      "link": "https://www.npr.org/2026/09/22/g-s1-144261/yemen-houthis-saudi-iran-humanitarian-crisis",
+      "pubDate": "Tue, 22 Sep 2026 06:59:37 -0400"
+    },
     {
       "title": "New DNA analysis adds evidence Jefferson fathered children with Sally Hemings",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5791513/thomas-jefferson-sally-hemings-dna-hair-smithsonian",
@@ -32,16 +42,6 @@
       "title": "Abortion is on the ballot again as post-Roe policies continue to evolve",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5974318/election-voting-abortion-policies-roe",
       "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Trump heads to U.N. looking for wins after a rough week",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5976843/trump-heads-to-u-n-looking-for-wins-after-a-rough-week",
-      "pubDate": "Tue, 22 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Grand jury finds no evidence of criminal conduct in the death of Nolan Wells",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5911804/nolan-wells-investigation-grand-jury",
-      "pubDate": "Tue, 22 Sep 2026 04:31:47 -0400"
     }
   ]
 }
