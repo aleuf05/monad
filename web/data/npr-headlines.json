@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T19:45:01.820311+00:00",
+  "fetched_at": "2026-09-22T21:45:02.204849+00:00",
   "items": [
+    {
+      "title": "Girl accuses Braden Peters, social media influencer known as 'Clavicular', of rape",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5978033/braden-peters-clavicular-looksmaxxing-rape-accusation",
+      "pubDate": "Tue, 22 Sep 2026 17:37:28 -0400"
+    },
+    {
+      "title": "White House launches 'Trump TV' after ban on major news outlets",
+      "link": "https://www.npr.org/2026/09/22/nx-s1-5977768/trump-tv-media-ban-white-house",
+      "pubDate": "Tue, 22 Sep 2026 17:31:01 -0400"
+    },
     {
       "title": "Trump's D.C. arch is now a military complex. Here's how that complicates things",
       "link": "https://www.npr.org/2026/09/22/nx-s1-5977646/trump-dc-arch-military-complex-questions",
@@ -32,16 +42,6 @@
       "title": "Houthis try to push deeper into western Yemen, upending life, witnesses tell NPR",
       "link": "https://www.npr.org/2026/09/22/g-s1-144261/yemen-houthis-saudi-iran-humanitarian-crisis",
       "pubDate": "Tue, 22 Sep 2026 06:59:37 -0400"
-    },
-    {
-      "title": "A journalist once barred from the White House says this media ban is different",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5976755/jim-acosta-white-house-media-ban",
-      "pubDate": "Tue, 22 Sep 2026 06:47:59 -0400"
-    },
-    {
-      "title": "New DNA analysis adds evidence Jefferson fathered children with Sally Hemings",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5791513/thomas-jefferson-sally-hemings-dna-hair-smithsonian",
-      "pubDate": "Tue, 22 Sep 2026 06:00:00 -0400"
     }
   ]
 }
