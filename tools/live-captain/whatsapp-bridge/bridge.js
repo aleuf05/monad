@@ -61,9 +61,14 @@ export class SelfChatBridge {
 
   stop() { this.stopped = true; }
 
-  isSelfChat(jid) { return this.ownJids.has(jid); }
-  isMikeChat(jid) { return this.mikeJids.has(jid); }
-  isPaused(jid) { return this.isMikeChat(jid) && this.paused.has("mike"); }
+  identityCandidates(value) {
+    if (!value || typeof value === "string") return [value].filter(Boolean);
+    return [value.remoteJid, value.remoteJidAlt, value.participant, value.participantAlt].filter(Boolean);
+  }
+
+  isSelfChat(value) { return this.identityCandidates(value).some(jid => this.ownJids.has(jid)); }
+  isMikeChat(value) { return this.identityCandidates(value).some(jid => this.mikeJids.has(jid)); }
+  isPaused(value) { return this.isMikeChat(value) && this.paused.has("mike"); }
 
   rememberHistory(jid, role, text) {
     const items = this.history.get(jid) || [];
@@ -83,11 +88,11 @@ export class SelfChatBridge {
     return String(message.text || "").trim().startsWith(this.replyLabel);
   }
 
-  async replyNow(remoteJid, text) {
+  async replyNow(remoteJid, text, identity = remoteJid) {
     const replyText = `${this.replyLabel} ${String(text).trim()}`.slice(0, MAX_REPLY);
     if (this.dryRun) return { action: "proposed", text: replyText };
     if (!this.send || this.sent >= this.maxSends) return { action: "failed", reason: "send-limit-or-sender-disabled" };
-    if (this.isPaused(remoteJid)) return { action: "failed", reason: "mike-paused-before-send" };
+    if (this.isPaused(identity)) return { action: "failed", reason: "mike-paused-before-send" };
     const key = this.echoKey(remoteJid, replyText);
     this.pendingCaptainEchoes.set(key, Date.now());
     try {
@@ -116,9 +121,9 @@ export class SelfChatBridge {
     const ignored = reason => { this.onDiagnostic(`gate-rejected:${reason}`); return { action: "ignored", reason }; };
     if (this.stopped || !message || this.seen.has(message.id)) return ignored("stopped-or-duplicate");
     this.seen.add(message.id);
-    const selfChat = this.isSelfChat(message.remoteJid);
-    const mikeChat = this.isMikeChat(message.remoteJid);
-    if (!this.allowedJids.has(message.remoteJid)) return ignored("not-allowed-chat");
+    const selfChat = this.isSelfChat(message);
+    const mikeChat = this.isMikeChat(message);
+    if (!this.identityCandidates(message).some(jid => this.allowedJids.has(jid))) return ignored("not-allowed-chat");
     if (this.isCaptainEcho(message)) return ignored("captain-echo");
     if (mikeChat && message.fromMe) {
       this.paused.add("mike");
@@ -184,8 +189,8 @@ export class SelfChatBridge {
       catch (error) { this.onDiagnostic(isNotebook ? "notebook-failed" : "codex-failed"); throw error; }
       const bounded = String(reply || "").trim().slice(0, MAX_REPLY);
       if (!bounded) return { action: "failed", reason: "empty-reply" };
-      if (this.isPaused(message.remoteJid)) return { action: "failed", reason: "mike-paused-before-send" };
-      return await this.replyNow(message.remoteJid, bounded);
+      if (this.isPaused(message)) return { action: "failed", reason: "mike-paused-before-send" };
+      return await this.replyNow(message.remoteJid, bounded, message);
     } catch (error) {
       return { action: "failed", reason: sanitizeBridgeError(error) };
     } finally {

@@ -77,6 +77,7 @@ try { client = await createPairedClient({
       console.error(mikeJids.length ? "Mike route configured with verified identities (identifiers withheld)." : "Mike route disabled: no verified identity configured.");
     }
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
+      remoteJidAlt: message.key.remoteJidAlt, participant: message.key.participant, participantAlt: message.key.participantAlt,
       fromMe: Boolean(message.key.fromMe), timestamp: Number(message.messageTimestamp || 0),
       text });
     if (result.action === "ignored") console.error(`WhatsApp self-chat gate: ${result.reason}`);

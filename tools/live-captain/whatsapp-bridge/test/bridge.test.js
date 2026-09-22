@@ -126,6 +126,15 @@ test("Mike route uses shared plus Mike-private context and excludes Cameron-priv
   assert.equal((await b.handleMessage({ id: "other-1", remoteJid: "15550000002@s.whatsapp.net", fromMe: false, timestamp: now / 1000, text: "hello" })).reason, "not-allowed-chat");
 });
 
+test("Mike route accepts an exact configured alternate phone/LID identity", async () => {
+  const mike = "15550000005@s.whatsapp.net";
+  const { bridge: b } = bridge({ mikeJids: [mike], liveMode: true,
+    invokeCodex: async () => "alternate identity reply" });
+  const result = await b.handleMessage({ id: "mike-alt", remoteJid: "19990000005@lid", remoteJidAlt: mike,
+    fromMe: false, timestamp: now / 1000, text: "hello Captain" });
+  assert.equal(result.action, "proposed");
+});
+
 test("Mike operator request has parity without Cameron-private context", async () => {
   const calls = [];
   const mike = "15550000003@s.whatsapp.net";
