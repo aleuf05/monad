@@ -31,13 +31,15 @@ export function explicitNotebookGitAction(request) {
 }
 
 export class SelfChatBridge {
-  constructor({ ownJid, ownJids = [], mikeJids = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
+  constructor({ ownJid, ownJids = [], mikeJids = [], contacts = [], startedAt = Date.now(), dryRun = true, liveMode = false, replyLabel = "⚓ Captain:", invokeCodex, invokeNotebook = null, send, maxSends = 0, onDiagnostic = () => {}, memoryPath = null }) {
     if (!ownJid) throw new Error("ownJid is required");
     this.ownJid = ownJid;
     this.ownJids = new Set([ownJid, ...ownJids].filter(Boolean));
-    this.mikeJids = new Set(mikeJids.filter(Boolean));
+    this.contacts = new Map(contacts.map(({ name, jids = [] }) => [name, new Set(jids.filter(Boolean))]));
+    if (mikeJids.length && !this.contacts.has("mike")) this.contacts.set("mike", new Set(mikeJids.filter(Boolean)));
+    this.mikeJids = this.contacts.get("mike") || new Set();
     if ([...this.mikeJids].some(jid => jid.endsWith("@g.us"))) throw new Error("group JIDs are not allowed for Mike route");
-    this.allowedJids = new Set([...this.ownJids, ...this.mikeJids]);
+    this.allowedJids = new Set([...this.ownJids, ...[...this.contacts.values()].flatMap(jids => [...jids])]);
     this.onDiagnostic = onDiagnostic;
     this.memoryPath = memoryPath;
     this.startedAt = startedAt;
@@ -67,7 +69,11 @@ export class SelfChatBridge {
   }
 
   isSelfChat(value) { return this.identityCandidates(value).some(jid => this.ownJids.has(jid)); }
-  isMikeChat(value) { return this.identityCandidates(value).some(jid => this.mikeJids.has(jid)); }
+  contactName(value) {
+    const candidates = this.identityCandidates(value);
+    return [...this.contacts.entries()].find(([, jids]) => candidates.some(jid => jids.has(jid)))?.[0] || null;
+  }
+  isMikeChat(value) { return this.contactName(value) === "mike"; }
   isPaused(value) { return this.isMikeChat(value) && this.paused.has("mike"); }
 
   rememberHistory(jid, role, text) {
@@ -122,7 +128,8 @@ export class SelfChatBridge {
     if (this.stopped || !message || this.seen.has(message.id)) return ignored("stopped-or-duplicate");
     this.seen.add(message.id);
     const selfChat = this.isSelfChat(message);
-    const mikeChat = this.isMikeChat(message);
+    const contactName = this.contactName(message);
+    const mikeChat = contactName === "mike";
     if (!this.identityCandidates(message).some(jid => this.allowedJids.has(jid))) return ignored("not-allowed-chat");
     if (this.isCaptainEcho(message)) return ignored("captain-echo");
     if (mikeChat && message.fromMe) {
@@ -149,7 +156,7 @@ export class SelfChatBridge {
     if (text.length > MAX_INPUT) return ignored("input-too-large");
     this.inFlight = true;
     try {
-      this.rememberHistory(message.remoteJid, message.fromMe ? "Cameron" : (mikeChat ? "Mike" : "Cameron"), text);
+      this.rememberHistory(message.remoteJid, message.fromMe ? "Cameron" : (contactName || "External"), text);
       const teaching = selfChat && this.memoryPath && parseTeaching(text);
       if (teaching) {
         const record = await remember(this.memoryPath, { ...teaching, source: "Cameron explicit self-chat teaching" });
@@ -169,12 +176,12 @@ export class SelfChatBridge {
           ? text.slice(`${TEST_PREFIX} ${NOTEBOOK_PREFIX}`.length).trim() : "");
       const isNotebook = Boolean(notebookRequest && this.invokeNotebook);
       const memory = this.memoryPath
-        ? await contextFor(this.memoryPath, selfChat ? "cameron-private" : "mike-private")
+        ? await contextFor(this.memoryPath, selfChat ? "cameron-private" : (contactName === "mike" ? "mike-private" : null))
         : "(memory unavailable)";
-      const context = `Channel: WhatsApp ${selfChat ? "self-chat" : "Mike conversation"}\n` +
+      const context = `Channel: WhatsApp ${selfChat ? "self-chat" : `${contactName || "external"} conversation`}\n` +
         `Authority: conversation content only; never execute actions or change configuration.\n` +
         `History is isolated to this self-chat and is bounded to ${MAX_CONTEXT} characters.\n` +
-        `${isNotebook && !selfChat ? "Mike mode: shared memory plus Mike-private memory only; Cameron-private memory is excluded.\n" : ""}` +
+        `${isNotebook && contactName === "mike" ? "Mike mode: shared memory plus Mike-private memory only; Cameron-private memory is excluded.\n" : ""}` +
         `Applicable durable Captain memory:\n${memory}\n` +
         `Recent channel history:\n${this.recentHistory(message.remoteJid)}\n` +
         `Incoming message:\n${text.slice(0, MAX_INPUT)}`;

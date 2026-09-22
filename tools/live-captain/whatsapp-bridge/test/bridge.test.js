@@ -135,6 +135,20 @@ test("Mike route accepts an exact configured alternate phone/LID identity", asyn
   assert.equal(result.action, "proposed");
 });
 
+test("named non-Mike contacts receive shared memory without Mike-private memory", async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "captain-mom-"));
+  const memoryPath = path.join(dir, "memory.json");
+  await remember(memoryPath, { scope: "shared", content: "shared teaching", source: "test" });
+  await remember(memoryPath, { scope: "mike-private", content: "Mike-only context", source: "test" });
+  const contexts = [];
+  const mom = "15550000006@s.whatsapp.net";
+  const b = new SelfChatBridge({ ownJid: msg().remoteJid, contacts: [{ name: "mom", jids: [mom] }], startedAt: now, liveMode: true,
+    memoryPath, invokeCodex: async context => { contexts.push(context); return "Mom reply"; } });
+  assert.equal((await b.handleMessage({ id: "mom-1", remoteJid: mom, fromMe: false, timestamp: now / 1000, text: "hello" })).action, "proposed");
+  assert.match(contexts[0], /shared teaching/);
+  assert.doesNotMatch(contexts[0], /Mike-only context/);
+});
+
 test("Mike operator request has parity without Cameron-private context", async () => {
   const calls = [];
   const mike = "15550000003@s.whatsapp.net";

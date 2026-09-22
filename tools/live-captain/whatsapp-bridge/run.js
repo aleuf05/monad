@@ -52,6 +52,18 @@ if (mikeJids.some(jid => !/^(?:\d+@s\.whatsapp\.net|\d+@lid)$/.test(jid))) {
   console.error("WHATSAPP_MIKE_JIDS must contain verified phone JIDs (@s.whatsapp.net) or LIDs (@lid); groups are rejected.");
   process.exit(2);
 }
+const contacts = new Map();
+for (const entry of String(process.env.WHATSAPP_CONTACTS || "").split(",").map(value => value.trim()).filter(Boolean)) {
+  const [name, jid] = entry.split("=", 2).map(value => value.trim());
+  if (!name || !/^[A-Za-z][A-Za-z0-9_-]*$/.test(name) || !jid || !/^(?:\d+@s\.whatsapp\.net|\d+@lid)$/.test(jid)) {
+    console.error("WHATSAPP_CONTACTS must contain name=verified phone JID/LID entries; groups are rejected.");
+    process.exit(2);
+  }
+  if (!contacts.has(name)) contacts.set(name, []);
+  contacts.get(name).push(jid);
+}
+if (mikeJids.length && !contacts.has("mike")) contacts.set("mike", mikeJids);
+const configuredContacts = [...contacts.entries()].map(([name, jids]) => ({ name, jids }));
 const startedAt = Date.now();
 let bridge, client, stopped = false;
 const stop = async () => { if (stopped) return; stopped = true; await client?.stop(); process.exit(0); };
@@ -68,13 +80,13 @@ try { client = await createPairedClient({
     console.error(`WhatsApp identity diagnostic: ${JSON.stringify(identityDiagnostic(message, mikeJids, ownJids))}`);
     console.error(`WhatsApp message event: text=${Boolean(text)} fromMe=${Boolean(message.key.fromMe)} selfChat=${ownJids.includes(message.key.remoteJid)} mikeChat=${mikeJids.includes(message.key.remoteJid)} timestamp=${Boolean(message.messageTimestamp)}`);
     if (!bridge) {
-      bridge = new SelfChatBridge({ ownJid, ownJids, mikeJids, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
+      bridge = new SelfChatBridge({ ownJid, ownJids, mikeJids, contacts: configuredContacts, startedAt, liveMode, dryRun: !liveMode && !sendOnce, maxSends: sendOnce ? 1 : (liveMode ? Number.MAX_SAFE_INTEGER : 0), memoryPath: process.env.CAPTAIN_MEMORY_PATH || DEFAULT_MEMORY_PATH,
         onDiagnostic: phase => console.error(`WhatsApp Codex worker: ${phase}`),
         invokeCodex: context => invokeCodexViaVerifiedAdapter(context),
         invokeNotebook: (request, sharedMemory, gitAction) => invokeNotebookViaVerifiedAdapter(request, sharedMemory, { gitAction }),
         send: async payload => await sock.sendMessage(payload.remoteJid, { text: payload.text }) });
       console.error("Authenticated WhatsApp self-chat identity verified (identifier withheld).");
-      console.error(mikeJids.length ? "Mike route configured with verified identities (identifiers withheld)." : "Mike route disabled: no verified identity configured.");
+      console.error(configuredContacts.length ? `Named WhatsApp contacts configured: ${configuredContacts.map(({ name }) => name).join(", ")}.` : "No named WhatsApp contacts configured.");
     }
     const result = await bridge.handleMessage({ id: message.key.id, remoteJid: message.key.remoteJid,
       remoteJidAlt: message.key.remoteJidAlt, participant: message.key.participant, participantAlt: message.key.participantAlt,
