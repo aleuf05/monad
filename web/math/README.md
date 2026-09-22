@@ -27,6 +27,7 @@ can expose a rusty derivative, a missing sign, or an unexamined physical assumpt
 2. **Accumulation / integral**: explore $g(t)=\sin(t)$ and compare instantaneous rate with accumulated signed area.
 3. **Electrostatics**: vary charge and radius for a point charge; connect $E(r)$, $V(r)$, force, and energy without losing the sign.
 4. **Maxwell check**: inspect a spherical Gaussian surface and see when flux, enclosed charge, and symmetry actually agree.
+5. **Fourier**: decompose a live waveform into two rotating components and watch time become frequency.
 
 ## MARA (Mathematical & Reality Assistant)
 

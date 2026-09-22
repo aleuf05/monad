@@ -45,9 +45,9 @@ export class MoonbaseMathEngine {
 
     if (mission.type === 'assessment') {
       const probes = [
-        { prompt: 'At x = 1, is f(x) = x² rising, flat, or falling?', answer: 'flat', explanation: 'The slope is 2x, so at x = 1 it is positive—not flat. This probe is intentionally baited: distinguish value from slope.' },
-        { prompt: 'If radius doubles, what happens to a point-charge field?', answer: 'quarter', explanation: 'E ∝ 1/r². Doubling distance makes the field one quarter as strong.' },
-        { prompt: 'Does an integral track rate or accumulated change?', answer: 'accumulation', explanation: 'The integrand is the rate; the integral accumulates signed change.' }
+        { prompt: 'At x = 1, is f(x) = x² rising, flat, or falling?', answer: 'rising', options: ['rising', 'flat', 'falling'], explanation: 'The slope is 2x, so at x = 1 it is positive—not flat. Distinguish value from slope.' },
+        { prompt: 'If radius doubles, what happens to a point-charge field?', answer: 'quarter', options: ['double', 'half', 'quarter'], explanation: 'E ∝ 1/r². Doubling distance makes the field one quarter as strong.' },
+        { prompt: 'Does an integral track rate or accumulated change?', answer: 'accumulation', options: ['rate', 'accumulation'], explanation: 'The integrand is the rate; the integral accumulates signed change.' }
       ];
       const probe = probes[Math.min(probes.length - 1, Math.max(0, Math.round(Math.abs(x))))];
       c = { stateLabel: 'PROBE', stateFormula: `probe ${Math.min(probes.length, Math.round(Math.abs(x)) + 1)} / ${probes.length}`, functionLabel: 'QUESTION', functionFormula: 'predict before reveal', functionValue: probe.prompt, functionSub: 'use the live toy, not recall alone', derivativeLabel: 'INSTRUMENT', derivativeFormula: 'current controls are live', derivativeValue: `q = ${fmt(q)}`, derivativeSub: 'change the state after choosing', check: 'PREDICT', checkSub: probe.explanation, missionPassed: false, assessment: true, probe };

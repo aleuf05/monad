@@ -18,6 +18,8 @@ class MoonbaseApp {
     const labels = [['ipStateLabel', c.stateLabel], ['ipFunctionLabel', c.functionLabel], ['ipDerivativeLabel', c.derivativeLabel], ['ipCheckLabel', 'CHECK']]; labels.forEach(([id, text]) => document.getElementById(id).textContent = text);
     [['ipStateFormula', c.stateFormula], ['ipState', c.stateFormula], ['ipFunctionFormula', c.functionFormula], ['ipFunction', c.functionValue], ['ipFunctionSub', c.functionSub], ['ipDerivativeFormula', c.derivativeFormula], ['ipDerivative', c.derivativeValue], ['ipDerivativeSub', c.derivativeSub], ['ipCheck', c.check], ['ipCheckSub', c.checkSub]].forEach(([id, text]) => document.getElementById(id).textContent = text);
     document.getElementById('maraSpeech').textContent = message || this.engine.evaluateMaraReaction(c);
+    const actions = document.getElementById('assessmentActions');
+    actions.innerHTML = c.assessment ? c.probe.options.map(option => `<button class="btn assessment-choice" data-answer="${option}">${option}</button>`).join('') : '';
     const badge = document.getElementById('promptBadge'); badge.hidden = !c.missionPassed; if (c.missionPassed) badge.textContent = '✓ INSIGHT LOCKED';
     document.getElementById('stampsList').innerHTML = c.insights.length ? c.insights.map(i => `<span class="factor-stamp">${i}</span>`).join('') : '<span style="color:#6B7C93;font-size:10px">Make a prediction, then earn a durable insight.</span>';
     this.renderer.notifyDimensionChange(); this.telemetry.recordDimensionAttempt(m.id, c.width, c.length, c.functionValue, c.derivativeValue);
@@ -35,6 +37,7 @@ class MoonbaseApp {
     document.getElementById('sliderLength').addEventListener('input', e => this.change(() => this.engine.setLength(e.target.value)));
     document.getElementById('btnMute').addEventListener('click', e => { this.audio.isMuted = !this.audio.isMuted; e.currentTarget.textContent = this.audio.isMuted ? '🔇 Sound Off' : '🔊 Sound On'; });
     document.getElementById('btnTelemetry').addEventListener('click', () => alert(JSON.stringify(this.telemetry.getLogs(), null, 2)));
+    document.getElementById('assessmentActions').addEventListener('click', e => { const button = e.target.closest('.assessment-choice'); if (!button) return; const c = this.engine.getCalculations(); const right = button.dataset.answer === c.probe.answer; this.refresh(right ? `“Correct. ${c.probe.explanation} Now move the toy and make the idea quantitative.”` : `“Not quite. ${c.probe.explanation} That mismatch is exactly what we are here to repair.”`); });
   }
   loop(t = performance.now()) { this.renderer.render(t); requestAnimationFrame(x => this.loop(x)); }
 }
