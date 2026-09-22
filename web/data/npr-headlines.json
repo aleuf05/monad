@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-22T02:15:02.388558+00:00",
+  "fetched_at": "2026-09-22T08:15:02.297228+00:00",
   "items": [
+    {
+      "title": "New book by Princess Diana's brother prompts war of words with King Charles III",
+      "link": "https://www.npr.org/2026/09/22/g-s1-144505/princess-diana-brother-book",
+      "pubDate": "Tue, 22 Sep 2026 04:03:27 -0400"
+    },
     {
       "title": "What the equinox 'henge' effect tells us about U.S. cities",
       "link": "https://www.npr.org/2026/09/21/nx-s1-5973179/equinox-henge-sunrise-sunset",
@@ -36,11 +41,6 @@
     {
       "title": "Germany's leader stands his ground after his party loses in state elections",
       "link": "https://www.npr.org/2026/09/21/g-s1-144231/germany-state-elections-merz",
-      "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "What to know as world leaders converge at the United Nations this week",
-      "link": "https://www.npr.org/2026/09/21/nx-s1-5971262/united-nations-general-assembly",
       "pubDate": "Mon, 21 Sep 2026 05:00:00 -0400"
     }
   ]
