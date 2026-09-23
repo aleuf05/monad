@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-23T13:45:01.477268+00:00",
+  "fetched_at": "2026-09-23T14:30:01.906597+00:00",
   "items": [
+    {
+      "title": "It's getting harder to afford rent in the U.S., even for middle-income families",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5977022/rent-affordability-middle-income",
+      "pubDate": "Wed, 23 Sep 2026 10:09:10 -0400"
+    },
     {
       "title": "Greetings from Edinburgh, where a cheeky tour guide makes art history hilarious",
       "link": "https://www.npr.org/2026/09/23/g-s1-142427/uk-coco-art-history-comedy-tour",
@@ -32,11 +37,6 @@
       "title": "Major news outlets banned by Trump will have their day in court",
       "link": "https://www.npr.org/2026/09/23/nx-s1-5978069/cnn-msnow-politico-trump-white-house-ban",
       "pubDate": "Wed, 23 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "There's growing concern that Trump may deploy the National Guard ahead of elections",
-      "link": "https://www.npr.org/2026/09/23/nx-s1-5978015/national-guard-election-military-midterms",
-      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
       "title": "As Congress confronts AI, Senate lawmakers are shut off from its most advanced tools",
