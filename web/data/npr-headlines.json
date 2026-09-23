@@ -1,47 +1,47 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-23T06:30:01.766799+00:00",
+  "fetched_at": "2026-09-23T09:15:01.989839+00:00",
   "items": [
     {
-      "title": "Category 5 Hurricane Polo is 'one of the strongest storms ever'",
-      "link": "https://www.npr.org/2026/09/23/nx-s1-5978589/hurricane-polo",
-      "pubDate": "Wed, 23 Sep 2026 02:13:35 -0400"
+      "title": "DOJ defends White House media ban, urges court to reject lawsuit",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5978614/doj-defend-white-house-media-ban",
+      "pubDate": "Wed, 23 Sep 2026 05:06:47 -0400"
     },
     {
-      "title": "Trump administration to remove 760,000 Affordable Care Act enrollees over fraud claims",
-      "link": "https://www.npr.org/2026/09/23/g-s1-144623/trump-affordable-care-act",
-      "pubDate": "Wed, 23 Sep 2026 01:26:31 -0400"
+      "title": "Major news outlets banned by Trump will have their day in court",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5978069/cnn-msnow-politico-trump-white-house-ban",
+      "pubDate": "Wed, 23 Sep 2026 05:01:00 -0400"
     },
     {
-      "title": "Questions remain after grand jury declines indictment in Nolan Wells' death",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5977673/questions-remain-after-grand-jury-declines-indictment-in-nolan-wells-death",
-      "pubDate": "Tue, 22 Sep 2026 17:47:51 -0400"
+      "title": "There's growing concern that Trump may deploy the National Guard ahead of elections",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5978015/national-guard-election-military-midterms",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Girl accuses Braden Peters, social media influencer known as 'Clavicular,' of rape",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5978033/braden-peters-clavicular-looksmaxxing-rape-accusation",
-      "pubDate": "Tue, 22 Sep 2026 17:37:28 -0400"
+      "title": "As Congress confronts AI, Senate lawmakers are shut off from its most advanced tools",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5978055/congress-ai-regulation",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "White House launches 'Trump TV' after ban on major news outlets",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5977768/trump-tv-media-ban-white-house",
-      "pubDate": "Tue, 22 Sep 2026 17:31:01 -0400"
+      "title": "How an 'AI freeze' could make big AI companies bigger and hurt smaller firms",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5973306/ai-slowdown-debate-openai-anthropic",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump's D.C. arch is now a military complex. Here's how that complicates things",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5977646/trump-dc-arch-military-complex-questions",
-      "pubDate": "Tue, 22 Sep 2026 15:25:05 -0400"
+      "title": "ICE is looking into 'mobile detention facilities'",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5976875/ice-mobile-detention-facilities-immigration",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Inside a 'modern slavery situation' where cyber scammers are victims themselves",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5977731/inside-a-modern-slavery-situation-where-cyber-scammers-are-victims-themselves",
-      "pubDate": "Tue, 22 Sep 2026 12:29:37 -0400"
+      "title": "Poll: Trust in the U.S. Postal Service delivering mail-in ballots on time has fallen",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5978081/usps-election-mail-in-ballot",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "This 'fire amoeba' pushes the limit of what's possible for complex life",
-      "link": "https://www.npr.org/2026/09/22/nx-s1-5977044/fire-amoeba-extremophile-eukaryote-life",
-      "pubDate": "Tue, 22 Sep 2026 12:17:37 -0400"
+      "title": "Poll: Most voters agree the 2026 midterms are all about Trump \u2014 and they disapprove",
+      "link": "https://www.npr.org/2026/09/23/nx-s1-5977613/trump-poll-democrats-congress",
+      "pubDate": "Wed, 23 Sep 2026 05:00:00 -0400"
     }
   ]
 }
