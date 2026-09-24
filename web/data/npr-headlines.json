@@ -1,12 +1,12 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T10:30:01.655911+00:00",
+  "fetched_at": "2026-09-24T11:00:02.180062+00:00",
   "items": [
     {
-      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
+      "title": "Needy couples got cash and a spending plan. Results were good -- and bad",
+      "link": "https://www.npr.org/2026/09/24/g-s1-144544/cash-transfer-poverty-liberia-partner-violence",
+      "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
     },
     {
       "title": "Under Trump, NIH funding disruptions have evolved. Here's what the numbers show",
@@ -14,8 +14,8 @@
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
+      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
@@ -29,6 +29,11 @@
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
+      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
+      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
+    },
+    {
       "title": "Judge orders Trump administration to restore journalists' access to White House",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5979582/judge-order-trump-restore-access-white-house",
       "pubDate": "Thu, 24 Sep 2026 02:21:06 -0400"
@@ -37,11 +42,6 @@
       "title": "Venezuela's acting leader promises elections at the 'right moment'",
       "link": "https://www.npr.org/2026/09/24/g-s1-144837/venezuela-leader-un-general-assembly",
       "pubDate": "Thu, 24 Sep 2026 01:40:49 -0400"
-    },
-    {
-      "title": "OpenAI's breach of Australian health department website prompts rebuke",
-      "link": "https://www.npr.org/2026/09/24/g-s1-144835/openai-breach-australia",
-      "pubDate": "Thu, 24 Sep 2026 01:14:11 -0400"
     }
   ]
 }
