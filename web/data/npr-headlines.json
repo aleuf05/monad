@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T18:00:01.787663+00:00",
+  "fetched_at": "2026-09-24T18:15:01.428937+00:00",
   "items": [
     {
       "title": "RFK Jr.'s ethics filing reveals book deals worth millions of dollars",
@@ -34,13 +34,13 @@
       "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
     },
     {
-      "title": "These 6 charts show how NIH research funding has been reshaped under Trump",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5931971/trump-nih-science-funding-disruptions-charts",
+      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
+      "title": "eBay bans airbag sales as concerns about faulty or counterfeit parts rise",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5978124/ebay-bans-airbags-faulty-counterfeit-auto-parts",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     }
   ]
