@@ -1,16 +1,21 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T15:30:01.539409+00:00",
+  "fetched_at": "2026-09-24T16:15:01.634350+00:00",
   "items": [
+    {
+      "title": "Mortgage rates have just surpassed 7% for the first time in well over a year",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5977796/mortgage-rates-freddie-mac-homebuying",
+      "pubDate": "Thu, 24 Sep 2026 12:01:44 -0400"
+    },
     {
       "title": "The economic squeeze is pushing up poverty rates for older adults",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5979857/senior-adult-poverty-affordability",
       "pubDate": "Thu, 24 Sep 2026 11:00:00 -0400"
     },
     {
-      "title": "Trump rolls out the red carpet for Xi as high-stakes summit begins",
-      "link": "https://www.npr.org/2026/09/24/g-s1-144806/trump-rolls-out-red-carpet-for-xi-as-high-stakes-summit-begins",
+      "title": "Trump and Xi strike cordial tone at summit amid underlying tensions",
+      "link": "https://www.npr.org/2026/09/24/g-s1-144806/trump-xi-summit",
       "pubDate": "Thu, 24 Sep 2026 08:43:15 -0400"
     },
     {
@@ -36,11 +41,6 @@
     {
       "title": "Warren demands Trump officials explain removing a ban on interference in census data",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "eBay bans airbag sales as concerns about faulty or counterfeit parts rise",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5978124/ebay-bans-airbags-faulty-counterfeit-auto-parts",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     }
   ]
