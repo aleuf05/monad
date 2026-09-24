@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T11:45:02.390571+00:00",
+  "fetched_at": "2026-09-24T12:00:02.242233+00:00",
   "items": [
     {
       "title": "Judge restores journalists' White House access. And, Tucker Carlson on his MAGA split",
@@ -14,18 +14,13 @@
       "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
     },
     {
-      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "Under Trump, NIH funding disruptions have evolved. Here's what the numbers show",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5931971/trump-nih-science-funding-disruptions-charts",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
+      "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
@@ -36,6 +31,11 @@
     {
       "title": "States threaten action against company earning millions off disabled vets",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5978816/va-mortgages-trajector-bankruptcy-investigations",
+      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
