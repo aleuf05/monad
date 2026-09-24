@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T15:00:02.056200+00:00",
+  "fetched_at": "2026-09-24T15:15:01.703009+00:00",
   "items": [
+    {
+      "title": "The economic squeeze is pushing up poverty rates for older adults",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5979857/senior-adult-poverty-affordability",
+      "pubDate": "Thu, 24 Sep 2026 11:00:00 -0400"
+    },
     {
       "title": "Trump rolls out the red carpet for Xi as high-stakes summit begins",
       "link": "https://www.npr.org/2026/09/24/g-s1-144806/trump-rolls-out-red-carpet-for-xi-as-high-stakes-summit-begins",
@@ -19,18 +24,8 @@
       "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
     },
     {
-      "title": "These 6 charts show how NIH research funding has been reshaped under Trump",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5931971/trump-nih-science-funding-disruptions-charts",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "The Education Dept. hasn't been dismantled. It's become more inefficient, staff say",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5968605/education-department-dismantling-how-its-going",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +34,13 @@
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "States threaten action against company profiting off disabled vets after NPR report",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5978816/va-mortgages-trajector-bankruptcy-investigations",
+      "title": "Warren demands Trump officials explain removing a ban on interference in census data",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5979070/department-commerce-census-bureau-elizabeth-warren",
+      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "These 6 charts show how NIH research funding has been reshaped under Trump",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5931971/trump-nih-science-funding-disruptions-charts",
       "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     }
   ]
