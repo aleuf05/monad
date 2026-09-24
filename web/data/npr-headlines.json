@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T22:00:02.071610+00:00",
+  "fetched_at": "2026-09-24T22:30:01.640025+00:00",
   "items": [
+    {
+      "title": "Long agenda, short meeting: Trump and Xi meet",
+      "link": "https://www.npr.org/2026/09/24/nx-s1-5973112/long-agenda-short-meeting-trump-and-xi-meet",
+      "pubDate": "Thu, 24 Sep 2026 18:10:00 -0400"
+    },
     {
       "title": "In one of their last votes before November, Senate GOP blocks effort to end Iran war",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5980318/senate-iran-war-powers-vote",
@@ -37,11 +42,6 @@
       "title": "Needy couples got cash and a spending plan. Results were good -- and bad",
       "link": "https://www.npr.org/2026/09/24/g-s1-144544/cash-transfer-poverty-liberia-partner-violence",
       "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
-    },
-    {
-      "title": "These 6 charts show how NIH research funding has been reshaped under Trump",
-      "link": "https://www.npr.org/2026/09/24/nx-s1-5931971/trump-nih-science-funding-disruptions-charts",
-      "pubDate": "Thu, 24 Sep 2026 05:00:00 -0400"
     }
   ]
 }
