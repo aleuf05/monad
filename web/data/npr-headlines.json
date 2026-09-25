@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T22:15:02.047402+00:00",
+  "fetched_at": "2026-09-25T22:30:01.897810+00:00",
   "items": [
     {
       "title": "Supreme Court blocks Trump-backed Missouri congressional map",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5978875/midterms-redistricting-trump-missouri",
       "pubDate": "Fri, 25 Sep 2026 18:06:16 -0400"
+    },
+    {
+      "title": "The Pacific is churning with hurricanes. The Atlantic is quiet. Blame El Ni\u00f1o",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5980351/hurricane-nolo-pacific-el-nino",
+      "pubDate": "Fri, 25 Sep 2026 16:08:40 -0400"
     },
     {
       "title": "Takeaways from the Trump-Xi state visit: Pageantry and pandas",
@@ -37,11 +42,6 @@
       "title": "Hurricane Nolo, a zig-zagging storm, threatens Hawaii with flooding rains",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5981082/hurricane-nolo-hawaii",
       "pubDate": "Fri, 25 Sep 2026 10:46:28 -0400"
-    },
-    {
-      "title": "Trump and Xi strike cordial tone at summit. And, Netanyahu gives defiant UNGA speech",
-      "link": "https://www.npr.org/2026/09/25/g-s1-144994/up-first-newsletter-trump-xi-netanyahu-united-nations-mortgage-rates",
-      "pubDate": "Fri, 25 Sep 2026 07:18:52 -0400"
     }
   ]
 }
