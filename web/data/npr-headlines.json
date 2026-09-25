@@ -1,21 +1,31 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T09:30:02.362260+00:00",
+  "fetched_at": "2026-09-25T10:15:01.719218+00:00",
   "items": [
-    {
-      "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
-      "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
-      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
-    },
     {
       "title": "Mom! Mom! MOM! 3 ways to stay calm in stressful parenting moments",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5978936/how-to-manage-mom-rage",
       "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
     },
     {
+      "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
+      "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
+      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
+    },
+    {
       "title": "Americans are confused and worried about elections. Will that impact turnout?",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5946736/voting-confusion-turnout",
+      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As election enters its final stretch, some Republicans are distancing from Trump",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5978096/republicans-trump-midterm-elections",
+      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Is Switzerland's neutrality at a crossroads?",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5978905/swiss-referendum-neutrality-russia",
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     },
     {
@@ -29,18 +39,8 @@
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "As election enters its final stretch, some Republicans are distancing from Trump",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978096/republicans-trump-midterm-elections",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "American farmers are hurting -- and worried about their futures",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5979886/farmers-crops-economy-diesel-fertilizer",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Is Switzerland's neutrality at a crossroads?",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978905/swiss-referendum-neutrality-russia",
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     }
   ]
