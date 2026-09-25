@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T14:45:01.801556+00:00",
+  "fetched_at": "2026-09-25T15:00:01.602401+00:00",
   "items": [
+    {
+      "title": "Hurricane Nolo, a zig-zagging storm, threatens Hawaii with flooding rain",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5981082/hurricane-nolo-hawaii",
+      "pubDate": "Fri, 25 Sep 2026 10:46:28 -0400"
+    },
     {
       "title": "Trump and Xi strike cordial tone at summit. And, Netanyahu gives defiant UNGA speech",
       "link": "https://www.npr.org/2026/09/25/g-s1-144994/up-first-newsletter-trump-xi-netanyahu-united-nations-mortgage-rates",
@@ -19,23 +24,18 @@
       "pubDate": "Fri, 25 Sep 2026 06:25:03 -0400"
     },
     {
-      "title": "Mom! Mom! MOM! 3 ways to stay calm in stressful parenting moments",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978936/how-to-manage-mom-rage",
-      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
-    },
-    {
       "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
       "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
       "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
     },
     {
-      "title": "Americans are confused and worried about elections. Will that impact turnout?",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5946736/voting-confusion-turnout",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
+      "title": "Mom! Mom! MOM! 3 ways to stay calm in stressful parenting moments",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5978936/how-to-manage-mom-rage",
+      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
     },
     {
-      "title": "Is Switzerland's neutrality at a crossroads?",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978905/swiss-referendum-neutrality-russia",
+      "title": "Americans are confused and worried about elections. Will that impact turnout?",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5946736/voting-confusion-turnout",
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     },
     {
