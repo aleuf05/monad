@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T17:30:01.516584+00:00",
+  "fetched_at": "2026-09-25T19:30:02.023941+00:00",
   "items": [
+    {
+      "title": "Takeaways from the Trump-Xi state visit: Pageantry and pandas",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5981265/takeaways-trump-xi-state-visit-pageantry-pandas",
+      "pubDate": "Fri, 25 Sep 2026 15:11:47 -0400"
+    },
     {
       "title": "Woman who accused Jay-Z of sexual assault says her claims were false",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5981154/jay-z-sexual-assault-accuser-claims-false",
@@ -37,11 +42,6 @@
       "title": "Why this Pok\u00e9mon set is dropping in value",
       "link": "https://www.npr.org/sections/planet-money/2026/09/25/nx-s1-5980393/why-this-pokemon-set-is-dropping-in-value",
       "pubDate": "Fri, 25 Sep 2026 07:00:00 -0400"
-    },
-    {
-      "title": "Netanyahu rages against critics, including Mamdani, at the U.N. General Assembly",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5979852/israels-prime-minister-addresses-u-n-general-assembly",
-      "pubDate": "Fri, 25 Sep 2026 06:25:03 -0400"
     }
   ]
 }
