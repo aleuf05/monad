@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-24T22:30:01.640025+00:00",
+  "fetched_at": "2026-09-25T06:30:02.385867+00:00",
   "items": [
+    {
+      "title": "Trump's state dinner for Xi features sea bass and a long list of tech titans",
+      "link": "https://www.npr.org/2026/09/25/g-s1-144973/trump-state-dinner-xi",
+      "pubDate": "Fri, 25 Sep 2026 02:18:59 -0400"
+    },
+    {
+      "title": "Man shot during 2024 Trump campaign rally in Butler, Pennsylvania, has died",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5980967/man-shot-trump-campaign-rally-dies",
+      "pubDate": "Fri, 25 Sep 2026 02:16:07 -0400"
+    },
     {
       "title": "Long agenda, short meeting: Trump and Xi meet",
       "link": "https://www.npr.org/2026/09/24/nx-s1-5973112/long-agenda-short-meeting-trump-and-xi-meet",
@@ -32,16 +42,6 @@
       "title": "Trump and Xi strike cordial tone at summit amid underlying tensions",
       "link": "https://www.npr.org/2026/09/24/g-s1-144806/trump-xi-summit",
       "pubDate": "Thu, 24 Sep 2026 08:43:15 -0400"
-    },
-    {
-      "title": "Judge restores journalists' White House access. And, Tucker Carlson on his MAGA split",
-      "link": "https://www.npr.org/2026/09/24/g-s1-144850/up-first-newsletter-cnn-msnow-politico-iran-ukraine-unga-china-xi-jinping-trump",
-      "pubDate": "Thu, 24 Sep 2026 07:10:14 -0400"
-    },
-    {
-      "title": "Needy couples got cash and a spending plan. Results were good -- and bad",
-      "link": "https://www.npr.org/2026/09/24/g-s1-144544/cash-transfer-poverty-liberia-partner-violence",
-      "pubDate": "Thu, 24 Sep 2026 06:43:25 -0400"
     }
   ]
 }
