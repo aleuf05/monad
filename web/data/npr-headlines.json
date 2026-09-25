@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T10:45:02.153307+00:00",
+  "fetched_at": "2026-09-25T11:15:01.499213+00:00",
   "items": [
     {
-      "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
-      "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
-      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
+      "title": "Why this Pok\u00e9mon set is dropping in value",
+      "link": "https://www.npr.org/sections/planet-money/2026/09/25/nx-s1-5980393/why-this-pokemon-set-is-dropping-in-value",
+      "pubDate": "Fri, 25 Sep 2026 07:00:00 -0400"
+    },
+    {
+      "title": "Netanyahu rages against critics, including Mamdani, at UNGA",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5979852/israels-prime-minister-addresses-u-n-general-assembly",
+      "pubDate": "Fri, 25 Sep 2026 06:25:03 -0400"
     },
     {
       "title": "Mom! Mom! MOM! 3 ways to stay calm in stressful parenting moments",
@@ -14,8 +19,18 @@
       "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
     },
     {
+      "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
+      "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
+      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
+    },
+    {
       "title": "Americans are confused and worried about elections. Will that impact turnout?",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5946736/voting-confusion-turnout",
+      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Is Switzerland's neutrality at a crossroads?",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5978905/swiss-referendum-neutrality-russia",
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     },
     {
@@ -26,21 +41,6 @@
     {
       "title": "The U.S. Strategic Petroleum Reserve is low. Here's why you should care",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5965797/strategic-petroleum-reserve-low-level-venezuela",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "American farmers are hurting -- and worried about their futures",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5979886/farmers-crops-economy-diesel-fertilizer",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Is Switzerland's neutrality at a crossroads?",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978905/swiss-referendum-neutrality-russia",
-      "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As election enters its final stretch, some Republicans are distancing from Trump",
-      "link": "https://www.npr.org/2026/09/25/nx-s1-5978096/republicans-trump-midterm-elections",
       "pubDate": "Fri, 25 Sep 2026 05:00:00 -0400"
     }
   ]
