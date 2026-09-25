@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-25T16:15:01.915705+00:00",
+  "fetched_at": "2026-09-25T16:30:01.664952+00:00",
   "items": [
+    {
+      "title": "Woman who accused Jay-Z of sexual assault says her claims were false",
+      "link": "https://www.npr.org/2026/09/25/nx-s1-5981154/jay-z-sexual-assault-accuser-claims-false",
+      "pubDate": "Fri, 25 Sep 2026 12:14:24 -0400"
+    },
     {
       "title": "There's a global pandemic treaty that's signed -- and in 'limbo.' What's the holdup?",
       "link": "https://www.npr.org/2026/09/25/g-s1-144948/pandemic-prevention-treaty-agreement-world-health-organization",
@@ -37,11 +42,6 @@
       "title": "Netanyahu rages against critics, including Mamdani, at the U.N. General Assembly",
       "link": "https://www.npr.org/2026/09/25/nx-s1-5979852/israels-prime-minister-addresses-u-n-general-assembly",
       "pubDate": "Fri, 25 Sep 2026 06:25:03 -0400"
-    },
-    {
-      "title": "Fill in the blank in the quiz: Trump's says his triumphal arch will include _____",
-      "link": "https://www.npr.org/2026/09/25/g-s1-144665/trump-arch-fat-bear-media-ai-news-quiz",
-      "pubDate": "Fri, 25 Sep 2026 05:01:00 -0400"
     }
   ]
 }
