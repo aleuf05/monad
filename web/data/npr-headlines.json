@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-26T21:30:02.370626+00:00",
+  "fetched_at": "2026-09-26T21:45:01.924971+00:00",
   "items": [
+    {
+      "title": "Trump gave Xi Jinping a warm welcome. What did the talks accomplish?",
+      "link": "https://www.npr.org/2026/09/26/nx-s1-5980066/trump-gave-xi-jinping-a-warm-welcome-what-did-the-talks-accomplish",
+      "pubDate": "Sat, 26 Sep 2026 17:13:54 -0400"
+    },
     {
       "title": "Trump calls Iranian plan to reopen Strait of Hormuz not 'acceptable'",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5981990/trump-rejects-iranian-deal-strait-of-hormuz",
@@ -36,11 +41,6 @@
     {
       "title": "Meal deliveries can save money and improve health. Will they survive Medicaid cuts?",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5946434/medically-tailored-meal-deliveries-medicaid-cuts",
-      "pubDate": "Sat, 26 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "The U.S. has more thalidomide survivors than the government admits",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5979047/us-thalidomide-survivors-want-recognition-government",
       "pubDate": "Sat, 26 Sep 2026 05:00:00 -0400"
     }
   ]
