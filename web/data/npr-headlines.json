@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T12:00:02.439953+00:00",
+  "fetched_at": "2026-09-27T12:15:02.096029+00:00",
   "items": [
+    {
+      "title": "Playing 'La Bamba' for an hour? Must be a Mexican fandango!",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5973237/la-bamba-mexico-fandango",
+      "pubDate": "Sun, 27 Sep 2026 08:00:00 -0400"
+    },
     {
       "title": "Photos: These shepherds climb down a mountain to go to night school",
       "link": "https://www.npr.org/2026/09/27/g-s1-143582/night-school-shepherds-lesotho",
@@ -37,11 +42,6 @@
       "title": "OpenAI says its models engaged with US government websites in misbehavior disclosure",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5981979/openai-us-government-websites-misbehavior",
       "pubDate": "Sat, 26 Sep 2026 13:10:04 -0400"
-    },
-    {
-      "title": "OPINION: Trump's U.N. speech, a stark contrast with past presidents",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5974096/essay-09-26-26",
-      "pubDate": "Sat, 26 Sep 2026 08:00:00 -0400"
     }
   ]
 }
