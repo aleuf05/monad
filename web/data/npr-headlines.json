@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T12:15:02.096029+00:00",
+  "fetched_at": "2026-09-27T13:15:02.185651+00:00",
   "items": [
+    {
+      "title": "South Africa reels from spate of mass shootings that killed 38 people in a week",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5982488/south-africa-mass-shootings-killed-38-week",
+      "pubDate": "Sun, 27 Sep 2026 09:01:27 -0400"
+    },
     {
       "title": "Playing 'La Bamba' for an hour? Must be a Mexican fandango!",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5973237/la-bamba-mexico-fandango",
@@ -37,11 +42,6 @@
       "title": "Trump calls Iranian plan to reopen Strait of Hormuz not 'acceptable'",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5981990/trump-rejects-iranian-deal-strait-of-hormuz",
       "pubDate": "Sat, 26 Sep 2026 16:08:28 -0400"
-    },
-    {
-      "title": "OpenAI says its models engaged with US government websites in misbehavior disclosure",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5981979/openai-us-government-websites-misbehavior",
-      "pubDate": "Sat, 26 Sep 2026 13:10:04 -0400"
     }
   ]
 }
