@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-27T05:55:06Z",
+  "generated": "2026-09-27T06:00:41Z",
   "units": {
     "installed": 26,
     "active": 21,
@@ -15,7 +15,7 @@
   },
   "tree": {
     "uncommitted": 4,
-    "head": "426c636d"
+    "head": "58f26b36"
   },
   "captain": "running",
   "captain_detail": {
