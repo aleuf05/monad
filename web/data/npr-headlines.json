@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T18:00:02.147148+00:00",
+  "fetched_at": "2026-09-27T22:45:01.614109+00:00",
   "items": [
+    {
+      "title": "Scientists discover two new species of sea spiders along Canadian coastline",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5982026/new-sea-spider-species",
+      "pubDate": "Sun, 27 Sep 2026 18:31:16 -0400"
+    },
     {
       "title": "South Africa reels from spate of mass shootings that killed 38 people in a week",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982488/south-africa-mass-shootings-killed-38-week",
@@ -37,11 +42,6 @@
       "title": "From professor to patient: One man's journey on the frontier of lung cancer treatment",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5981264/lung-cancer-treatment-mrna-affordability",
       "pubDate": "Sun, 27 Sep 2026 07:00:00 -0400"
-    },
-    {
-      "title": "5 arrested near a U.K. air base used by U.S. on suspicion of preparing a terrorist act",
-      "link": "https://www.npr.org/2026/09/27/nx-s1-5982480/multiple-arrests-suspicion-explosives-offenses-uk-base-us-forces",
-      "pubDate": "Sun, 27 Sep 2026 06:49:36 -0400"
     }
   ]
 }
