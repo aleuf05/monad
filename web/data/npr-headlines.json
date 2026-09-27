@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-26T22:45:01.988355+00:00",
+  "fetched_at": "2026-09-27T10:15:01.961421+00:00",
   "items": [
+    {
+      "title": "These Democrats are running for Congress on Christian faith. Will it pay off?",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5979946/these-democrats-are-running-for-congress-on-christian-faith-will-it-pay-off",
+      "pubDate": "Sun, 27 Sep 2026 06:00:00 -0400"
+    },
     {
       "title": "Trump gave Xi Jinping a warm welcome. What did the talks accomplish?",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5980066/trump-gave-xi-jinping-a-warm-welcome-what-did-the-talks-accomplish",
@@ -36,11 +41,6 @@
     {
       "title": "The AI safety debate is confusing. Here's our guide to the different factions",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5979085/the-ai-safety-debate-is-confusing-heres-our-guide-to-the-different-factions",
-      "pubDate": "Sat, 26 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Meal deliveries can save money and improve health. Will they survive Medicaid cuts?",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5946434/medically-tailored-meal-deliveries-medicaid-cuts",
       "pubDate": "Sat, 26 Sep 2026 05:00:00 -0400"
     }
   ]
