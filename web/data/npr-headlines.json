@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T11:00:02.199887+00:00",
+  "fetched_at": "2026-09-27T11:15:01.996625+00:00",
   "items": [
+    {
+      "title": "From professor to patient: One man's journey on the frontier of lung cancer treatment",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5981264/lung-cancer-treatment-mrna-affordability",
+      "pubDate": "Sun, 27 Sep 2026 07:00:00 -0400"
+    },
     {
       "title": "Multiple arrests on suspicion of explosives offenses near U.K. base used by U.S. forces",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982480/multiple-arrests-suspicion-explosives-offenses-uk-base-us-forces",
@@ -37,11 +42,6 @@
       "title": "Windy weddings and rocky cruises: How East Coasters are braving the nor'easter this weekend",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5981392/noreaster-east-coast-floods",
       "pubDate": "Sat, 26 Sep 2026 07:38:00 -0400"
-    },
-    {
-      "title": "Why this island paradise has the world's fastest-growing HIV epidemic",
-      "link": "https://www.npr.org/2026/09/26/g-s1-144667/hiv-crystal-meth-epidemic-fiji",
-      "pubDate": "Sat, 26 Sep 2026 07:31:18 -0400"
     }
   ]
 }
