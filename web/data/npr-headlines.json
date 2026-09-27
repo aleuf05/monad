@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T10:15:01.961421+00:00",
+  "fetched_at": "2026-09-27T11:00:02.199887+00:00",
   "items": [
+    {
+      "title": "Multiple arrests on suspicion of explosives offenses near U.K. base used by U.S. forces",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5982480/multiple-arrests-suspicion-explosives-offenses-uk-base-us-forces",
+      "pubDate": "Sun, 27 Sep 2026 06:49:36 -0400"
+    },
     {
       "title": "These Democrats are running for Congress on Christian faith. Will it pay off?",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5979946/these-democrats-are-running-for-congress-on-christian-faith-will-it-pay-off",
@@ -37,11 +42,6 @@
       "title": "Why this island paradise has the world's fastest-growing HIV epidemic",
       "link": "https://www.npr.org/2026/09/26/g-s1-144667/hiv-crystal-meth-epidemic-fiji",
       "pubDate": "Sat, 26 Sep 2026 07:31:18 -0400"
-    },
-    {
-      "title": "The AI safety debate is confusing. Here's our guide to the different factions",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5979085/the-ai-safety-debate-is-confusing-heres-our-guide-to-the-different-factions",
-      "pubDate": "Sat, 26 Sep 2026 05:00:00 -0400"
     }
   ]
 }
