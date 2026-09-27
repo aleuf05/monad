@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T16:45:01.867326+00:00",
+  "fetched_at": "2026-09-27T17:00:01.645696+00:00",
   "items": [
     {
       "title": "South Africa reels from spate of mass shootings that killed 38 people in a week",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982488/south-africa-mass-shootings-killed-38-week",
       "pubDate": "Sun, 27 Sep 2026 09:01:27 -0400"
+    },
+    {
+      "title": "Trump wants to remove a question about race in the census. We look back at the history",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5966883/trump-wants-to-remove-a-question-about-race-in-the-census-we-look-back-at-the-history",
+      "pubDate": "Sun, 27 Sep 2026 08:17:31 -0400"
     },
     {
       "title": "As Congress debates college sports, athletes-turned-senators have a seat at the table",
@@ -37,11 +42,6 @@
       "title": "5 arrested near a U.K. air base used by U.S. on suspicion of preparing a terrorist act",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982480/multiple-arrests-suspicion-explosives-offenses-uk-base-us-forces",
       "pubDate": "Sun, 27 Sep 2026 06:49:36 -0400"
-    },
-    {
-      "title": "These Democrats are making Christianity a centerpiece of their midterm campaigns",
-      "link": "https://www.npr.org/2026/09/27/nx-s1-5979946/these-democrats-are-running-for-congress-on-christian-faith-will-it-pay-off",
-      "pubDate": "Sun, 27 Sep 2026 06:00:00 -0400"
     }
   ]
 }
