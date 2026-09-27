@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T11:15:01.996625+00:00",
+  "fetched_at": "2026-09-27T12:00:02.439953+00:00",
   "items": [
+    {
+      "title": "Photos: These shepherds climb down a mountain to go to night school",
+      "link": "https://www.npr.org/2026/09/27/g-s1-143582/night-school-shepherds-lesotho",
+      "pubDate": "Sun, 27 Sep 2026 07:53:42 -0400"
+    },
     {
       "title": "From professor to patient: One man's journey on the frontier of lung cancer treatment",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5981264/lung-cancer-treatment-mrna-affordability",
@@ -37,11 +42,6 @@
       "title": "OPINION: Trump's U.N. speech, a stark contrast with past presidents",
       "link": "https://www.npr.org/2026/09/26/nx-s1-5974096/essay-09-26-26",
       "pubDate": "Sat, 26 Sep 2026 08:00:00 -0400"
-    },
-    {
-      "title": "Windy weddings and rocky cruises: How East Coasters are braving the nor'easter this weekend",
-      "link": "https://www.npr.org/2026/09/26/nx-s1-5981392/noreaster-east-coast-floods",
-      "pubDate": "Sat, 26 Sep 2026 07:38:00 -0400"
     }
   ]
 }
