@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T13:30:01.566088+00:00",
+  "fetched_at": "2026-09-28T13:45:02.220239+00:00",
   "items": [
     {
       "title": "SpaceX's Starship launches on first orbital mission from Texas",
@@ -19,7 +19,7 @@
       "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
     },
     {
-      "title": "U.K. holds 5 British suspects after arrests near U.S. air base as Iran denies role",
+      "title": "5 British suspects arrested, explosives found near U.S.-run air base. Iran denies role",
       "link": "https://www.npr.org/2026/09/28/g-s1-145245/britain-us-base-suspected-foiled-attack",
       "pubDate": "Mon, 28 Sep 2026 06:51:25 -0400"
     },
