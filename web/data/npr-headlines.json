@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T08:15:01.420067+00:00",
+  "fetched_at": "2026-09-28T09:00:01.763603+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5979667/morning-news-brief",
+      "pubDate": "Mon, 28 Sep 2026 04:44:29 -0400"
+    },
     {
       "title": "Mexico's Baja California braces for Hurricane Polo as Hurricane Nolo threatens Hawaii",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5983317/hurricane-polo-hurricane-nolo",
@@ -37,11 +42,6 @@
       "title": "As Congress debates college sports, athletes-turned-senators have a seat at the table",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5978973/protect-college-sports-act-senators-athletes",
       "pubDate": "Sun, 27 Sep 2026 08:06:24 -0400"
-    },
-    {
-      "title": "Ohio governor's race: Ramaswamy and Acton clash in rare Democratic pickup opportunity",
-      "link": "https://www.npr.org/2026/09/27/nx-s1-5976743/ohio-governors-race-ramaswamy-and-acton-clash-in-rare-democratic-pickup-opportunity",
-      "pubDate": "Sun, 27 Sep 2026 08:06:23 -0400"
     }
   ]
 }
