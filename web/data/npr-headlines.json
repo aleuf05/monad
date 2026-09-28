@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T17:30:02.082912+00:00",
+  "fetched_at": "2026-09-28T18:00:01.633331+00:00",
   "items": [
     {
       "title": "Prosecutors are reexamining a Cornell fraternity rape case. Here's what we know",
@@ -34,7 +34,7 @@
       "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
     },
     {
-      "title": "5 British suspects arrested, explosives found near U.S.-run air base. Iran denies role",
+      "title": "U.K. examines if Iran or Russia are involved in foiled attack near base used by U.S.",
       "link": "https://www.npr.org/2026/09/28/g-s1-145245/britain-us-base-suspected-foiled-attack",
       "pubDate": "Mon, 28 Sep 2026 06:51:25 -0400"
     },
