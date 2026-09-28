@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T01:00:01.923294+00:00",
+  "fetched_at": "2026-09-28T07:30:02.273215+00:00",
   "items": [
+    {
+      "title": "Eviction of 87-year-old sparks protests in Madrid over housing crisis",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5983303/encampment-protest-madrid-housing-crisis",
+      "pubDate": "Mon, 28 Sep 2026 03:20:18 -0400"
+    },
     {
       "title": "Nantucket shipwreck uncovered by Nor'easter",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982785/nantucket-shipwreck-uncovered-by-noreaster",
@@ -37,11 +42,6 @@
       "title": "Playing 'La Bamba' for an hour? Must be a Mexican fandango!",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5973237/la-bamba-mexico-fandango",
       "pubDate": "Sun, 27 Sep 2026 08:00:00 -0400"
-    },
-    {
-      "title": "Photos: This may be the most inspirational night school on Earth",
-      "link": "https://www.npr.org/2026/09/27/g-s1-143582/night-school-shepherds-lesotho",
-      "pubDate": "Sun, 27 Sep 2026 07:53:42 -0400"
     }
   ]
 }
