@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-27T22:45:01.614109+00:00",
+  "fetched_at": "2026-09-28T01:00:01.923294+00:00",
   "items": [
+    {
+      "title": "Nantucket shipwreck uncovered by Nor'easter",
+      "link": "https://www.npr.org/2026/09/27/nx-s1-5982785/nantucket-shipwreck-uncovered-by-noreaster",
+      "pubDate": "Sun, 27 Sep 2026 20:30:26 -0400"
+    },
     {
       "title": "Scientists discover two new species of sea spiders along Canadian coastline",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5982026/new-sea-spider-species",
@@ -37,11 +42,6 @@
       "title": "Photos: This may be the most inspirational night school on Earth",
       "link": "https://www.npr.org/2026/09/27/g-s1-143582/night-school-shepherds-lesotho",
       "pubDate": "Sun, 27 Sep 2026 07:53:42 -0400"
-    },
-    {
-      "title": "From professor to patient: One man's journey on the frontier of lung cancer treatment",
-      "link": "https://www.npr.org/2026/09/27/nx-s1-5981264/lung-cancer-treatment-mrna-affordability",
-      "pubDate": "Sun, 27 Sep 2026 07:00:00 -0400"
     }
   ]
 }
