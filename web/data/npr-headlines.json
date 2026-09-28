@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T07:30:02.273215+00:00",
+  "fetched_at": "2026-09-28T08:15:01.420067+00:00",
   "items": [
+    {
+      "title": "Mexico's Baja California braces for Hurricane Polo as Hurricane Nolo threatens Hawaii",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5983317/hurricane-polo-hurricane-nolo",
+      "pubDate": "Mon, 28 Sep 2026 03:54:01 -0400"
+    },
     {
       "title": "Eviction of 87-year-old sparks protests in Madrid over housing crisis",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5983303/encampment-protest-madrid-housing-crisis",
@@ -37,11 +42,6 @@
       "title": "Ohio governor's race: Ramaswamy and Acton clash in rare Democratic pickup opportunity",
       "link": "https://www.npr.org/2026/09/27/nx-s1-5976743/ohio-governors-race-ramaswamy-and-acton-clash-in-rare-democratic-pickup-opportunity",
       "pubDate": "Sun, 27 Sep 2026 08:06:23 -0400"
-    },
-    {
-      "title": "Playing 'La Bamba' for an hour? Must be a Mexican fandango!",
-      "link": "https://www.npr.org/2026/09/27/nx-s1-5973237/la-bamba-mexico-fandango",
-      "pubDate": "Sun, 27 Sep 2026 08:00:00 -0400"
     }
   ]
 }
