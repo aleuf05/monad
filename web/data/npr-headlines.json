@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T16:15:01.392664+00:00",
+  "fetched_at": "2026-09-28T16:45:01.860231+00:00",
   "items": [
+    {
+      "title": "Trump's immigration push has largely spared farms. Idaho dairymen worry it won't last.",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5976810/trumps-immigration-push-has-largely-spared-farms-idaho-dairymen-worry-it-wont-last",
+      "pubDate": "Mon, 28 Sep 2026 12:27:30 -0400"
+    },
     {
       "title": "The Trump administration weakens fuel efficiency standards for new cars",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5918509/car-fuel-efficiency-cafe-standards-rollback",
@@ -36,11 +41,6 @@
     {
       "title": "How to limit the rat numbers? Train the humans",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5980436/rats-dc-new-york-rangers",
-      "pubDate": "Mon, 28 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "5 tips for parents worried about their kids' screen time and online safety",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5965849/screens-teens-parents-social-media-safety",
       "pubDate": "Mon, 28 Sep 2026 05:00:00 -0400"
     }
   ]
