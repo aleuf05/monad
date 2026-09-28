@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T11:45:01.402007+00:00",
+  "fetched_at": "2026-09-28T12:00:02.074679+00:00",
   "items": [
+    {
+      "title": "Trump aims to leave a physical legacy in D.C., bulldozing norms along the way",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5930441/trump-construction-projects-legacy",
+      "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
+    },
     {
       "title": "British police investigate if arrests near U.S. air base foiled an Iran-linked attack",
       "link": "https://www.npr.org/2026/09/28/g-s1-145245/britain-us-base-suspected-foiled-attack",
@@ -37,11 +42,6 @@
       "title": "Mexico's Baja California braces for Hurricane Polo as Hurricane Nolo threatens Hawaii",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5983317/hurricane-polo-hurricane-nolo",
       "pubDate": "Mon, 28 Sep 2026 03:54:01 -0400"
-    },
-    {
-      "title": "Eviction of 87-year-old sparks protests in Madrid over housing crisis",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5983303/encampment-protest-madrid-housing-crisis",
-      "pubDate": "Mon, 28 Sep 2026 03:20:18 -0400"
     }
   ]
 }
