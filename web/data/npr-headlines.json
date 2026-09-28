@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T18:00:01.633331+00:00",
+  "fetched_at": "2026-09-28T20:30:01.784413+00:00",
   "items": [
     {
       "title": "Prosecutors are reexamining a Cornell fraternity rape case. Here's what we know",
@@ -39,8 +39,8 @@
       "pubDate": "Mon, 28 Sep 2026 06:51:25 -0400"
     },
     {
-      "title": "What to know about the $810 million in spending canceled by President Trump",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5982739/what-to-know-about-the-810-million-in-spending-canceled-by-president-trump",
+      "title": "How to limit the rat numbers? Train the humans",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5980436/rats-dc-new-york-rangers",
       "pubDate": "Mon, 28 Sep 2026 05:00:00 -0400"
     }
   ]
