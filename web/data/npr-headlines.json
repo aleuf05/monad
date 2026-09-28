@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-28T13:45:02.220239+00:00",
+  "fetched_at": "2026-09-28T16:15:01.392664+00:00",
   "items": [
+    {
+      "title": "The Trump administration weakens fuel efficiency standards for new cars",
+      "link": "https://www.npr.org/2026/09/28/nx-s1-5918509/car-fuel-efficiency-cafe-standards-rollback",
+      "pubDate": "Mon, 28 Sep 2026 12:07:15 -0400"
+    },
     {
       "title": "SpaceX's Starship launches on first orbital mission from Texas",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5983418/spacex-starship-first-orbital-flight-14-nasa",
@@ -36,11 +41,6 @@
     {
       "title": "5 tips for parents worried about their kids' screen time and online safety",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5965849/screens-teens-parents-social-media-safety",
-      "pubDate": "Mon, 28 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Schools are experimenting with AI with little evidence or policy to guide them",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5759718/ai-schools-experiment-research",
       "pubDate": "Mon, 28 Sep 2026 05:00:00 -0400"
     }
   ]
