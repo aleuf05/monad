@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T18:15:01.721063+00:00",
+  "fetched_at": "2026-09-29T19:30:01.614245+00:00",
   "items": [
+    {
+      "title": "U.S. Supreme Court sides with Trump administration in third-country deportations",
+      "link": "https://www.npr.org/2026/09/29/g-s1-145266/supreme-court-trump-third-country-deportations",
+      "pubDate": "Tue, 29 Sep 2026 15:19:37 -0400"
+    },
     {
       "title": "Lindsay Clancy's lawyer now questions whether she killed her 3 children",
       "link": "https://www.npr.org/2026/09/29/g-s1-145539/lindsay-clancy-trial-hearing-lawyer",
@@ -37,11 +42,6 @@
       "title": "How to hide your spending habits from retailers (so you don't get ripped off)",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983457/4-ways-to-avoid-getting-ripped-off-according-to-a-pricing-expert",
       "pubDate": "Tue, 29 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "As the U.S. signals a smaller Middle East footprint, Turkey is ready to step in",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5983685/turkey-influence",
-      "pubDate": "Tue, 29 Sep 2026 05:00:00 -0400"
     }
   ]
 }
