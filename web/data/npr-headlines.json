@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T06:15:01.988034+00:00",
+  "fetched_at": "2026-09-29T06:45:01.469850+00:00",
   "items": [
+    {
+      "title": "OpenAI delays latest model over security concerns, as industry faces pressure",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5984342/openai-delays-latest-model",
+      "pubDate": "Tue, 29 Sep 2026 02:34:43 -0400"
+    },
     {
       "title": "Tennessee is set to execute a woman for the first time in 200 years",
       "link": "https://www.npr.org/2026/09/29/g-s1-145408/tennessee-woman-execution",
@@ -37,11 +42,6 @@
       "title": "What we know about the suspected U.K. terror plot. And, why the Gulf remains in limbo",
       "link": "https://www.npr.org/2026/09/28/g-s1-145248/up-first-newsletter-uk-us-air-base-iran-strait-hormuz-media-outlets-cnn-trump",
       "pubDate": "Mon, 28 Sep 2026 08:15:05 -0400"
-    },
-    {
-      "title": "Trump aims to leave a physical legacy in D.C., bulldozing norms along the way",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5930441/trump-construction-projects-legacy",
-      "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
     }
   ]
 }
