@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T02:30:02.196456+00:00",
+  "fetched_at": "2026-09-29T05:45:02.397539+00:00",
   "items": [
     {
       "title": "The Senate passes the Protect College Sports Act, but the bill's future is unclear",
@@ -39,7 +39,7 @@
       "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
     },
     {
-      "title": "U.K. examines if Iran or Russia are involved in foiled attack near base used by U.S.",
+      "title": "5 men arrested near a U.S.-run base bailed as UK police probe if there's an Iran link",
       "link": "https://www.npr.org/2026/09/28/g-s1-145245/britain-us-base-suspected-foiled-attack",
       "pubDate": "Mon, 28 Sep 2026 06:51:25 -0400"
     }
