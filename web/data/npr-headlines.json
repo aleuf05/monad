@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T15:45:01.581891+00:00",
+  "fetched_at": "2026-09-29T16:15:02.080098+00:00",
   "items": [
+    {
+      "title": "This year's MacArthur Fellows include researchers who fuse science and justice",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983444/this-years-macarthur-fellows-include-researchers-who-fuse-science-and-justice",
+      "pubDate": "Tue, 29 Sep 2026 12:03:34 -0400"
+    },
+    {
+      "title": "Meet the 20 scholars and artists who've just won MacArthur Fellowships",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5980447/macarthur-genius-grants-2026-fellows",
+      "pubDate": "Tue, 29 Sep 2026 12:01:00 -0400"
+    },
     {
       "title": "Trump weakens fuel efficiency standards. And, Cornell fraternity rape case reopened",
       "link": "https://www.npr.org/2026/09/29/g-s1-145422/up-first-newsletter-fuel-efficiency-standards-cornell-rape-case-terror-suspects",
@@ -32,16 +42,6 @@
       "title": "Democrat Pete Buttigieg criticizes Trump's rollback of fuel-economy standards",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983537/pete-buttigieg-reaction-trump-fuel-economy-standards-rollback",
       "pubDate": "Tue, 29 Sep 2026 04:46:41 -0400"
-    },
-    {
-      "title": "News organizations ask court to bar White House enforcement of access ban",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5984349/news-organizations-court-white-house-ban",
-      "pubDate": "Tue, 29 Sep 2026 04:13:11 -0400"
-    },
-    {
-      "title": "OpenAI delays latest model over security concerns, as industry faces pressure",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5984342/openai-delays-latest-model",
-      "pubDate": "Tue, 29 Sep 2026 02:34:43 -0400"
     }
   ]
 }
