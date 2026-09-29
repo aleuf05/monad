@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T08:30:01.702097+00:00",
+  "fetched_at": "2026-09-29T09:00:01.993708+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5979951/morning-news-brief",
+      "pubDate": "Tue, 29 Sep 2026 04:47:43 -0400"
+    },
     {
       "title": "News organizations ask court to bar White House enforcement of access ban",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5984349/news-organizations-court-white-house-ban",
@@ -37,11 +42,6 @@
       "title": "The Trump administration weakens fuel efficiency standards for new cars",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5918509/car-fuel-efficiency-cafe-standards-rollback",
       "pubDate": "Mon, 28 Sep 2026 12:07:15 -0400"
-    },
-    {
-      "title": "SpaceX's Starship launches on first orbital mission from Texas",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5983418/spacex-starship-first-orbital-flight-14-nasa",
-      "pubDate": "Mon, 28 Sep 2026 09:15:29 -0400"
     }
   ]
 }
