@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T05:45:02.397539+00:00",
+  "fetched_at": "2026-09-29T06:15:01.988034+00:00",
   "items": [
+    {
+      "title": "Tennessee is set to execute a woman for the first time in 200 years",
+      "link": "https://www.npr.org/2026/09/29/g-s1-145408/tennessee-woman-execution",
+      "pubDate": "Tue, 29 Sep 2026 01:59:18 -0400"
+    },
     {
       "title": "The Senate passes the Protect College Sports Act, but the bill's future is unclear",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5977851/protect-college-sports-act-senate-bill-vote",
@@ -37,11 +42,6 @@
       "title": "Trump aims to leave a physical legacy in D.C., bulldozing norms along the way",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5930441/trump-construction-projects-legacy",
       "pubDate": "Mon, 28 Sep 2026 07:41:48 -0400"
-    },
-    {
-      "title": "5 men arrested near a U.S.-run base bailed as UK police probe if there's an Iran link",
-      "link": "https://www.npr.org/2026/09/28/g-s1-145245/britain-us-base-suspected-foiled-attack",
-      "pubDate": "Mon, 28 Sep 2026 06:51:25 -0400"
     }
   ]
 }
