@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T17:15:01.981935+00:00",
+  "fetched_at": "2026-09-29T17:30:01.737020+00:00",
   "items": [
+    {
+      "title": "Potential Taiwan tension sparked 'last minute' change in Trump-Xi National Archives visit",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5984989/digital-archives-trump-xi",
+      "pubDate": "Tue, 29 Sep 2026 13:17:04 -0400"
+    },
     {
       "title": "Making gene-edited babies is illegal. This startup says it may be time to reconsider",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5950439/embryo-gene-editing-babies-biotech",
@@ -37,11 +42,6 @@
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5979951/morning-news-brief",
       "pubDate": "Tue, 29 Sep 2026 04:47:43 -0400"
-    },
-    {
-      "title": "Trump administration says it's scaling back fuel efficiency standards for new cars",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5983673/trump-administration-says-its-scaling-back-fuel-efficiency-standards-for-new-cars",
-      "pubDate": "Tue, 29 Sep 2026 04:46:49 -0400"
     }
   ]
 }
