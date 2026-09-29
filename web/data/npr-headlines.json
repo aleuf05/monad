@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T09:15:01.596312+00:00",
+  "fetched_at": "2026-09-29T11:45:01.830884+00:00",
   "items": [
+    {
+      "title": "Trump weakens fuel efficiency standards. And, Cornell fraternity rape case reopened",
+      "link": "https://www.npr.org/2026/09/29/g-s1-145422/up-first-newsletter-fuel-efficiency-standards-cornell-rape-case-terror-suspects",
+      "pubDate": "Tue, 29 Sep 2026 07:36:24 -0400"
+    },
     {
       "title": "4 ways to avoid getting ripped off, according to a pricing expert",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983457/4-ways-to-avoid-getting-ripped-off-according-to-a-pricing-expert",
@@ -37,11 +42,6 @@
       "title": "The Senate passes the Protect College Sports Act, but the bill's future is unclear",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5977851/protect-college-sports-act-senate-bill-vote",
       "pubDate": "Mon, 28 Sep 2026 22:16:19 -0400"
-    },
-    {
-      "title": "Prosecutors are reopening a Cornell fraternity rape case. Here's what we know",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5983480/cornell-fraternity-rape-chi-phi-case-updates",
-      "pubDate": "Mon, 28 Sep 2026 13:14:25 -0400"
     }
   ]
 }
