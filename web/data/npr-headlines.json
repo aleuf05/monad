@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T16:15:02.080098+00:00",
+  "fetched_at": "2026-09-29T17:15:01.981935+00:00",
   "items": [
+    {
+      "title": "Making gene-edited babies is illegal. This startup says it may be time to reconsider",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5950439/embryo-gene-editing-babies-biotech",
+      "pubDate": "Tue, 29 Sep 2026 13:00:08 -0400"
+    },
     {
       "title": "This year's MacArthur Fellows include researchers who fuse science and justice",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983444/this-years-macarthur-fellows-include-researchers-who-fuse-science-and-justice",
@@ -37,11 +42,6 @@
       "title": "Trump administration says it's scaling back fuel efficiency standards for new cars",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983673/trump-administration-says-its-scaling-back-fuel-efficiency-standards-for-new-cars",
       "pubDate": "Tue, 29 Sep 2026 04:46:49 -0400"
-    },
-    {
-      "title": "Democrat Pete Buttigieg criticizes Trump's rollback of fuel-economy standards",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5983537/pete-buttigieg-reaction-trump-fuel-economy-standards-rollback",
-      "pubDate": "Tue, 29 Sep 2026 04:46:41 -0400"
     }
   ]
 }
