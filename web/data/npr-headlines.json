@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T11:45:01.830884+00:00",
+  "fetched_at": "2026-09-29T15:15:02.039611+00:00",
   "items": [
     {
       "title": "Trump weakens fuel efficiency standards. And, Cornell fraternity rape case reopened",
@@ -24,6 +24,16 @@
       "pubDate": "Tue, 29 Sep 2026 04:47:43 -0400"
     },
     {
+      "title": "Trump administration says it's scaling back fuel efficiency standards for new cars",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983673/trump-administration-says-its-scaling-back-fuel-efficiency-standards-for-new-cars",
+      "pubDate": "Tue, 29 Sep 2026 04:46:49 -0400"
+    },
+    {
+      "title": "Democrat Pete Buttigieg criticizes Trump's rollback of fuel-economy standards",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983537/pete-buttigieg-reaction-trump-fuel-economy-standards-rollback",
+      "pubDate": "Tue, 29 Sep 2026 04:46:41 -0400"
+    },
+    {
       "title": "News organizations ask court to bar White House enforcement of access ban",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5984349/news-organizations-court-white-house-ban",
       "pubDate": "Tue, 29 Sep 2026 04:13:11 -0400"
@@ -32,16 +42,6 @@
       "title": "OpenAI delays latest model over security concerns, as industry faces pressure",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5984342/openai-delays-latest-model",
       "pubDate": "Tue, 29 Sep 2026 02:34:43 -0400"
-    },
-    {
-      "title": "Tennessee is set to execute a woman for the first time in 200 years",
-      "link": "https://www.npr.org/2026/09/29/g-s1-145408/tennessee-woman-execution",
-      "pubDate": "Tue, 29 Sep 2026 01:59:18 -0400"
-    },
-    {
-      "title": "The Senate passes the Protect College Sports Act, but the bill's future is unclear",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5977851/protect-college-sports-act-senate-bill-vote",
-      "pubDate": "Mon, 28 Sep 2026 22:16:19 -0400"
     }
   ]
 }
