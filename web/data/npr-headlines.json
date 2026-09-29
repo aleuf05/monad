@@ -1,15 +1,20 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T17:30:01.737020+00:00",
+  "fetched_at": "2026-09-29T18:15:01.721063+00:00",
   "items": [
+    {
+      "title": "Lindsay Clancy's lawyer now questions whether she killed her 3 children",
+      "link": "https://www.npr.org/2026/09/29/g-s1-145539/lindsay-clancy-trial-hearing-lawyer",
+      "pubDate": "Tue, 29 Sep 2026 14:00:50 -0400"
+    },
     {
       "title": "Potential Taiwan tension sparked 'last minute' change in Trump-Xi National Archives visit",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5984989/digital-archives-trump-xi",
       "pubDate": "Tue, 29 Sep 2026 13:17:04 -0400"
     },
     {
-      "title": "Making gene-edited babies is illegal. This startup says it may be time to reconsider",
+      "title": "This startup wants to prove gene-editing embryos is safe for making healthy babies",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5950439/embryo-gene-editing-babies-biotech",
       "pubDate": "Tue, 29 Sep 2026 13:00:08 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "As the U.S. signals a smaller Middle East footprint, Turkey is ready to step in",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983685/turkey-influence",
       "pubDate": "Tue, 29 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Morning news brief",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5979951/morning-news-brief",
-      "pubDate": "Tue, 29 Sep 2026 04:47:43 -0400"
     }
   ]
 }
