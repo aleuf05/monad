@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T09:00:01.993708+00:00",
+  "fetched_at": "2026-09-29T09:15:01.596312+00:00",
   "items": [
+    {
+      "title": "4 ways to avoid getting ripped off, according to a pricing expert",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983457/4-ways-to-avoid-getting-ripped-off-according-to-a-pricing-expert",
+      "pubDate": "Tue, 29 Sep 2026 05:01:00 -0400"
+    },
+    {
+      "title": "As the U.S. signals a smaller Middle East footprint, Turkey is ready to step in",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983685/turkey-influence",
+      "pubDate": "Tue, 29 Sep 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5979951/morning-news-brief",
@@ -32,16 +42,6 @@
       "title": "Prosecutors are reopening a Cornell fraternity rape case. Here's what we know",
       "link": "https://www.npr.org/2026/09/28/nx-s1-5983480/cornell-fraternity-rape-chi-phi-case-updates",
       "pubDate": "Mon, 28 Sep 2026 13:14:25 -0400"
-    },
-    {
-      "title": "Trump's immigration push has largely spared farms. Idaho dairymen worry it won't last.",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5976810/trumps-immigration-idaho-dairy-industry",
-      "pubDate": "Mon, 28 Sep 2026 12:27:30 -0400"
-    },
-    {
-      "title": "The Trump administration weakens fuel efficiency standards for new cars",
-      "link": "https://www.npr.org/2026/09/28/nx-s1-5918509/car-fuel-efficiency-cafe-standards-rollback",
-      "pubDate": "Mon, 28 Sep 2026 12:07:15 -0400"
     }
   ]
 }
