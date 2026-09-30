@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T13:00:01.792769+00:00",
+  "fetched_at": "2026-09-30T13:45:02.052982+00:00",
   "items": [
+    {
+      "title": "A flight from Dubai to Tel Aviv diverts to Saudi Arabia after making distress call",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5985806/flydubai-flight-dubai-tel-aviv-israel",
+      "pubDate": "Wed, 30 Sep 2026 09:35:11 -0400"
+    },
     {
       "title": "FBI hunting the hackers who stole its employees' sensitive data",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5985202/fbi-hack-shinyhunters",
@@ -29,18 +34,13 @@
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "One year after the end of the EV tax credit, is the future still electric?",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5979915/ev-hybrid-sales-2026-federal-tax-credit",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Montana starts enforcing Medicaid work requirements on Oct 1. Patients are confused",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5946766/montana-early-medicaid-work-requirements-patients-confused",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "What's behind HHS claims that gender-affirming care 'may' radicalize",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5962843/hhs-study-gender-ideology-flaws-missing-context",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Drugs are widely used to sedate dementia patients. Her sons wanted to keep her off them",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5980081/memory-drugs-brain-aging-dementia",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
