@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T02:00:02.168575+00:00",
+  "fetched_at": "2026-09-30T06:30:02.106472+00:00",
   "items": [
+    {
+      "title": "Hurricane Polo's remnants bringing more rain to flood-struck U.S. Southwest",
+      "link": "https://www.npr.org/2026/09/30/g-s1-145590/hurricane-polo-us-southwest",
+      "pubDate": "Wed, 30 Sep 2026 02:16:44 -0400"
+    },
     {
       "title": "The federal law aimed at protecting college students from sexual abuse",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5983779/investigating-sexual-abuse-on-campus",
@@ -37,11 +42,6 @@
       "title": "Meet the 20 scholars and artists who've just won MacArthur Fellowships",
       "link": "https://www.npr.org/2026/09/29/nx-s1-5980447/macarthur-genius-grants-2026-fellows",
       "pubDate": "Tue, 29 Sep 2026 12:01:00 -0400"
-    },
-    {
-      "title": "Trump weakens fuel efficiency standards. And, Cornell fraternity rape case reopened",
-      "link": "https://www.npr.org/2026/09/29/g-s1-145422/up-first-newsletter-fuel-efficiency-standards-cornell-rape-case-terror-suspects",
-      "pubDate": "Tue, 29 Sep 2026 07:36:24 -0400"
     }
   ]
 }
