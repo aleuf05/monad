@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-29T19:30:01.614245+00:00",
+  "fetched_at": "2026-09-30T02:00:02.168575+00:00",
   "items": [
+    {
+      "title": "The federal law aimed at protecting college students from sexual abuse",
+      "link": "https://www.npr.org/2026/09/29/nx-s1-5983779/investigating-sexual-abuse-on-campus",
+      "pubDate": "Tue, 29 Sep 2026 17:29:21 -0400"
+    },
     {
       "title": "U.S. Supreme Court sides with Trump administration in third-country deportations",
       "link": "https://www.npr.org/2026/09/29/g-s1-145266/supreme-court-trump-third-country-deportations",
@@ -37,11 +42,6 @@
       "title": "Trump weakens fuel efficiency standards. And, Cornell fraternity rape case reopened",
       "link": "https://www.npr.org/2026/09/29/g-s1-145422/up-first-newsletter-fuel-efficiency-standards-cornell-rape-case-terror-suspects",
       "pubDate": "Tue, 29 Sep 2026 07:36:24 -0400"
-    },
-    {
-      "title": "How to hide your spending habits from retailers (so you don't get ripped off)",
-      "link": "https://www.npr.org/2026/09/29/nx-s1-5983457/4-ways-to-avoid-getting-ripped-off-according-to-a-pricing-expert",
-      "pubDate": "Tue, 29 Sep 2026 05:01:00 -0400"
     }
   ]
 }
