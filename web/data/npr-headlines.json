@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T16:45:01.919045+00:00",
+  "fetched_at": "2026-09-30T17:30:01.895685+00:00",
   "items": [
+    {
+      "title": "Police questioning can shape a sexual assault case. Their approach is often wrong",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5983868/cornell-rape-police-interview-investigation-victim-trauma-informed",
+      "pubDate": "Wed, 30 Sep 2026 13:19:24 -0400"
+    },
     {
       "title": "Trump officials changed forms for overseas voters amid a GOP push to restrict voting",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5978976/military-voter-registration-overseas-citizens-absentee-voting",
@@ -37,11 +42,6 @@
       "title": "U.S. forces exit Iraq amid Iran war. And, SCOTUS revives Trump deportation policy",
       "link": "https://www.npr.org/2026/09/30/g-s1-145604/up-first-newsletter-iraq-us-troops-scotus-deportations-trump-ai",
       "pubDate": "Wed, 30 Sep 2026 07:13:17 -0400"
-    },
-    {
-      "title": "Travel plans? Here's what to know as measles exposures reach trains and games",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5978940/traveling-measles-exposure-vaccines-transportation",
-      "pubDate": "Wed, 30 Sep 2026 07:00:00 -0400"
     }
   ]
 }
