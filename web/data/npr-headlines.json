@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T15:00:01.849910+00:00",
+  "fetched_at": "2026-09-30T15:15:01.630660+00:00",
   "items": [
+    {
+      "title": "How Trump keeps undercutting his anti-communist message",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5913363/how-trump-keeps-undercutting-his-anti-communist-message",
+      "pubDate": "Wed, 30 Sep 2026 10:58:51 -0400"
+    },
     {
       "title": "After failed execution, health workers say Tennessee's method flouts medical ethics",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5981250/tennessee-execution-tony-carruthers-christa-pike-medical-ethics-lethal-injection",
@@ -36,11 +41,6 @@
     {
       "title": "The moment you've been waiting for: America's best student podcasts",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5930430/student-podcast-challenge-2026-finalists",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "What's behind HHS claims that gender-affirming care 'may' radicalize",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5962843/hhs-study-gender-ideology-flaws-missing-context",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
