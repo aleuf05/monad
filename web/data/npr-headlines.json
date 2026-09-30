@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T11:00:01.848621+00:00",
+  "fetched_at": "2026-09-30T11:15:01.497303+00:00",
   "items": [
+    {
+      "title": "Travel plans? Here's what to know as measles exposures reach trains and games",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5978940/traveling-measles-exposure-vaccines-transportation",
+      "pubDate": "Wed, 30 Sep 2026 07:00:00 -0400"
+    },
     {
       "title": "A startup wants to build a massive nuclear-powered data center on public land in Utah",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5983482/valar-atomic-nuclear-data-center-project-beehive-utah",
@@ -36,11 +41,6 @@
     {
       "title": "Montana starts enforcing Medicaid work requirements on Oct 1. Patients are confused",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5946766/montana-early-medicaid-work-requirements-patients-confused",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "One year after the end of the EV tax credit, is the future still electric?",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5979915/ev-hybrid-sales-2026-federal-tax-credit",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
