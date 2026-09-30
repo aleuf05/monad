@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T15:45:02.049858+00:00",
+  "fetched_at": "2026-09-30T16:45:01.919045+00:00",
   "items": [
+    {
+      "title": "Trump officials changed forms for overseas voters amid a GOP push to restrict voting",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5978976/military-voter-registration-overseas-citizens-absentee-voting",
+      "pubDate": "Wed, 30 Sep 2026 12:32:12 -0400"
+    },
     {
       "title": "How Ukrainians are coping with new, more deadly Russian attacks",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5984948/how-ukrainians-are-coping-with-new-more-deadly-russian-attacks",
@@ -19,7 +24,7 @@
       "pubDate": "Wed, 30 Sep 2026 10:30:03 -0400"
     },
     {
-      "title": "Israel says a flydubai pilot tried to crash a plane of mostly Israeli passengers",
+      "title": "A pilot stabs the other pilot and tries to crash their flight to Tel Aviv, Israel says",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5985806/flydubai-flight-dubai-tel-aviv-israel",
       "pubDate": "Wed, 30 Sep 2026 09:35:11 -0400"
     },
@@ -37,11 +42,6 @@
       "title": "Travel plans? Here's what to know as measles exposures reach trains and games",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5978940/traveling-measles-exposure-vaccines-transportation",
       "pubDate": "Wed, 30 Sep 2026 07:00:00 -0400"
-    },
-    {
-      "title": "A startup wants to build a massive nuclear-powered data center on public land in Utah",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5983482/valar-atomic-nuclear-data-center-project-beehive-utah",
-      "pubDate": "Wed, 30 Sep 2026 05:01:00 -0400"
     }
   ]
 }
