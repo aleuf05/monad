@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T11:15:01.497303+00:00",
+  "fetched_at": "2026-09-30T11:30:02.185671+00:00",
   "items": [
+    {
+      "title": "U.S. forces exit Iraq amid Iran war. And, SCOTUS revives Trump deportation policy",
+      "link": "https://www.npr.org/2026/09/30/g-s1-145604/up-first-newsletter-iraq-us-troops-scotus-deportations-trump-ai",
+      "pubDate": "Wed, 30 Sep 2026 07:13:17 -0400"
+    },
     {
       "title": "Travel plans? Here's what to know as measles exposures reach trains and games",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5978940/traveling-measles-exposure-vaccines-transportation",
@@ -19,28 +24,23 @@
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     },
     {
-      "title": "What's behind HHS claims that gender-affirming care 'may' radicalize",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5962843/hhs-study-gender-ideology-flaws-missing-context",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Drugs are widely used to sedate dementia patients. Her sons wanted to keep her off them",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5980081/memory-drugs-brain-aging-dementia",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "The 2026 Student Podcast Challenge Honorable Mentions",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5984991/student-podcast-challenge-2026-honorable-mentions",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
       "title": "Foster care often fails kids with disabilities. Consider these cases",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5534203/foster-care-disabilities-children-bad-outcomes",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     },
     {
+      "title": "One year after the end of the EV tax credit, is the future still electric?",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5979915/ev-hybrid-sales-2026-federal-tax-credit",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
       "title": "Montana starts enforcing Medicaid work requirements on Oct 1. Patients are confused",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5946766/montana-early-medicaid-work-requirements-patients-confused",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "What's behind HHS claims that gender-affirming care 'may' radicalize",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5962843/hhs-study-gender-ideology-flaws-missing-context",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
