@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-29T23:59:39Z",
+  "generated": "2026-09-30T00:05:46Z",
   "units": {
     "installed": 26,
     "active": 21,
@@ -15,7 +15,7 @@
   },
   "tree": {
     "uncommitted": 2,
-    "head": "a3416fe9"
+    "head": "d1eda497"
   },
   "captain": "running",
   "captain_detail": {
@@ -26,7 +26,7 @@
     "event_audio": "procedural-live-web-audio"
   },
   "voice": {
-    "day": "2026-09-29",
+    "day": "2026-09-30",
     "seconds_used": 0,
     "seconds_limit": null,
     "usd_used": 0,
@@ -97,7 +97,7 @@
       "disk_used_percent": 23,
       "disk_available": "162.2G",
       "memory_available_percent": 76.5,
-      "load_1m": 0.98
+      "load_1m": 1.03
     }
   },
   "sound": false,
