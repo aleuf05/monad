@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T13:45:02.052982+00:00",
+  "fetched_at": "2026-09-30T14:45:02.047116+00:00",
   "items": [
+    {
+      "title": "After failed execution, health workers say Tennessee's method flouts medical ethics",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5981250/tennessee-execution-tony-carruthers-christa-pike-medical-ethics-lethal-injection",
+      "pubDate": "Wed, 30 Sep 2026 10:30:03 -0400"
+    },
     {
       "title": "A flight from Dubai to Tel Aviv diverts to Saudi Arabia after making distress call",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5985806/flydubai-flight-dubai-tel-aviv-israel",
@@ -36,11 +41,6 @@
     {
       "title": "What's behind HHS claims that gender-affirming care 'may' radicalize",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5962843/hhs-study-gender-ideology-flaws-missing-context",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Drugs are widely used to sedate dementia patients. Her sons wanted to keep her off them",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5980081/memory-drugs-brain-aging-dementia",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
