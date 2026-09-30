@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T22:00:01.817967+00:00",
+  "fetched_at": "2026-09-30T23:15:01.636896+00:00",
   "items": [
+    {
+      "title": "Swiss glaciers suffer another year of record ice loss",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5981403/swiss-glaciers-climate-change",
+      "pubDate": "Wed, 30 Sep 2026 19:00:00 -0400"
+    },
     {
       "title": "Leaning into culture war flashpoints, Hegseth says he has transformed U.S. military",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5986304/hegseth-troops-address",
@@ -37,11 +42,6 @@
       "title": "After failed execution, health workers say Tennessee's method flouts medical ethics",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5981250/tennessee-execution-tony-carruthers-christa-pike-medical-ethics-lethal-injection",
       "pubDate": "Wed, 30 Sep 2026 10:30:03 -0400"
-    },
-    {
-      "title": "On flight to Israel, pilot is stabbed, plane plunges before passengers tackle attacker",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5985806/flydubai-flight-dubai-tel-aviv-israel",
-      "pubDate": "Wed, 30 Sep 2026 09:35:11 -0400"
     }
   ]
 }
