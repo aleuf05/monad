@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T15:30:02.359757+00:00",
+  "fetched_at": "2026-09-30T15:45:02.049858+00:00",
   "items": [
+    {
+      "title": "How Ukrainians are coping with new, more deadly Russian attacks",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5984948/how-ukrainians-are-coping-with-new-more-deadly-russian-attacks",
+      "pubDate": "Wed, 30 Sep 2026 11:33:19 -0400"
+    },
     {
       "title": "How Trump keeps undercutting his anti-communist message",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5913363/how-trump-keeps-undercutting-his-anti-communist-message",
@@ -37,11 +42,6 @@
       "title": "A startup wants to build a massive nuclear-powered data center on public land in Utah",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5983482/valar-atomic-nuclear-data-center-project-beehive-utah",
       "pubDate": "Wed, 30 Sep 2026 05:01:00 -0400"
-    },
-    {
-      "title": "The moment you've been waiting for: America's best student podcasts",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5930430/student-podcast-challenge-2026-finalists",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
 }
