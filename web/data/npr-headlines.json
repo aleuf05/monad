@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T17:30:01.895685+00:00",
+  "fetched_at": "2026-09-30T18:00:02.187231+00:00",
   "items": [
+    {
+      "title": "Greetings from Syria, where time seems to melt as a glassmaker braves scorching temps",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5983516/damascus-syria-glass",
+      "pubDate": "Wed, 30 Sep 2026 13:51:42 -0400"
+    },
     {
       "title": "Police questioning can shape a sexual assault case. Their approach is often wrong",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5983868/cornell-rape-police-interview-investigation-victim-trauma-informed",
@@ -37,11 +42,6 @@
       "title": "FBI hunting the hackers who stole its employees' sensitive data",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5985202/fbi-hack-shinyhunters",
       "pubDate": "Wed, 30 Sep 2026 08:29:05 -0400"
-    },
-    {
-      "title": "U.S. forces exit Iraq amid Iran war. And, SCOTUS revives Trump deportation policy",
-      "link": "https://www.npr.org/2026/09/30/g-s1-145604/up-first-newsletter-iraq-us-troops-scotus-deportations-trump-ai",
-      "pubDate": "Wed, 30 Sep 2026 07:13:17 -0400"
     }
   ]
 }
