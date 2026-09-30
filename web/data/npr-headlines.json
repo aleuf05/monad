@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-09-30T10:45:02.150387+00:00",
+  "fetched_at": "2026-09-30T11:00:01.848621+00:00",
   "items": [
     {
       "title": "A startup wants to build a massive nuclear-powered data center on public land in Utah",
@@ -11,21 +11,6 @@
     {
       "title": "The moment you've been waiting for: America's best student podcasts",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5930430/student-podcast-challenge-2026-finalists",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Foster care often fails kids with disabilities. Consider these cases",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5534203/foster-care-disabilities-children-bad-outcomes",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "One year after the end of the EV tax credit, is the future still electric?",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5979915/ev-hybrid-sales-2026-federal-tax-credit",
-      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Montana starts enforcing Medicaid work requirements on Oct 1. Patients are confused",
-      "link": "https://www.npr.org/2026/09/30/nx-s1-5946766/montana-early-medicaid-work-requirements-patients-confused",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     },
     {
@@ -41,6 +26,21 @@
     {
       "title": "The 2026 Student Podcast Challenge Honorable Mentions",
       "link": "https://www.npr.org/2026/09/30/nx-s1-5984991/student-podcast-challenge-2026-honorable-mentions",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Foster care often fails kids with disabilities. Consider these cases",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5534203/foster-care-disabilities-children-bad-outcomes",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Montana starts enforcing Medicaid work requirements on Oct 1. Patients are confused",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5946766/montana-early-medicaid-work-requirements-patients-confused",
+      "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
+    },
+    {
+      "title": "One year after the end of the EV tax credit, is the future still electric?",
+      "link": "https://www.npr.org/2026/09/30/nx-s1-5979915/ev-hybrid-sales-2026-federal-tax-credit",
       "pubDate": "Wed, 30 Sep 2026 05:00:00 -0400"
     }
   ]
