@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T13:00:01.600888+00:00",
+  "fetched_at": "2026-10-01T13:15:02.215128+00:00",
   "items": [
     {
       "title": "Passengers recount chaos on Tel Aviv flight. And, FBI probes employee-data hack",
@@ -19,18 +19,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +29,18 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
