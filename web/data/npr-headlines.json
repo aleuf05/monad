@@ -1,11 +1,11 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T09:15:01.670015+00:00",
+  "fetched_at": "2026-10-01T09:30:01.431804+00:00",
   "items": [
     {
-      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
+      "title": "En esta ciudad de Pensilvania, los dos partidos pol\u00edticos buscan el voto latino",
+      "link": "https://www.npr.org/2026/10/01/g-s1-145488/en-esta-ciudad-de-pensilvania-los-dos-partidos-politicos-buscan-el-voto-latino",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -14,8 +14,23 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "Egg prices have tumbled since Trump returned to office. Here's why",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5978076/egg-prices-trump-affordability",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -24,23 +39,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "SNAP's funding model is starting to change. Here's what that means for the program",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5985222/snap-benefits-program-october-change-funding",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
