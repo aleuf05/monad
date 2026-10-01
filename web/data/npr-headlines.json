@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T11:45:01.997087+00:00",
+  "fetched_at": "2026-10-01T12:15:01.489524+00:00",
   "items": [
     {
       "title": "Passengers recount chaos on Tel Aviv flight. And, FBI probes employee-data hack",
@@ -19,13 +19,13 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
+      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
+      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -34,8 +34,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
