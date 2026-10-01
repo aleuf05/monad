@@ -1,16 +1,11 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T09:30:01.431804+00:00",
+  "fetched_at": "2026-10-01T09:45:02.187583+00:00",
   "items": [
     {
       "title": "En esta ciudad de Pensilvania, los dos partidos pol\u00edticos buscan el voto latino",
       "link": "https://www.npr.org/2026/10/01/g-s1-145488/en-esta-ciudad-de-pensilvania-los-dos-partidos-politicos-buscan-el-voto-latino",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -19,8 +14,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
+      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -29,18 +24,23 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
