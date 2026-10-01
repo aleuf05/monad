@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T16:00:01.931581+00:00",
+  "fetched_at": "2026-10-01T16:45:02.194912+00:00",
   "items": [
     {
       "title": "New space station crew launches from Florida on SpaceX's Crew Dragon capsule",
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
+      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
