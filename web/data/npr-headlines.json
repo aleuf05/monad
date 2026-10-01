@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T17:00:01.839383+00:00",
+  "fetched_at": "2026-10-01T18:30:02.170373+00:00",
   "items": [
+    {
+      "title": "A judge permanently dismisses former Olympian's Reflecting Pool charges",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5987947/reflecting-pool-vandalism-hearn-charges-dismissed",
+      "pubDate": "Thu, 01 Oct 2026 14:22:59 -0400"
+    },
     {
       "title": "AI data centers: How much are ratepayers on the hook for?",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5984949/data-centers-ai-ratepayers-congress",
@@ -36,11 +41,6 @@
     {
       "title": "En esta ciudad de Pensilvania, los dos partidos pol\u00edticos buscan el voto latino",
       "link": "https://www.npr.org/2026/10/01/g-s1-145488/en-esta-ciudad-de-pensilvania-los-dos-partidos-politicos-buscan-el-voto-latino",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
