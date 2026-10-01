@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T18:30:02.170373+00:00",
+  "fetched_at": "2026-10-01T19:00:01.629384+00:00",
   "items": [
+    {
+      "title": "Google launches Project Suncatcher, a step towards AI data centers in space",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5983697/project-suncatcher-google-ai-data-center-space",
+      "pubDate": "Thu, 01 Oct 2026 14:41:07 -0400"
+    },
     {
       "title": "A judge permanently dismisses former Olympian's Reflecting Pool charges",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5987947/reflecting-pool-vandalism-hearn-charges-dismissed",
@@ -37,11 +42,6 @@
       "title": "Picanha, prices and politics: What Brazil's favorite steak says about the election",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5986079/picanha-election-brazil-economy",
       "pubDate": "Thu, 01 Oct 2026 06:00:00 -0400"
-    },
-    {
-      "title": "En esta ciudad de Pensilvania, los dos partidos pol\u00edticos buscan el voto latino",
-      "link": "https://www.npr.org/2026/10/01/g-s1-145488/en-esta-ciudad-de-pensilvania-los-dos-partidos-politicos-buscan-el-voto-latino",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
 }
