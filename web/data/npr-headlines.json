@@ -1,16 +1,16 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T10:00:01.967789+00:00",
+  "fetched_at": "2026-10-01T10:15:01.724765+00:00",
   "items": [
+    {
+      "title": "Picanha, prices and politics: What Brazil's favorite steak says about the election",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5986079/picanha-election-brazil-economy",
+      "pubDate": "Thu, 01 Oct 2026 06:00:00 -0400"
+    },
     {
       "title": "En esta ciudad de Pensilvania, los dos partidos pol\u00edticos buscan el voto latino",
       "link": "https://www.npr.org/2026/10/01/g-s1-145488/en-esta-ciudad-de-pensilvania-los-dos-partidos-politicos-buscan-el-voto-latino",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -19,18 +19,13 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Egg prices have tumbled since Trump returned to office. Here's why",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5978076/egg-prices-trump-affordability",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Trade tensions mean fewer Canadians flocking to South Florida",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Egg prices have tumbled since Trump returned to office. Here's why",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5978076/egg-prices-trump-affordability",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +34,13 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "SNAP's funding model is starting to change. Here's what that means for the program",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5985222/snap-benefits-program-october-change-funding",
+      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
+      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
