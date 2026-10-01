@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T15:30:01.591911+00:00",
+  "fetched_at": "2026-10-01T16:00:01.931581+00:00",
   "items": [
     {
       "title": "New space station crew launches from Florida on SpaceX's Crew Dragon capsule",
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
