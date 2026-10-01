@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T15:15:01.806095+00:00",
+  "fetched_at": "2026-10-01T15:30:01.591911+00:00",
   "items": [
+    {
+      "title": "New space station crew launches from Florida on SpaceX's Crew Dragon capsule",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5987698/nasa-crew-13-spacex-international-space-station-iss",
+      "pubDate": "Thu, 01 Oct 2026 11:21:33 -0400"
+    },
     {
       "title": "What a Pearly King taught me about Cockney rhyming slang and East London history",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5928148/pearly-king-peckham-george-major-london-cockney",
@@ -36,11 +41,6 @@
     {
       "title": "Studying this super El Ni\u00f1o could save lives. NOAA is scaling back research",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5976905/super-el-nino-research-noaa-floods",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
