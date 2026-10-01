@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T11:15:01.582786+00:00",
+  "fetched_at": "2026-10-01T11:30:02.277659+00:00",
   "items": [
     {
       "title": "Picanha, prices and politics: What Brazil's favorite steak says about the election",
@@ -14,13 +14,13 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
+      "title": "Trump administration reverses stance on integration of people with disabilities",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
+      "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -29,8 +29,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Trump administration reverses stance on integration of people with disabilities",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5981375/integration-mandate-disabilities-reversed-trump",
+      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Do AI and air traffic control mix? CEO addresses anxiety about new FAA tool",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5973243/ai-faa-air-traffic-control-software",
+      "title": "Egg prices have tumbled since Trump returned to office. Here's why",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5978076/egg-prices-trump-affordability",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
