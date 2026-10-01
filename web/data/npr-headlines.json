@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-01T16:45:02.194912+00:00",
+  "fetched_at": "2026-10-01T17:00:01.839383+00:00",
   "items": [
+    {
+      "title": "AI data centers: How much are ratepayers on the hook for?",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5984949/data-centers-ai-ratepayers-congress",
+      "pubDate": "Thu, 01 Oct 2026 12:47:53 -0400"
+    },
+    {
+      "title": "Cornell Jane Doe's attorney says she told police in 2024: 'I was raped'",
+      "link": "https://www.npr.org/2026/10/01/nx-s1-5987703/cornell-fraternity-rape-case-updates",
+      "pubDate": "Thu, 01 Oct 2026 12:43:26 -0400"
+    },
     {
       "title": "New space station crew launches from Florida on SpaceX's Crew Dragon capsule",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5987698/nasa-crew-13-spacex-international-space-station-iss",
@@ -31,16 +41,6 @@
     {
       "title": "COMIC: How the census gives your state power (and what Trump wants to change)",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5983684/trump-2030-census-overhaul-changes",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Trade tensions mean fewer Canadians flocking to South Florida",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5971507/trade-tensions-fewer-canadians-south-florida",
-      "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Along U.S. Route 1, Maine voters worry about heating oil, gas and Canadian tariffs",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5969830/maine-senate-collins-jackson-aroostook-county",
       "pubDate": "Thu, 01 Oct 2026 05:00:00 -0400"
     }
   ]
