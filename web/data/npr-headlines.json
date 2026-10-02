@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T18:30:01.784690+00:00",
+  "fetched_at": "2026-10-02T19:00:02.166753+00:00",
   "items": [
+    {
+      "title": "Pro-Trump Influencer Benny Johnson is being sued for defamation by ICE protesters",
+      "link": "https://www.npr.org/2026/10/02/nx-s1-5989413/benny-johnson-defamation-lawsuit-ice-protesters",
+      "pubDate": "Fri, 02 Oct 2026 14:43:30 -0400"
+    },
     {
       "title": "October 1 ushered in a new era in U.S. foreign aid. What's the plan? Will it work?",
       "link": "https://www.npr.org/2026/10/02/g-s1-146042/foreign-aid-united-states-healthcare-america-first",
@@ -37,11 +42,6 @@
       "title": "Failed 'torturous' execution attempt on Christa Pike reignites death penalty debate",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5988832/christa-pike-reignites-death-penalty-debate",
       "pubDate": "Fri, 02 Oct 2026 06:25:03 -0400"
-    },
-    {
-      "title": "Who uttered the phrase 'the ideological clowns are out' this week? The quiz knows",
-      "link": "https://www.npr.org/2026/10/02/g-s1-145638/trump-hegseth-panda-ai-beyonce-news-quiz",
-      "pubDate": "Fri, 02 Oct 2026 05:01:00 -0400"
     }
   ]
 }
