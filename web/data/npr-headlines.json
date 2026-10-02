@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T10:45:02.237673+00:00",
+  "fetched_at": "2026-10-02T11:15:01.583061+00:00",
   "items": [
+    {
+      "title": "Why is diesel more expensive than regular gas?",
+      "link": "https://www.npr.org/sections/planet-money/2026/10/02/nx-s1-5988075/why-is-diesel-more-expensive-than-regular-gas",
+      "pubDate": "Fri, 02 Oct 2026 07:00:00 -0400"
+    },
     {
       "title": "San Francisco's car crime has plunged. How much credit does Flock deserve?",
       "link": "https://www.npr.org/sections/planet-money/2026/10/02/g-s1-146060/san-franciscos-car-crime-has-plunged-how-much-credit-does-flock-deserve",
@@ -24,24 +29,19 @@
       "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "He was banned by betting sites, and filed for bankruptcy. Then he relapsed on Kalshi",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5981420/kalshi-betting-prediction-markets-gambling-addiction",
+      "title": "Pro-democracy activists increasingly vulnerable to authoritarian governments in Southeast Asia",
+      "link": "https://www.npr.org/2026/10/02/g-s1-146064/pro-democracy-activists-asia-authoritarian-governments",
       "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Pro-democracy activists increasingly vulnerable to authoritarian governments in Southeast Asia",
-      "link": "https://www.npr.org/2026/10/02/g-s1-146064/pro-democracy-activists-asia-authoritarian-governments",
+      "title": "He was banned by betting sites, and filed for bankruptcy. Then he relapsed on Kalshi",
+      "link": "https://www.npr.org/2026/10/02/nx-s1-5981420/kalshi-betting-prediction-markets-gambling-addiction",
       "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "The family of Renee Good files lawsuits over her death during Minneapolis ICE raids",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5986224/renee-good-ice-lawsuit-minneapolis",
       "pubDate": "Thu, 01 Oct 2026 16:15:07 -0400"
-    },
-    {
-      "title": "'It's a nightmare.' Former refugee, professor on Trump's new Medicaid policy",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5987948/trump-medicaid-health-insurance-disability-refugee",
-      "pubDate": "Thu, 01 Oct 2026 15:49:45 -0400"
     }
   ]
 }
