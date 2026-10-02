@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T19:00:02.166753+00:00",
+  "fetched_at": "2026-10-02T19:45:02.387916+00:00",
   "items": [
+    {
+      "title": "Germany's political center fights for relevance after far-right and far-left gains",
+      "link": "https://www.npr.org/2026/10/02/g-s1-146108/germany-politics-center-afd-die-linke-cdu-merz",
+      "pubDate": "Fri, 02 Oct 2026 15:22:57 -0400"
+    },
     {
       "title": "Pro-Trump Influencer Benny Johnson is being sued for defamation by ICE protesters",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5989413/benny-johnson-defamation-lawsuit-ice-protesters",
@@ -37,11 +42,6 @@
       "title": "San Francisco's car crime has plunged. How much credit does Flock deserve?",
       "link": "https://www.npr.org/sections/planet-money/2026/10/02/g-s1-146060/san-franciscos-car-crime-has-plunged-how-much-credit-does-flock-deserve",
       "pubDate": "Fri, 02 Oct 2026 06:30:00 -0400"
-    },
-    {
-      "title": "Failed 'torturous' execution attempt on Christa Pike reignites death penalty debate",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5988832/christa-pike-reignites-death-penalty-debate",
-      "pubDate": "Fri, 02 Oct 2026 06:25:03 -0400"
     }
   ]
 }
