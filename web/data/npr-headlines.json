@@ -1,17 +1,12 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T09:45:01.380356+00:00",
+  "fetched_at": "2026-10-02T10:15:01.814722+00:00",
   "items": [
     {
       "title": "Who uttered the phrase 'the ideological clowns are out' this week? The quiz knows",
       "link": "https://www.npr.org/2026/10/02/g-s1-145638/trump-hegseth-panda-ai-beyonce-news-quiz",
       "pubDate": "Fri, 02 Oct 2026 05:01:00 -0400"
-    },
-    {
-      "title": "Pro-democracy activists increasingly vulnerable to authoritarian governments in Asia",
-      "link": "https://www.npr.org/2026/10/02/g-s1-146064/pro-democracy-activists-asia-authoritarian-governments",
-      "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "The U.S. Senate is up for grabs. Can this Ohio Democrat win back working class votes?",
@@ -21,6 +16,11 @@
     {
       "title": "He was banned by betting sites, and filed for bankruptcy. Then he relapsed on Kalshi",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5981420/kalshi-betting-prediction-markets-gambling-addiction",
+      "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Pro-democracy activists increasingly vulnerable to authoritarian governments in Southeast Asia",
+      "link": "https://www.npr.org/2026/10/02/g-s1-146064/pro-democracy-activists-asia-authoritarian-governments",
       "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
     },
     {
