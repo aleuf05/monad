@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T07:15:01.880467+00:00",
+  "fetched_at": "2026-10-02T09:15:01.893222+00:00",
   "items": [
+    {
+      "title": "Who uttered the phrase 'the ideological clowns are out' this week? The quiz knows",
+      "link": "https://www.npr.org/2026/10/02/g-s1-145638/trump-hegseth-panda-ai-beyonce-news-quiz",
+      "pubDate": "Fri, 02 Oct 2026 05:01:00 -0400"
+    },
+    {
+      "title": "The U.S. Senate is up for grabs. Can this Ohio Democrat win back working class votes?",
+      "link": "https://www.npr.org/2026/10/02/nx-s1-5981096/ohio-senate-sherrod-brown-labor-workers",
+      "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "He was banned by betting sites, and filed for bankruptcy. Then he relapsed on Kalshi",
+      "link": "https://www.npr.org/2026/10/02/nx-s1-5981420/kalshi-betting-prediction-markets-gambling-addiction",
+      "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Pro-democracy activists increasingly vulnerable to authoritarian governments in Asia",
+      "link": "https://www.npr.org/2026/10/02/g-s1-146064/pro-democracy-activists-asia-authoritarian-governments",
+      "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "The family of Renee Good files lawsuits over her death during Minneapolis ICE raids",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5986224/renee-good-ice-lawsuit-minneapolis",
@@ -22,26 +42,6 @@
       "title": "Google launches Project Suncatcher, a step towards AI data centers in space",
       "link": "https://www.npr.org/2026/10/01/nx-s1-5983697/project-suncatcher-google-ai-data-center-space",
       "pubDate": "Thu, 01 Oct 2026 14:41:07 -0400"
-    },
-    {
-      "title": "A judge permanently dismisses former Olympian's Reflecting Pool charges",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5987947/reflecting-pool-vandalism-hearn-charges-dismissed",
-      "pubDate": "Thu, 01 Oct 2026 14:22:59 -0400"
-    },
-    {
-      "title": "AI data centers: How much are ratepayers on the hook for?",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5984949/data-centers-ai-ratepayers-congress",
-      "pubDate": "Thu, 01 Oct 2026 12:47:53 -0400"
-    },
-    {
-      "title": "New York Attorney General Letitia James made special prosecutor in Cornell rape investigation",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5987703/cornell-fraternity-rape-case-updates",
-      "pubDate": "Thu, 01 Oct 2026 12:43:26 -0400"
-    },
-    {
-      "title": "New space station crew launches from Florida on SpaceX's Crew Dragon capsule",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5987698/nasa-crew-13-spacex-international-space-station-iss",
-      "pubDate": "Thu, 01 Oct 2026 11:21:33 -0400"
     }
   ]
 }
