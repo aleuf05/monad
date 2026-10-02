@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T19:45:02.387916+00:00",
+  "fetched_at": "2026-10-02T22:00:01.885357+00:00",
   "items": [
+    {
+      "title": "As Trump's proposed arch looms over D.C., protesters pin their hopes on the midterms",
+      "link": "https://www.npr.org/2026/10/02/nx-s1-5985789/trump-arch-protest-veterans-midterms",
+      "pubDate": "Fri, 02 Oct 2026 17:44:07 -0400"
+    },
     {
       "title": "Germany's political center fights for relevance after far-right and far-left gains",
       "link": "https://www.npr.org/2026/10/02/g-s1-146108/germany-politics-center-afd-die-linke-cdu-merz",
@@ -37,11 +42,6 @@
       "title": "Why is diesel more expensive than regular gas?",
       "link": "https://www.npr.org/sections/planet-money/2026/10/02/nx-s1-5988075/why-is-diesel-more-expensive-than-regular-gas",
       "pubDate": "Fri, 02 Oct 2026 07:00:00 -0400"
-    },
-    {
-      "title": "San Francisco's car crime has plunged. How much credit does Flock deserve?",
-      "link": "https://www.npr.org/sections/planet-money/2026/10/02/g-s1-146060/san-franciscos-car-crime-has-plunged-how-much-credit-does-flock-deserve",
-      "pubDate": "Fri, 02 Oct 2026 06:30:00 -0400"
     }
   ]
 }
