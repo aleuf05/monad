@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-02T11:15:01.583061+00:00",
+  "fetched_at": "2026-10-02T11:30:02.308386+00:00",
   "items": [
+    {
+      "title": "Cornell rape case gets special prosecutor. And, Renee Good's family sues the government",
+      "link": "https://www.npr.org/2026/10/02/g-s1-146075/up-first-newsletter-cornell-assault-case-christa-pike-jobs-report-renee-good",
+      "pubDate": "Fri, 02 Oct 2026 07:22:38 -0400"
+    },
     {
       "title": "Why is diesel more expensive than regular gas?",
       "link": "https://www.npr.org/sections/planet-money/2026/10/02/nx-s1-5988075/why-is-diesel-more-expensive-than-regular-gas",
@@ -37,11 +42,6 @@
       "title": "He was banned by betting sites, and filed for bankruptcy. Then he relapsed on Kalshi",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5981420/kalshi-betting-prediction-markets-gambling-addiction",
       "pubDate": "Fri, 02 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "The family of Renee Good files lawsuits over her death during Minneapolis ICE raids",
-      "link": "https://www.npr.org/2026/10/01/nx-s1-5986224/renee-good-ice-lawsuit-minneapolis",
-      "pubDate": "Thu, 01 Oct 2026 16:15:07 -0400"
     }
   ]
 }
