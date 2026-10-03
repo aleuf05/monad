@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T03:15:02.175014+00:00",
+  "fetched_at": "2026-10-03T09:15:01.393451+00:00",
   "items": [
+    {
+      "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "A hot tip to battle performance anxiety? 'Pretend flush' a mistake down the toilet",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5989391/a-hot-tip-to-battle-performance-anxiety-pretend-flush-a-mistake-down-the-toilet",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "How the system failed us: Former foster youth tell their stories",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5939829/foster-care-youth-disabilities-failure-voices",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "The Supreme Court faces another term jam-packed with controversy",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Brazil's big political rematch: What to know",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5989727/brazil-election-lula-bolsonaro-flavio-democracy",
@@ -22,26 +42,6 @@
       "title": "Pro-Trump Influencer Benny Johnson is being sued for defamation by ICE protesters",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5989413/benny-johnson-defamation-lawsuit-ice-protesters",
       "pubDate": "Fri, 02 Oct 2026 14:43:30 -0400"
-    },
-    {
-      "title": "October 1 ushered in a new era in U.S. foreign aid. What's the plan? Will it work?",
-      "link": "https://www.npr.org/2026/10/02/g-s1-146042/foreign-aid-united-states-healthcare-america-first",
-      "pubDate": "Fri, 02 Oct 2026 14:16:07 -0400"
-    },
-    {
-      "title": "Cloaked in anonymity, Israeli soldiers describe mass civilian killings in 'NAZA'",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5987714/naza-review-israel-palestine",
-      "pubDate": "Fri, 02 Oct 2026 10:37:27 -0400"
-    },
-    {
-      "title": "The U.S. added only 29,000 jobs in September as job market lacks spark",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5989140/jobs-labor-wages-federal-reserve",
-      "pubDate": "Fri, 02 Oct 2026 09:54:18 -0400"
-    },
-    {
-      "title": "Cornell rape case gets special prosecutor. And, Renee Good's family sues the government",
-      "link": "https://www.npr.org/2026/10/02/g-s1-146075/up-first-newsletter-cornell-assault-case-christa-pike-jobs-report-renee-good",
-      "pubDate": "Fri, 02 Oct 2026 07:22:38 -0400"
     }
   ]
 }
