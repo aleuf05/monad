@@ -1,16 +1,21 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T10:45:01.913035+00:00",
+  "fetched_at": "2026-10-03T11:15:02.282998+00:00",
   "items": [
+    {
+      "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
+      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
+    },
+    {
+      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
+      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
+    },
     {
       "title": "The Supreme Court faces another term jam-packed with controversy",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     },
     {
@@ -24,6 +29,11 @@
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "Brazil's big political rematch: What to know",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5989727/brazil-election-lula-bolsonaro-flavio-democracy",
       "pubDate": "Fri, 02 Oct 2026 22:57:07 -0400"
@@ -32,16 +42,6 @@
       "title": "As Trump's proposed arch looms over D.C., protesters pin their hopes on the midterms",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5985789/trump-arch-protest-veterans-midterms",
       "pubDate": "Fri, 02 Oct 2026 17:44:07 -0400"
-    },
-    {
-      "title": "Germany's political center fights for relevance after far-right and far-left gains",
-      "link": "https://www.npr.org/2026/10/02/g-s1-146108/germany-politics-center-afd-die-linke-cdu-merz",
-      "pubDate": "Fri, 02 Oct 2026 15:22:57 -0400"
-    },
-    {
-      "title": "Pro-Trump Influencer Benny Johnson is being sued for defamation by ICE protesters",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5989413/benny-johnson-defamation-lawsuit-ice-protesters",
-      "pubDate": "Fri, 02 Oct 2026 14:43:30 -0400"
     }
   ]
 }
