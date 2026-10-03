@@ -1,13 +1,8 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T09:15:01.393451+00:00",
+  "fetched_at": "2026-10-03T10:00:01.790026+00:00",
   "items": [
-    {
-      "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
-    },
     {
       "title": "A hot tip to battle performance anxiety? 'Pretend flush' a mistake down the toilet",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5989391/a-hot-tip-to-battle-performance-anxiety-pretend-flush-a-mistake-down-the-toilet",
@@ -21,6 +16,11 @@
     {
       "title": "The Supreme Court faces another term jam-packed with controversy",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     },
     {
