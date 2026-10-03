@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T22:15:02.134986+00:00",
+  "fetched_at": "2026-10-03T22:45:01.598730+00:00",
   "items": [
+    {
+      "title": "Coast Guard searching for missing medical plane carrying 6 people",
+      "link": "https://www.npr.org/2026/10/03/g-s1-146338/plane-missing-coast-guard-search-massachusetts",
+      "pubDate": "Sat, 03 Oct 2026 18:31:04 -0400"
+    },
+    {
+      "title": "Can the Cornell lawsuit force changes that make students safer?",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5989313/can-the-cornell-lawsuit-force-changes-that-make-students-safer",
+      "pubDate": "Sat, 03 Oct 2026 17:57:34 -0400"
+    },
     {
       "title": "Opinion: A Hawk is not the same as a Hawkeye",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5981300/opinion-a-hawk-is-not-the-same-as-a-hawkeye",
@@ -14,13 +24,13 @@
       "pubDate": "Sat, 03 Oct 2026 07:47:09 -0400"
     },
     {
-      "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
+      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
       "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
+      "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
       "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
@@ -31,16 +41,6 @@
     {
       "title": "No one expected Leo to be pope \u2014 except everyone who knew him as 'Bob'",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "4 ways to battle performance anxiety, according to a confidence coach",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5989391/a-hot-tip-to-battle-performance-anxiety-pretend-flush-a-mistake-down-the-toilet",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "How the system failed us: Former foster youth tell their stories",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5939829/foster-care-youth-disabilities-failure-voices",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     }
   ]
