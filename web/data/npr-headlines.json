@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T12:00:01.526879+00:00",
+  "fetched_at": "2026-10-03T12:15:02.252240+00:00",
   "items": [
+    {
+      "title": "Opinion: A Hawk is not the same as a Hawkeye",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5981300/opinion-a-hawk-is-not-the-same-as-a-hawkeye",
+      "pubDate": "Sat, 03 Oct 2026 08:00:00 -0400"
+    },
     {
       "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
@@ -37,11 +42,6 @@
       "title": "Brazil's big political rematch: What to know",
       "link": "https://www.npr.org/2026/10/02/nx-s1-5989727/brazil-election-lula-bolsonaro-flavio-democracy",
       "pubDate": "Fri, 02 Oct 2026 22:57:07 -0400"
-    },
-    {
-      "title": "As Trump's proposed arch looms over D.C., protesters pin their hopes on the midterms",
-      "link": "https://www.npr.org/2026/10/02/nx-s1-5985789/trump-arch-protest-veterans-midterms",
-      "pubDate": "Fri, 02 Oct 2026 17:44:07 -0400"
     }
   ]
 }
