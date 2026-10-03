@@ -1,26 +1,21 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-03T11:15:02.282998+00:00",
+  "fetched_at": "2026-10-03T12:00:01.526879+00:00",
   "items": [
-    {
-      "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
-      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
-    },
     {
       "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
       "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "The Supreme Court faces another term jam-packed with controversy",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+      "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
+      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "How the system failed us: Former foster youth tell their stories",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5939829/foster-care-youth-disabilities-failure-voices",
+      "title": "The Supreme Court faces another term jam-packed with controversy",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     },
     {
@@ -31,6 +26,11 @@
     {
       "title": "No one expected an American pope. Here's the inside story of how 'Bob' became Pope Leo",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
+      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "How the system failed us: Former foster youth tell their stories",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5939829/foster-care-youth-disabilities-failure-voices",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     },
     {
