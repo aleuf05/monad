@@ -1,10 +1,10 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T03:30:02.326472+00:00",
+  "fetched_at": "2026-10-04T03:45:01.972571+00:00",
   "items": [
     {
-      "title": "Coast Guard searching for missing medical plane carrying 6 people",
+      "title": "Coast Guard finds debris from medical plane carrying 6 people",
       "link": "https://www.npr.org/2026/10/03/g-s1-146338/plane-missing-coast-guard-search-massachusetts",
       "pubDate": "Sat, 03 Oct 2026 18:31:04 -0400"
     },
