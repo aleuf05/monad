@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T15:00:01.755400+00:00",
+  "fetched_at": "2026-10-04T15:30:02.296626+00:00",
   "items": [
+    {
+      "title": "U.S. Marine arrested for alleged murder of a woman in Okinawa, Japan",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5990790/us-marine-arrested-for-alleged-murder-woman-on-okinawa",
+      "pubDate": "Sun, 04 Oct 2026 11:15:09 -0400"
+    },
     {
       "title": "How the Cornell case is affecting women who have experienced sexual assault",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5990232/how-the-cornell-case-is-affecting-women-who-have-experienced-sexual-assault",
@@ -37,11 +42,6 @@
       "title": "Economist Betsey Stevenson breaks down the gender gap in recent hiring reports",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5989546/economist-betsey-stevenson-breaks-down-the-gender-gap-in-recent-hiring-reports",
       "pubDate": "Sat, 03 Oct 2026 07:47:09 -0400"
-    },
-    {
-      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
-      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     }
   ]
 }
