@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T18:45:01.701664+00:00",
+  "fetched_at": "2026-10-04T23:00:02.074609+00:00",
   "items": [
+    {
+      "title": "Brazil votes, with Lula facing Bolsonaro's son",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5981107/brazil-votes-with-lula-facing-bolsonaros-son",
+      "pubDate": "Sun, 04 Oct 2026 17:52:09 -0400"
+    },
     {
       "title": "Trump names national intelligence chief Jay Clayton as new AI czar",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5990781/jay-clayton-ai-czar-trump",
@@ -37,11 +42,6 @@
       "title": "Coast Guard finds debris from medical plane carrying 6 people",
       "link": "https://www.npr.org/2026/10/03/g-s1-146338/plane-missing-coast-guard-search-massachusetts",
       "pubDate": "Sat, 03 Oct 2026 18:31:04 -0400"
-    },
-    {
-      "title": "Can the Cornell lawsuit force changes that make students safer?",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5989313/can-the-cornell-lawsuit-force-changes-that-make-students-safer",
-      "pubDate": "Sat, 03 Oct 2026 17:57:34 -0400"
     }
   ]
 }
