@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T16:00:01.722390+00:00",
+  "fetched_at": "2026-10-04T18:45:01.701664+00:00",
   "items": [
+    {
+      "title": "Trump names national intelligence chief Jay Clayton as new AI czar",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5990781/jay-clayton-ai-czar-trump",
+      "pubDate": "Sun, 04 Oct 2026 14:36:48 -0400"
+    },
     {
       "title": "Cornell president calls gang rape allegations 'deeply disturbing'",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5990789/cornell-president-calls-gang-rape-allegations-deeply-disturbing",
@@ -37,11 +42,6 @@
       "title": "Can the Cornell lawsuit force changes that make students safer?",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5989313/can-the-cornell-lawsuit-force-changes-that-make-students-safer",
       "pubDate": "Sat, 03 Oct 2026 17:57:34 -0400"
-    },
-    {
-      "title": "Opinion: A Hawk is not the same as a Hawkeye",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5981300/opinion-a-hawk-is-not-the-same-as-a-hawkeye",
-      "pubDate": "Sat, 03 Oct 2026 08:00:00 -0400"
     }
   ]
 }
