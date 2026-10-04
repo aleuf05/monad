@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T07:30:01.846918+00:00",
+  "fetched_at": "2026-10-04T09:15:01.654101+00:00",
   "items": [
+    {
+      "title": "Latter-day Saints women turn away from scandal-plagued Republican candidate in Arizona",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5950536/arizona-house-race-mark-lamb-lds-church",
+      "pubDate": "Sun, 04 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Coast Guard finds debris from medical plane carrying 6 people",
       "link": "https://www.npr.org/2026/10/03/g-s1-146338/plane-missing-coast-guard-search-massachusetts",
@@ -24,23 +29,18 @@
       "pubDate": "Sat, 03 Oct 2026 07:47:09 -0400"
     },
     {
-      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
-      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
-    },
-    {
       "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
       "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "The Supreme Court faces another term jam-packed with controversy",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
+      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "No one expected Leo to be pope \u2014 except everyone who knew him as 'Bob'",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5987816/pope-leo-american-pope-book-excerpt",
+      "title": "The Supreme Court faces another term jam-packed with controversy",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
       "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
     }
   ]
