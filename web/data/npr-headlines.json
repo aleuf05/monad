@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T15:30:02.296626+00:00",
+  "fetched_at": "2026-10-04T16:00:01.722390+00:00",
   "items": [
+    {
+      "title": "Cornell president calls gang rape allegations 'deeply disturbing'",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5990789/cornell-president-calls-gang-rape-allegations-deeply-disturbing",
+      "pubDate": "Sun, 04 Oct 2026 11:41:07 -0400"
+    },
     {
       "title": "U.S. Marine arrested for alleged murder of a woman in Okinawa, Japan",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5990790/us-marine-arrested-for-alleged-murder-woman-on-okinawa",
@@ -37,11 +42,6 @@
       "title": "Opinion: A Hawk is not the same as a Hawkeye",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5981300/opinion-a-hawk-is-not-the-same-as-a-hawkeye",
       "pubDate": "Sat, 03 Oct 2026 08:00:00 -0400"
-    },
-    {
-      "title": "Economist Betsey Stevenson breaks down the gender gap in recent hiring reports",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5989546/economist-betsey-stevenson-breaks-down-the-gender-gap-in-recent-hiring-reports",
-      "pubDate": "Sat, 03 Oct 2026 07:47:09 -0400"
     }
   ]
 }
