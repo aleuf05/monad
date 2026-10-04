@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-04T09:45:02.089413+00:00",
+  "fetched_at": "2026-10-04T10:15:01.405379+00:00",
   "items": [
+    {
+      "title": "She died covering war for Fox News. Her parents blame the network \u2014 and a star reporter",
+      "link": "https://www.npr.org/2026/10/04/nx-s1-5737621/fox-news-ukraine-deaths",
+      "pubDate": "Sun, 04 Oct 2026 06:00:00 -0400"
+    },
     {
       "title": "Latter-day Saints women turn away from scandal-plagued Republican candidate in Arizona",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5950536/arizona-house-race-mark-lamb-lds-church",
@@ -29,19 +34,14 @@
       "pubDate": "Sat, 03 Oct 2026 07:47:09 -0400"
     },
     {
-      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
-      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
-    },
-    {
       "title": "Just short of its 200th birthday, a landmark natural history museum shuts down",
       "link": "https://www.npr.org/2026/10/03/nx-s1-5989716/philadelphia-academy-natural-sciences-museum-closure",
       "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "The Supreme Court faces another term jam-packed with controversy",
-      "link": "https://www.npr.org/2026/10/03/nx-s1-5986341/supreme-court-term-religion-guns-environment-immigration",
-      "pubDate": "Sat, 03 Oct 2026 05:00:00 -0400"
+      "title": "All's fair in love and 'War' \u2014 a well-cast, classy-trashy divorce drama",
+      "link": "https://www.npr.org/2026/10/03/nx-s1-5983443/war-hbo-divorce-dominic-west-sienna-miller",
+      "pubDate": "Sat, 03 Oct 2026 07:00:00 -0400"
     }
   ]
 }
