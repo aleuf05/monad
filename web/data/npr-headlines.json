@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T00:30:02.148685+00:00",
+  "fetched_at": "2026-10-05T09:00:01.474188+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5986099/morning-news-brief",
+      "pubDate": "Mon, 05 Oct 2026 04:45:43 -0400"
+    },
     {
       "title": "Brazil's presidential race heads to Lula\u2013Bolsonaro run-off as right gains ground",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5981181/brazil-presidential-lula-bolsonaro",
@@ -37,11 +42,6 @@
       "title": "She died covering war for Fox News. Her parents blame the network \u2014 and a star reporter",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5737621/fox-news-ukraine-deaths",
       "pubDate": "Sun, 04 Oct 2026 06:00:00 -0400"
-    },
-    {
-      "title": "Latter-day Saints women turn away from scandal-plagued Republican candidate in Arizona",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5950536/arizona-house-race-mark-lamb-lds-church",
-      "pubDate": "Sun, 04 Oct 2026 05:00:00 -0400"
     }
   ]
 }
