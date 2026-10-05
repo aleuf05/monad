@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T13:45:01.599661+00:00",
+  "fetched_at": "2026-10-05T14:30:01.950309+00:00",
   "items": [
+    {
+      "title": "Dennis Hastert, longtime Republican House speaker who went to prison, dies at age 84",
+      "link": "https://www.npr.org/2026/10/05/g-s1-146452/dennis-hastert-republican-house-speaker-dies-obit",
+      "pubDate": "Mon, 05 Oct 2026 10:24:31 -0400"
+    },
     {
       "title": "Drones buzz overhead, troops hunker underground in Ukraine's hellish kill zone",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5925803/drones-buzz-overhead-troops-hunker-underground-in-ukraines-hellish-kill-zone",
@@ -37,11 +42,6 @@
       "title": "Former Prince Andrew files legal action to quash warrants that led to residence searches",
       "link": "https://www.npr.org/2026/10/05/g-s1-146396/former-prince-andrew-legal-action",
       "pubDate": "Mon, 05 Oct 2026 06:01:19 -0400"
-    },
-    {
-      "title": "Spain's prime minister calls early elections as pressure mounts over housing crisis",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5991404/spain-snap-elections",
-      "pubDate": "Mon, 05 Oct 2026 05:15:55 -0400"
     }
   ]
 }
