@@ -1,8 +1,33 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T09:00:01.474188+00:00",
+  "fetched_at": "2026-10-05T09:15:02.109173+00:00",
   "items": [
+    {
+      "title": "Super El Ni\u00f1o is here. What's so super about it?",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5981261/super-el-nino-floods-droughts",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Republicans and Democrats find a unifying target: Pharmacy benefit managers",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5943563/pharmacy-benefit-managers-pbms-tennessee-arkansas-regulation",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Voters are increasingly using AI chatbots to fact-check and compare candidates",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5977852/ai-chatbots-midterm-election",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Supreme Court's new term kicks off with blockbuster climate change case",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5970070/supreme-court-climate-change-boulder-county",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "From floating saunas to clinical trials: How heat might help mental health",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5986099/morning-news-brief",
@@ -17,31 +42,6 @@
       "title": "Brazil votes, with Lula facing Bolsonaro's son",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5981107/brazil-votes-with-lula-facing-bolsonaros-son",
       "pubDate": "Sun, 04 Oct 2026 17:52:09 -0400"
-    },
-    {
-      "title": "Trump names national intelligence chief Jay Clayton as new AI czar",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5990781/jay-clayton-ai-czar-trump",
-      "pubDate": "Sun, 04 Oct 2026 14:36:48 -0400"
-    },
-    {
-      "title": "Cornell president calls gang rape allegations 'deeply disturbing'",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5990789/cornell-president-calls-gang-rape-allegations-deeply-disturbing",
-      "pubDate": "Sun, 04 Oct 2026 11:41:07 -0400"
-    },
-    {
-      "title": "U.S. Marine arrested for alleged murder of a woman in Okinawa, Japan",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5990790/us-marine-arrested-for-alleged-murder-woman-on-okinawa",
-      "pubDate": "Sun, 04 Oct 2026 11:15:09 -0400"
-    },
-    {
-      "title": "How the Cornell case is affecting women who have experienced sexual assault",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5990232/how-the-cornell-case-is-affecting-women-who-have-experienced-sexual-assault",
-      "pubDate": "Sun, 04 Oct 2026 10:51:27 -0400"
-    },
-    {
-      "title": "She died covering war for Fox News. Her parents blame the network \u2014 and a star reporter",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5737621/fox-news-ukraine-deaths",
-      "pubDate": "Sun, 04 Oct 2026 06:00:00 -0400"
     }
   ]
 }
