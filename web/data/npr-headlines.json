@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T12:45:01.748306+00:00",
+  "fetched_at": "2026-10-05T13:00:01.532685+00:00",
   "items": [
     {
       "title": "Drones buzz overhead, troops hunker underground in Ukraine's hellish Kill Zone",
@@ -24,6 +24,11 @@
       "pubDate": "Mon, 05 Oct 2026 07:07:09 -0400"
     },
     {
+      "title": "FlyDubai attacker intended to crash plane into Tel Aviv airport, ongoing investigation finds",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5990802/midair-attack-flydubai",
+      "pubDate": "Mon, 05 Oct 2026 06:53:46 -0400"
+    },
+    {
       "title": "Nobel medicine prize goes to 3 scientists for research into brain activity",
       "link": "https://www.npr.org/2026/10/05/g-s1-146400/nobel-medicine-prize",
       "pubDate": "Mon, 05 Oct 2026 06:11:33 -0400"
@@ -37,11 +42,6 @@
       "title": "Spain's prime minister calls early elections as pressure mounts over housing crisis",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5991404/spain-snap-elections",
       "pubDate": "Mon, 05 Oct 2026 05:15:55 -0400"
-    },
-    {
-      "title": "Super El Ni\u00f1o is here. What's so super about it?",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5981261/super-el-nino-floods-droughts",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     }
   ]
 }
