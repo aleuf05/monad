@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T10:30:01.797623+00:00",
+  "fetched_at": "2026-10-05T10:45:01.394725+00:00",
   "items": [
     {
       "title": "Nobel medicine prize goes to 3 scientists for research into brain activity",
@@ -17,11 +17,6 @@
       "title": "Spain's prime minister calls early elections as pressure mounts over housing crisis",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5991404/spain-snap-elections",
       "pubDate": "Mon, 05 Oct 2026 05:15:55 -0400"
-    },
-    {
-      "title": "Supreme Court's new term kicks off with blockbuster climate change case",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5970070/supreme-court-climate-change-boulder-county",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "Voters are increasingly using AI chatbots to fact-check and compare candidates",
@@ -41,6 +36,11 @@
     {
       "title": "From floating saunas to clinical trials: How heat might help mental health",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Supreme Court's new term kicks off with blockbuster climate change case",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5970070/supreme-court-climate-change-boulder-county",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     }
   ]
