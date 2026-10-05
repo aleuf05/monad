@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T11:45:01.901170+00:00",
+  "fetched_at": "2026-10-05T12:00:01.584238+00:00",
   "items": [
+    {
+      "title": "FBI arrests a woman accused of spying on Taiwan leader's family for China",
+      "link": "https://www.npr.org/2026/10/05/g-s1-146410/fbi-arrests-a-woman-accused-of-spying-on-taiwan-leaders-family-for-china",
+      "pubDate": "Mon, 05 Oct 2026 07:47:36 -0400"
+    },
     {
       "title": "Imran Khan supporters march in Pakistan to demand his release after talks failed",
       "link": "https://www.npr.org/2026/10/05/g-s1-146408/imran-khan-supporters-march-in-pakistan-to-demand-his-release-after-talks-failed",
@@ -29,18 +34,13 @@
       "pubDate": "Mon, 05 Oct 2026 05:15:55 -0400"
     },
     {
-      "title": "Republicans and Democrats find a unifying target: Pharmacy benefit managers",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5943563/pharmacy-benefit-managers-pbms-tennessee-arkansas-regulation",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Super El Ni\u00f1o is here. What's so super about it?",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5981261/super-el-nino-floods-droughts",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "From floating saunas to clinical trials: How heat might help mental health",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
+      "title": "Republicans and Democrats find a unifying target: Pharmacy benefit managers",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5943563/pharmacy-benefit-managers-pbms-tennessee-arkansas-regulation",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     }
   ]
