@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T14:30:01.950309+00:00",
+  "fetched_at": "2026-10-05T18:30:01.825937+00:00",
   "items": [
+    {
+      "title": "The iconic Arthur Read made his TV debut 30 years ago",
+      "link": "https://www.npr.org/2026/10/05/g-s1-146052/arthur-read-tv-debut-30-anniversary",
+      "pubDate": "Mon, 05 Oct 2026 14:26:01 -0400"
+    },
     {
       "title": "Dennis Hastert, longtime Republican House speaker who went to prison, dies at age 84",
       "link": "https://www.npr.org/2026/10/05/g-s1-146452/dennis-hastert-republican-house-speaker-dies-obit",
@@ -37,11 +42,6 @@
       "title": "Nobel medicine prize goes to 3 scientists for research into brain activity",
       "link": "https://www.npr.org/2026/10/05/g-s1-146400/nobel-medicine-prize",
       "pubDate": "Mon, 05 Oct 2026 06:11:33 -0400"
-    },
-    {
-      "title": "Former Prince Andrew files legal action to quash warrants that led to residence searches",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146396/former-prince-andrew-legal-action",
-      "pubDate": "Mon, 05 Oct 2026 06:01:19 -0400"
     }
   ]
 }
