@@ -1,21 +1,16 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T09:15:02.109173+00:00",
+  "fetched_at": "2026-10-05T09:30:01.883651+00:00",
   "items": [
     {
-      "title": "Super El Ni\u00f1o is here. What's so super about it?",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5981261/super-el-nino-floods-droughts",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+      "title": "Spain's prime minister calls early elections as pressure mounts over housing crisis",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5991404/spain-snap-elections",
+      "pubDate": "Mon, 05 Oct 2026 05:15:55 -0400"
     },
     {
       "title": "Republicans and Democrats find a unifying target: Pharmacy benefit managers",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5943563/pharmacy-benefit-managers-pbms-tennessee-arkansas-regulation",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Voters are increasingly using AI chatbots to fact-check and compare candidates",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5977852/ai-chatbots-midterm-election",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     },
     {
@@ -29,6 +24,16 @@
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "Voters are increasingly using AI chatbots to fact-check and compare candidates",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5977852/ai-chatbots-midterm-election",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Super El Ni\u00f1o is here. What's so super about it?",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5981261/super-el-nino-floods-droughts",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5986099/morning-news-brief",
       "pubDate": "Mon, 05 Oct 2026 04:45:43 -0400"
@@ -37,11 +42,6 @@
       "title": "Brazil's presidential race heads to Lula\u2013Bolsonaro run-off as right gains ground",
       "link": "https://www.npr.org/2026/10/04/nx-s1-5981181/brazil-presidential-lula-bolsonaro",
       "pubDate": "Sun, 04 Oct 2026 20:17:35 -0400"
-    },
-    {
-      "title": "Brazil votes, with Lula facing Bolsonaro's son",
-      "link": "https://www.npr.org/2026/10/04/nx-s1-5981107/brazil-votes-with-lula-facing-bolsonaros-son",
-      "pubDate": "Sun, 04 Oct 2026 17:52:09 -0400"
     }
   ]
 }
