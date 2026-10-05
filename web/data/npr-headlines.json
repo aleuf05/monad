@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T10:45:01.394725+00:00",
+  "fetched_at": "2026-10-05T11:15:02.352653+00:00",
   "items": [
+    {
+      "title": "SCOTUS hears major climate change case. And, Brazil's presidential race goes to runoff",
+      "link": "https://www.npr.org/2026/10/05/g-s1-146406/up-first-newsletter-flydubai-investigation-colorado-suncor-exxon-brazil-presidential-elections",
+      "pubDate": "Mon, 05 Oct 2026 07:07:09 -0400"
+    },
     {
       "title": "Nobel medicine prize goes to 3 scientists for research into brain activity",
       "link": "https://www.npr.org/2026/10/05/g-s1-146400/nobel-medicine-prize",
@@ -36,11 +41,6 @@
     {
       "title": "From floating saunas to clinical trials: How heat might help mental health",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Supreme Court's new term kicks off with blockbuster climate change case",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5970070/supreme-court-climate-change-boulder-county",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     }
   ]
