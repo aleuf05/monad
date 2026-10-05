@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-05T10:15:02.018348+00:00",
+  "fetched_at": "2026-10-05T10:30:01.797623+00:00",
   "items": [
     {
       "title": "Nobel medicine prize goes to 3 scientists for research into brain activity",
@@ -24,11 +24,6 @@
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "From floating saunas to clinical trials: How heat might help mental health",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
-      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Voters are increasingly using AI chatbots to fact-check and compare candidates",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5977852/ai-chatbots-midterm-election",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
@@ -41,6 +36,11 @@
     {
       "title": "Republicans and Democrats find a unifying target: Pharmacy benefit managers",
       "link": "https://www.npr.org/2026/10/05/nx-s1-5943563/pharmacy-benefit-managers-pbms-tennessee-arkansas-regulation",
+      "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "From floating saunas to clinical trials: How heat might help mental health",
+      "link": "https://www.npr.org/2026/10/05/nx-s1-5979044/sauna-heat-therapy-mental-health-depression",
       "pubDate": "Mon, 05 Oct 2026 05:00:00 -0400"
     }
   ]
