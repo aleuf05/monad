@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T16:00:02.537506+00:00",
+  "fetched_at": "2026-10-06T18:15:02.048332+00:00",
   "items": [
+    {
+      "title": "France's police fire tear gas and water cannons as school protests sweep the country",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5992819/france-student-protests-schools",
+      "pubDate": "Tue, 06 Oct 2026 14:05:44 -0400"
+    },
     {
       "title": "Here are the finalists for the 2026 National Book Awards",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5991463/2026-national-book-award-shortlist-finalists",
@@ -37,11 +42,6 @@
       "title": "What voters in 6 key states could tell us about the 2026 midterms",
       "link": "https://www.npr.org/2026/10/06/g-s1-146559/morning-edition-2026-midterms-election-voters-states",
       "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
-    },
-    {
-      "title": "Francis Halzen wins Nobel Prize in physics for work on high-energy neutrinos from space",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146622/nobel-prize-physics",
-      "pubDate": "Tue, 06 Oct 2026 06:16:28 -0400"
     }
   ]
 }
