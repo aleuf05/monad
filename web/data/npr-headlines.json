@@ -1,8 +1,38 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T09:00:01.975987+00:00",
+  "fetched_at": "2026-10-06T09:15:01.718587+00:00",
   "items": [
+    {
+      "title": "Wildfire smoke affects animals in unique ways. Scientists are trying to understand it",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991854/wildfire-smoke-ecology-birds-wildlife-health",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "'We could all hear her breathing': Witnessing the failed execution of Christa Pike",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991669/failed-execution-christa-pike-tennessee-reporter-witness",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Elon Musk and Palmer Luckey's new Pentagon roles raise ethics worries",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991899/elon-musk-palmer-luckey-pentagon-drones-ai",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Democrats' advantage is clear with less than a month to go in the midterm elections",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5989694/midterm-elections-control-congress",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "FBI's spy hunting squads hit with deep cuts even as foreign espionage threats soar",
+      "link": "https://www.npr.org/2026/10/06/g-s1-145511/fbi-trump-counterintelligence-units-cuts",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "New Hollywood era begins with an epic mega merger between Paramount and Warner Bros.",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5988283/paramount-warner-bros-skydance-merger-david-ellison",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5988270/morning-news-brief",
@@ -12,36 +42,6 @@
       "title": "Jim Bakker, who built 'PTL Club' televangelism empire, has died at 86",
       "link": "https://www.npr.org/2026/10/06/g-s1-146603/obit-jim-bakker",
       "pubDate": "Tue, 06 Oct 2026 01:57:34 -0400"
-    },
-    {
-      "title": "The iconic Arthur Read made his TV debut 30 years ago",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146052/arthur-read-tv-debut-30-anniversary",
-      "pubDate": "Mon, 05 Oct 2026 14:26:01 -0400"
-    },
-    {
-      "title": "Dennis Hastert, longtime Republican House speaker who went to prison, dies at age 84",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146452/dennis-hastert-republican-house-speaker-dies-obit",
-      "pubDate": "Mon, 05 Oct 2026 10:24:31 -0400"
-    },
-    {
-      "title": "Drones buzz overhead, troops hunker underground in Ukraine's hellish kill zone",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5925803/drones-buzz-overhead-troops-hunker-underground-in-ukraines-hellish-kill-zone",
-      "pubDate": "Mon, 05 Oct 2026 08:33:20 -0400"
-    },
-    {
-      "title": "FBI arrests a woman accused of spying on Taiwan leader's family for China",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146410/fbi-arrests-a-woman-accused-of-spying-on-taiwan-leaders-family-for-china",
-      "pubDate": "Mon, 05 Oct 2026 07:47:36 -0400"
-    },
-    {
-      "title": "Imran Khan supporters march in Pakistan to demand his release after talks failed",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146408/imran-khan-supporters-march-in-pakistan-to-demand-his-release-after-talks-failed",
-      "pubDate": "Mon, 05 Oct 2026 07:38:26 -0400"
-    },
-    {
-      "title": "SCOTUS hears major climate change case. And, Brazil's presidential race goes to runoff",
-      "link": "https://www.npr.org/2026/10/05/g-s1-146406/up-first-newsletter-flydubai-investigation-colorado-suncor-exxon-brazil-presidential-elections",
-      "pubDate": "Mon, 05 Oct 2026 07:07:09 -0400"
     }
   ]
 }
