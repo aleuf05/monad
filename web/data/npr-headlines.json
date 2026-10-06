@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T09:45:02.122797+00:00",
+  "fetched_at": "2026-10-06T10:00:01.919933+00:00",
   "items": [
     {
       "title": "Disney, ABC battle Trump's FCC in court over free speech protections",
@@ -9,18 +9,13 @@
       "pubDate": "Tue, 06 Oct 2026 05:17:00 -0400"
     },
     {
-      "title": "New Hollywood era begins with an epic mega merger between Paramount and Warner Bros.",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5988283/paramount-warner-bros-skydance-merger-david-ellison",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "FBI's spy hunting squads hit with deep cuts even as foreign espionage threats soar",
       "link": "https://www.npr.org/2026/10/06/g-s1-145511/fbi-trump-counterintelligence-units-cuts",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Elon Musk and Palmer Luckey's new Pentagon roles raise ethics worries",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991899/elon-musk-palmer-luckey-pentagon-drones-ai",
+      "title": "New Hollywood era begins with an epic mega merger between Paramount and Warner Bros.",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5988283/paramount-warner-bros-skydance-merger-david-ellison",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
@@ -29,13 +24,18 @@
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "Wildfire smoke affects animals in unique ways. Scientists are trying to understand it",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991854/wildfire-smoke-ecology-birds-wildlife-health",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "'We could all hear her breathing': Witnessing the failed execution of Christa Pike",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5991669/failed-execution-christa-pike-tennessee-reporter-witness",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Wildfire smoke affects animals in unique ways. Scientists are trying to understand it",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991854/wildfire-smoke-ecology-birds-wildlife-health",
+      "title": "Elon Musk and Palmer Luckey's new Pentagon roles raise ethics worries",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991899/elon-musk-palmer-luckey-pentagon-drones-ai",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
