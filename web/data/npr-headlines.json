@@ -1,21 +1,36 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T11:30:01.613599+00:00",
+  "fetched_at": "2026-10-06T11:45:02.285495+00:00",
   "items": [
+    {
+      "title": "What to know about nationwide protests in India over voter list changes",
+      "link": "https://www.npr.org/2026/10/06/g-s1-146636/what-to-know-about-nationwide-protests-in-india-over-voter-list-changes",
+      "pubDate": "Tue, 06 Oct 2026 07:44:06 -0400"
+    },
+    {
+      "title": "Vietnamese police arrest 12 suspected of prowling city streets at night, snatching cats for meat",
+      "link": "https://www.npr.org/2026/10/06/g-s1-146634/vietnamese-police-arrest-12-suspected-of-prowling-city-streets-at-night-snatching-cats-for-meat",
+      "pubDate": "Tue, 06 Oct 2026 07:38:48 -0400"
+    },
+    {
+      "title": "Ex-spy chief is arrested in Germany on suspicion of trading state secrets and treason",
+      "link": "https://www.npr.org/2026/10/06/g-s1-146630/germany-ex-spy-chief-state-secrets",
+      "pubDate": "Tue, 06 Oct 2026 07:31:48 -0400"
+    },
     {
       "title": "Dems have edge in midterms, poll shows. And, Paramount-Warner Bros. merger to close",
       "link": "https://www.npr.org/2026/10/06/g-s1-146626/up-first-newsletter-election-day-skydance-christa-pike-russia-plague-scare",
       "pubDate": "Tue, 06 Oct 2026 07:19:25 -0400"
     },
     {
-      "title": "A history of presidents naming things after themselves (It's short. They rarely do)",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5986321/kennedy-center-trump-naming-washington",
+      "title": "What voters in 6 key states could tell us about the 2026 midterms",
+      "link": "https://www.npr.org/2026/10/06/g-s1-146559/morning-edition-2026-midterms-election-voters-states",
       "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "What voters in 6 key states could tell us about the 2026 midterms",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146559/morning-edition-2026-midterms-election-voters-states",
+      "title": "A history of presidents naming things after themselves (It's short. They rarely do)",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5986321/kennedy-center-trump-naming-washington",
       "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
     },
     {
@@ -27,21 +42,6 @@
       "title": "Disney, ABC battle Trump's FCC in court over free speech protections",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5991831/disney-battles-fcc",
       "pubDate": "Tue, 06 Oct 2026 05:17:00 -0400"
-    },
-    {
-      "title": "Elon Musk and Palmer Luckey's new Pentagon roles raise ethics worries",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991899/elon-musk-palmer-luckey-pentagon-drones-ai",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Democrats' advantage is clear with less than a month to go in the midterm elections",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5989694/midterm-elections-control-congress",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "'We could all hear her breathing': Witnessing the failed execution of Christa Pike",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991669/failed-execution-christa-pike-tennessee-reporter-witness",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     }
   ]
 }
