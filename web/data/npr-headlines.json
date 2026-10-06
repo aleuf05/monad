@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T11:15:01.705832+00:00",
+  "fetched_at": "2026-10-06T11:30:01.613599+00:00",
   "items": [
+    {
+      "title": "Dems have edge in midterms, poll shows. And, Paramount-Warner Bros. merger to close",
+      "link": "https://www.npr.org/2026/10/06/g-s1-146626/up-first-newsletter-election-day-skydance-christa-pike-russia-plague-scare",
+      "pubDate": "Tue, 06 Oct 2026 07:19:25 -0400"
+    },
     {
       "title": "A history of presidents naming things after themselves (It's short. They rarely do)",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5986321/kennedy-center-trump-naming-washington",
@@ -24,18 +29,13 @@
       "pubDate": "Tue, 06 Oct 2026 05:17:00 -0400"
     },
     {
-      "title": "FBI's spy hunting squads hit with deep cuts even as foreign espionage threats soar",
-      "link": "https://www.npr.org/2026/10/06/g-s1-145511/fbi-trump-counterintelligence-units-cuts",
+      "title": "Elon Musk and Palmer Luckey's new Pentagon roles raise ethics worries",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991899/elon-musk-palmer-luckey-pentagon-drones-ai",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "Democrats' advantage is clear with less than a month to go in the midterm elections",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5989694/midterm-elections-control-congress",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Wildfire smoke affects animals in unique ways. Scientists are trying to understand it",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991854/wildfire-smoke-ecology-birds-wildlife-health",
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
