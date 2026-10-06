@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T20:00:01.426803+00:00",
+  "fetched_at": "2026-10-06T23:00:01.985305+00:00",
   "items": [
+    {
+      "title": "Actress Eva Marie Saint, who won an Oscar for 'On the Waterfront,' dies at 102",
+      "link": "https://www.npr.org/2026/10/06/462030457/eva-marie-saint-on-the-waterfront-dead-102",
+      "pubDate": "Tue, 06 Oct 2026 18:45:00 -0400"
+    },
     {
       "title": "Cornell names former acting U.S. attorney general to review rape case",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5992799/cornell-yates-rape-case-updates-review",
@@ -37,11 +42,6 @@
       "title": "Dems have edge in midterms, poll shows. And, Paramount-Warner Bros. merger to close",
       "link": "https://www.npr.org/2026/10/06/g-s1-146626/up-first-newsletter-election-day-skydance-christa-pike-russia-plague-scare",
       "pubDate": "Tue, 06 Oct 2026 07:19:25 -0400"
-    },
-    {
-      "title": "What voters in 6 key states could tell us about the 2026 midterms",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146559/morning-edition-2026-midterms-election-voters-states",
-      "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
     }
   ]
 }
