@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T06:15:01.443302+00:00",
+  "fetched_at": "2026-10-06T09:00:01.975987+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5988270/morning-news-brief",
+      "pubDate": "Tue, 06 Oct 2026 04:51:39 -0400"
+    },
     {
       "title": "Jim Bakker, who built 'PTL Club' televangelism empire, has died at 86",
       "link": "https://www.npr.org/2026/10/06/g-s1-146603/obit-jim-bakker",
@@ -37,11 +42,6 @@
       "title": "SCOTUS hears major climate change case. And, Brazil's presidential race goes to runoff",
       "link": "https://www.npr.org/2026/10/05/g-s1-146406/up-first-newsletter-flydubai-investigation-colorado-suncor-exxon-brazil-presidential-elections",
       "pubDate": "Mon, 05 Oct 2026 07:07:09 -0400"
-    },
-    {
-      "title": "FlyDubai attacker intended to crash plane into Tel Aviv airport, investigation finds",
-      "link": "https://www.npr.org/2026/10/05/nx-s1-5990802/midair-attack-flydubai",
-      "pubDate": "Mon, 05 Oct 2026 06:53:46 -0400"
     }
   ]
 }
