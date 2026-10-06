@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T18:15:02.048332+00:00",
+  "fetched_at": "2026-10-06T18:45:01.601498+00:00",
   "items": [
+    {
+      "title": "Cornell names former acting U.S. attorney general to review rape case",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5992799/cornell-yates-rape-case-updates-review",
+      "pubDate": "Tue, 06 Oct 2026 14:31:45 -0400"
+    },
     {
       "title": "France's police fire tear gas and water cannons as school protests sweep the country",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5992819/france-student-protests-schools",
@@ -36,11 +41,6 @@
     {
       "title": "A history of presidents naming things after themselves (It's short. They rarely do)",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5986321/kennedy-center-trump-naming-washington",
-      "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
-    },
-    {
-      "title": "What voters in 6 key states could tell us about the 2026 midterms",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146559/morning-edition-2026-midterms-election-voters-states",
       "pubDate": "Tue, 06 Oct 2026 07:00:00 -0400"
     }
   ]
