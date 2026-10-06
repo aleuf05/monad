@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T14:30:02.283042+00:00",
+  "fetched_at": "2026-10-06T14:45:01.967726+00:00",
   "items": [
+    {
+      "title": "Here are the finalists for the 2026 National Book Awards",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991463/2026-national-book-award-shortlist-finalists",
+      "pubDate": "Tue, 06 Oct 2026 10:30:20 -0400"
+    },
     {
       "title": "What to know about nationwide protests in India over voter list changes",
       "link": "https://www.npr.org/2026/10/06/g-s1-146636/what-to-know-about-nationwide-protests-in-india-over-voter-list-changes",
@@ -37,11 +42,6 @@
       "title": "Francis Halzen wins Nobel Prize in physics for work on high-energy neutrinos from space",
       "link": "https://www.npr.org/2026/10/06/g-s1-146622/nobel-prize-physics",
       "pubDate": "Tue, 06 Oct 2026 06:16:28 -0400"
-    },
-    {
-      "title": "Disney, ABC battle Trump's FCC in court over free speech protections",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5991831/disney-battles-fcc",
-      "pubDate": "Tue, 06 Oct 2026 05:17:00 -0400"
     }
   ]
 }
