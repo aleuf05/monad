@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T09:15:01.718587+00:00",
+  "fetched_at": "2026-10-06T09:30:01.476981+00:00",
   "items": [
+    {
+      "title": "Disney, ABC battle Trump's FCC in court over free speech protections",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5991831/disney-battles-fcc",
+      "pubDate": "Tue, 06 Oct 2026 05:17:00 -0400"
+    },
+    {
+      "title": "FBI's spy hunting squads hit with deep cuts even as foreign espionage threats soar",
+      "link": "https://www.npr.org/2026/10/06/g-s1-145511/fbi-trump-counterintelligence-units-cuts",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "New Hollywood era begins with an epic mega merger between Paramount and Warner Bros.",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5988283/paramount-warner-bros-skydance-merger-david-ellison",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Democrats' advantage is clear with less than a month to go in the midterm elections",
+      "link": "https://www.npr.org/2026/10/06/nx-s1-5989694/midterm-elections-control-congress",
+      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Wildfire smoke affects animals in unique ways. Scientists are trying to understand it",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5991854/wildfire-smoke-ecology-birds-wildlife-health",
@@ -19,29 +39,9 @@
       "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Democrats' advantage is clear with less than a month to go in the midterm elections",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5989694/midterm-elections-control-congress",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "FBI's spy hunting squads hit with deep cuts even as foreign espionage threats soar",
-      "link": "https://www.npr.org/2026/10/06/g-s1-145511/fbi-trump-counterintelligence-units-cuts",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "New Hollywood era begins with an epic mega merger between Paramount and Warner Bros.",
-      "link": "https://www.npr.org/2026/10/06/nx-s1-5988283/paramount-warner-bros-skydance-merger-david-ellison",
-      "pubDate": "Tue, 06 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Morning news brief",
       "link": "https://www.npr.org/2026/10/06/nx-s1-5988270/morning-news-brief",
       "pubDate": "Tue, 06 Oct 2026 04:51:39 -0400"
-    },
-    {
-      "title": "Jim Bakker, who built 'PTL Club' televangelism empire, has died at 86",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146603/obit-jim-bakker",
-      "pubDate": "Tue, 06 Oct 2026 01:57:34 -0400"
     }
   ]
 }
