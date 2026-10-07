@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T06:15:01.359893+00:00",
+  "fetched_at": "2026-10-07T07:00:01.611896+00:00",
   "items": [
+    {
+      "title": "Former CIA official accused of stealing $40M in gold bars pleads guilty",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5993468/cia-official-stealing-gold-bars-pleads-guilty",
+      "pubDate": "Wed, 07 Oct 2026 02:52:18 -0400"
+    },
     {
       "title": "Israelis mourn on the anniversary of the Oct. 7 as Palestinians grapple with war it sparked",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5993459/israelis-oct-7-palestinians-war",
@@ -37,11 +42,6 @@
       "title": "Vietnamese police arrest 12 suspected of prowling city streets at night, snatching cats for meat",
       "link": "https://www.npr.org/2026/10/06/g-s1-146634/vietnamese-police-arrest-12-suspected-of-prowling-city-streets-at-night-snatching-cats-for-meat",
       "pubDate": "Tue, 06 Oct 2026 07:38:48 -0400"
-    },
-    {
-      "title": "Ex-spy chief is arrested in Germany on suspicion of trading state secrets and treason",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146630/germany-ex-spy-chief-state-secrets",
-      "pubDate": "Tue, 06 Oct 2026 07:31:48 -0400"
     }
   ]
 }
