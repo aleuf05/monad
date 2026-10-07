@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T16:45:02.192368+00:00",
+  "fetched_at": "2026-10-07T17:00:01.910334+00:00",
   "items": [
+    {
+      "title": "How Defense Secretary Pete Hegseth has brought the culture wars to the military",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5992775/how-defense-secretary-pete-hegseth-has-brought-the-culture-wars-to-the-military",
+      "pubDate": "Wed, 07 Oct 2026 12:55:19 -0400"
+    },
     {
       "title": "She got Trump's $500 check for health insurance. To her, it's a 'political stunt'",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5991687/trump-medicare-aca-payments-midterms",
@@ -37,11 +42,6 @@
       "title": "Henri B. Kagan and Kenso Soai win Nobel Prize in chemistry",
       "link": "https://www.npr.org/2026/10/07/g-s1-146849/nobel-prize-chemistry",
       "pubDate": "Wed, 07 Oct 2026 06:05:54 -0400"
-    },
-    {
-      "title": "Over 1,000 children are buried at juvenile detention centers nationwide",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5986124/over-1-000-children-are-buried-at-juvenile-detention-centers-nationwide",
-      "pubDate": "Wed, 07 Oct 2026 05:00:00 -0400"
     }
   ]
 }
