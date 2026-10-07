@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T15:15:01.894880+00:00",
+  "fetched_at": "2026-10-07T15:45:01.370366+00:00",
   "items": [
     {
       "title": "Gut microbes followed migrating humans across continents, new study suggests",
@@ -34,13 +34,13 @@
       "pubDate": "Wed, 07 Oct 2026 06:05:54 -0400"
     },
     {
-      "title": "BTS frontman RM is showing his art collection. Fans are flocking to see it",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5986317/bts-rm-sfmoma-korean-art-san-francisco",
+      "title": "Over 1,000 children are buried at juvenile detention centers nationwide",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5986124/over-1-000-children-are-buried-at-juvenile-detention-centers-nationwide",
       "pubDate": "Wed, 07 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Over 1,000 children are buried at juvenile detention centers nationwide",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5986124/over-1-000-children-are-buried-at-juvenile-detention-centers-nationwide",
+      "title": "An early flu season means it might be time to think about a flu shot",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5992940/early-flu-season-vaccine",
       "pubDate": "Wed, 07 Oct 2026 05:00:00 -0400"
     }
   ]
