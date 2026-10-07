@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T18:15:02.164606+00:00",
+  "fetched_at": "2026-10-07T19:15:01.974343+00:00",
   "items": [
+    {
+      "title": "Trump approved the military's 1st firing squad execution since WWII. Why now?",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5993539/firing-squad-execution-nidal-hasan-fort-hood",
+      "pubDate": "Wed, 07 Oct 2026 15:08:48 -0400"
+    },
     {
       "title": "Why Trump just loosened the rules on 'dyed diesel' \u2014 normally a farm fuel",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5992963/dyed-diesel-fuel-price-farmers-trucks",
@@ -37,11 +42,6 @@
       "title": "U.S. moves long-range bombers from U.K. And, Israel allegedly warned before Oct. 7",
       "link": "https://www.npr.org/2026/10/07/g-s1-146853/up-first-newsletter-long-range-bombers-france-high-school-protest-germany-august-hanning-oct-7-memorial-day",
       "pubDate": "Wed, 07 Oct 2026 06:52:58 -0400"
-    },
-    {
-      "title": "Who will win the 2026 Nobel Prize in economics?",
-      "link": "https://www.npr.org/sections/planet-money/2026/10/07/g-s1-146828/who-will-win-the-2026-nobel-prize-in-economics",
-      "pubDate": "Wed, 07 Oct 2026 06:30:00 -0400"
     }
   ]
 }
