@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T19:15:01.974343+00:00",
+  "fetched_at": "2026-10-07T20:15:01.641535+00:00",
   "items": [
+    {
+      "title": "This surprising mammal fossil is giving scientists something to chew on",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5991361/fossil-mammal-platypus-chew-swallow-suckle-earliest",
+      "pubDate": "Wed, 07 Oct 2026 15:59:16 -0400"
+    },
+    {
+      "title": "Judge orders that Christa Pike execution evidence be preserved",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5993628/judge-orders-that-christa-pike-execution-evidence-be-preserved",
+      "pubDate": "Wed, 07 Oct 2026 15:53:10 -0400"
+    },
     {
       "title": "Trump approved the military's 1st firing squad execution since WWII. Why now?",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5993539/firing-squad-execution-nidal-hasan-fort-hood",
@@ -32,16 +42,6 @@
       "title": "Greetings from Lahore, Pakistan, whose high court offers an oasis for chatter and chai",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5992681/lahore-pakistan-high-court-square",
       "pubDate": "Wed, 07 Oct 2026 09:53:54 -0400"
-    },
-    {
-      "title": "DIY fertilizer is a blessing as farmers face steep prices due to the Iran war",
-      "link": "https://www.npr.org/2026/10/07/g-s1-146541/fertilizer-diy-farmers-iran-war",
-      "pubDate": "Wed, 07 Oct 2026 09:32:37 -0400"
-    },
-    {
-      "title": "U.S. moves long-range bombers from U.K. And, Israel allegedly warned before Oct. 7",
-      "link": "https://www.npr.org/2026/10/07/g-s1-146853/up-first-newsletter-long-range-bombers-france-high-school-protest-germany-august-hanning-oct-7-memorial-day",
-      "pubDate": "Wed, 07 Oct 2026 06:52:58 -0400"
     }
   ]
 }
