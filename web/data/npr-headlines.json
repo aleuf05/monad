@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T07:00:01.611896+00:00",
+  "fetched_at": "2026-10-07T09:00:01.712851+00:00",
   "items": [
+    {
+      "title": "Morning news brief",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5988272/morning-news-brief",
+      "pubDate": "Wed, 07 Oct 2026 04:44:52 -0400"
+    },
     {
       "title": "Former CIA official accused of stealing $40M in gold bars pleads guilty",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5993468/cia-official-stealing-gold-bars-pleads-guilty",
@@ -37,11 +42,6 @@
       "title": "What to know about nationwide protests in India over voter list changes",
       "link": "https://www.npr.org/2026/10/06/g-s1-146636/what-to-know-about-nationwide-protests-in-india-over-voter-list-changes",
       "pubDate": "Tue, 06 Oct 2026 07:44:06 -0400"
-    },
-    {
-      "title": "Vietnamese police arrest 12 suspected of prowling city streets at night, snatching cats for meat",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146634/vietnamese-police-arrest-12-suspected-of-prowling-city-streets-at-night-snatching-cats-for-meat",
-      "pubDate": "Tue, 06 Oct 2026 07:38:48 -0400"
     }
   ]
 }
