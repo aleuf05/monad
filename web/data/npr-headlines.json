@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T21:15:01.665247+00:00",
+  "fetched_at": "2026-10-07T22:15:01.680539+00:00",
   "items": [
+    {
+      "title": "The WHO seeks more details on the death of a plague research lab employee in Russia",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5993873/russia-death-plague-research-institute",
+      "pubDate": "Wed, 07 Oct 2026 17:53:47 -0400"
+    },
     {
       "title": "What is the pneumonic plague?",
       "link": "https://www.npr.org/2026/10/07/g-s1-146952/pneumonic-plague-russia-siberia-lab-death",
@@ -37,11 +42,6 @@
       "title": "She got Trump's $500 check for health insurance. To her, it's a 'political stunt'",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5991687/trump-medicare-aca-payments-midterms",
       "pubDate": "Wed, 07 Oct 2026 12:15:26 -0400"
-    },
-    {
-      "title": "Gut microbes followed migrating humans across continents, new study suggests",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5987874/ancient-gut-microbiome-migration-evolution-hadza-tsimane",
-      "pubDate": "Wed, 07 Oct 2026 11:00:47 -0400"
     }
   ]
 }
