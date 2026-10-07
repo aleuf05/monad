@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T13:15:01.899538+00:00",
+  "fetched_at": "2026-10-07T13:45:01.637854+00:00",
   "items": [
+    {
+      "title": "DIY fertilizer is a blessing as farmers face steep prices due to the Iran war",
+      "link": "https://www.npr.org/2026/10/07/g-s1-146541/fertilizer-diy-farmers-iran-war",
+      "pubDate": "Wed, 07 Oct 2026 09:32:37 -0400"
+    },
     {
       "title": "U.S. moves long-range bombers from U.K. And, Israel allegedly warned before Oct. 7",
       "link": "https://www.npr.org/2026/10/07/g-s1-146853/up-first-newsletter-long-range-bombers-france-high-school-protest-germany-august-hanning-oct-7-memorial-day",
@@ -36,11 +41,6 @@
     {
       "title": "3 years on, Israelis grapple with reports Netanyahu was warned before Oct. 7 attacks",
       "link": "https://www.npr.org/2026/10/07/g-s1-146776/israel-gaza-oct-7-attack-netanyahu-warning",
-      "pubDate": "Wed, 07 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Deep in Appalachia, a rail-to-trail project builds bipartisan support for a bridge",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5980349/rail-trail-bridge-ohio-river",
       "pubDate": "Wed, 07 Oct 2026 05:00:00 -0400"
     }
   ]
