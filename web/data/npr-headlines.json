@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-06T23:00:01.985305+00:00",
+  "fetched_at": "2026-10-07T06:15:01.359893+00:00",
   "items": [
+    {
+      "title": "Israelis mourn on the anniversary of the Oct. 7 as Palestinians grapple with war it sparked",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5993459/israelis-oct-7-palestinians-war",
+      "pubDate": "Wed, 07 Oct 2026 02:02:57 -0400"
+    },
     {
       "title": "Actress Eva Marie Saint, who won an Oscar for 'On the Waterfront,' dies at 102",
       "link": "https://www.npr.org/2026/10/06/462030457/eva-marie-saint-on-the-waterfront-dead-102",
@@ -37,11 +42,6 @@
       "title": "Ex-spy chief is arrested in Germany on suspicion of trading state secrets and treason",
       "link": "https://www.npr.org/2026/10/06/g-s1-146630/germany-ex-spy-chief-state-secrets",
       "pubDate": "Tue, 06 Oct 2026 07:31:48 -0400"
-    },
-    {
-      "title": "Dems have edge in midterms, poll shows. And, Paramount-Warner Bros. merger to close",
-      "link": "https://www.npr.org/2026/10/06/g-s1-146626/up-first-newsletter-election-day-skydance-christa-pike-russia-plague-scare",
-      "pubDate": "Tue, 06 Oct 2026 07:19:25 -0400"
     }
   ]
 }
