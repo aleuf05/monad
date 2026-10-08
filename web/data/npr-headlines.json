@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T05:30:02.197458+00:00",
+  "fetched_at": "2026-10-08T06:15:02.434707+00:00",
   "items": [
+    {
+      "title": "Maricarmen, the 87-year-old woman whose eviction shook Spain, has died",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5994868/maricarmen-eviction-spain-dies",
+      "pubDate": "Thu, 08 Oct 2026 01:56:02 -0400"
+    },
     {
       "title": "Isaias strengthens into the first hurricane of the Atlantic season",
       "link": "https://www.npr.org/2026/10/08/g-s1-147095/weather-hurricane-season",
@@ -37,11 +42,6 @@
       "title": "Why Trump just loosened the rules on 'dyed diesel' \u2014 normally a farm fuel",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5992963/dyed-diesel-fuel-price-farmers-trucks",
       "pubDate": "Wed, 07 Oct 2026 14:00:31 -0400"
-    },
-    {
-      "title": "How Defense Secretary Pete Hegseth has brought the culture wars to the military",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5992775/how-defense-secretary-pete-hegseth-has-brought-the-culture-wars-to-the-military",
-      "pubDate": "Wed, 07 Oct 2026 12:55:19 -0400"
     }
   ]
 }
