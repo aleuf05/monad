@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T13:45:01.930024+00:00",
+  "fetched_at": "2026-10-08T14:00:01.800592+00:00",
   "items": [
     {
       "title": "South Korea to recall its ambassador to Ukraine over North Korean POW dispute",
@@ -39,8 +39,8 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "As crypto and prediction markets expand, their regulator shrinks",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
+      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
