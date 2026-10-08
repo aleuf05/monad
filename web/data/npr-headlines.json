@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-07T22:15:01.680539+00:00",
+  "fetched_at": "2026-10-08T05:30:02.197458+00:00",
   "items": [
+    {
+      "title": "Isaias strengthens into the first hurricane of the Atlantic season",
+      "link": "https://www.npr.org/2026/10/08/g-s1-147095/weather-hurricane-season",
+      "pubDate": "Thu, 08 Oct 2026 01:22:15 -0400"
+    },
     {
       "title": "The WHO seeks more details on the death of a plague research lab employee in Russia",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5993873/russia-death-plague-research-institute",
@@ -37,11 +42,6 @@
       "title": "How Defense Secretary Pete Hegseth has brought the culture wars to the military",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5992775/how-defense-secretary-pete-hegseth-has-brought-the-culture-wars-to-the-military",
       "pubDate": "Wed, 07 Oct 2026 12:55:19 -0400"
-    },
-    {
-      "title": "She got Trump's $500 check for health insurance. To her, it's a 'political stunt'",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5991687/trump-medicare-aca-payments-midterms",
-      "pubDate": "Wed, 07 Oct 2026 12:15:26 -0400"
     }
   ]
 }
