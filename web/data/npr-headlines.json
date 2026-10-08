@@ -1,11 +1,21 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T09:30:01.721180+00:00",
+  "fetched_at": "2026-10-08T09:45:01.396090+00:00",
   "items": [
+    {
+      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Medical debt is crushing hospital patients in LA. Health officials may have a fix",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5991633/hospital-california-healthcare-medical-debt",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As crypto and prediction markets expand, their regulator shrinks",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
@@ -19,14 +29,9 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "As crypto and prediction markets expand, their regulator shrinks",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+      "title": "How 'Musk' director Alex Gibney became a critic",
+      "link": "https://www.npr.org/2026/10/07/nx-s1-5960380/musk-film-alex-gibney",
+      "pubDate": "Thu, 08 Oct 2026 04:45:37 -0400"
     },
     {
       "title": "Trump proposes Camp David-style presidential retreat at his private Florida golf club",
@@ -37,11 +42,6 @@
       "title": "Maricarmen, the 87-year-old woman whose eviction shook Spain, has died",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5994868/maricarmen-eviction-spain-dies",
       "pubDate": "Thu, 08 Oct 2026 01:56:02 -0400"
-    },
-    {
-      "title": "Isaias strengthens into the first hurricane of the Atlantic season",
-      "link": "https://www.npr.org/2026/10/08/g-s1-147095/weather-hurricane-season",
-      "pubDate": "Thu, 08 Oct 2026 01:22:15 -0400"
     }
   ]
 }
