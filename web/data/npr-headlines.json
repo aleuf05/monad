@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T12:15:01.633083+00:00",
+  "fetched_at": "2026-10-08T12:30:02.363466+00:00",
   "items": [
+    {
+      "title": "South Korea to recall its ambassador to Ukraine over North Korean POW dispute",
+      "link": "https://www.npr.org/2026/10/08/g-s1-147115/south-korea-to-recall-its-ambassador-to-ukraine-over-north-korean-pow-dispute",
+      "pubDate": "Thu, 08 Oct 2026 08:13:54 -0400"
+    },
     {
       "title": "South Korea test-flies its first domestically developed hypersonic weapon",
       "link": "https://www.npr.org/2026/10/08/g-s1-147113/south-korea-test-flies-its-first-domestically-developed-hypersonic-weapon",
@@ -36,11 +41,6 @@
     {
       "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
