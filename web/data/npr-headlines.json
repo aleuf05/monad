@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T12:30:02.363466+00:00",
+  "fetched_at": "2026-10-08T12:45:02.037693+00:00",
   "items": [
     {
       "title": "South Korea to recall its ambassador to Ukraine over North Korean POW dispute",
@@ -34,13 +34,13 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "As crypto and prediction markets expand, their regulator shrinks",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
+      "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
+      "title": "As crypto and prediction markets expand, their regulator shrinks",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
