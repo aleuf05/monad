@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T15:45:02.087660+00:00",
+  "fetched_at": "2026-10-08T16:15:01.505815+00:00",
   "items": [
+    {
+      "title": "New U.S. indictment charges former Venezuelan President Nicol\u00e1s Maduro with torture",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5995360/venezuela-nicolas-maduro-torture-charges",
+      "pubDate": "Thu, 08 Oct 2026 12:05:37 -0400"
+    },
     {
       "title": "4 people on NASA's Crew-12 mission return to Earth after 8 months in space",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5992845/nasa-spacex-crew-12-international-space-station-iss-splashdown",
@@ -37,11 +42,6 @@
       "title": "ICE has quietly used this warehouse as a detention facility all summer, neighbors say",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5983441/ice-warehouses-new-jersey-roxbury",
       "pubDate": "Thu, 08 Oct 2026 06:13:18 -0400"
-    },
-    {
-      "title": "Medical debt is crushing hospital patients in LA. Health officials may have a fix",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5991633/hospital-california-healthcare-medical-debt",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
 }
