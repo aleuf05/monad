@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T15:15:01.658053+00:00",
+  "fetched_at": "2026-10-08T15:30:02.472388+00:00",
   "items": [
+    {
+      "title": "White House correspondent April Ryan reflects on reporting while under attack",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5994416/white-house-correspondent-april-ryan-reflects-on-reporting-while-under-attack",
+      "pubDate": "Thu, 08 Oct 2026 11:24:23 -0400"
+    },
     {
       "title": "South Korea to recall its ambassador to Ukraine over North Korean POW dispute",
       "link": "https://www.npr.org/2026/10/08/g-s1-147115/south-korea-to-recall-its-ambassador-to-ukraine-over-north-korean-pow-dispute",
@@ -34,13 +39,8 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "As crypto and prediction markets expand, their regulator shrinks",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
+      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
