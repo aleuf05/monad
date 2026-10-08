@@ -1,8 +1,33 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T06:30:02.320711+00:00",
+  "fetched_at": "2026-10-08T09:15:01.978786+00:00",
   "items": [
+    {
+      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "As crypto and prediction markets expand, their regulator shrinks",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Medical debt is crushing hospital patients in LA. Health officials may have a fix",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5991633/hospital-california-healthcare-medical-debt",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Trump proposes Camp David-style presidential retreat at his private Florida golf club",
       "link": "https://www.npr.org/2026/10/08/g-s1-147101/trump-presidential-retreat-golf-club",
@@ -17,31 +42,6 @@
       "title": "Isaias strengthens into the first hurricane of the Atlantic season",
       "link": "https://www.npr.org/2026/10/08/g-s1-147095/weather-hurricane-season",
       "pubDate": "Thu, 08 Oct 2026 01:22:15 -0400"
-    },
-    {
-      "title": "The WHO seeks more details on the death of a plague research lab employee in Russia",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5993873/russia-death-plague-research-institute",
-      "pubDate": "Wed, 07 Oct 2026 17:53:47 -0400"
-    },
-    {
-      "title": "What is the pneumonic plague?",
-      "link": "https://www.npr.org/2026/10/07/g-s1-146952/pneumonic-plague-russia-siberia-lab-death",
-      "pubDate": "Wed, 07 Oct 2026 17:06:31 -0400"
-    },
-    {
-      "title": "This surprising mammal fossil is giving scientists something to chew on",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5991361/fossil-mammal-platypus-chew-swallow-suckle-earliest",
-      "pubDate": "Wed, 07 Oct 2026 15:59:16 -0400"
-    },
-    {
-      "title": "Judge orders that Christa Pike execution evidence be preserved",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5993628/judge-orders-that-christa-pike-execution-evidence-be-preserved",
-      "pubDate": "Wed, 07 Oct 2026 15:53:10 -0400"
-    },
-    {
-      "title": "Trump approved the military's 1st firing squad execution since WWII. Why now?",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5993539/firing-squad-execution-nidal-hasan-fort-hood",
-      "pubDate": "Wed, 07 Oct 2026 15:08:48 -0400"
     }
   ]
 }
