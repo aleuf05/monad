@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T18:45:02.064967+00:00",
+  "fetched_at": "2026-10-08T19:30:02.304748+00:00",
   "items": [
     {
       "title": "Suicide is up among Black Americans. We need to talk about it.",
@@ -39,7 +39,7 @@
       "pubDate": "Thu, 08 Oct 2026 07:35:22 -0400"
     },
     {
-      "title": "Strike on Ukrainian public bus leaves 30 dead as blackouts worsen in Kyiv",
+      "title": "Russian strikes on Ukraine's public buses leave 30 dead as blackouts worsen in Kyiv",
       "link": "https://www.npr.org/2026/10/08/g-s1-147106/russia-ukraine-war",
       "pubDate": "Thu, 08 Oct 2026 07:25:28 -0400"
     }
