@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T11:00:01.960037+00:00",
+  "fetched_at": "2026-10-08T11:15:01.561971+00:00",
   "items": [
     {
       "title": "ICE has quietly used this warehouse as a detention facility all summer, neighbors say",
@@ -14,23 +14,23 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "As crypto and prediction markets expand, their regulator shrinks",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
+      "title": "As crypto and prediction markets expand, their regulator shrinks",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Toss-ups, triage and targets: How to read the wide-open 2026 House map",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993809/2026-house-map-democrats-flip-republicans-tossup-triage",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
