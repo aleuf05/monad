@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T09:45:01.396090+00:00",
+  "fetched_at": "2026-10-08T10:15:01.729504+00:00",
   "items": [
+    {
+      "title": "ICE has quietly used this warehouse as a detention facility all summer, neighbors say",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5983441/ice-warehouses-new-jersey-roxbury",
+      "pubDate": "Thu, 08 Oct 2026 06:13:18 -0400"
+    },
     {
       "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
@@ -37,11 +42,6 @@
       "title": "Trump proposes Camp David-style presidential retreat at his private Florida golf club",
       "link": "https://www.npr.org/2026/10/08/g-s1-147101/trump-presidential-retreat-golf-club",
       "pubDate": "Thu, 08 Oct 2026 02:27:50 -0400"
-    },
-    {
-      "title": "Maricarmen, the 87-year-old woman whose eviction shook Spain, has died",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5994868/maricarmen-eviction-spain-dies",
-      "pubDate": "Thu, 08 Oct 2026 01:56:02 -0400"
     }
   ]
 }
