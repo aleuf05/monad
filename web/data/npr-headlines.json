@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T16:15:01.505815+00:00",
+  "fetched_at": "2026-10-08T18:45:02.064967+00:00",
   "items": [
+    {
+      "title": "Suicide is up among Black Americans. We need to talk about it.",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5963905/suicide-black-americans-discussion-analysis",
+      "pubDate": "Thu, 08 Oct 2026 14:37:02 -0400"
+    },
     {
       "title": "New U.S. indictment charges former Venezuelan President Nicol\u00e1s Maduro with torture",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5995360/venezuela-nicolas-maduro-torture-charges",
@@ -37,11 +42,6 @@
       "title": "Strike on Ukrainian public bus leaves 30 dead as blackouts worsen in Kyiv",
       "link": "https://www.npr.org/2026/10/08/g-s1-147106/russia-ukraine-war",
       "pubDate": "Thu, 08 Oct 2026 07:25:28 -0400"
-    },
-    {
-      "title": "ICE has quietly used this warehouse as a detention facility all summer, neighbors say",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5983441/ice-warehouses-new-jersey-roxbury",
-      "pubDate": "Thu, 08 Oct 2026 06:13:18 -0400"
     }
   ]
 }
