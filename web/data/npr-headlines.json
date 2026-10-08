@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T19:30:02.304748+00:00",
+  "fetched_at": "2026-10-08T20:30:02.205735+00:00",
   "items": [
     {
       "title": "Suicide is up among Black Americans. We need to talk about it.",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5963905/suicide-black-americans-discussion-analysis",
       "pubDate": "Thu, 08 Oct 2026 14:37:02 -0400"
+    },
+    {
+      "title": "The long-deployed USS Lincoln is returning home to San Diego",
+      "link": "https://www.npr.org/2026/10/08/g-s1-147195/uss-lincoln-returning-san-diego",
+      "pubDate": "Thu, 08 Oct 2026 12:18:20 -0400"
     },
     {
       "title": "New U.S. indictment charges former Venezuelan President Nicol\u00e1s Maduro with torture",
@@ -37,11 +42,6 @@
       "title": "Isaias intensifies to hurricane. And, judge orders Pike execution evidence preserved",
       "link": "https://www.npr.org/2026/10/08/g-s1-147105/up-first-newsletter-hurricane-isaias-house-elections-christa-pike-nidal-hasan-cnn-ms-now-politico",
       "pubDate": "Thu, 08 Oct 2026 07:35:22 -0400"
-    },
-    {
-      "title": "Russian strikes on Ukraine's public buses leave 30 dead as blackouts worsen in Kyiv",
-      "link": "https://www.npr.org/2026/10/08/g-s1-147106/russia-ukraine-war",
-      "pubDate": "Thu, 08 Oct 2026 07:25:28 -0400"
     }
   ]
 }
