@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T11:15:01.561971+00:00",
+  "fetched_at": "2026-10-08T11:30:02.353790+00:00",
   "items": [
+    {
+      "title": "Strike on Ukrainian public bus leaves 30 dead as blackouts worsen in Kyiv",
+      "link": "https://www.npr.org/2026/10/08/g-s1-147106/russia-ukraine-war",
+      "pubDate": "Thu, 08 Oct 2026 07:25:28 -0400"
+    },
     {
       "title": "ICE has quietly used this warehouse as a detention facility all summer, neighbors say",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5983441/ice-warehouses-new-jersey-roxbury",
@@ -14,18 +19,13 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "As crypto and prediction markets expand, their regulator shrinks",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5903204/crypto-prediction-markets-cftc-weakens",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
+      "title": "Syrian general accused of atrocities is protected by U.S. and Lebanon, NPR and BBC find",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5993637/syrian-general-lebanon-fbi-austin-tice",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
@@ -34,14 +34,14 @@
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     },
     {
+      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
+      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "How 'Musk' director Alex Gibney became a critic",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5960380/musk-film-alex-gibney",
       "pubDate": "Thu, 08 Oct 2026 04:45:37 -0400"
-    },
-    {
-      "title": "Trump proposes Camp David-style presidential retreat at his private Florida golf club",
-      "link": "https://www.npr.org/2026/10/08/g-s1-147101/trump-presidential-retreat-golf-club",
-      "pubDate": "Thu, 08 Oct 2026 02:27:50 -0400"
     }
   ]
 }
