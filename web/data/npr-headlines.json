@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T15:30:02.472388+00:00",
+  "fetched_at": "2026-10-08T15:45:02.087660+00:00",
   "items": [
+    {
+      "title": "4 people on NASA's Crew-12 mission return to Earth after 8 months in space",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5992845/nasa-spacex-crew-12-international-space-station-iss-splashdown",
+      "pubDate": "Thu, 08 Oct 2026 11:34:39 -0400"
+    },
     {
       "title": "White House correspondent April Ryan reflects on reporting while under attack",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5994416/white-house-correspondent-april-ryan-reflects-on-reporting-while-under-attack",
@@ -36,11 +41,6 @@
     {
       "title": "Medical debt is crushing hospital patients in LA. Health officials may have a fix",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5991633/hospital-california-healthcare-medical-debt",
-      "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Flock is catching flak. Experts say other police surveillance tools are more worrisome",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5981343/beyond-flock-police-ai-surveillance-tools",
       "pubDate": "Thu, 08 Oct 2026 05:00:00 -0400"
     }
   ]
