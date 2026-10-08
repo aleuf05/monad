@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T06:15:02.434707+00:00",
+  "fetched_at": "2026-10-08T06:30:02.320711+00:00",
   "items": [
+    {
+      "title": "Trump proposes Camp David-style presidential retreat at his private Florida golf club",
+      "link": "https://www.npr.org/2026/10/08/g-s1-147101/trump-presidential-retreat-golf-club",
+      "pubDate": "Thu, 08 Oct 2026 02:27:50 -0400"
+    },
     {
       "title": "Maricarmen, the 87-year-old woman whose eviction shook Spain, has died",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5994868/maricarmen-eviction-spain-dies",
@@ -37,11 +42,6 @@
       "title": "Trump approved the military's 1st firing squad execution since WWII. Why now?",
       "link": "https://www.npr.org/2026/10/07/nx-s1-5993539/firing-squad-execution-nidal-hasan-fort-hood",
       "pubDate": "Wed, 07 Oct 2026 15:08:48 -0400"
-    },
-    {
-      "title": "Why Trump just loosened the rules on 'dyed diesel' \u2014 normally a farm fuel",
-      "link": "https://www.npr.org/2026/10/07/nx-s1-5992963/dyed-diesel-fuel-price-farmers-trucks",
-      "pubDate": "Wed, 07 Oct 2026 14:00:31 -0400"
     }
   ]
 }
