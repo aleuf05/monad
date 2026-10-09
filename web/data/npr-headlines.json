@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T21:30:02.309266+00:00",
+  "fetched_at": "2026-10-09T22:30:02.075742+00:00",
   "items": [
+    {
+      "title": "Kalshi taps former FBI agent to fight against money laundering",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5996683/kalshi-fbi-sean-fern-money-laundering",
+      "pubDate": "Fri, 09 Oct 2026 18:23:11 -0400"
+    },
     {
       "title": "Fired OpenAI employees question the company's commitment to safety",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5996890/openai-safety-firings",
@@ -37,11 +42,6 @@
       "title": "Trump says U.S. won't attack Iran before midterms. And, ICE agent shoots man in NYC",
       "link": "https://www.npr.org/2026/10/09/g-s1-147455/up-first-newsletter-hurricane-isaias-ukraine-russia-trump-iran-ice-shooting",
       "pubDate": "Fri, 09 Oct 2026 07:37:04 -0400"
-    },
-    {
-      "title": "Why American investors love European defense startups",
-      "link": "https://www.npr.org/sections/planet-money/2026/10/09/nx-s1-5995606/why-american-investors-love-european-defense-startups",
-      "pubDate": "Fri, 09 Oct 2026 07:00:00 -0400"
     }
   ]
 }
