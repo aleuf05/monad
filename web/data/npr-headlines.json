@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T06:00:01.862125+00:00",
+  "fetched_at": "2026-10-09T08:45:02.114991+00:00",
   "items": [
+    {
+      "title": "NEWSBRIEF: HURRICANE ISAIAS, UKRAINE WAR LATEST, POLITICS OF IRAN WAR",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5988274/newsbrief-hurricane-isaias-ukraine-war-latest-politics-of-iran-war",
+      "pubDate": "Fri, 09 Oct 2026 04:28:16 -0400"
+    },
     {
       "title": "Christa Pike is walking with help and eating after failed execution attempt",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5996402/christa-pike-updates",
@@ -37,11 +42,6 @@
       "title": "The long-deployed USS Lincoln is returning home to San Diego",
       "link": "https://www.npr.org/2026/10/08/g-s1-147195/uss-lincoln-returning-san-diego",
       "pubDate": "Thu, 08 Oct 2026 12:18:20 -0400"
-    },
-    {
-      "title": "New U.S. indictment charges former Venezuelan President Nicol\u00e1s Maduro with torture",
-      "link": "https://www.npr.org/2026/10/08/nx-s1-5995360/venezuela-nicolas-maduro-torture-charges",
-      "pubDate": "Thu, 08 Oct 2026 12:05:37 -0400"
     }
   ]
 }
