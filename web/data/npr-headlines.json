@@ -1,10 +1,10 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T11:45:02.061505+00:00",
+  "fetched_at": "2026-10-09T12:15:01.415003+00:00",
   "items": [
     {
-      "title": "Trump says U.S. won't attack Iran before midterms. And, And, ICE agent shoots man in NYC",
+      "title": "Trump says U.S. won't attack Iran before midterms. And, ICE agent shoots man in NYC",
       "link": "https://www.npr.org/2026/10/09/g-s1-147455/up-first-newsletter-hurricane-isaias-ukraine-russia-trump-iran-ice-shooting",
       "pubDate": "Fri, 09 Oct 2026 07:37:04 -0400"
     },
@@ -19,18 +19,13 @@
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Republican congressman tries to outrun a potential blue wave in New York toss-up seat",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5986150/lawler-new-york-congress-trump",
-      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
-    {
       "title": "Why we remember: One student's journey into memory",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5986352/memory-family-burger-king-grandfather",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "A student hated reading for years. Her podcast explores finding the right diagnosis",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5977043/dyslexia-teenager-diagnosis-reading",
+      "title": "Republican congressman tries to outrun a potential blue wave in New York toss-up seat",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5986150/lawler-new-york-congress-trump",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
@@ -41,6 +36,11 @@
     {
       "title": "ChatGPT for Teens has special safeguards. A watchdog group finds most don't work",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5995514/chatgpt-openai-teens-mental-health",
+      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Why mailing a ballot close to Election Day may get it rejected for a late postmark",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5984981/mail-in-ballot-usps-postmark",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     }
   ]
