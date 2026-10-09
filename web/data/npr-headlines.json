@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-08T20:30:02.205735+00:00",
+  "fetched_at": "2026-10-09T00:15:01.800112+00:00",
   "items": [
+    {
+      "title": "The long-deployed USS Lincoln returns home to San Diego Bay",
+      "link": "https://www.npr.org/2026/10/08/nx-s1-5995911/the-long-deployed-uss-lincoln-returns-home-to-san-diego-bay",
+      "pubDate": "Thu, 08 Oct 2026 20:05:48 -0400"
+    },
     {
       "title": "Suicide is up among Black Americans. We need to talk about it.",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5963905/suicide-black-americans-discussion-analysis",
@@ -37,11 +42,6 @@
       "title": "South Korea test-flies its first domestically developed hypersonic weapon",
       "link": "https://www.npr.org/2026/10/08/g-s1-147113/south-korea-test-flies-its-first-domestically-developed-hypersonic-weapon",
       "pubDate": "Thu, 08 Oct 2026 08:01:34 -0400"
-    },
-    {
-      "title": "Isaias intensifies to hurricane. And, judge orders Pike execution evidence preserved",
-      "link": "https://www.npr.org/2026/10/08/g-s1-147105/up-first-newsletter-hurricane-isaias-house-elections-christa-pike-nidal-hasan-cnn-ms-now-politico",
-      "pubDate": "Thu, 08 Oct 2026 07:35:22 -0400"
     }
   ]
 }
