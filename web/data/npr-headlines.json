@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T17:45:02.004961+00:00",
+  "fetched_at": "2026-10-09T18:00:01.714906+00:00",
   "items": [
+    {
+      "title": "U.S. working to reverse an Egyptian man's third-country deportation to Africa",
+      "link": "https://www.npr.org/2026/10/09/g-s1-147476/trump-third-country-deportation-africa-reverse",
+      "pubDate": "Fri, 09 Oct 2026 13:49:28 -0400"
+    },
     {
       "title": "Did Russia play by the rules in reporting lab worker's death?",
       "link": "https://www.npr.org/2026/10/09/g-s1-147295/russia-lab-death-pneumonia-plague",
@@ -26,11 +31,6 @@
     {
       "title": "Why we remember: One student's journey into memory",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5986352/memory-family-burger-king-grandfather",
-      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Republican congressman tries to outrun a potential blue wave in New York toss-up seat",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5986150/lawler-new-york-congress-trump",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
