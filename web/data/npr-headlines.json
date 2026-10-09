@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T20:00:01.925226+00:00",
+  "fetched_at": "2026-10-09T21:00:01.792966+00:00",
   "items": [
+    {
+      "title": "Opinion: Can I keep the baseball I caught?",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5982500/opinion-can-i-keep-the-baseball-i-caught",
+      "pubDate": "Fri, 09 Oct 2026 16:49:30 -0400"
+    },
     {
       "title": "The U.S. last held a public execution in the 1930s. The Pentagon wants to change that",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5996529/firing-squad-livestream-execution-fort-hood-shooter",
@@ -36,11 +41,6 @@
     {
       "title": "Fill in the blank in the quiz: A plague research employee in Russia died from ____",
       "link": "https://www.npr.org/2026/10/09/g-s1-147111/trump-bts-paramount-tv-el-nino-news-quiz",
-      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "ChatGPT for Teens has special safeguards. A watchdog group finds most don't work",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5995514/chatgpt-openai-teens-mental-health",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     }
   ]
