@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T19:00:01.843877+00:00",
+  "fetched_at": "2026-10-09T20:00:01.925226+00:00",
   "items": [
     {
       "title": "The U.S. last held a public execution in the 1930s. The Pentagon wants to change that",
@@ -34,13 +34,13 @@
       "pubDate": "Fri, 09 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "Why we remember: One student's journey into memory",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5986352/memory-family-burger-king-grandfather",
+      "title": "Fill in the blank in the quiz: A plague research employee in Russia died from ____",
+      "link": "https://www.npr.org/2026/10/09/g-s1-147111/trump-bts-paramount-tv-el-nino-news-quiz",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Fill in the blank in the quiz: A plague research employee in Russia died from ____",
-      "link": "https://www.npr.org/2026/10/09/g-s1-147111/trump-bts-paramount-tv-el-nino-news-quiz",
+      "title": "ChatGPT for Teens has special safeguards. A watchdog group finds most don't work",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5995514/chatgpt-openai-teens-mental-health",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     }
   ]
