@@ -1,21 +1,26 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T10:45:02.287445+00:00",
+  "fetched_at": "2026-10-09T11:15:01.688913+00:00",
   "items": [
+    {
+      "title": "Why American investors love European defense startups",
+      "link": "https://www.npr.org/sections/planet-money/2026/10/09/nx-s1-5995606/why-american-investors-love-european-defense-startups",
+      "pubDate": "Fri, 09 Oct 2026 07:00:00 -0400"
+    },
     {
       "title": "In Central African Republic, deported immigrants find themselves in limbo",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5993805/third-country-deportations-cuba",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Why we remember: One student's journey into memory",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5986352/memory-family-burger-king-grandfather",
+      "title": "Republican congressman tries to outrun a potential blue wave in New York toss-up seat",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5986150/lawler-new-york-congress-trump",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Republican congressman tries to outrun a potential blue wave in New York toss-up seat",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5986150/lawler-new-york-congress-trump",
+      "title": "Why we remember: One student's journey into memory",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5986352/memory-family-burger-king-grandfather",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "Why mailing a ballot close to Election Day may get it rejected for a late postmark",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5984981/mail-in-ballot-usps-postmark",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "NEWSBRIEF: HURRICANE ISAIAS, UKRAINE WAR LATEST, POLITICS OF IRAN WAR",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5988274/newsbrief-hurricane-isaias-ukraine-war-latest-politics-of-iran-war",
-      "pubDate": "Fri, 09 Oct 2026 04:28:16 -0400"
     }
   ]
 }
