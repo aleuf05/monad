@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T00:30:01.613697+00:00",
+  "fetched_at": "2026-10-09T05:30:02.388063+00:00",
   "items": [
+    {
+      "title": "Isaias strengthens into Category 2 hurricane on collision course with the Gulf Coast",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5996396/hurricane-isaias-updates",
+      "pubDate": "Fri, 09 Oct 2026 01:20:03 -0400"
+    },
     {
       "title": "OpenAI caught Russians and Iranians using ChatGPT for influence campaigns",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5995576/openai-russia-iran-influence-operations-chatgpt",
@@ -37,11 +42,6 @@
       "title": "White House correspondent April Ryan reflects on reporting while under attack",
       "link": "https://www.npr.org/2026/10/08/nx-s1-5994416/white-house-correspondent-april-ryan-reflects-on-reporting-while-under-attack",
       "pubDate": "Thu, 08 Oct 2026 11:24:23 -0400"
-    },
-    {
-      "title": "South Korea to recall its ambassador to Ukraine over North Korean POW dispute",
-      "link": "https://www.npr.org/2026/10/08/g-s1-147115/south-korea-to-recall-its-ambassador-to-ukraine-over-north-korean-pow-dispute",
-      "pubDate": "Thu, 08 Oct 2026 08:13:54 -0400"
     }
   ]
 }
