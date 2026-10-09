@@ -1,13 +1,8 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T10:00:02.099911+00:00",
+  "fetched_at": "2026-10-09T10:30:01.587527+00:00",
   "items": [
-    {
-      "title": "Fill in the blank in the quiz: A plague research employee in Russia died from ____",
-      "link": "https://www.npr.org/2026/10/09/g-s1-147111/trump-bts-paramount-tv-el-nino-news-quiz",
-      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
     {
       "title": "In Central African Republic, deported immigrants find themselves in limbo",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5993805/third-country-deportations-cuba",
@@ -24,8 +19,13 @@
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Why mailing a ballot close to Election Day may get it rejected for a late postmark",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5984981/mail-in-ballot-usps-postmark",
+      "title": "A student hated reading for years. Her podcast explores finding the right diagnosis",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5977043/dyslexia-teenager-diagnosis-reading",
+      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Fill in the blank in the quiz: A plague research employee in Russia died from ____",
+      "link": "https://www.npr.org/2026/10/09/g-s1-147111/trump-bts-paramount-tv-el-nino-news-quiz",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
@@ -34,8 +34,8 @@
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "A student hated reading for years. Her podcast explores finding the right diagnosis",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5977043/dyslexia-teenager-diagnosis-reading",
+      "title": "Why mailing a ballot close to Election Day may get it rejected for a late postmark",
+      "link": "https://www.npr.org/2026/10/09/nx-s1-5984981/mail-in-ballot-usps-postmark",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     },
     {
