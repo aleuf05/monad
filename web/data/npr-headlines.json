@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T16:15:01.476669+00:00",
+  "fetched_at": "2026-10-09T17:00:01.771002+00:00",
   "items": [
+    {
+      "title": "Did Russia play by the rules in reporting lab worker's death?",
+      "link": "https://www.npr.org/2026/10/09/g-s1-147295/russia-lab-death-pneumonia-plague",
+      "pubDate": "Fri, 09 Oct 2026 12:43:45 -0400"
+    },
     {
       "title": "How the oil industry is preparing for Hurricane Isaias",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5995417/hurricane-isaias-oil-refineries-diesel-gasoline-prices",
@@ -36,11 +41,6 @@
     {
       "title": "ChatGPT for Teens has special safeguards. A watchdog group finds most don't work",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5995514/chatgpt-openai-teens-mental-health",
-      "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Why mailing a ballot close to Election Day may get it rejected for a late postmark",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5984981/mail-in-ballot-usps-postmark",
       "pubDate": "Fri, 09 Oct 2026 05:00:00 -0400"
     }
   ]
