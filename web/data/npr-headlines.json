@@ -1,8 +1,28 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T08:45:01.666549+00:00",
+  "fetched_at": "2026-10-10T09:15:01.406462+00:00",
   "items": [
+    {
+      "title": "The Met puts a modern artist front and center (and there's some Jackson Pollock, too)",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5920376/lee-krasner-jackson-pollock-met",
+      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
+      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "A year of ceasefire in Gaza through the lens of NPR's reporter",
+      "link": "https://www.npr.org/sections/the-picture-show/2026/10/10/nx-s1-5991619/gaza-ceasefire-israel-life",
+      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "16 cozy activities to add to your fall bucket list",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
+      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "India cracks down on youth protests as anger grows against Modi and election chief",
       "link": "https://www.npr.org/2026/10/10/g-s1-147603/india-cracks-down-on-youth-protests-as-anger-grows-against-modi-and-election-chief",
@@ -22,26 +42,6 @@
       "title": "Trump says U.S. to get diesel from Russia, relaxing pressure on Moscow to ease prices before midterms",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5996912/trump-says-u-s-to-get-diesel-from-russia-relaxing-pressure-on-moscow-to-ease-prices-before-midterms",
       "pubDate": "Fri, 09 Oct 2026 17:24:13 -0400"
-    },
-    {
-      "title": "The U.S. last held a public execution in the 1930s. The Pentagon wants to change that",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5996529/firing-squad-livestream-execution-fort-hood-shooter",
-      "pubDate": "Fri, 09 Oct 2026 14:55:38 -0400"
-    },
-    {
-      "title": "U.S. working to reverse an Egyptian man's third-country deportation to Africa",
-      "link": "https://www.npr.org/2026/10/09/g-s1-147476/trump-third-country-deportation-africa-reverse",
-      "pubDate": "Fri, 09 Oct 2026 13:49:28 -0400"
-    },
-    {
-      "title": "Did Russia play by the rules in reporting lab worker's death?",
-      "link": "https://www.npr.org/2026/10/09/g-s1-147295/russia-lab-death-pneumonia-plague",
-      "pubDate": "Fri, 09 Oct 2026 12:43:45 -0400"
-    },
-    {
-      "title": "How the oil industry is preparing for Hurricane Isaias",
-      "link": "https://www.npr.org/2026/10/09/nx-s1-5995417/hurricane-isaias-oil-refineries-diesel-gasoline-prices",
-      "pubDate": "Fri, 09 Oct 2026 12:03:32 -0400"
     }
   ]
 }
