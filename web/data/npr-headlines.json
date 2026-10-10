@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T21:30:02.392990+00:00",
+  "fetched_at": "2026-10-10T21:45:01.991620+00:00",
   "items": [
+    {
+      "title": "Trump weighs joining the fight against Houthis after Riyadh airport attack",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5997512/saudi-arabia-riyadh-airport-bombing-attack",
+      "pubDate": "Sat, 10 Oct 2026 17:32:53 -0400"
+    },
     {
       "title": "The Kennedy Center names new artistic director, amid concerns",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5996934/kennedy-center-rick-canny-new-artistic-director",
@@ -36,11 +41,6 @@
     {
       "title": "The Met puts a modern artist front and center (and there's some Jackson Pollock, too)",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5920376/lee-krasner-jackson-pollock-met",
-      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "Photos: What a year of ceasefire in Gaza looks like",
-      "link": "https://www.npr.org/sections/the-picture-show/2026/10/10/nx-s1-5991619/gaza-ceasefire-israel-life",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     }
   ]
