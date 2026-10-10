@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T22:00:01.763860+00:00",
+  "fetched_at": "2026-10-10T22:30:02.143658+00:00",
   "items": [
+    {
+      "title": "Christa Pike discharged from the hospital and back in prison",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5997504/christa-pike-hospital-prison-after-botched-execution",
+      "pubDate": "Sat, 10 Oct 2026 18:15:04 -0400"
+    },
     {
       "title": "Bayeux Tapestry's London tour spurs enthusiasts to Battle of Hastings reenactment",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5993847/bayeux-tapestrys-london-tour-spurs-enthusiasts-to-battle-of-hastings-re-enactment",
@@ -36,11 +41,6 @@
     {
       "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
-      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "16 cozy activities to add to your fall bucket list",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     }
   ]
