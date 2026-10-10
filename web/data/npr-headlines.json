@@ -1,17 +1,12 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T11:45:01.630505+00:00",
+  "fetched_at": "2026-10-10T12:00:02.398792+00:00",
   "items": [
     {
       "title": "Ongoing lawsuits allege GLP-1s can cause serious harm. But we don't know how often",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5996652/glp1-fda-naion-blind-lawsuit-ozempic",
       "pubDate": "Sat, 10 Oct 2026 07:00:00 -0400"
-    },
-    {
-      "title": "16 cozy activities to add to your fall bucket list",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
-      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "A year of ceasefire in Gaza through the lens of NPR's reporter",
@@ -21,6 +16,11 @@
     {
       "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
+      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "16 cozy activities to add to your fall bucket list",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     },
     {
