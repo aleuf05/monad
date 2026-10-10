@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T18:15:01.786362+00:00",
+  "fetched_at": "2026-10-10T18:30:01.538476+00:00",
   "items": [
+    {
+      "title": "The Kennedy Center names new artistic director, amid concerns",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5996934/kennedy-center-rick-canny-new-artistic-director",
+      "pubDate": "Sat, 10 Oct 2026 14:17:12 -0400"
+    },
     {
       "title": "At least 2 deaths attributed to Isaias after hurricane bashes Florida and Alabama",
       "link": "https://www.npr.org/2026/10/10/g-s1-147632/at-least-2-deaths-attributed-to-isaias-after-hurricane-bashes-florida-and-alabama",
@@ -19,13 +24,13 @@
       "pubDate": "Sat, 10 Oct 2026 07:00:00 -0400"
     },
     {
-      "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
+      "title": "16 cozy activities to add to your fall bucket list",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "16 cozy activities to add to your fall bucket list",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5993688/16-cozy-activities-to-add-to-your-fall-bucket-list",
+      "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
+      "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "Photos: What a year of ceasefire in Gaza looks like",
       "link": "https://www.npr.org/sections/the-picture-show/2026/10/10/nx-s1-5991619/gaza-ceasefire-israel-life",
       "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "India cracks down on youth protests as anger grows against Modi and election chief",
-      "link": "https://www.npr.org/2026/10/10/g-s1-147603/india-cracks-down-on-youth-protests-as-anger-grows-against-modi-and-election-chief",
-      "pubDate": "Sat, 10 Oct 2026 04:31:28 -0400"
     }
   ]
 }
