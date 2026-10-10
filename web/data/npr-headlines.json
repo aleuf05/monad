@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-09T22:30:02.075742+00:00",
+  "fetched_at": "2026-10-10T08:45:01.666549+00:00",
   "items": [
+    {
+      "title": "India cracks down on youth protests as anger grows against Modi and election chief",
+      "link": "https://www.npr.org/2026/10/10/g-s1-147603/india-cracks-down-on-youth-protests-as-anger-grows-against-modi-and-election-chief",
+      "pubDate": "Sat, 10 Oct 2026 04:31:28 -0400"
+    },
     {
       "title": "Kalshi taps former FBI agent to fight against money laundering",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5996683/kalshi-fbi-sean-fern-money-laundering",
@@ -37,11 +42,6 @@
       "title": "How the oil industry is preparing for Hurricane Isaias",
       "link": "https://www.npr.org/2026/10/09/nx-s1-5995417/hurricane-isaias-oil-refineries-diesel-gasoline-prices",
       "pubDate": "Fri, 09 Oct 2026 12:03:32 -0400"
-    },
-    {
-      "title": "Trump says U.S. won't attack Iran before midterms. And, ICE agent shoots man in NYC",
-      "link": "https://www.npr.org/2026/10/09/g-s1-147455/up-first-newsletter-hurricane-isaias-ukraine-russia-trump-iran-ice-shooting",
-      "pubDate": "Fri, 09 Oct 2026 07:37:04 -0400"
     }
   ]
 }
