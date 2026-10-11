@@ -1,17 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-11T11:00:02.244271+00:00",
+  "fetched_at": "2026-10-11T11:45:01.472483+00:00",
   "items": [
+    {
+      "title": "A heroic, 7-day bike ride made this teen a global star. Where is she now?",
+      "link": "https://www.npr.org/2026/10/11/g-s1-147267/bicycle-teenager-india-pandemic",
+      "pubDate": "Sun, 11 Oct 2026 07:28:15 -0400"
+    },
     {
       "title": "Sweating the details: Sauna's potential health benefits draw scientists' interest",
       "link": "https://www.npr.org/2026/10/11/nx-s1-5996655/heat-therapy-sauna-thermoregulation-health-benefits",
       "pubDate": "Sun, 11 Oct 2026 06:00:00 -0400"
-    },
-    {
-      "title": "It's taking longer to find a new job after losing one",
-      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
-      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "In one of the country's most competitive districts, a Democrat tries to keep her seat",
@@ -21,6 +21,11 @@
     {
       "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
       "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "It's taking longer to find a new job after losing one",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
@@ -37,11 +42,6 @@
       "title": "Bayeux Tapestry's London tour spurs enthusiasts to Battle of Hastings reenactment",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5993847/bayeux-tapestrys-london-tour-spurs-enthusiasts-to-battle-of-hastings-re-enactment",
       "pubDate": "Sat, 10 Oct 2026 17:40:58 -0400"
-    },
-    {
-      "title": "Trump weighs joining the fight against Houthis after Riyadh airport attack",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5997512/saudi-arabia-riyadh-airport-bombing-attack",
-      "pubDate": "Sat, 10 Oct 2026 17:32:53 -0400"
     }
   ]
 }
