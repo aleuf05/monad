@@ -1,8 +1,13 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-10T22:30:02.143658+00:00",
+  "fetched_at": "2026-10-11T00:00:02.705577+00:00",
   "items": [
+    {
+      "title": "Attack on Riyadh airport killed 12 people and wounded over 300 more, Saudi authorities say",
+      "link": "https://www.npr.org/2026/10/10/g-s1-147682/attack-on-riyadh-airport-killed-12-people-and-wounded-over-300-more-saudi-authorities-say",
+      "pubDate": "Sat, 10 Oct 2026 19:44:15 -0400"
+    },
     {
       "title": "Christa Pike discharged from the hospital and back in prison",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5997504/christa-pike-hospital-prison-after-botched-execution",
@@ -37,11 +42,6 @@
       "title": "Ongoing lawsuits allege GLP-1s can cause serious harm. But we don't know how often",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5996652/glp1-fda-naion-blind-lawsuit-ozempic",
       "pubDate": "Sat, 10 Oct 2026 07:00:00 -0400"
-    },
-    {
-      "title": "After losing ground with Latino voters, Democrats are turning to influencers for help",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5991897/democrats-latino-voters-influencers-bold-pac",
-      "pubDate": "Sat, 10 Oct 2026 05:00:00 -0400"
     }
   ]
 }
