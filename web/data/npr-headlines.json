@@ -1,8 +1,18 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-11T12:00:02.158459+00:00",
+  "fetched_at": "2026-10-11T12:15:01.948011+00:00",
   "items": [
+    {
+      "title": "Hurricane Simon nears Mexico with 155 mph winds and flooding fears",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5998022/hurricane-simon-nears-mexico-155-mph-winds-flooding-fears",
+      "pubDate": "Sun, 11 Oct 2026 08:10:54 -0400"
+    },
+    {
+      "title": "Don't be scared: Being afraid is outright fun, and maybe useful",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5973128/dont-be-scared-being-afraid-is-outright-fun-and-maybe-useful",
+      "pubDate": "Sun, 11 Oct 2026 08:00:00 -0400"
+    },
     {
       "title": "A heroic, 7-day bike ride made this teen a global star. Where is she now?",
       "link": "https://www.npr.org/2026/10/11/g-s1-147267/bicycle-teenager-india-pandemic",
@@ -14,8 +24,8 @@
       "pubDate": "Sun, 11 Oct 2026 06:00:00 -0400"
     },
     {
-      "title": "It's taking longer to find a new job after losing one",
-      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
+      "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
+      "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
@@ -24,24 +34,14 @@
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
-      "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
-      "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
+      "title": "It's taking longer to find a new job after losing one",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "Attack on Riyadh airport killed 12 people and wounded over 300 more, Saudi authorities say",
       "link": "https://www.npr.org/2026/10/10/g-s1-147682/attack-on-riyadh-airport-killed-12-people-and-wounded-over-300-more-saudi-authorities-say",
       "pubDate": "Sat, 10 Oct 2026 19:44:15 -0400"
-    },
-    {
-      "title": "Christa Pike discharged from the hospital and back in prison",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5997504/christa-pike-hospital-prison-after-botched-execution",
-      "pubDate": "Sat, 10 Oct 2026 18:15:04 -0400"
-    },
-    {
-      "title": "Bayeux Tapestry's London tour spurs enthusiasts to Battle of Hastings reenactment",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5993847/bayeux-tapestrys-london-tour-spurs-enthusiasts-to-battle-of-hastings-re-enactment",
-      "pubDate": "Sat, 10 Oct 2026 17:40:58 -0400"
     }
   ]
 }
