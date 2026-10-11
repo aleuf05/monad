@@ -1,7 +1,7 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-11T11:45:01.472483+00:00",
+  "fetched_at": "2026-10-11T12:00:02.158459+00:00",
   "items": [
     {
       "title": "A heroic, 7-day bike ride made this teen a global star. Where is she now?",
@@ -14,6 +14,11 @@
       "pubDate": "Sun, 11 Oct 2026 06:00:00 -0400"
     },
     {
+      "title": "It's taking longer to find a new job after losing one",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
+    },
+    {
       "title": "In one of the country's most competitive districts, a Democrat tries to keep her seat",
       "link": "https://www.npr.org/2026/10/11/nx-s1-5968691/midterm-elections-washington-congressional-district",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
@@ -21,11 +26,6 @@
     {
       "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
       "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
-      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "It's taking longer to find a new job after losing one",
-      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
