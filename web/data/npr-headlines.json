@@ -1,12 +1,17 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-11T10:15:02.091821+00:00",
+  "fetched_at": "2026-10-11T11:00:02.244271+00:00",
   "items": [
     {
       "title": "Sweating the details: Sauna's potential health benefits draw scientists' interest",
       "link": "https://www.npr.org/2026/10/11/nx-s1-5996655/heat-therapy-sauna-thermoregulation-health-benefits",
       "pubDate": "Sun, 11 Oct 2026 06:00:00 -0400"
+    },
+    {
+      "title": "It's taking longer to find a new job after losing one",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
       "title": "In one of the country's most competitive districts, a Democrat tries to keep her seat",
@@ -16,11 +21,6 @@
     {
       "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
       "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
-      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
-    },
-    {
-      "title": "It's taking longer to find a new job after losing one",
-      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
       "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
     },
     {
