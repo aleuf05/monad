@@ -1,8 +1,23 @@
 {
   "source": "NPR News Headlines",
   "source_url": "https://www.npr.org/sections/news/",
-  "fetched_at": "2026-10-11T00:00:02.705577+00:00",
+  "fetched_at": "2026-10-11T09:15:02.316949+00:00",
   "items": [
+    {
+      "title": "In one of the country's most competitive districts, a Democrat tries to keep her seat",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5968691/midterm-elections-washington-congressional-district",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "Reshaped civil rights mission at Justice Department transforms its work, workforce",
+      "link": "https://www.npr.org/2026/10/11/g-s1-145063/justice-department-civil-rights-transformed",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
+    },
+    {
+      "title": "It's taking longer to find a new job after losing one",
+      "link": "https://www.npr.org/2026/10/11/nx-s1-5995238/jobs-employment-economy-unemployment-benefits",
+      "pubDate": "Sun, 11 Oct 2026 05:00:00 -0400"
+    },
     {
       "title": "Attack on Riyadh airport killed 12 people and wounded over 300 more, Saudi authorities say",
       "link": "https://www.npr.org/2026/10/10/g-s1-147682/attack-on-riyadh-airport-killed-12-people-and-wounded-over-300-more-saudi-authorities-say",
@@ -27,21 +42,6 @@
       "title": "The Kennedy Center names new artistic director, amid concerns",
       "link": "https://www.npr.org/2026/10/10/nx-s1-5996934/kennedy-center-rick-canny-new-artistic-director",
       "pubDate": "Sat, 10 Oct 2026 14:17:12 -0400"
-    },
-    {
-      "title": "At least 2 deaths attributed to Isaias after hurricane bashes Florida and Alabama",
-      "link": "https://www.npr.org/2026/10/10/g-s1-147632/at-least-2-deaths-attributed-to-isaias-after-hurricane-bashes-florida-and-alabama",
-      "pubDate": "Sat, 10 Oct 2026 13:14:03 -0400"
-    },
-    {
-      "title": "Opinion: Can I keep the baseball I caught?",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5982500/opinion-can-i-keep-the-baseball-i-caught",
-      "pubDate": "Sat, 10 Oct 2026 08:00:00 -0400"
-    },
-    {
-      "title": "Ongoing lawsuits allege GLP-1s can cause serious harm. But we don't know how often",
-      "link": "https://www.npr.org/2026/10/10/nx-s1-5996652/glp1-fda-naion-blind-lawsuit-ozempic",
-      "pubDate": "Sat, 10 Oct 2026 07:00:00 -0400"
     }
   ]
 }
